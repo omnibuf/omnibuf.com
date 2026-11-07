@@ -1,0 +1,37 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  web:
+    name: Web (Format, Lint, Typecheck & Build)
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Install tools via mise
+        uses: jdx/mise-action@v5
+        with:
+          install: true
+
+      - name: Install frontend dependencies
+        run: just install
+
+      - name: Check frontend formatting (Prettier)
+        run: just fmt-check
+
+      - name: Lint and typecheck frontend (ESLint + Astro Check)
+        run: just lint
+
+      - name: Build production site (omnibuf.com)
+        run: just build
