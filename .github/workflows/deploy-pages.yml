@@ -37,8 +37,11 @@ jobs:
         run: just build
 
       - name: Deploy to Cloudflare Pages (omnibuf.com)
-        if: ${{ env.CLOUDFLARE_API_TOKEN != '' && env.CLOUDFLARE_ACCOUNT_ID != '' }}
         run: |
+          if [[ -z "${CLOUDFLARE_API_TOKEN:-}" || -z "${CLOUDFLARE_ACCOUNT_ID:-}" ]]; then
+            echo "::error::Missing CLOUDFLARE_API_TOKEN or CLOUDFLARE_ACCOUNT_ID repository secrets."
+            exit 1
+          fi
           pnpm exec wrangler pages project list | grep -q "omnibuf" || pnpm exec wrangler pages project create omnibuf --production-branch=main
           pnpm exec wrangler pages deploy ./dist --project-name=omnibuf --branch=main
         env:
