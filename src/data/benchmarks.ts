@@ -1,3 +1,5 @@
+import type { LanguageKey } from './languages';
+
 export interface FormatStat {
   label: string;
   score: number;
@@ -14,6 +16,9 @@ export interface FormatProfile {
 export interface BenchmarkRow {
   name: string;
   val: number;
+  ops?: string;
+  ratio?: string;
+  sizeBytes?: number;
   highlight?: boolean;
   baseline?: boolean;
 }
@@ -26,22 +31,24 @@ export interface BenchmarkCategory {
   rows: BenchmarkRow[];
 }
 
-export interface EsBenchmarkRow {
-  name: string;
-  val: number;
-  ops: string;
-  ratio: string;
-  sizeBytes?: number;
-  highlight?: boolean;
-  baseline?: boolean;
-}
+export type EsBenchmarkRow = BenchmarkRow;
+export type EsBenchmarkCategory = BenchmarkCategory;
 
-export interface EsBenchmarkCategory {
-  title: string;
-  unit: string;
-  maxVal: number;
-  methodology: string;
-  rows: EsBenchmarkRow[];
+export interface LanguageBenchmarkSuite {
+  key: LanguageKey;
+  label: string;
+  shortLabel: string;
+  headingPrefix: string;
+  subtitleHtml: string;
+  href: string;
+  ctaLabel: string;
+  competitorsLabel: string;
+  heroSummaryHtml: string;
+  categories: BenchmarkCategory[];
+  butterflyEncodeRows: BenchmarkRow[];
+  butterflyDecodeRows: BenchmarkRow[];
+  hardwareLines: string[];
+  environmentParagraphs: string[];
 }
 
 export const formatProfiles: Record<string, FormatProfile> = {
@@ -168,7 +175,7 @@ export const opponentKeys = [
   'json',
 ] as const;
 
-// Raw output and commands: testdata/benchmarks.txt.
+// Raw output and commands: testdata/benchmarks.txt and testdata/benchmarks.json.
 export const benchmarkCategories: BenchmarkCategory[] = [
   {
     title: 'Full Message Encode Speed',
@@ -450,4 +457,73 @@ export const esBenchmarkCategories: EsBenchmarkCategory[] = [
       },
     ],
   },
+];
+
+const goSpeedCategories = benchmarkCategories.filter((cat) => cat.unit !== 'B');
+const goEncodeCat = benchmarkCategories.find((cat) => cat.title === 'Full Message Encode Speed');
+const goDecodeCat = benchmarkCategories.find((cat) => cat.title === 'Full Message Decode Speed');
+const esEncodeCat = esBenchmarkCategories.find((cat) => cat.title === 'Full Message Encode Speed');
+const esDecodeCat = esBenchmarkCategories.find((cat) => cat.title === 'Full Message Decode Speed');
+
+export const languageBenchmarks: Record<LanguageKey, LanguageBenchmarkSuite> = {
+  go: {
+    key: 'go',
+    label: 'Go',
+    shortLabel: 'Go',
+    headingPrefix: 'Go',
+    subtitleHtml:
+      '11-field <code>PeerUpdate</code> struct on Apple M1 Pro (Go 1.27.1). <strong>Shorter bars = Faster.</strong>',
+    href: '/go#benchmarks',
+    ctaLabel: 'See full results',
+    competitorsLabel: "Protobuf, FlatBuffers, Avro, Cap'n Proto, MsgPack, JSON",
+    heroSummaryHtml:
+      'In our Go benchmarks, OmniBuf runs <strong>about 6x faster on encode (126 ns) and 5.5x to 7x faster on decode (144 to 251 ns)</strong> than standard Go Protobuf on an 11-field message. Against <code>encoding/json</code> on plain Go structs, it is <strong>over 10x faster</strong> and cuts packet size in half. Read <a href="/how-it-works" class="doc-link">how the wire format works</a> or check the <a href="/spec" class="doc-link">wire specification</a>.',
+    categories: goSpeedCategories,
+    butterflyEncodeRows: (goEncodeCat?.rows ?? []).filter(
+      (r) => (r.baseline || !r.highlight) && r.name !== 'JSON (encoding/json/v2)',
+    ),
+    butterflyDecodeRows: (goDecodeCat?.rows ?? []).filter(
+      (r) => (r.baseline || !r.highlight) && r.name !== 'JSON (encoding/json/v2)',
+    ),
+    hardwareLines: [
+      'CPU: Apple M1 Pro (darwin/arm64)',
+      'Compiler: Go 1.27.1',
+      'Samples: 8 × 200 ms, CPU=1',
+      'Updated: 2026-10-28',
+    ],
+    environmentParagraphs: [
+      'M1 Pro MacBook Pro, Go 1.27.1 (<code>GOEXPERIMENT=jsonv2</code>), <code>-benchtime=200ms -count=8 -cpu=1</code> (median of 8 runs). Every benchmark encodes and decodes the 11-field <code>PeerUpdate</code> struct: integers, booleans, strings, one <code>Location</code> struct, and 4 <code>Neighbor</code> structs.',
+      'Benchmark source lives in <a href="https://github.com/omnibuf/omnibuf-go/blob/main/omnibuf_bench_test.go" target="_blank" rel="noopener noreferrer" class="doc-link font-mono">omnibuf_bench_test.go</a>, <a href="https://github.com/omnibuf/omnibuf-go/blob/main/opaque_table_bench_test.go" target="_blank" rel="noopener noreferrer" class="doc-link font-mono">opaque_table_bench_test.go</a>, <a href="https://github.com/omnibuf/omnibuf-go/blob/main/jsonv2_bench_test.go" target="_blank" rel="noopener noreferrer" class="doc-link font-mono">jsonv2_bench_test.go</a>, and <a href="https://github.com/omnibuf/omnibuf-go/blob/main/peer_codecs_test.go" target="_blank" rel="noopener noreferrer" class="doc-link font-mono">peer_codecs_test.go</a>, with recorded output in <a href="https://github.com/omnibuf/omnibuf-go/blob/main/testdata/benchmarks.txt" target="_blank" rel="noopener noreferrer" class="doc-link font-mono">testdata/benchmarks.txt</a> and <a href="https://github.com/omnibuf/omnibuf-go/blob/main/testdata/benchmarks.json" target="_blank" rel="noopener noreferrer" class="doc-link font-mono">testdata/benchmarks.json</a>.',
+    ],
+  },
+  es: {
+    key: 'es',
+    label: 'TypeScript & JS',
+    shortLabel: 'TS / JS',
+    headingPrefix: 'TypeScript & JS',
+    subtitleHtml:
+      '11-field <code>PeerUpdate</code> numbers on Node.js v24 (Apple M1 Pro) across <code>@omnibuf/core</code>, <code>protobufjs</code>, <code>@bufbuild/protobuf</code>, <code>google-protobuf</code>, <code>@msgpack/msgpack</code>, and <code>JSON</code>. <strong>Shorter bars = Faster.</strong>',
+    href: '/es#benchmarks',
+    ctaLabel: 'See full results',
+    competitorsLabel: 'protobufjs, protobuf-es, google-protobuf, MsgPack, JSON',
+    heroSummaryHtml:
+      'In TypeScript and JavaScript on Node.js v24, <code>@omnibuf/core</code> encodes <strong>2.3x faster</strong> and decodes <strong>3.5x faster</strong> than <code>@bufbuild/protobuf</code> (<code>protobuf-es</code>), and splices a single field in place <strong>12.6x faster</strong>. Against native <code>JSON.stringify</code> and <code>JSON.parse</code>, it runs <strong>2x faster</strong> at less than half the byte size. Read <a href="/how-it-works" class="doc-link">how the wire format works</a> or check the <a href="/spec" class="doc-link">wire specification</a>.',
+    categories: esBenchmarkCategories,
+    butterflyEncodeRows: esEncodeCat?.rows ?? [],
+    butterflyDecodeRows: esDecodeCat?.rows ?? [],
+    hardwareLines: [
+      'CPU: Apple M1 Pro (darwin/arm64)',
+      'Runtime: Node.js v24.22.1 (V8)',
+      'Command: pnpm run bench',
+    ],
+    environmentParagraphs: [
+      'I ran these benchmarks on an Apple M1 Pro Mac using Node.js v24.22.1. Each test uses the same 11-field <code>PeerUpdate</code> message as the Go benchmark suite (numbers, booleans, strings, a nested <code>Location</code> message, and 4 <code>Neighbor</code> messages).',
+      'Benchmark source is in <a href="https://github.com/omnibuf/omnibuf-es/blob/main/benchmarks/bench.ts" target="_blank" rel="noopener noreferrer" class="doc-link font-mono">benchmarks/bench.ts</a> in the <code>omnibuf-es</code> repository (<code>pnpm run bench</code>), with recorded output in <a href="https://github.com/omnibuf/omnibuf-es/blob/main/testdata/benchmarks.json" target="_blank" rel="noopener noreferrer" class="doc-link font-mono">testdata/benchmarks.json</a>.',
+    ],
+  },
+};
+
+export const languageBenchmarkList: LanguageBenchmarkSuite[] = [
+  languageBenchmarks.go,
+  languageBenchmarks.es,
 ];

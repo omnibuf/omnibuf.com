@@ -4,6 +4,7 @@ import Navbar from '../components/Navbar.astro';
 import HowItWorks from '../components/HowItWorks.astro';
 import Capabilities from '../components/Capabilities.astro';
 import Comparisons from '../components/Comparisons.astro';
+import LanguageStrip from '../components/LanguageStrip.astro';
 import Footer from '../components/Footer.astro';
 
 interface WireTypeRow {
@@ -256,28 +257,7 @@ const wireTypeRows: WireTypeRow[] = [
     <HowItWorks />
     <Capabilities />
     <Comparisons />
-
-    <section class="py-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto border-t-2 border-ink no-print">
-      <div class="flex flex-wrap items-center justify-between gap-4">
-        <div class="font-mono text-sm sm:text-base font-bold uppercase text-ink/80">
-          More about OmniBuf
-        </div>
-        <div class="flex flex-wrap gap-3 font-mono text-sm sm:text-base">
-          <a href="/spec" class="os-btn px-5 py-2.5 bg-acid text-ink font-bold rounded-md">
-            Wire Specification &rarr;
-          </a>
-          <a href="/go" class="os-btn px-5 py-2.5 bg-[#FAF8F2] text-ink font-bold rounded-md">
-            OmniBuf for Go &rarr;
-          </a>
-          <a href="/es" class="os-btn px-5 py-2.5 bg-[#FAF8F2] text-ink font-bold rounded-md">
-            TypeScript / JS &rarr;
-          </a>
-          <a href="/cli" class="os-btn px-5 py-2.5 bg-[#FAF8F2] text-ink font-bold rounded-md">
-            OmniBuf CLI &rarr;
-          </a>
-        </div>
-      </div>
-    </section>
+    <LanguageStrip currentPage="how-it-works" />
   </main>
 
   <Footer />

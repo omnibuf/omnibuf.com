@@ -1013,9 +1013,27 @@ WireSubMsg (12): [ByteLen: Prefix-Varint][Message field stream]</code></pre>
         </p>
         <h3 id="sec-11-2">11.2 Conformance Runner &amp; Client Protocol</h3>
         <p>
-          Cross-language conformance uses a standalone test runner (<code>omnibuf conformance</code>{' '}
-          / <code>conformance-runner</code>) paired with a per-language client binary (
-          <code>conformance-go</code>, <code>conformance-es</code>). This split follows Protobuf's{' '}
+          Cross-language conformance uses the standalone test runner (
+          <code>conformance-runner</code> in{' '}
+          <a
+            href="https://github.com/omnibuf/omnibuf-go"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="doc-link"
+          >
+            <code>omnibuf-go</code>
+          </a>
+          , documented in{' '}
+          <a
+            href="https://github.com/omnibuf/omnibuf-go/blob/main/CONFORMANCE.md"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="doc-link"
+          >
+            <code>CONFORMANCE.md</code>
+          </a>
+          ) paired with a per-language client binary (<code>conformance-go</code>,{' '}
+          <code>conformance-es</code>). This split follows Protobuf's{' '}
           <code>conformance-test-runner</code> and <code>protovalidate-conformance</code>.
         </p>
         <p>

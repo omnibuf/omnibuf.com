@@ -1,4 +1,5 @@
 ---
+import { cliNavPage, languages, primaryNavPages, specNavPage } from '../data/languages';
 ---
 
 <footer class="border-t-2 border-ink bg-[#FAF8F2] py-10 px-4 sm:px-6 font-mono text-sm sm:text-base select-none">
@@ -7,15 +8,31 @@
       <strong>OmniBuf</strong> &bull; Fast, Self-Describing Binary Wire Format for{' '}
       <code>.proto</code> &amp; Native Structs
     </div>
-    <!-- prettier-ignore -->
     <div class="flex flex-wrap items-center gap-5">
-      <a href="/" class="doc-link">Overview</a>
-      <a href="/how-it-works" class="doc-link">How It Works</a>
-      <a href="/spec" class="doc-link">Specification</a>
-      <a href="/go" class="doc-link">Go</a>
-      <a href="/es" class="doc-link">TypeScript / JS</a>
-      <a href="/cli" class="doc-link">CLI</a>
-      <a href="https://github.com/omnibuf" target="_blank" rel="noopener noreferrer" class="doc-link">GitHub</a>
+      {primaryNavPages.map((p) => (
+        <a href={p.href} class="doc-link">
+          {p.label}
+        </a>
+      ))}
+      <a href={specNavPage.href} class="doc-link">
+        {specNavPage.label}
+      </a>
+      {languages.map((lang) => (
+        <a href={lang.href} class="doc-link">
+          {lang.label}
+        </a>
+      ))}
+      <a href={cliNavPage.href} class="doc-link">
+        {cliNavPage.label}
+      </a>
+      <a
+        href="https://github.com/omnibuf"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="doc-link"
+      >
+        GitHub
+      </a>
     </div>
   </div>
 </footer>

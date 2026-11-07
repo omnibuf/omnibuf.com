@@ -1,29 +1,29 @@
 ---
+import {
+  cliNavPage,
+  getGitHubUrlForPage,
+  languages,
+  primaryNavPages,
+  specNavPage,
+  totalSitePages,
+  type PageKey,
+} from '../data/languages';
+
 interface Props {
-  currentPage?: 'home' | 'how-it-works' | 'spec' | 'go' | 'es' | 'cli' | 'none';
+  currentPage?: PageKey;
 }
 
 const { currentPage = 'home' } = Astro.props;
 
-const primaryPages = [
-  { href: '/', key: 'home', label: 'Overview' },
-  { href: '/how-it-works', key: 'how-it-works', label: 'How It Works' },
-] as const;
-
-const cliPage = { href: '/cli', key: 'cli', label: 'CLI' } as const;
-const specPage = { href: '/spec', key: 'spec', label: 'Specification' } as const;
-
-const languages = [
-  { href: '/go', key: 'go', label: 'Go' },
-  { href: '/es', key: 'es', label: 'TypeScript / JS' },
-] as const;
-
 const activeLang = languages.find((l) => l.key === currentPage);
 const activePageLabel =
-  primaryPages.find((p) => p.key === currentPage)?.label ??
-  (currentPage === cliPage.key ? cliPage.label : undefined) ??
-  (currentPage === specPage.key ? specPage.label : undefined) ??
-  (activeLang ? `Languages: ${activeLang.label}` : 'Menu');
+  primaryNavPages.find((p) => p.key === currentPage)?.label ??
+  (currentPage === cliNavPage.key ? cliNavPage.label : undefined) ??
+  (currentPage === specNavPage.key ? specNavPage.label : undefined) ??
+  (activeLang ? `Languages: ${activeLang.shortLabel}` : 'Menu');
+
+const githubUrl = getGitHubUrlForPage(currentPage);
+const isMultiColDropdown = languages.length >= 5;
 ---
 
 <header class="sticky top-0 z-50 bg-[#FAF8F2] border-b-2 border-ink no-print select-none">
@@ -42,7 +42,7 @@ const activePageLabel =
         aria-label="Page navigation"
         class="hidden lg:flex items-center gap-2 font-medium min-w-0 py-1.5 px-0.5"
       >
-        {primaryPages.map((p) => (
+        {primaryNavPages.map((p) => (
           <a
             href={p.href}
             class="nav-link"
@@ -59,25 +59,41 @@ const activePageLabel =
             data-active={activeLang ? 'true' : 'false'}
             class="nav-link list-none cursor-pointer flex items-center gap-1.5 select-none"
           >
-            <span>{activeLang ? `Languages: ${activeLang.label}` : 'Languages'}</span>
+            <span>{activeLang ? `Languages: ${activeLang.shortLabel}` : 'Languages'}</span>
             <span class="text-[10px] transition-transform group-open:rotate-180" aria-hidden="true">
               &#9662;
             </span>
           </summary>
 
-          <div class="absolute left-0 mt-2 w-44 bg-[#FAF8F2] border-2 border-ink rounded-md shadow-[4px_4px_0px_#111111] py-1.5 z-50 divide-y divide-ink/15">
+          <div
+            class:list={[
+              'absolute left-0 mt-2 bg-[#FAF8F2] border-2 border-ink rounded-md shadow-[4px_4px_0px_#111111] py-1.5 z-50',
+              isMultiColDropdown
+                ? 'w-[26rem] grid grid-cols-2 gap-px bg-ink/15'
+                : 'w-64 divide-y divide-ink/15',
+            ]}
+          >
             {languages.map((lang) => {
               const isActive = currentPage === lang.key;
               return (
                 <a
                   href={lang.href}
                   aria-current={isActive ? 'page' : undefined}
-                  class={`flex items-center justify-between px-3.5 py-2 text-sm font-bold transition-colors ${
-                    isActive ? 'bg-acid text-ink' : 'text-ink hover:bg-[#E5E0D5]'
+                  class={`flex items-center justify-between gap-3 px-3.5 py-2 text-sm font-bold transition-colors ${
+                    isActive ? 'bg-acid text-ink' : 'bg-[#FAF8F2] text-ink hover:bg-[#E5E0D5]'
                   }`}
                 >
-                  <span>{lang.label}</span>
-                  {isActive && <span class="text-xs">&bull;</span>}
+                  <div class="min-w-0">
+                    <div class="truncate">{lang.label}</div>
+                    <div
+                      class={`text-[11px] font-normal truncate ${
+                        isActive ? 'text-ink/80' : 'text-ink/60'
+                      }`}
+                    >
+                      {lang.shortPackage}
+                    </div>
+                  </div>
+                  {isActive && <span class="text-xs shrink-0">&bull;</span>}
                 </a>
               );
             })}
@@ -85,21 +101,21 @@ const activePageLabel =
         </details>
 
         <a
-          href={cliPage.href}
+          href={cliNavPage.href}
           class="nav-link"
-          data-active={currentPage === cliPage.key ? 'true' : 'false'}
-          aria-current={currentPage === cliPage.key ? 'page' : undefined}
+          data-active={currentPage === cliNavPage.key ? 'true' : 'false'}
+          aria-current={currentPage === cliNavPage.key ? 'page' : undefined}
         >
-          {cliPage.label}
+          {cliNavPage.label}
         </a>
 
         <a
-          href={specPage.href}
+          href={specNavPage.href}
           class="nav-link"
-          data-active={currentPage === specPage.key ? 'true' : 'false'}
-          aria-current={currentPage === specPage.key ? 'page' : undefined}
+          data-active={currentPage === specNavPage.key ? 'true' : 'false'}
+          aria-current={currentPage === specNavPage.key ? 'page' : undefined}
         >
-          {specPage.label}
+          {specNavPage.label}
         </a>
       </nav>
 
@@ -127,9 +143,9 @@ const activePageLabel =
 
         <nav
           aria-label="Mobile page navigation"
-          class="absolute left-0 mt-2 w-52 bg-[#FAF8F2] border-2 border-ink rounded-md shadow-[4px_4px_0px_#111111] py-1.5 z-50 divide-y divide-ink/15"
+          class="absolute left-0 mt-2 w-64 bg-[#FAF8F2] border-2 border-ink rounded-md shadow-[4px_4px_0px_#111111] py-1.5 z-50 divide-y divide-ink/15"
         >
-          {primaryPages.map((p) => {
+          {primaryNavPages.map((p) => {
             const isActive = currentPage === p.key;
             return (
               <a
@@ -147,40 +163,42 @@ const activePageLabel =
           <div class="px-3.5 pt-2 pb-1 text-[11px] font-bold uppercase text-ink/70 bg-[#E5E0D5]/50">
             Languages
           </div>
-          {languages.map((lang) => {
-            const isActive = currentPage === lang.key;
-            return (
-              <a
-                href={lang.href}
-                aria-current={isActive ? 'page' : undefined}
-                class={`flex items-center justify-between px-3.5 py-2.5 text-sm font-bold transition-colors ${
-                  isActive ? 'bg-acid text-ink' : 'text-ink hover:bg-[#E5E0D5]'
-                }`}
-              >
-                <span>{lang.label}</span>
-                {isActive && <span class="text-xs">&bull;</span>}
-              </a>
-            );
-          })}
+          <div class="grid grid-cols-2 divide-x divide-ink/15">
+            {languages.map((lang) => {
+              const isActive = currentPage === lang.key;
+              return (
+                <a
+                  href={lang.href}
+                  aria-current={isActive ? 'page' : undefined}
+                  class={`flex items-center justify-between px-3 py-2 text-xs font-bold transition-colors ${
+                    isActive ? 'bg-acid text-ink' : 'text-ink hover:bg-[#E5E0D5]'
+                  }`}
+                >
+                  <span class="truncate">{lang.shortLabel}</span>
+                  {isActive && <span class="text-xs shrink-0">&bull;</span>}
+                </a>
+              );
+            })}
+          </div>
           <a
-            href={cliPage.href}
-            aria-current={currentPage === cliPage.key ? 'page' : undefined}
+            href={cliNavPage.href}
+            aria-current={currentPage === cliNavPage.key ? 'page' : undefined}
             class={`flex items-center justify-between px-3.5 py-2.5 text-sm font-bold transition-colors ${
-              currentPage === cliPage.key ? 'bg-acid text-ink' : 'text-ink hover:bg-[#E5E0D5]'
+              currentPage === cliNavPage.key ? 'bg-acid text-ink' : 'text-ink hover:bg-[#E5E0D5]'
             }`}
           >
-            <span>{cliPage.label}</span>
-            {currentPage === cliPage.key && <span class="text-xs">&bull;</span>}
+            <span>{cliNavPage.label}</span>
+            {currentPage === cliNavPage.key && <span class="text-xs">&bull;</span>}
           </a>
           <a
-            href={specPage.href}
-            aria-current={currentPage === specPage.key ? 'page' : undefined}
+            href={specNavPage.href}
+            aria-current={currentPage === specNavPage.key ? 'page' : undefined}
             class={`flex items-center justify-between px-3.5 py-2.5 text-sm font-bold transition-colors ${
-              currentPage === specPage.key ? 'bg-acid text-ink' : 'text-ink hover:bg-[#E5E0D5]'
+              currentPage === specNavPage.key ? 'bg-acid text-ink' : 'text-ink hover:bg-[#E5E0D5]'
             }`}
           >
-            <span>{specPage.label}</span>
-            {currentPage === specPage.key && <span class="text-xs">&bull;</span>}
+            <span>{specNavPage.label}</span>
+            {currentPage === specNavPage.key && <span class="text-xs">&bull;</span>}
           </a>
         </nav>
       </details>
@@ -215,7 +233,7 @@ const activePageLabel =
       </button>
 
       <a
-        href="https://github.com/omnibuf/omnibuf-go"
+        href={githubUrl}
         target="_blank"
         rel="noopener noreferrer"
         aria-label="OmniBuf on GitHub"
@@ -331,60 +349,61 @@ const activePageLabel =
     aria-label="Search results"
     class="flex-1 overflow-y-auto p-3 sm:p-4 space-y-1.5"
   >
-    <div id="search-default-links" class="grid sm:grid-cols-2 gap-2">
-      <a
-        href="/how-it-works#wire-types"
-        data-search-item
-        data-active="true"
-        class="block p-2.5 rounded border-2 border-ink/25 hover:border-ink transition"
-      >
-        <div class="text-[10px] font-bold uppercase text-ink/65">How It Works</div>
-        <div class="text-xs sm:text-sm font-bold text-ink mt-0.5">The 16 Wire Types</div>
-      </a>
-      <a
-        href="/spec"
-        data-search-item
-        class="block p-2.5 rounded border-2 border-ink/25 hover:border-ink transition"
-      >
-        <div class="text-[10px] font-bold uppercase text-ink/65">Specification</div>
-        <div class="text-xs sm:text-sm font-bold text-ink mt-0.5">
-          Wire Format Specification v0.1
+    <div id="search-default-links" class="space-y-2.5">
+      <div class="grid sm:grid-cols-3 gap-2">
+        <a
+          href="/how-it-works#wire-types"
+          data-search-item
+          data-active="true"
+          class="block p-2.5 rounded border-2 border-ink/25 hover:border-ink transition"
+        >
+          <div class="text-[10px] font-bold uppercase text-ink/65">How It Works</div>
+          <div class="text-xs sm:text-sm font-bold text-ink mt-0.5">The 16 Wire Types</div>
+        </a>
+        <a
+          href="/spec"
+          data-search-item
+          class="block p-2.5 rounded border-2 border-ink/25 hover:border-ink transition"
+        >
+          <div class="text-[10px] font-bold uppercase text-ink/65">Specification</div>
+          <div class="text-xs sm:text-sm font-bold text-ink mt-0.5">Wire Specification v0.1</div>
+        </a>
+        <a
+          href="/cli"
+          data-search-item
+          class="block p-2.5 rounded border-2 border-ink/25 hover:border-ink transition"
+        >
+          <div class="text-[10px] font-bold uppercase text-ink/65">CLI</div>
+          <div class="text-xs sm:text-sm font-bold text-ink mt-0.5">
+            Inspect &amp; Query Packets
+          </div>
+        </a>
+      </div>
+      <div>
+        <div class="text-[10px] font-bold uppercase text-ink/65 px-0.5 mb-1.5">
+          Language Implementations
         </div>
-      </a>
-      <a
-        href="/go"
-        data-search-item
-        class="block p-2.5 rounded border-2 border-ink/25 hover:border-ink transition"
-      >
-        <div class="text-[10px] font-bold uppercase text-ink/65">Go</div>
-        <div class="text-xs sm:text-sm font-bold text-ink mt-0.5">OmniBuf for Go</div>
-      </a>
-      <a
-        href="/es"
-        data-search-item
-        class="block p-2.5 rounded border-2 border-ink/25 hover:border-ink transition"
-      >
-        <div class="text-[10px] font-bold uppercase text-ink/65">TypeScript / JS</div>
-        <div class="text-xs sm:text-sm font-bold text-ink mt-0.5">
-          OmniBuf for TypeScript &amp; JS
+        <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
+          {languages.map((lang) => (
+            <a
+              href={lang.href}
+              data-search-item
+              class="block p-2 rounded border-2 border-ink/25 hover:border-ink transition"
+            >
+              <div class="text-xs font-bold text-ink">{lang.label}</div>
+              <div class="text-[11px] text-ink/65 truncate">{lang.shortPackage}</div>
+            </a>
+          ))}
         </div>
-      </a>
-      <a
-        href="/cli"
-        data-search-item
-        class="block p-2.5 rounded border-2 border-ink/25 hover:border-ink transition"
-      >
-        <div class="text-[10px] font-bold uppercase text-ink/65">CLI</div>
-        <div class="text-xs sm:text-sm font-bold text-ink mt-0.5">
-          Inspect, Query &amp; Encode Packets
-        </div>
-      </a>
+      </div>
     </div>
     <div id="search-dynamic-results" class="hidden space-y-1.5"></div>
   </div>
 
   <div class="px-3 sm:px-4 py-2 bg-[#E5E0D5] border-t-2 border-ink flex items-center justify-between gap-2 text-[11px] text-ink/80 shrink-0">
-    <span id="search-status">Type to search all 6 pages</span>
+    <span id="search-status" data-default-status={`Type to search all ${totalSitePages} pages`}>
+      Type to search all {totalSitePages} pages
+    </span>
     <div class="hidden sm:flex items-center gap-3">
       <span>
         <kbd class="px-1 py-0.5 bg-[#FAF8F2] border border-ink rounded text-[10px] font-bold">
@@ -593,7 +612,10 @@ const activePageLabel =
     if (!query) {
       searchDefaultLinks?.classList.remove('hidden');
       searchDynamicResults?.classList.add('hidden');
-      if (searchStatus) searchStatus.textContent = 'Type to search all 6 pages';
+      if (searchStatus) {
+        searchStatus.textContent =
+          searchStatus.getAttribute('data-default-status') || 'Type to search documentation';
+      }
       updateActiveItem(0);
       return;
     }

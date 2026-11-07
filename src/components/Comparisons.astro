@@ -1,40 +1,37 @@
 ---
 import {
   benchmarkCategories,
-  esBenchmarkCategories,
   formatProfiles,
+  languageBenchmarkList,
   opponentKeys,
 } from '../data/benchmarks';
 import RadarChart from './RadarChart.astro';
 
 const packetSizeCat = benchmarkCategories.find((cat) => cat.unit === 'B');
-const goEncodeCat = benchmarkCategories.find((cat) => cat.title === 'Full Message Encode Speed');
-const goDecodeCat = benchmarkCategories.find((cat) => cat.title === 'Full Message Decode Speed');
-const esEncodeCat = esBenchmarkCategories.find((cat) => cat.title === 'Full Message Encode Speed');
-const esDecodeCat = esBenchmarkCategories.find((cat) => cat.title === 'Full Message Decode Speed');
 
-const miniLanguagePreviews = [
-  {
-    lang: 'Go',
-    href: '/go#benchmarks',
-    cta: 'Go Benchmarks',
-    competitorsLabel: "Protobuf, FlatBuffers, Avro, Cap'n Proto, MsgPack, JSON",
-    encodeRows: (goEncodeCat?.rows ?? []).filter(
-      (r) => (r.baseline || !r.highlight) && r.name !== 'JSON (encoding/json/v2)',
-    ),
-    decodeRows: (goDecodeCat?.rows ?? []).filter(
-      (r) => (r.baseline || !r.highlight) && r.name !== 'JSON (encoding/json/v2)',
-    ),
-  },
-  {
-    lang: 'TypeScript & JS',
-    href: '/es#benchmarks',
-    cta: 'TS / JS Benchmarks',
-    competitorsLabel: 'protobufjs, protobuf-es, google-protobuf, MsgPack, JSON',
-    encodeRows: esEncodeCat?.rows ?? [],
-    decodeRows: esDecodeCat?.rows ?? [],
-  },
-];
+const comparisonLanguageCharts = languageBenchmarkList.map((suite) => {
+  const maxEnc = Math.max(...suite.butterflyEncodeRows.map((r) => r.val), 1);
+  const maxDec = Math.max(...suite.butterflyDecodeRows.map((r) => r.val), 1);
+  const decByName = new Map(suite.butterflyDecodeRows.map((r) => [r.name, r.val]));
+  const bRows = suite.butterflyEncodeRows.map((r) => {
+    const decVal = decByName.get(r.name) ?? r.val;
+    return {
+      name: r.name,
+      baseline: Boolean(r.baseline),
+      encVal: r.val,
+      decVal,
+      encPct: Math.max(4.5, Math.min(100, (r.val / maxEnc) * 100)).toFixed(1),
+      decPct: Math.max(4.5, Math.min(100, (decVal / maxDec) * 100)).toFixed(1),
+    };
+  });
+  const omni = bRows.find((r) => r.baseline) ?? bRows[0];
+  const rest = bRows.filter((r) => !r.baseline);
+  return {
+    ...suite,
+    omni,
+    rest,
+  };
+});
 ---
 
 <section
@@ -60,51 +57,54 @@ const miniLanguagePreviews = [
     </p>
   </div>
 
-  <!-- Compact Language Encode/Decode Butterfly Previews -->
-  <div class="grid md:grid-cols-2 gap-8 mb-10">
-    {miniLanguagePreviews.map((preview) => {
-      const maxEnc = Math.max(...preview.encodeRows.map((r) => r.val), 1);
-      const maxDec = Math.max(...preview.decodeRows.map((r) => r.val), 1);
-      const decByName = new Map(preview.decodeRows.map((r) => [r.name, r.val]));
-      const bRows = preview.encodeRows.map((r) => {
-        const decVal = decByName.get(r.name) ?? r.val;
-        return {
-          name: r.name,
-          baseline: Boolean(r.baseline),
-          encVal: r.val,
-          decVal,
-          encPct: Math.max(4.5, Math.min(100, (r.val / maxEnc) * 100)).toFixed(1),
-          decPct: Math.max(4.5, Math.min(100, (decVal / maxDec) * 100)).toFixed(1),
-        };
-      });
-      const omni = bRows.find((r) => r.baseline) ?? bRows[0];
-      const rest = bRows.filter((r) => !r.baseline);
+  <!-- Tabbed Language Butterfly Preview + Packet Size on the Wire -->
+  <div
+    class="grid lg:grid-cols-12 gap-8 mb-10 items-start select-none"
+    data-butterfly-widget="comparisons"
+  >
+    <!-- Left: Interactive Tabbed Butterfly Chart -->
+    <div class="lg:col-span-5 flex flex-col justify-between p-4 sm:p-5 bg-[#FAF8F2] border-2 border-ink rounded-md shadow-[6px_6px_0px_#111111]">
+      <div>
+        <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+          <h3 class="text-xl sm:text-2xl font-bold uppercase tracking-tight leading-none text-ink">
+            Runtime{' '}
+            <span class="font-serif italic font-normal normal-case text-[#FF4F18]">speed.</span>
+          </h3>
+          <div
+            role="tablist"
+            aria-label="Select runtime speed comparison language"
+            class="inline-flex items-center gap-1.5 font-mono text-xs font-bold uppercase"
+          >
+            {comparisonLanguageCharts.map((preview, idx) => (
+              <button
+                type="button"
+                role="tab"
+                data-butterfly-tab={preview.key}
+                aria-selected={idx === 0 ? 'true' : 'false'}
+                class:list={[
+                  'px-2.5 py-1 rounded border-2 border-ink transition cursor-pointer',
+                  idx === 0
+                    ? 'bg-acid text-ink shadow-[2px_2px_0px_#111111]'
+                    : 'bg-white text-ink/75 hover:bg-[#E5E0D5] hover:text-ink',
+                ]}
+              >
+                {preview.shortLabel}
+              </button>
+            ))}
+          </div>
+        </div>
 
-      return (
-        <a
-          href={preview.href}
-          class="group flex flex-col justify-between p-3 sm:p-4 -m-2 sm:-m-3 rounded-md hover:bg-ink/5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-ink transition select-none cursor-pointer"
-        >
-          <div>
-            <div class="flex items-baseline justify-between gap-2 mb-2">
-              <h3 class="text-xl sm:text-2xl font-bold uppercase tracking-tight leading-none text-ink group-hover:text-[#FF4F18] transition-colors">
-                {preview.lang}{' '}
-                <span class="font-serif italic font-normal normal-case text-[#FF4F18]">speed.</span>
-              </h3>
-              <span class="font-mono text-[10px] sm:text-xs font-bold uppercase text-ink/65 shrink-0">
-                Shorter = Faster
-              </span>
-            </div>
+        <div class="grid grid-cols-2 items-baseline border-b-2 border-ink pb-1 mb-2 font-mono text-xs font-bold uppercase text-ink">
+          <div class="text-right pr-3">&larr; Encode</div>
+          <div class="text-left pl-3 border-l-2 border-ink">Decode &rarr;</div>
+        </div>
 
-            <div class="grid grid-cols-2 items-baseline border-b-2 border-ink pb-1 mb-2 font-mono text-xs font-bold uppercase text-ink">
-              <div class="text-right pr-3">&larr; Encode</div>
-              <div class="text-left pl-3 border-l-2 border-ink">Decode &rarr;</div>
-            </div>
-
+        {comparisonLanguageCharts.map((preview, idx) => (
+          <div role="tabpanel" data-butterfly-panel={preview.key} class={idx === 0 ? '' : 'hidden'}>
             <!-- OmniBuf Row -->
             <div
               class="grid grid-cols-2 items-center py-1"
-              title={`${omni.name} - Encode: ${omni.encVal} ns, Decode: ${omni.decVal} ns`}
+              title={`${preview.omni.name} - Encode: ${preview.omni.encVal} ns, Decode: ${preview.omni.decVal} ns`}
             >
               <div class="flex items-center justify-end pr-0.5 min-w-0">
                 <svg
@@ -123,13 +123,13 @@ const miniLanguagePreviews = [
                 </svg>
                 <div
                   class="h-4 bench-bar-omni border-2 border-ink rounded-l-sm shadow-[1px_1px_0px_#111111] shrink-0"
-                  style={`width: ${omni.encPct}%;`}
+                  style={`width: ${preview.omni.encPct}%;`}
                 />
               </div>
               <div class="flex items-center justify-start pl-0.5 border-l-2 border-ink min-w-0">
                 <div
                   class="h-4 bench-bar-omni border-2 border-ink rounded-r-sm shadow-[1px_1px_0px_#111111] shrink-0"
-                  style={`width: ${omni.decPct}%;`}
+                  style={`width: ${preview.omni.decPct}%;`}
                 />
                 <svg
                   class="w-5 h-3.5 text-[#FF4F18] shrink-0 mx-1"
@@ -153,7 +153,7 @@ const miniLanguagePreviews = [
 
             <!-- Competitor Rows -->
             <div class="mt-0.5 space-y-1">
-              {rest.map((r) => (
+              {preview.rest.map((r) => (
                 <div
                   class="grid grid-cols-2 items-center"
                   title={`${r.name} - Encode: ${r.encVal} ns, Decode: ${r.decVal} ns`}
@@ -174,7 +174,7 @@ const miniLanguagePreviews = [
               ))}
             </div>
 
-            <div class="mt-2 flex items-center justify-center gap-2">
+            <div class="mt-2.5 flex items-center justify-center gap-2">
               <svg
                 class="w-7 h-4 text-ink/75 shrink-0"
                 viewBox="0 0 28 16"
@@ -208,83 +208,99 @@ const miniLanguagePreviews = [
               </svg>
             </div>
           </div>
-
-          <div class="pt-2.5 mt-2 border-t border-ink/20 flex items-center justify-end font-mono text-xs font-bold uppercase">
-            <span class="text-ink underline decoration-ink/50 underline-offset-2 group-hover:text-[#FF4F18]">
-              {preview.cta} &rarr;
-            </span>
-          </div>
-        </a>
-      );
-    })}
-  </div>
-
-  {packetSizeCat && (
-    <div id="packet-size" class="os-window overflow-hidden mb-10 scroll-mt-20 select-none">
-      <div class="os-titlebar bg-[#E5E0D5]">
-        <span class="font-mono text-xs sm:text-sm font-bold uppercase">{packetSizeCat.title}</span>
-        <div class="os-stripes" />
+        ))}
       </div>
 
-      <div class="p-3.5 sm:p-4 bg-[#FAF8F2] space-y-1">
-        <p class="text-xs sm:text-sm text-ink/85 leading-snug pb-1.5 max-w-[70ch]">
-          {packetSizeCat.methodology}
-        </p>
-        {(() => {
-          const omniVal =
-            packetSizeCat.rows.find((row) => row.baseline)?.val ??
-            packetSizeCat.rows.find((row) => row.highlight)?.val ??
-            packetSizeCat.rows[0].val;
-          return packetSizeCat.rows.map((r) => {
-            const numPct = Math.max(2, Math.min(100, (r.val / packetSizeCat.maxVal) * 100));
-            const pct = numPct.toFixed(1);
-            let ratioStr = 'Baseline (1x)';
-            if (r.val !== omniVal) {
-              const pctDiff = Math.round((Math.abs(r.val - omniVal) / omniVal) * 100);
-              ratioStr = r.val < omniVal ? `${pctDiff}% smaller` : `+${pctDiff}% larger`;
-            }
-            return (
-              <div
-                class:list={[
-                  'grid grid-cols-12 gap-x-2 gap-y-1 items-center px-2.5 py-1 rounded min-w-0',
-                  r.baseline
-                    ? 'bg-acid/45 border-2 border-ink shadow-[2px_2px_0px_#111111] font-bold'
-                    : r.highlight
-                      ? 'bg-acid/25 border-2 border-dashed border-ink font-bold'
-                      : 'border border-ink/15 bg-white',
-                ]}
-              >
-                <div
-                  class="col-span-12 sm:col-span-4 font-mono text-xs sm:text-sm text-ink truncate"
-                  title={r.name}
-                >
-                  {r.name}
-                </div>
-                <div class="col-span-6 sm:col-span-5 flex items-center min-w-0">
-                  <div class="w-full bg-[#E5E0D5] h-3.5 border border-ink rounded-sm overflow-hidden">
-                    <div
-                      class:list={[
-                        'h-full',
-                        numPct < 99.5 && 'border-r border-ink',
-                        r.highlight ? 'bench-bar-omni' : 'bench-bar-competitor',
-                      ]}
-                      style={`width: ${pct}%;`}
-                    />
-                  </div>
-                </div>
-                <div class="col-span-6 sm:col-span-3 text-right font-mono text-xs sm:text-sm tabular-nums whitespace-nowrap leading-none">
-                  <span class="font-bold text-ink">{ratioStr}</span>{' '}
-                  <span class="text-ink/70 font-normal">
-                    ({r.val.toLocaleString('en-US')} {packetSizeCat.unit})
-                  </span>
-                </div>
-              </div>
-            );
-          });
-        })()}
+      <div class="pt-2.5 mt-3 border-t border-ink/20 flex items-center justify-between font-mono text-xs font-bold uppercase">
+        <span class="text-ink/65">Shorter = Faster</span>
+        {comparisonLanguageCharts.map((preview, idx) => (
+          <a
+            href={preview.href}
+            data-butterfly-link={preview.key}
+            class:list={[
+              'text-ink underline decoration-ink/50 underline-offset-2 hover:text-[#FF4F18]',
+              idx === 0 ? '' : 'hidden',
+            ]}
+          >
+            {preview.ctaLabel} &rarr;
+          </a>
+        ))}
       </div>
     </div>
-  )}
+
+    <!-- Right: Packet Size on the Wire -->
+    {packetSizeCat && (
+      <div
+        id="packet-size"
+        class="lg:col-span-7 os-window overflow-hidden scroll-mt-20 select-none"
+      >
+        <div class="os-titlebar bg-[#E5E0D5]">
+          <span class="font-mono text-xs sm:text-sm font-bold uppercase">
+            {packetSizeCat.title}
+          </span>
+          <div class="os-stripes" />
+        </div>
+
+        <div class="p-3.5 sm:p-4 bg-[#FAF8F2] space-y-1">
+          <p class="text-xs sm:text-sm text-ink/85 leading-snug pb-1.5 max-w-[70ch]">
+            {packetSizeCat.methodology}
+          </p>
+          {(() => {
+            const omniVal =
+              packetSizeCat.rows.find((row) => row.baseline)?.val ??
+              packetSizeCat.rows.find((row) => row.highlight)?.val ??
+              packetSizeCat.rows[0].val;
+            return packetSizeCat.rows.map((r) => {
+              const numPct = Math.max(2, Math.min(100, (r.val / packetSizeCat.maxVal) * 100));
+              const pct = numPct.toFixed(1);
+              let ratioStr = 'Baseline (1x)';
+              if (r.val !== omniVal) {
+                const pctDiff = Math.round((Math.abs(r.val - omniVal) / omniVal) * 100);
+                ratioStr = r.val < omniVal ? `${pctDiff}% smaller` : `+${pctDiff}% larger`;
+              }
+              return (
+                <div
+                  class:list={[
+                    'grid grid-cols-12 gap-x-2 gap-y-1 items-center px-2.5 py-1 rounded min-w-0',
+                    r.baseline
+                      ? 'bg-acid/45 border-2 border-ink shadow-[2px_2px_0px_#111111] font-bold'
+                      : r.highlight
+                        ? 'bg-acid/25 border-2 border-dashed border-ink font-bold'
+                        : 'border border-ink/15 bg-white',
+                  ]}
+                >
+                  <div
+                    class="col-span-12 sm:col-span-5 font-mono text-xs text-ink truncate"
+                    title={r.name}
+                  >
+                    {r.name}
+                  </div>
+                  <div class="col-span-6 sm:col-span-4 flex items-center min-w-0">
+                    <div class="w-full bg-[#E5E0D5] h-3.5 border border-ink rounded-sm overflow-hidden">
+                      <div
+                        class:list={[
+                          'h-full',
+                          numPct < 99.5 && 'border-r border-ink',
+                          r.highlight ? 'bench-bar-omni' : 'bench-bar-competitor',
+                        ]}
+                        style={`width: ${pct}%;`}
+                      />
+                    </div>
+                  </div>
+                  <div class="col-span-6 sm:col-span-3 text-right font-mono text-xs tabular-nums whitespace-nowrap leading-none">
+                    <span class="font-bold text-ink">{ratioStr}</span>{' '}
+                    <span class="text-ink/70 font-normal">
+                      ({r.val.toLocaleString('en-US')} {packetSizeCat.unit})
+                    </span>
+                  </div>
+                </div>
+              );
+            });
+          })()}
+        </div>
+      </div>
+    )}
+  </div>
 
   <div class="grid md:grid-cols-2 gap-6">
     <!-- Standalone OmniBuf Panel Explaining the 5 Radar Scores -->
@@ -346,3 +362,48 @@ const miniLanguagePreviews = [
     })}
   </div>
 </section>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-butterfly-widget]').forEach((widget) => {
+    const tabs = Array.from(widget.querySelectorAll<HTMLButtonElement>('[data-butterfly-tab]'));
+    const panels = Array.from(widget.querySelectorAll<HTMLElement>('[data-butterfly-panel]'));
+    const links = Array.from(widget.querySelectorAll<HTMLElement>('[data-butterfly-link]'));
+
+    function activateLang(key: string) {
+      tabs.forEach((tab) => {
+        const isActive = tab.getAttribute('data-butterfly-tab') === key;
+        tab.setAttribute('aria-selected', isActive ? 'true' : 'false');
+        tab.classList.toggle('bg-acid', isActive);
+        tab.classList.toggle('text-ink', isActive);
+        tab.classList.toggle('shadow-[2px_2px_0px_#111111]', isActive);
+        tab.classList.toggle('bg-white', !isActive);
+        tab.classList.toggle('text-ink/75', !isActive);
+      });
+      panels.forEach((panel) => {
+        panel.classList.toggle('hidden', panel.getAttribute('data-butterfly-panel') !== key);
+      });
+      links.forEach((link) => {
+        link.classList.toggle('hidden', link.getAttribute('data-butterfly-link') !== key);
+      });
+    }
+
+    tabs.forEach((tab, idx) => {
+      tab.addEventListener('click', () => {
+        const key = tab.getAttribute('data-butterfly-tab');
+        if (key) activateLang(key);
+      });
+      tab.addEventListener('keydown', (e) => {
+        if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') {
+          e.preventDefault();
+          const dir = e.key === 'ArrowRight' ? 1 : -1;
+          const next = tabs[(idx + dir + tabs.length) % tabs.length];
+          if (next) {
+            next.focus();
+            const key = next.getAttribute('data-butterfly-tab');
+            if (key) activateLang(key);
+          }
+        }
+      });
+    });
+  });
+</script>

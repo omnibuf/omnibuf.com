@@ -5,17 +5,21 @@ import sitemap from '@astrojs/sitemap';
 import { defineConfig } from 'astro/config';
 import tailwindcss from 'tailwindcss';
 import tailwindConfig from './tailwind.config.mjs';
+import { cliNavPage, languages, primaryNavPages, specNavPage } from './src/data/languages.ts';
 
-const PAGE_LABELS = {
-  '/': 'Overview',
-  '/how-it-works': 'How It Works',
-  '/spec': 'Specification',
-  '/go': 'Go',
-  '/es': 'TypeScript / JS',
-  '/cli': 'CLI',
-};
+const PAGE_LABELS = Object.fromEntries([
+  ...primaryNavPages.map((p) => [p.href, p.label]),
+  [specNavPage.href, specNavPage.label],
+  ...languages.map((l) => [l.href, l.label]),
+  [cliNavPage.href, cliNavPage.label],
+]);
 
-const PAGE_ORDER = ['/', '/how-it-works', '/spec', '/go', '/es', '/cli'];
+const PAGE_ORDER = [
+  ...primaryNavPages.map((p) => p.href),
+  specNavPage.href,
+  ...languages.map((l) => l.href),
+  cliNavPage.href,
+];
 
 function decodeEntities(str) {
   return str

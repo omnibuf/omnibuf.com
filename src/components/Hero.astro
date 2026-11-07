@@ -1,32 +1,29 @@
 ---
-import { benchmarkCategories } from '../data/benchmarks';
+import { languageBenchmarkList } from '../data/benchmarks';
 
-const goEncodeCat = benchmarkCategories.find((cat) => cat.title === 'Full Message Encode Speed');
-const goDecodeCat = benchmarkCategories.find((cat) => cat.title === 'Full Message Decode Speed');
-
-const heroEncodeRows = (goEncodeCat?.rows ?? []).filter(
-  (r) => (r.baseline || !r.highlight) && r.name !== 'JSON (encoding/json/v2)',
-);
-const heroDecodeRows = (goDecodeCat?.rows ?? []).filter(
-  (r) => (r.baseline || !r.highlight) && r.name !== 'JSON (encoding/json/v2)',
-);
-const maxHeroEnc = Math.max(...heroEncodeRows.map((r) => r.val), 1);
-const maxHeroDec = Math.max(...heroDecodeRows.map((r) => r.val), 1);
-
-const decodeByName = new Map(heroDecodeRows.map((r) => [r.name, r.val]));
-const butterflyRows = heroEncodeRows.map((r) => {
-  const decVal = decodeByName.get(r.name) ?? r.val;
+const heroLanguageCharts = languageBenchmarkList.map((suite) => {
+  const maxEnc = Math.max(...suite.butterflyEncodeRows.map((r) => r.val), 1);
+  const maxDec = Math.max(...suite.butterflyDecodeRows.map((r) => r.val), 1);
+  const decodeByName = new Map(suite.butterflyDecodeRows.map((r) => [r.name, r.val]));
+  const bRows = suite.butterflyEncodeRows.map((r) => {
+    const decVal = decodeByName.get(r.name) ?? r.val;
+    return {
+      name: r.name,
+      baseline: Boolean(r.baseline),
+      encVal: r.val,
+      decVal,
+      encPct: Math.max(4.5, Math.min(100, (r.val / maxEnc) * 100)).toFixed(1),
+      decPct: Math.max(4.5, Math.min(100, (decVal / maxDec) * 100)).toFixed(1),
+    };
+  });
+  const omniRow = bRows.find((r) => r.baseline) ?? bRows[0];
+  const restRows = bRows.filter((r) => !r.baseline);
   return {
-    name: r.name,
-    baseline: Boolean(r.baseline),
-    encVal: r.val,
-    decVal,
-    encPct: Math.max(4.5, Math.min(100, (r.val / maxHeroEnc) * 100)).toFixed(1),
-    decPct: Math.max(4.5, Math.min(100, (decVal / maxHeroDec) * 100)).toFixed(1),
+    ...suite,
+    omniRow,
+    restRows,
   };
 });
-const omniRow = butterflyRows.find((r) => r.baseline) ?? butterflyRows[0];
-const restRows = butterflyRows.filter((r) => !r.baseline);
 ---
 
 <section class="relative pt-10 pb-14 sm:pt-16 sm:pb-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
@@ -56,25 +53,47 @@ const restRows = butterflyRows.filter((r) => !r.baseline);
       I built OmniBuf to replace both <a href="https://protobuf.dev/programming-guides/encoding/" target="_blank" rel="noopener noreferrer" class="doc-link">Protobuf</a> and <strong>JSON</strong>. It is a binary serialization format where raw packets remain readable on their own, individual fields can be read or updated in place, and schemas are optional. Plug it into <a href="https://grpc.io/" target="_blank" rel="noopener noreferrer" class="doc-link">gRPC</a> and <a href="https://connectrpc.com/" target="_blank" rel="noopener noreferrer" class="doc-link">Connect</a> with your existing <code>.proto</code> files, or serialize plain <a href="/go" class="doc-link">Go structs</a> and <a href="/es" class="doc-link">TypeScript objects</a> directly.
     </p>
 
-    <div class="grid lg:grid-cols-12 gap-5 items-stretch">
-      <p class="lg:col-span-7 text-base sm:text-xl font-medium text-ink/90 leading-relaxed bg-[#FAF8F2] p-5 sm:p-6 border-2 border-ink shadow-[6px_6px_0px_#111] rounded-md flex items-center">
-        <!-- prettier-ignore -->
-        <span>
-          In our Go benchmarks below, OmniBuf runs <strong>about 6x faster on encode (123 ns) and 7x faster on decode (229 ns)</strong> than standard Go Protobuf on an 11-field message. Against <code>encoding/json</code> on plain Go structs, it is <strong>over 10x faster</strong> and cuts packet size in half. Read <a href="/how-it-works" class="doc-link">how the wire format works</a> or check the <a href="/spec" class="doc-link">wire specification</a>.
-        </span>
-      </p>
+    <div class="grid lg:grid-cols-12 gap-5 items-stretch" data-butterfly-widget="hero">
+      <div class="lg:col-span-7 text-base sm:text-xl font-medium text-ink/90 leading-relaxed bg-[#FAF8F2] p-5 sm:p-6 border-2 border-ink shadow-[6px_6px_0px_#111] rounded-md flex items-center">
+        {heroLanguageCharts.map((chart, idx) => (
+          <p
+            data-butterfly-summary={chart.key}
+            class={idx === 0 ? '' : 'hidden'}
+            set:html={chart.heroSummaryHtml}
+          />
+        ))}
+      </div>
 
-      <!-- Open Butterfly Speed Diagram (No Panel Frame) -->
+      <!-- Open Butterfly Speed Diagram with Language Switcher Tabs -->
       <div class="lg:col-span-5 flex flex-col justify-between px-1 sm:px-2 py-1 select-none">
         <div>
-          <div class="flex items-baseline justify-between gap-2 mb-2.5">
+          <div class="flex flex-wrap items-center justify-between gap-2 mb-2.5">
             <h2 class="text-2xl sm:text-3xl lg:text-4xl font-bold uppercase tracking-tight leading-none text-ink">
               Ludicrous{' '}
               <span class="font-serif italic font-normal normal-case text-[#FF4F18]">speed.</span>
             </h2>
-            <span class="font-mono text-[10px] sm:text-xs font-bold uppercase text-ink/65 shrink-0">
-              Shorter = Faster
-            </span>
+            <div
+              role="tablist"
+              aria-label="Select benchmark language"
+              class="inline-flex items-center gap-1.5 font-mono text-xs font-bold uppercase"
+            >
+              {heroLanguageCharts.map((chart, idx) => (
+                <button
+                  type="button"
+                  role="tab"
+                  data-butterfly-tab={chart.key}
+                  aria-selected={idx === 0 ? 'true' : 'false'}
+                  class:list={[
+                    'px-2.5 py-1 rounded border-2 border-ink transition cursor-pointer',
+                    idx === 0
+                      ? 'bg-acid text-ink shadow-[2px_2px_0px_#111111]'
+                      : 'bg-[#FAF8F2] text-ink/75 hover:bg-[#E5E0D5] hover:text-ink',
+                  ]}
+                >
+                  {chart.shortLabel}
+                </button>
+              ))}
+            </div>
           </div>
 
           <!-- Top Butterfly Axis Header -->
@@ -83,129 +102,134 @@ const restRows = butterflyRows.filter((r) => !r.baseline);
             <div class="text-left pl-3 border-l-2 border-ink">Decode &rarr;</div>
           </div>
 
-          <!-- Row 1: OmniBuf (Tiny Wings + Callout Arrow) -->
-          <div
-            class="grid grid-cols-2 items-center py-1"
-            title={`${omniRow.name} - Encode: ${omniRow.encVal} ns, Decode: ${omniRow.decVal} ns`}
-          >
-            <div class="flex items-center justify-end pr-0.5 min-w-0">
-              <svg
-                class="w-5 h-3.5 text-[#FF4F18] shrink-0 mr-1"
-                viewBox="0 0 22 14"
-                fill="none"
-                aria-hidden="true"
-              >
-                <path
-                  d="M1 7H19M19 7L14 2M19 7L14 12"
-                  stroke="currentColor"
-                  stroke-width="2.2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                />
-              </svg>
+          {heroLanguageCharts.map((chart, idx) => (
+            <div role="tabpanel" data-butterfly-panel={chart.key} class={idx === 0 ? '' : 'hidden'}>
+              <!-- Row 1: OmniBuf (Tiny Wings + Callout Arrow) -->
               <div
-                class="h-4 bench-bar-omni border-2 border-ink rounded-l-sm shadow-[1px_1px_0px_#111111] shrink-0"
-                style={`width: ${omniRow.encPct}%;`}
-              />
-            </div>
-
-            <div class="flex items-center justify-start pl-0.5 border-l-2 border-ink min-w-0">
-              <div
-                class="h-4 bench-bar-omni border-2 border-ink rounded-r-sm shadow-[1px_1px_0px_#111111] shrink-0"
-                style={`width: ${omniRow.decPct}%;`}
-              />
-              <svg
-                class="w-5 h-3.5 text-[#FF4F18] shrink-0 mx-1"
-                viewBox="0 0 22 14"
-                fill="none"
-                aria-hidden="true"
-              >
-                <path
-                  d="M21 7H3M3 7L8 2M3 7L8 12"
-                  stroke="currentColor"
-                  stroke-width="2.2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                />
-              </svg>
-              <span class="font-mono text-xs font-bold uppercase px-2 py-0.5 bg-acid border-2 border-ink text-ink shadow-[2px_2px_0px_#111111] leading-none rounded-sm shrink-0">
-                OmniBuf
-              </span>
-            </div>
-          </div>
-
-          <!-- Rows 2..N: Competitor Butterfly Wings + Callout -->
-          <div class="mt-0.5 space-y-1">
-            {restRows.map((r) => (
-              <div
-                class="grid grid-cols-2 items-center"
-                title={`${r.name} - Encode: ${r.encVal} ns, Decode: ${r.decVal} ns`}
+                class="grid grid-cols-2 items-center py-1"
+                title={`${chart.omniRow.name} - Encode: ${chart.omniRow.encVal} ns, Decode: ${chart.omniRow.decVal} ns`}
               >
                 <div class="flex items-center justify-end pr-0.5 min-w-0">
+                  <svg
+                    class="w-5 h-3.5 text-[#FF4F18] shrink-0 mr-1"
+                    viewBox="0 0 22 14"
+                    fill="none"
+                    aria-hidden="true"
+                  >
+                    <path
+                      d="M1 7H19M19 7L14 2M19 7L14 12"
+                      stroke="currentColor"
+                      stroke-width="2.2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    />
+                  </svg>
                   <div
-                    class="h-2.5 bench-bar-competitor border border-ink/65 rounded-l-sm opacity-80"
-                    style={`width: ${r.encPct}%;`}
+                    class="h-4 bench-bar-omni border-2 border-ink rounded-l-sm shadow-[1px_1px_0px_#111111] shrink-0"
+                    style={`width: ${chart.omniRow.encPct}%;`}
                   />
                 </div>
+
                 <div class="flex items-center justify-start pl-0.5 border-l-2 border-ink min-w-0">
                   <div
-                    class="h-2.5 bench-bar-competitor border border-ink/65 rounded-r-sm opacity-80"
-                    style={`width: ${r.decPct}%;`}
+                    class="h-4 bench-bar-omni border-2 border-ink rounded-r-sm shadow-[1px_1px_0px_#111111] shrink-0"
+                    style={`width: ${chart.omniRow.decPct}%;`}
                   />
+                  <svg
+                    class="w-5 h-3.5 text-[#FF4F18] shrink-0 mx-1"
+                    viewBox="0 0 22 14"
+                    fill="none"
+                    aria-hidden="true"
+                  >
+                    <path
+                      d="M21 7H3M3 7L8 2M3 7L8 12"
+                      stroke="currentColor"
+                      stroke-width="2.2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    />
+                  </svg>
+                  <span class="font-mono text-xs font-bold uppercase px-2 py-0.5 bg-acid border-2 border-ink text-ink shadow-[2px_2px_0px_#111111] leading-none rounded-sm shrink-0">
+                    OmniBuf
+                  </span>
                 </div>
               </div>
-            ))}
-          </div>
 
-          <!-- Dual Upward Callout Arrows Pointing to Competitor Wings -->
-          <div class="mt-2 flex items-center justify-center gap-2">
-            <svg
-              class="w-7 h-4 text-ink/75 shrink-0"
-              viewBox="0 0 28 16"
-              fill="none"
-              aria-hidden="true"
-            >
-              <path
-                d="M26 13C16 13 11 9 6 2M6 2L5 8.5M6 2L12.5 4"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              />
-            </svg>
-            <span class="font-mono text-[11px] font-bold uppercase px-2 py-1 bg-[#E5E0D5] border border-ink text-ink text-center leading-tight rounded-sm">
-              Protobuf, FlatBuffers, Avro, Cap&apos;n Proto, MsgPack, JSON
-            </span>
-            <svg
-              class="w-7 h-4 text-ink/75 shrink-0"
-              viewBox="0 0 28 16"
-              fill="none"
-              aria-hidden="true"
-            >
-              <path
-                d="M2 13C12 13 17 9 22 2M22 2L23 8.5M22 2L15.5 4"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              />
-            </svg>
-          </div>
+              <!-- Rows 2..N: Competitor Butterfly Wings + Callout -->
+              <div class="mt-0.5 space-y-1">
+                {chart.restRows.map((r) => (
+                  <div
+                    class="grid grid-cols-2 items-center"
+                    title={`${r.name} - Encode: ${r.encVal} ns, Decode: ${r.decVal} ns`}
+                  >
+                    <div class="flex items-center justify-end pr-0.5 min-w-0">
+                      <div
+                        class="h-2.5 bench-bar-competitor border border-ink/65 rounded-l-sm opacity-80"
+                        style={`width: ${r.encPct}%;`}
+                      />
+                    </div>
+                    <div class="flex items-center justify-start pl-0.5 border-l-2 border-ink min-w-0">
+                      <div
+                        class="h-2.5 bench-bar-competitor border border-ink/65 rounded-r-sm opacity-80"
+                        style={`width: ${r.decPct}%;`}
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <!-- Dual Upward Callout Arrows Pointing to Competitor Wings -->
+              <div class="mt-2 flex items-center justify-center gap-2">
+                <svg
+                  class="w-7 h-4 text-ink/75 shrink-0"
+                  viewBox="0 0 28 16"
+                  fill="none"
+                  aria-hidden="true"
+                >
+                  <path
+                    d="M26 13C16 13 11 9 6 2M6 2L5 8.5M6 2L12.5 4"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                </svg>
+                <span class="font-mono text-[11px] font-bold uppercase px-2 py-1 bg-[#E5E0D5] border border-ink text-ink text-center leading-tight rounded-sm">
+                  {chart.competitorsLabel}
+                </span>
+                <svg
+                  class="w-7 h-4 text-ink/75 shrink-0"
+                  viewBox="0 0 28 16"
+                  fill="none"
+                  aria-hidden="true"
+                >
+                  <path
+                    d="M2 13C12 13 17 9 22 2M22 2L23 8.5M22 2L15.5 4"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                </svg>
+              </div>
+            </div>
+          ))}
         </div>
 
         <div class="pt-2.5 mt-2 border-t border-ink/20 flex flex-wrap items-center justify-between gap-2 font-mono text-xs font-bold uppercase">
-          <a
-            href="/go#benchmarks"
-            class="text-ink underline decoration-ink/50 underline-offset-2 hover:text-[#FF4F18]"
-          >
-            Go Benchmarks &rarr;
-          </a>
-          <a
-            href="/es#benchmarks"
-            class="text-ink underline decoration-ink/50 underline-offset-2 hover:text-[#FF4F18]"
-          >
-            TS / JS Benchmarks &rarr;
-          </a>
+          <span class="text-ink/65">Shorter = Faster</span>
+          {heroLanguageCharts.map((chart, idx) => (
+            <a
+              href={chart.href}
+              data-butterfly-link={chart.key}
+              class:list={[
+                'text-ink underline decoration-ink/50 underline-offset-2 hover:text-[#FF4F18]',
+                idx === 0 ? '' : 'hidden',
+              ]}
+            >
+              {chart.ctaLabel} &rarr;
+            </a>
+          ))}
         </div>
       </div>
     </div>
@@ -1158,3 +1182,52 @@ const restRows = butterflyRows.filter((r) => !r.baseline);
     </div>
   </div>
 </section>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-butterfly-widget]').forEach((widget) => {
+    const tabs = Array.from(widget.querySelectorAll<HTMLButtonElement>('[data-butterfly-tab]'));
+    const panels = Array.from(widget.querySelectorAll<HTMLElement>('[data-butterfly-panel]'));
+    const summaries = Array.from(widget.querySelectorAll<HTMLElement>('[data-butterfly-summary]'));
+    const links = Array.from(widget.querySelectorAll<HTMLElement>('[data-butterfly-link]'));
+
+    function activateLang(key: string) {
+      tabs.forEach((tab) => {
+        const isActive = tab.getAttribute('data-butterfly-tab') === key;
+        tab.setAttribute('aria-selected', isActive ? 'true' : 'false');
+        tab.classList.toggle('bg-acid', isActive);
+        tab.classList.toggle('text-ink', isActive);
+        tab.classList.toggle('shadow-[2px_2px_0px_#111111]', isActive);
+        tab.classList.toggle('bg-[#FAF8F2]', !isActive);
+        tab.classList.toggle('text-ink/75', !isActive);
+      });
+      panels.forEach((panel) => {
+        panel.classList.toggle('hidden', panel.getAttribute('data-butterfly-panel') !== key);
+      });
+      summaries.forEach((summary) => {
+        summary.classList.toggle('hidden', summary.getAttribute('data-butterfly-summary') !== key);
+      });
+      links.forEach((link) => {
+        link.classList.toggle('hidden', link.getAttribute('data-butterfly-link') !== key);
+      });
+    }
+
+    tabs.forEach((tab, idx) => {
+      tab.addEventListener('click', () => {
+        const key = tab.getAttribute('data-butterfly-tab');
+        if (key) activateLang(key);
+      });
+      tab.addEventListener('keydown', (e) => {
+        if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') {
+          e.preventDefault();
+          const dir = e.key === 'ArrowRight' ? 1 : -1;
+          const next = tabs[(idx + dir + tabs.length) % tabs.length];
+          if (next) {
+            next.focus();
+            const key = next.getAttribute('data-butterfly-tab');
+            if (key) activateLang(key);
+          }
+        }
+      });
+    });
+  });
+</script>

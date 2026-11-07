@@ -34,17 +34,11 @@ echo '{"event": {"int": 10, "city": "FRA"}}' | omnibuf | omnibuf '.event.city'
 # Encode or decode against a compiled Protobuf FileDescriptorSet (.pb, .pb.gz, .json)
 omnibuf encode --schema descriptors.pb --type demo.v1.PeerUpdate input.json > packet.obuf
 omnibuf decode --schema descriptors.pb --type demo.v1.PeerUpdate packet.obuf`;
-
-const conformanceSnippet = `# Run the built-in 584-case conformance suite against any adapter binary
-omnibuf conformance ./bin/my-omnibuf-adapter
-
-# Emit machine-readable conformance results as JSON
-omnibuf conformance --json node ./packages/conformance/dist/cli.js`;
 ---
 
 <Layout
   title="OmniBuf CLI | Inspect, Query & Encode OmniBuf Packets"
-  description="Inspect raw OmniBuf packets without a schema, filter fields with built-in jq expressions, convert between JSON and OmniBuf wire bytes, and run the 584-case conformance suite."
+  description="Inspect raw OmniBuf packets without a schema, filter fields with built-in jq expressions, and convert between JSON and OmniBuf wire bytes."
 >
   <Navbar currentPage="cli" />
 
@@ -67,15 +61,11 @@ omnibuf conformance --json node ./packages/conformance/dist/cli.js`;
             <a href="#jq-queries" class="doc-link">
               <code>jq</code> expressions
             </a>
-            ,{' '}
+            , or{' '}
             <a href="#encode-json" class="doc-link">
               encode JSON
             </a>{' '}
-            into self-describing wire packets, or run the{' '}
-            <a href="#conformance" class="doc-link">
-              584-case conformance suite
-            </a>
-            .
+            into self-describing wire packets.
           </p>
           <div class="flex flex-wrap gap-3 font-mono text-sm sm:text-base pt-1 no-print">
             <a
@@ -205,7 +195,7 @@ omnibuf conformance --json node ./packages/conformance/dist/cli.js`;
         <!-- 3. Auto-Detect JSON Encode & Schema Mode -->
         <div
           id="encode-json"
-          class="scroll-mt-16 py-10 sm:py-12 grid lg:grid-cols-12 gap-6 lg:gap-8 items-center"
+          class="scroll-mt-16 pt-10 sm:pt-12 grid lg:grid-cols-12 gap-6 lg:gap-8 items-center"
         >
           <div class="lg:col-span-5 space-y-3">
             <h2 class="text-2xl sm:text-3xl font-bold uppercase tracking-tight leading-snug">
@@ -229,36 +219,6 @@ omnibuf conformance --json node ./packages/conformance/dist/cli.js`;
               </div>
               <div class="bg-ink text-paper p-4 [&>pre]:!bg-transparent [&>pre]:!p-0 [&>pre]:!m-0 [&>pre]:!border-0 [&>pre]:leading-relaxed [&>pre]:overflow-x-auto">
                 <Code code={encodeSnippet} lang="sh" theme="github-dark" />
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- 4. Built-in Conformance Suite -->
-        <div
-          id="conformance"
-          class="scroll-mt-16 pt-10 sm:pt-12 grid lg:grid-cols-12 gap-6 lg:gap-8 items-center"
-        >
-          <div class="lg:col-span-5 space-y-3">
-            <h2 class="text-2xl sm:text-3xl font-bold uppercase tracking-tight leading-snug">
-              Built-in 584-case conformance runner.
-            </h2>
-            <p class="text-base sm:text-lg text-ink/90 leading-relaxed max-w-[60ch]">
-              The CLI embeds the full OmniBuf wire conformance corpus. Authors building an OmniBuf
-              implementation in another language can test their encoder, decoder, blind decoder, and
-              opaque field splicer against all 584 positive and negative test vectors with{' '}
-              <code>omnibuf conformance</code>.
-            </p>
-          </div>
-
-          <div class="lg:col-span-7 min-w-0">
-            <div class="os-window overflow-hidden font-mono text-xs sm:text-sm">
-              <div class="os-titlebar bg-[#E5E0D5]">
-                <span class="font-bold uppercase text-ink text-xs">omnibuf conformance</span>
-                <div class="os-stripes"></div>
-              </div>
-              <div class="bg-ink text-paper p-4 [&>pre]:!bg-transparent [&>pre]:!p-0 [&>pre]:!m-0 [&>pre]:!border-0 [&>pre]:leading-relaxed [&>pre]:overflow-x-auto">
-                <Code code={conformanceSnippet} lang="sh" theme="github-dark" />
               </div>
             </div>
           </div>
