@@ -26,25 +26,38 @@
           Protobuf only has a 3-bit wire type, so strings, byte slices, sub-messages, maps, and
           packed arrays all get lumped into <code>Wire Type 2</code>. Fixed 32-bit and 64-bit
           numbers mix floats with signed and unsigned integers. OmniBuf widens the wire type to 4
-          bits and puts element types on arrays and maps. Calling <code>DecodeBlind</code> on a raw
-          buffer gives you back the exact numbers, booleans, strings, arrays, and maps that were
-          sent. You only need the schema for things that aren't sent on the wire, like enum names,
-          default values, or <code>oneof</code> groupings.
+          bits and puts element types on arrays and maps. Running the{' '}
+          <a href="/cli" class="doc-link">
+            <code>omnibuf</code> CLI
+          </a>{' '}
+          or calling <code>DecodeBlind</code> on a raw buffer returns the exact numbers, booleans,
+          strings, arrays, and maps that were sent. You only need the schema for things that aren't
+          sent on the wire, like enum names, default values, or <code>oneof</code> groupings.
         </p>
       </div>
-      <div class="lg:col-span-6 grid sm:grid-cols-2 gap-3.5 font-mono text-sm min-w-0">
-        <div class="p-4 bg-[#FAF8F2] border-2 border-ink rounded-md overflow-x-auto">
+      <div class="lg:col-span-6 space-y-3 font-mono text-sm min-w-0">
+        <div class="p-3.5 bg-[#FAF8F2] border-2 border-ink rounded-md overflow-x-auto">
           <!-- prettier-ignore -->
-          <div class="text-xs font-bold text-ink/75 mb-1.5">
-            <a href="https://github.com/protocolbuffers/protoscope" target="_blank" rel="noopener noreferrer" class="doc-link">protoscope</a>
+          <div class="flex items-center justify-between gap-2 text-xs font-bold text-ink/75 mb-1.5">
+            <a href="https://github.com/protocolbuffers/protoscope" target="_blank" rel="noopener noreferrer" class="doc-link">$ protoscope packet.pb</a>
+            <span class="font-normal">Protobuf</span>
           </div>
-          <pre class="text-sm text-ink/85 leading-snug"><span class="text-[#C23000] font-bold">3:</span> 1 <span class="text-ink/75"># int or bool?</span>
-<span class="text-[#C23000] font-bold">9:</span> &#123;<span class="text-ink/75">"\x1a\x03FRA\x20*"</span>&#125;</pre>
+          <pre class="text-xs sm:text-sm text-ink/85 leading-snug"><span class="text-[#C23000] font-bold">3:</span> 1                <span class="text-ink/75"># int or bool?</span>
+<span class="text-[#C23000] font-bold">9:</span> &#123;<span class="text-ink/75">"\x1a\x03FRA\x20*"</span>&#125; <span class="text-ink/75"># string, bytes, or sub-msg?</span></pre>
         </div>
-        <div class="p-4 bg-ink text-paper border-2 border-ink rounded-md overflow-x-auto">
-          <div class="text-xs font-bold text-acid mb-1.5">omnibuf decode</div>
-          <pre class="text-sm text-paper/95 leading-snug">&#123;<span class="text-acid font-bold">"3":</span> <span class="text-[#FF4F18] font-bold">true</span>,
- <span class="text-acid font-bold">"9":</span> &#123;<span class="text-acid">"3":</span> <span class="text-paper font-bold">"FRA"</span>, <span class="text-acid">"4":</span> 42&#125;&#125;</pre>
+        <div class="p-3.5 bg-ink text-paper border-2 border-ink rounded-md overflow-x-auto">
+          <div class="flex items-center justify-between gap-2 text-xs font-bold text-acid mb-1.5">
+            <span>$ omnibuf -c packet.obuf</span>
+            <span class="font-normal text-paper/65">OmniBuf</span>
+          </div>
+          <pre class="text-xs sm:text-sm text-paper/95 leading-snug">&#123;<span class="text-acid font-bold">"3":</span> <span class="text-[#FF4F18] font-bold">true</span>, <span class="text-acid font-bold">"9":</span> &#123;<span class="text-acid">"3":</span> <span class="text-paper font-bold">"FRA"</span>, <span class="text-acid">"4":</span> 42&#125;&#125;</pre>
+        </div>
+        <div class="p-3.5 bg-ink text-paper border-2 border-ink rounded-md overflow-x-auto">
+          <div class="flex items-center justify-between gap-2 text-xs font-bold text-acid mb-1.5">
+            <span>$ omnibuf -c packet-field0.obuf</span>
+            <span class="font-normal text-acid/85">OmniBuf + Field #0</span>
+          </div>
+          <pre class="text-xs sm:text-sm text-paper/95 leading-snug">&#123;<span class="text-acid font-bold">"active":</span> <span class="text-[#FF4F18] font-bold">true</span>, <span class="text-acid font-bold">"node":</span> &#123;<span class="text-acid">"city":</span> <span class="text-paper font-bold">"FRA"</span>, <span class="text-acid">"asn":</span> 42&#125;&#125;</pre>
         </div>
       </div>
     </div>

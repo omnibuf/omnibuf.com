@@ -1,6 +1,6 @@
 ---
 interface Props {
-  currentPage?: 'home' | 'how-it-works' | 'spec' | 'go' | 'es' | 'none';
+  currentPage?: 'home' | 'how-it-works' | 'spec' | 'go' | 'es' | 'cli' | 'none';
 }
 
 const { currentPage = 'home' } = Astro.props;
@@ -10,6 +10,7 @@ const primaryPages = [
   { href: '/how-it-works', key: 'how-it-works', label: 'How It Works' },
 ] as const;
 
+const cliPage = { href: '/cli', key: 'cli', label: 'CLI' } as const;
 const specPage = { href: '/spec', key: 'spec', label: 'Specification' } as const;
 
 const languages = [
@@ -20,6 +21,7 @@ const languages = [
 const activeLang = languages.find((l) => l.key === currentPage);
 const activePageLabel =
   primaryPages.find((p) => p.key === currentPage)?.label ??
+  (currentPage === cliPage.key ? cliPage.label : undefined) ??
   (currentPage === specPage.key ? specPage.label : undefined) ??
   (activeLang ? `Languages: ${activeLang.label}` : 'Menu');
 ---
@@ -81,6 +83,15 @@ const activePageLabel =
             })}
           </div>
         </details>
+
+        <a
+          href={cliPage.href}
+          class="nav-link"
+          data-active={currentPage === cliPage.key ? 'true' : 'false'}
+          aria-current={currentPage === cliPage.key ? 'page' : undefined}
+        >
+          {cliPage.label}
+        </a>
 
         <a
           href={specPage.href}
@@ -151,6 +162,16 @@ const activePageLabel =
               </a>
             );
           })}
+          <a
+            href={cliPage.href}
+            aria-current={currentPage === cliPage.key ? 'page' : undefined}
+            class={`flex items-center justify-between px-3.5 py-2.5 text-sm font-bold transition-colors ${
+              currentPage === cliPage.key ? 'bg-acid text-ink' : 'text-ink hover:bg-[#E5E0D5]'
+            }`}
+          >
+            <span>{cliPage.label}</span>
+            {currentPage === cliPage.key && <span class="text-xs">&bull;</span>}
+          </a>
           <a
             href={specPage.href}
             aria-current={currentPage === specPage.key ? 'page' : undefined}
@@ -348,12 +369,22 @@ const activePageLabel =
           OmniBuf for TypeScript &amp; JS
         </div>
       </a>
+      <a
+        href="/cli"
+        data-search-item
+        class="block p-2.5 rounded border-2 border-ink/25 hover:border-ink transition"
+      >
+        <div class="text-[10px] font-bold uppercase text-ink/65">CLI</div>
+        <div class="text-xs sm:text-sm font-bold text-ink mt-0.5">
+          Inspect, Query &amp; Encode Packets
+        </div>
+      </a>
     </div>
     <div id="search-dynamic-results" class="hidden space-y-1.5"></div>
   </div>
 
   <div class="px-3 sm:px-4 py-2 bg-[#E5E0D5] border-t-2 border-ink flex items-center justify-between gap-2 text-[11px] text-ink/80 shrink-0">
-    <span id="search-status">Type to search all 5 pages</span>
+    <span id="search-status">Type to search all 6 pages</span>
     <div class="hidden sm:flex items-center gap-3">
       <span>
         <kbd class="px-1 py-0.5 bg-[#FAF8F2] border border-ink rounded text-[10px] font-bold">
@@ -562,7 +593,7 @@ const activePageLabel =
     if (!query) {
       searchDefaultLinks?.classList.remove('hidden');
       searchDynamicResults?.classList.add('hidden');
-      if (searchStatus) searchStatus.textContent = 'Type to search all 5 pages';
+      if (searchStatus) searchStatus.textContent = 'Type to search all 6 pages';
       updateActiveItem(0);
       return;
     }

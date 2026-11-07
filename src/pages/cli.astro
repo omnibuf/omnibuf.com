@@ -1,0 +1,302 @@
+---
+import { Code } from 'astro:components';
+import Layout from '../layouts/Layout.astro';
+import Navbar from '../components/Navbar.astro';
+import Footer from '../components/Footer.astro';
+
+const installCommands = `# Homebrew (macOS & Linux)
+brew install omnibuf/tap/omnibuf
+
+# mise
+mise use -g github:omnibuf/omnibuf-cli
+
+# Shell script
+curl -fsSL https://omnibuf.com/install.sh | sh
+
+# Go
+go install github.com/omnibuf/omnibuf-cli/cmd/omnibuf@latest`;
+
+const jqFilterSnippet = `# Pretty-print any OmniBuf packet as JSON
+omnibuf packet.obuf
+
+# Extract a nested field as a raw string (-r)
+omnibuf -r '.location.city' packet.obuf
+
+# Filter array elements and emit compact JSON (-c)
+omnibuf -c '.neighbors[] | select(.established) | .router' packet.obuf`;
+
+const encodeSnippet = `# Pipe JSON directly into omnibuf to produce self-describing wire bytes (Field #0)
+echo '{"event": {"int": 10, "city": "FRA"}}' | omnibuf > event.obuf
+
+# Round-trip back to JSON or query a field in one pipeline
+echo '{"event": {"int": 10, "city": "FRA"}}' | omnibuf | omnibuf '.event.city'
+
+# Encode or decode against a compiled Protobuf FileDescriptorSet (.pb, .pb.gz, .json)
+omnibuf encode --schema descriptors.pb --type demo.v1.PeerUpdate input.json > packet.obuf
+omnibuf decode --schema descriptors.pb --type demo.v1.PeerUpdate packet.obuf`;
+
+const conformanceSnippet = `# Run the built-in 584-case conformance suite against any adapter binary
+omnibuf conformance ./bin/my-omnibuf-adapter
+
+# Emit machine-readable conformance results as JSON
+omnibuf conformance --json node ./packages/conformance/dist/cli.js`;
+---
+
+<Layout
+  title="OmniBuf CLI | Inspect, Query & Encode OmniBuf Packets"
+  description="Inspect raw OmniBuf packets without a schema, filter fields with built-in jq expressions, convert between JSON and OmniBuf wire bytes, and run the 584-case conformance suite."
+>
+  <Navbar currentPage="cli" />
+
+  <main id="main-content">
+    <!-- Page Header + Up-Front Install Bar -->
+    <section class="relative pt-10 pb-8 sm:pt-16 sm:pb-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+      <h1 class="text-[2.6rem] sm:text-7xl lg:text-[5.5rem] font-bold tracking-tight leading-[0.94] text-ink uppercase">
+        OmniBuf
+        <br />
+        <span class="font-serif italic font-normal normal-case text-[#FF4F18] text-[3.1rem] sm:text-8xl lg:text-[6.2rem]">
+          on the command line.
+        </span>
+      </h1>
+
+      <div class="mt-6 grid lg:grid-cols-12 gap-6 lg:gap-8 items-start">
+        <div class="lg:col-span-6 space-y-4">
+          <p class="text-lg sm:text-2xl text-ink/85 font-medium leading-snug">
+            <code>omnibuf</code> is a <code>jq</code>-style command-line tool for OmniBuf packets.
+            Point it at raw wire bytes to decode actual field values to JSON, filter messages with{' '}
+            <a href="#jq-queries" class="doc-link">
+              <code>jq</code> expressions
+            </a>
+            ,{' '}
+            <a href="#encode-json" class="doc-link">
+              encode JSON
+            </a>{' '}
+            into self-describing wire packets, or run the{' '}
+            <a href="#conformance" class="doc-link">
+              584-case conformance suite
+            </a>
+            .
+          </p>
+          <div class="flex flex-wrap gap-3 font-mono text-sm sm:text-base pt-1 no-print">
+            <a
+              href="https://github.com/omnibuf/omnibuf-cli"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="os-btn px-4 py-2.5 bg-acid text-ink font-bold rounded-md"
+            >
+              GitHub Repository &rarr;
+            </a>
+            <a
+              href="https://github.com/omnibuf/omnibuf-cli/releases"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="os-btn px-4 py-2.5 bg-[#FAF8F2] text-ink font-bold rounded-md"
+            >
+              Release Binaries &rarr;
+            </a>
+          </div>
+        </div>
+
+        <div class="lg:col-span-6 min-w-0">
+          <div class="p-4 sm:p-5 bg-ink text-paper rounded-md font-mono text-xs sm:text-sm overflow-x-auto leading-relaxed border-2 border-ink shadow-[4px_4px_0px_#111111] [&>pre]:!bg-transparent [&>pre]:!p-0 [&>pre]:!m-0 [&>pre]:!border-0">
+            <div class="flex items-center justify-between gap-2 mb-2.5 pb-2 border-b border-paper/15">
+              <div class="text-xs font-bold uppercase text-acid">Install omnibuf CLI</div>
+              <button
+                type="button"
+                data-copy="brew install omnibuf/tap/omnibuf"
+                class="copy-snippet-btn min-w-[4.75rem] text-center px-2.5 py-1 text-xs font-bold uppercase bg-paper/15 hover:bg-acid hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-acid text-paper border border-paper/30 rounded shrink-0 transition"
+              >
+                Copy brew
+              </button>
+            </div>
+            <Code code={installCommands} lang="sh" theme="github-dark" />
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CLI Capabilities -->
+    <section class="py-12 sm:py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto border-t-2 border-ink">
+      <div class="divide-y-2 divide-ink/20">
+        <!-- 1. Schema-Less Packet Inspection: protoscope vs omnibuf vs Field #0 -->
+        <div
+          id="inspect-without-schema"
+          class="scroll-mt-16 pb-10 sm:pb-12 grid lg:grid-cols-12 gap-6 lg:gap-8 items-center"
+        >
+          <div class="lg:col-span-5 space-y-3">
+            <h2 class="text-2xl sm:text-3xl font-bold uppercase tracking-tight leading-snug">
+              See actual values, not guesses.
+            </h2>
+            <!-- prettier-ignore -->
+            <p class="text-base sm:text-lg text-ink/90 leading-relaxed max-w-[60ch]">
+              Protobuf collapses strings, byte slices, sub-messages, maps, and packed arrays into one wire type, and shares a single varint wire type across booleans, signed integers, and unsigned integers. Inspecting a raw Protobuf packet with <a href="https://github.com/protocolbuffers/protoscope" target="_blank" rel="noopener noreferrer" class="doc-link"><code>protoscope</code></a> leaves you guessing what each field means. OmniBuf carries an explicit 4-bit wire type on every field, plus element types on arrays and maps. Running <code>omnibuf</code> prints the exact booleans, signed numbers, UTF-8 strings, arrays, and maps on the wire. Packets encoded with <strong>Field #0</strong> also decode with their original field names.
+            </p>
+          </div>
+
+          <div class="lg:col-span-7 min-w-0">
+            <div class="os-window overflow-hidden font-mono text-xs sm:text-sm">
+              <div class="os-titlebar bg-[#E5E0D5]">
+                <span class="font-bold uppercase text-ink text-xs">protoscope vs. omnibuf cli</span>
+                <div class="os-stripes"></div>
+              </div>
+              <div class="bg-ink text-paper p-4 space-y-3">
+                <div class="bg-[#1F1F1F] p-3 rounded border border-paper/15">
+                  <div class="flex flex-wrap items-center justify-between gap-2 mb-1.5">
+                    <span class="text-[11px] uppercase font-bold text-[#FF4F18]">
+                      $ protoscope packet.pb
+                    </span>
+                    <span class="text-[11px] text-paper/55">Protobuf &middot; guesses types</span>
+                  </div>
+                  <pre class="leading-relaxed overflow-x-auto"><code><span class="text-[#FF4F18] font-bold">1:</span> 1          <span class="text-paper/55"># bool / uint / sint / enum?</span>
+<span class="text-[#FF4F18] font-bold">2:</span> 3          <span class="text-paper/55"># +3 uint or -2 sint?</span>
+<span class="text-[#FF4F18] font-bold">3:</span> &#123;<span class="text-acid">"FRA"</span>&#125;    <span class="text-paper/55"># string / bytes / sub-msg?</span>
+<span class="text-[#FF4F18] font-bold">4:</span> <span class="text-acid">"\x0a\x14"</span> <span class="text-paper/55"># bytes / string / packed array?</span></code></pre>
+                </div>
+                <div class="bg-[#1F1F1F] p-3 rounded border border-paper/25">
+                  <div class="flex flex-wrap items-center justify-between gap-2 mb-1.5">
+                    <span class="text-[11px] uppercase font-bold text-acid">
+                      $ omnibuf -c packet.obuf
+                    </span>
+                    <span class="text-[11px] text-paper/65">OmniBuf &middot; actual values</span>
+                  </div>
+                  <pre class="leading-relaxed overflow-x-auto"><code>&#123;<span class="text-acid font-bold">"1"</span>: <span class="text-[#FF4F18] font-bold">true</span>, <span class="text-acid font-bold">"2"</span>: -2, <span class="text-acid font-bold">"3"</span>: <span class="text-acid">"FRA"</span>, <span class="text-acid font-bold">"4"</span>: [10, 20]&#125;</code></pre>
+                </div>
+                <div class="bg-[#1F1F1F] p-3 rounded border border-acid/45">
+                  <div class="flex flex-wrap items-center justify-between gap-2 mb-1.5">
+                    <span class="text-[11px] uppercase font-bold text-acid">
+                      $ omnibuf -c packet-field0.obuf
+                    </span>
+                    <span class="text-[11px] text-acid/85">
+                      OmniBuf + Field #0 &middot; actual values &amp; names
+                    </span>
+                  </div>
+                  <pre class="leading-relaxed overflow-x-auto"><code>&#123;<span class="text-acid font-bold">"active"</span>: <span class="text-[#FF4F18] font-bold">true</span>, <span class="text-acid font-bold">"delta"</span>: -2, <span class="text-acid font-bold">"city"</span>: <span class="text-acid">"FRA"</span>, <span class="text-acid font-bold">"peers"</span>: [10, 20]&#125;</code></pre>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2. Built-in jq Queries -->
+        <div
+          id="jq-queries"
+          class="scroll-mt-16 py-10 sm:py-12 grid lg:grid-cols-12 gap-6 lg:gap-8 items-center"
+        >
+          <div class="lg:col-span-5 space-y-3">
+            <h2 class="text-2xl sm:text-3xl font-bold uppercase tracking-tight leading-snug">
+              Query packets with jq filters.
+            </h2>
+            <p class="text-base sm:text-lg text-ink/90 leading-relaxed max-w-[60ch]">
+              Pass a <code>jq</code> filter expression as the first argument to slice, select, or
+              reshape decoded fields in a single command. Flags such as <code>-r</code> (raw string
+              output) and <code>-c</code> (compact single-line JSON) work the same way as{' '}
+              <code>jq</code>. Hex (<code>-x</code>) and base64 (<code>-b</code>) inputs are
+              supported directly.
+            </p>
+          </div>
+
+          <div class="lg:col-span-7 min-w-0">
+            <div class="os-window overflow-hidden font-mono text-xs sm:text-sm">
+              <div class="os-titlebar bg-[#E5E0D5]">
+                <span class="font-bold uppercase text-ink text-xs">jq filter expressions</span>
+                <div class="os-stripes"></div>
+              </div>
+              <div class="bg-ink text-paper p-4 [&>pre]:!bg-transparent [&>pre]:!p-0 [&>pre]:!m-0 [&>pre]:!border-0 [&>pre]:leading-relaxed [&>pre]:overflow-x-auto">
+                <Code code={jqFilterSnippet} lang="sh" theme="github-dark" />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3. Auto-Detect JSON Encode & Schema Mode -->
+        <div
+          id="encode-json"
+          class="scroll-mt-16 py-10 sm:py-12 grid lg:grid-cols-12 gap-6 lg:gap-8 items-center"
+        >
+          <div class="lg:col-span-5 space-y-3">
+            <h2 class="text-2xl sm:text-3xl font-bold uppercase tracking-tight leading-snug">
+              Convert JSON to OmniBuf and back.
+            </h2>
+            <p class="text-base sm:text-lg text-ink/90 leading-relaxed max-w-[60ch]">
+              <code>omnibuf</code> auto-detects whether its input is JSON or OmniBuf wire bytes.
+              Piping a JSON object into <code>omnibuf</code> encodes it into a self-describing
+              OmniBuf packet with <code>Field #0</code> field names and deterministic field tags.
+              Supplying <code>--schema</code> (<code>-s</code>) with a compiled{' '}
+              <code>FileDescriptorSet</code> encodes or decodes against your <code>.proto</code>{' '}
+              definitions.
+            </p>
+          </div>
+
+          <div class="lg:col-span-7 min-w-0">
+            <div class="os-window overflow-hidden font-mono text-xs sm:text-sm">
+              <div class="os-titlebar bg-[#E5E0D5]">
+                <span class="font-bold uppercase text-ink text-xs">json &harr; omnibuf</span>
+                <div class="os-stripes"></div>
+              </div>
+              <div class="bg-ink text-paper p-4 [&>pre]:!bg-transparent [&>pre]:!p-0 [&>pre]:!m-0 [&>pre]:!border-0 [&>pre]:leading-relaxed [&>pre]:overflow-x-auto">
+                <Code code={encodeSnippet} lang="sh" theme="github-dark" />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 4. Built-in Conformance Suite -->
+        <div
+          id="conformance"
+          class="scroll-mt-16 pt-10 sm:pt-12 grid lg:grid-cols-12 gap-6 lg:gap-8 items-center"
+        >
+          <div class="lg:col-span-5 space-y-3">
+            <h2 class="text-2xl sm:text-3xl font-bold uppercase tracking-tight leading-snug">
+              Built-in 584-case conformance runner.
+            </h2>
+            <p class="text-base sm:text-lg text-ink/90 leading-relaxed max-w-[60ch]">
+              The CLI embeds the full OmniBuf wire conformance corpus. Authors building an OmniBuf
+              implementation in another language can test their encoder, decoder, blind decoder, and
+              opaque field splicer against all 584 positive and negative test vectors with{' '}
+              <code>omnibuf conformance</code>.
+            </p>
+          </div>
+
+          <div class="lg:col-span-7 min-w-0">
+            <div class="os-window overflow-hidden font-mono text-xs sm:text-sm">
+              <div class="os-titlebar bg-[#E5E0D5]">
+                <span class="font-bold uppercase text-ink text-xs">omnibuf conformance</span>
+                <div class="os-stripes"></div>
+              </div>
+              <div class="bg-ink text-paper p-4 [&>pre]:!bg-transparent [&>pre]:!p-0 [&>pre]:!m-0 [&>pre]:!border-0 [&>pre]:leading-relaxed [&>pre]:overflow-x-auto">
+                <Code code={conformanceSnippet} lang="sh" theme="github-dark" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="py-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto border-t-2 border-ink no-print">
+      <div class="flex flex-wrap items-center justify-between gap-4">
+        <div class="font-mono text-sm sm:text-base font-bold uppercase text-ink/80">
+          Language Libraries &amp; Specification
+        </div>
+        <div class="flex flex-wrap gap-3 font-mono text-sm sm:text-base">
+          <a href="/go" class="os-btn px-5 py-2.5 bg-acid text-ink font-bold rounded-md">
+            OmniBuf for Go &rarr;
+          </a>
+          <a href="/es" class="os-btn px-5 py-2.5 bg-[#FAF8F2] text-ink font-bold rounded-md">
+            TypeScript / JS &rarr;
+          </a>
+          <a
+            href="/how-it-works"
+            class="os-btn px-5 py-2.5 bg-[#FAF8F2] text-ink font-bold rounded-md"
+          >
+            How It Works &rarr;
+          </a>
+          <a href="/spec" class="os-btn px-5 py-2.5 bg-[#FAF8F2] text-ink font-bold rounded-md">
+            Wire Specification &rarr;
+          </a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <Footer />
+</Layout>

@@ -12,9 +12,10 @@ const PAGE_LABELS = {
   '/spec': 'Specification',
   '/go': 'Go',
   '/es': 'TypeScript / JS',
+  '/cli': 'CLI',
 };
 
-const PAGE_ORDER = ['/', '/how-it-works', '/spec', '/go', '/es'];
+const PAGE_ORDER = ['/', '/how-it-works', '/spec', '/go', '/es', '/cli'];
 
 function decodeEntities(str) {
   return str

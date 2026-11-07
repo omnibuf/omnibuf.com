@@ -36,29 +36,47 @@ pkt, _ := omnibuf.Marshal(&Node{ID: 1, City: "FRA"})`;
         </h3>
         <!-- prettier-ignore -->
         <p class="text-base sm:text-lg text-ink/90 leading-relaxed max-w-[60ch]">
-          Protobuf packs strings, byte slices, sub-messages, maps, and arrays into a single wire type, and mixes booleans, unsigned ints, and signed ints together. Looking at a raw packet without the <code>.proto</code> file leaves you guessing what each field is. OmniBuf puts an explicit type on every field (16 wire types in total), so any tool can decode exact values from raw bytes. Turning on optional <strong>Field #0</strong> metadata also writes the field names once at the top of the packet.
+          Protobuf packs strings, byte slices, sub-messages, maps, and arrays into one wire type, and mixes booleans, unsigned ints, and signed ints together. Without the <code>.proto</code> file, <a href="https://github.com/protocolbuffers/protoscope" target="_blank" rel="noopener noreferrer" class="doc-link"><code>protoscope</code></a> has to guess what each field holds. OmniBuf tags every field with an explicit 4-bit wire type (16 types in total). Run the <a href="/cli" class="doc-link"><code>omnibuf</code> CLI</a> on a raw packet to see the actual values and query them with <code>jq</code> filters. Turning on optional <strong>Field #0</strong> metadata writes the field names once at the top of the packet.
         </p>
       </div>
       <div class="lg:col-span-7 min-w-0">
         <div class="os-window overflow-hidden font-mono text-xs sm:text-sm">
           <div class="os-titlebar bg-[#E5E0D5]">
-            <span class="font-bold uppercase text-ink text-xs">raw packet dump</span>
+            <span class="font-bold uppercase text-ink text-xs">schema-less packet inspection</span>
             <div class="os-stripes"></div>
           </div>
           <div class="bg-ink text-paper p-4 space-y-3">
             <div class="bg-[#1F1F1F] p-3 rounded border border-paper/15">
-              <div class="text-[11px] uppercase font-bold text-[#FF4F18] mb-1.5">Protobuf</div>
+              <div class="flex flex-wrap items-center justify-between gap-2 mb-1.5">
+                <span class="text-[11px] uppercase font-bold text-[#FF4F18]">
+                  $ protoscope packet.pb
+                </span>
+                <span class="text-[11px] text-paper/55">Protobuf &middot; guesses types</span>
+              </div>
               <pre class="leading-relaxed overflow-x-auto"><code><span class="text-[#FF4F18] font-bold">1:</span> 1          <span class="text-paper/55"># bool / uint / sint / enum?</span>
 <span class="text-[#FF4F18] font-bold">2:</span> 3          <span class="text-paper/55"># +3 uint or -2 sint?</span>
 <span class="text-[#FF4F18] font-bold">3:</span> &#123;<span class="text-acid">"FRA"</span>&#125;    <span class="text-paper/55"># string / bytes / sub-msg?</span>
 <span class="text-[#FF4F18] font-bold">4:</span> <span class="text-acid">"\x0a\x14"</span> <span class="text-paper/55"># bytes / string / packed array?</span></code></pre>
             </div>
-            <div class="bg-[#1F1F1F] p-3 rounded border border-acid/40">
-              <div class="text-[11px] uppercase font-bold text-acid mb-1.5">OmniBuf</div>
-              <pre class="leading-relaxed overflow-x-auto"><code><span class="text-acid font-bold">1:</span> <span class="text-[#FF4F18] font-bold">true</span>       <span class="text-acid/80"># bool (0 value bytes)</span>
-<span class="text-acid font-bold">2:</span> -2         <span class="text-acid/80"># signed int</span>
-<span class="text-acid font-bold">3:</span> <span class="text-acid">"FRA"</span>      <span class="text-acid/80"># utf8 string</span>
-<span class="text-acid font-bold">4:</span> [10, 20]   <span class="text-acid/80"># 2 uints</span></code></pre>
+            <div class="bg-[#1F1F1F] p-3 rounded border border-paper/25">
+              <div class="flex flex-wrap items-center justify-between gap-2 mb-1.5">
+                <span class="text-[11px] uppercase font-bold text-acid">
+                  $ omnibuf -c packet.obuf
+                </span>
+                <span class="text-[11px] text-paper/65">OmniBuf &middot; actual values</span>
+              </div>
+              <pre class="leading-relaxed overflow-x-auto"><code>&#123;<span class="text-acid font-bold">"1"</span>: <span class="text-[#FF4F18] font-bold">true</span>, <span class="text-acid font-bold">"2"</span>: -2, <span class="text-acid font-bold">"3"</span>: <span class="text-acid">"FRA"</span>, <span class="text-acid font-bold">"4"</span>: [10, 20]&#125;</code></pre>
+            </div>
+            <div class="bg-[#1F1F1F] p-3 rounded border border-acid/45">
+              <div class="flex flex-wrap items-center justify-between gap-2 mb-1.5">
+                <span class="text-[11px] uppercase font-bold text-acid">
+                  $ omnibuf -c packet-field0.obuf
+                </span>
+                <span class="text-[11px] text-acid/85">
+                  OmniBuf + Field #0 &middot; actual values &amp; names
+                </span>
+              </div>
+              <pre class="leading-relaxed overflow-x-auto"><code>&#123;<span class="text-acid font-bold">"active"</span>: <span class="text-[#FF4F18] font-bold">true</span>, <span class="text-acid font-bold">"delta"</span>: -2, <span class="text-acid font-bold">"city"</span>: <span class="text-acid">"FRA"</span>, <span class="text-acid font-bold">"peers"</span>: [10, 20]&#125;</code></pre>
             </div>
           </div>
         </div>
