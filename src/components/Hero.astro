@@ -53,14 +53,14 @@ const restRows = butterflyRows.filter((r) => !r.baseline);
   <div class="mt-8 space-y-5">
     <!-- prettier-ignore -->
     <p class="max-w-4xl text-lg sm:text-2xl font-medium leading-snug text-ink/90">
-      I built OmniBuf to replace both <a href="https://protobuf.dev/programming-guides/encoding/" target="_blank" rel="noopener noreferrer" class="doc-link">Protobuf</a> and <strong>JSON</strong>. It is a binary serialization format where raw packets remain readable on their own, individual fields can be read or updated in place, and schemas are optional. Plug it into <a href="https://grpc.io/" target="_blank" rel="noopener noreferrer" class="doc-link">gRPC</a> and <a href="https://connectrpc.com/" target="_blank" rel="noopener noreferrer" class="doc-link">Connect</a> with your existing <code>.proto</code> files, or serialize plain Go structs and TypeScript objects directly.
+      I built OmniBuf to replace both <a href="https://protobuf.dev/programming-guides/encoding/" target="_blank" rel="noopener noreferrer" class="doc-link">Protobuf</a> and <strong>JSON</strong>. It is a binary serialization format where raw packets remain readable on their own, individual fields can be read or updated in place, and schemas are optional. Plug it into <a href="https://grpc.io/" target="_blank" rel="noopener noreferrer" class="doc-link">gRPC</a> and <a href="https://connectrpc.com/" target="_blank" rel="noopener noreferrer" class="doc-link">Connect</a> with your existing <code>.proto</code> files, or serialize plain <a href="/go" class="doc-link">Go structs</a> and <a href="/es" class="doc-link">TypeScript objects</a> directly.
     </p>
 
     <div class="grid lg:grid-cols-12 gap-5 items-stretch">
       <p class="lg:col-span-7 text-base sm:text-xl font-medium text-ink/90 leading-relaxed bg-[#FAF8F2] p-5 sm:p-6 border-2 border-ink shadow-[6px_6px_0px_#111] rounded-md flex items-center">
         <!-- prettier-ignore -->
         <span>
-          In our Go benchmarks below, OmniBuf runs <strong>about 6x faster on encode (123 ns) and 7x faster on decode (229 ns)</strong> than standard Go Protobuf on an 11-field message. Against <code>encoding/json</code> on plain Go structs, it is <strong>over 10x faster</strong> and cuts packet size in half. Below is how the wire format works and what it trades off.
+          In our Go benchmarks below, OmniBuf runs <strong>about 6x faster on encode (123 ns) and 7x faster on decode (229 ns)</strong> than standard Go Protobuf on an 11-field message. Against <code>encoding/json</code> on plain Go structs, it is <strong>over 10x faster</strong> and cuts packet size in half. Read <a href="/how-it-works" class="doc-link">how the wire format works</a> or check the <a href="/spec" class="doc-link">wire specification</a>.
         </span>
       </p>
 
@@ -208,39 +208,6 @@ const restRows = butterflyRows.filter((r) => !r.baseline);
           </a>
         </div>
       </div>
-    </div>
-
-    <div class="flex flex-wrap gap-3.5 pt-2 no-print">
-      <a
-        href="/how-it-works"
-        class="os-btn px-5 py-3 bg-acid text-ink font-mono font-bold text-sm sm:text-base rounded-md"
-      >
-        How It Works &rarr;
-      </a>
-      <a
-        href="/go"
-        class="os-btn px-5 py-3 bg-[#FAF8F2] text-ink font-mono font-bold text-sm sm:text-base rounded-md"
-      >
-        Go &rarr;
-      </a>
-      <a
-        href="/es"
-        class="os-btn px-5 py-3 bg-[#FAF8F2] text-ink font-mono font-bold text-sm sm:text-base rounded-md"
-      >
-        TypeScript / JS &rarr;
-      </a>
-      <a
-        href="/cli"
-        class="os-btn px-5 py-3 bg-[#FAF8F2] text-ink font-mono font-bold text-sm sm:text-base rounded-md"
-      >
-        CLI &rarr;
-      </a>
-      <a
-        href="/spec"
-        class="os-btn px-5 py-3 bg-[#FAF8F2] text-ink font-mono font-bold text-sm sm:text-base rounded-md"
-      >
-        Specification &rarr;
-      </a>
     </div>
   </div>
 
