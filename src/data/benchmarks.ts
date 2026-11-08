@@ -477,7 +477,7 @@ export const languageBenchmarks: Record<LanguageKey, LanguageBenchmarkSuite> = {
     ctaLabel: 'See full results',
     competitorsLabel: "Protobuf, FlatBuffers, Avro, Cap'n Proto, MsgPack, JSON",
     heroSummaryHtml:
-      'In our Go benchmarks, OmniBuf runs <strong>about 6x faster on encode (126 ns) and 5.5x to 7x faster on decode (144 to 251 ns)</strong> than standard Go Protobuf on an 11-field message. Against <code>encoding/json</code> on plain Go structs, it is <strong>over 10x faster</strong> and cuts packet size in half. Read <a href="/how-it-works" class="doc-link">how the wire format works</a> or check the <a href="/spec" class="doc-link">wire specification</a>.',
+      'In our Go benchmarks, OmniBuf runs <strong>about 6x faster on encode and 5.5x to 7x faster on decode</strong> than standard Go Protobuf on an 11-field message. Against <code>encoding/json</code> on plain Go structs, it is <strong>over 10x faster</strong> and cuts packet size in half. Read <a href="/how-it-works" class="doc-link">how the wire format works</a> or check the <a href="/spec" class="doc-link">wire specification</a>.',
     categories: goSpeedCategories,
     butterflyEncodeRows: (goEncodeCat?.rows ?? []).filter(
       (r) => (r.baseline || !r.highlight) && r.name !== 'JSON (encoding/json/v2)',
