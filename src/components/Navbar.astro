@@ -353,6 +353,8 @@ const isMultiColDropdown = languages.length >= 5;
       <div class="grid sm:grid-cols-3 gap-2">
         <a
           href="/how-it-works#wire-types"
+          role="option"
+          aria-selected="true"
           data-search-item
           data-active="true"
           class="block p-2.5 rounded border-2 border-ink/25 hover:border-ink transition"
@@ -362,6 +364,8 @@ const isMultiColDropdown = languages.length >= 5;
         </a>
         <a
           href="/spec"
+          role="option"
+          aria-selected="false"
           data-search-item
           class="block p-2.5 rounded border-2 border-ink/25 hover:border-ink transition"
         >
@@ -370,6 +374,8 @@ const isMultiColDropdown = languages.length >= 5;
         </a>
         <a
           href="/cli"
+          role="option"
+          aria-selected="false"
           data-search-item
           class="block p-2.5 rounded border-2 border-ink/25 hover:border-ink transition"
         >
@@ -387,6 +393,8 @@ const isMultiColDropdown = languages.length >= 5;
           {languages.map((lang) => (
             <a
               href={lang.href}
+              role="option"
+              aria-selected="false"
               data-search-item
               class="block p-2 rounded border-2 border-ink/25 hover:border-ink transition"
             >
@@ -597,6 +605,7 @@ const isMultiColDropdown = languages.length >= 5;
     items.forEach((el, idx) => {
       const isSelected = idx === activeIndex;
       el.setAttribute('data-active', isSelected ? 'true' : 'false');
+      el.setAttribute('aria-selected', isSelected ? 'true' : 'false');
       if (isSelected) {
         el.scrollIntoView({ block: 'nearest' });
       }
@@ -706,6 +715,8 @@ const isMultiColDropdown = languages.length >= 5;
             return `
               <a
                 href="${escapeHtml(entry.url)}"
+                role="option"
+                aria-selected="${idx === 0 ? 'true' : 'false'}"
                 data-search-item
                 data-active="${idx === 0 ? 'true' : 'false'}"
                 class="block p-2.5 sm:p-3 rounded border-2 border-transparent hover:border-ink transition"

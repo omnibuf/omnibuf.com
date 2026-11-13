@@ -21,18 +21,48 @@ const PAGE_ORDER = [
   cliNavPage.href,
 ];
 
+const NAMED_HTML_ENTITIES = {
+  amp: '&',
+  lt: '<',
+  gt: '>',
+  quot: '"',
+  apos: "'",
+  nbsp: ' ',
+  middot: '·',
+  bull: '•',
+  hellip: '…',
+  rarr: '→',
+  larr: '←',
+  uarr: '↑',
+  darr: '↓',
+  harr: '↔',
+  crarr: '↵',
+  rsaquo: '›',
+  lsaquo: '‹',
+  rsquo: '’',
+  lsquo: '‘',
+  rdquo: '”',
+  ldquo: '“',
+  ndash: '–',
+  times: '×',
+  plusmn: '±',
+  le: '≤',
+  ge: '≥',
+  ne: '≠',
+};
+
 function decodeEntities(str) {
-  return str
-    .replace(/&rarr;/g, '→')
-    .replace(/&larr;/g, '←')
-    .replace(/&hellip;/g, '…')
-    .replace(/&bull;/g, '•')
-    .replace(/&amp;/g, '&')
-    .replace(/&lt;/g, '<')
-    .replace(/&gt;/g, '>')
-    .replace(/&quot;/g, '"')
-    .replace(/&#39;/g, "'")
-    .replace(/&#(\d+);/g, (_, n) => String.fromCharCode(Number(n)));
+  return str.replace(
+    /&(?:#(\d+)|#x([0-9a-fA-F]+)|([a-zA-Z][a-zA-Z0-9]+));/g,
+    (match, dec, hex, named) => {
+      if (dec !== undefined) return String.fromCodePoint(Number.parseInt(dec, 10));
+      if (hex !== undefined) return String.fromCodePoint(Number.parseInt(hex, 16));
+      if (named !== undefined && Object.hasOwn(NAMED_HTML_ENTITIES, named)) {
+        return NAMED_HTML_ENTITIES[named];
+      }
+      return match;
+    },
+  );
 }
 
 function cleanHtmlText(html) {

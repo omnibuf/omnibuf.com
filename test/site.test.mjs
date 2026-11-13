@@ -166,3 +166,32 @@ esac
     rmSync(workDir, { recursive: true, force: true });
   }
 });
+
+test('search-index.json decodes HTML entities and Navbar listbox options manage aria-selected', () => {
+  const searchIndexPath = resolve(rootDir, 'dist/search-index.json');
+  assert.equal(existsSync(searchIndexPath), true, 'dist/search-index.json must exist after build');
+  const entries = JSON.parse(readFileSync(searchIndexPath, 'utf8'));
+  assert.ok(Array.isArray(entries) && entries.length > 0);
+
+  const entityRe = /&(?:#\d+|#x[0-9a-fA-F]+|[a-zA-Z][a-zA-Z0-9]+);/;
+  for (const entry of entries) {
+    for (const field of ['page', 'section', 'title', 'text']) {
+      assert.doesNotMatch(
+        String(entry[field] ?? ''),
+        entityRe,
+        `undecoded HTML entity in ${entry.url} (${field})`,
+      );
+    }
+  }
+
+  const navbar = readRepoFile('src/components/Navbar.astro');
+  assert.match(navbar, /role="listbox"/);
+  const searchItemAttrs = navbar.match(/^\s+data-search-item$/gm) || [];
+  const optionRoleAttrs = navbar.match(/role="option"/g) || [];
+  assert.equal(
+    optionRoleAttrs.length,
+    searchItemAttrs.length,
+    'every static and dynamic [data-search-item] anchor must carry role="option"',
+  );
+  assert.match(navbar, /setAttribute\('aria-selected',\s*isSelected\s*\?\s*'true'\s*:\s*'false'\)/);
+});
