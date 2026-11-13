@@ -195,3 +195,30 @@ test('search-index.json decodes HTML entities and Navbar listbox options manage 
   );
   assert.match(navbar, /setAttribute\('aria-selected',\s*isSelected\s*\?\s*'true'\s*:\s*'false'\)/);
 });
+
+test('CSS, 404 routes, FAQ deterministic wording, HowItWorks KiB units, and PRODUCT.md paths stay consistent', () => {
+  const globalCss = readRepoFile('src/styles/global.css');
+  const darkGreenSelectorMatches = globalCss.match(/html\.dark svg text\[fill='#00805A'\]/g) || [];
+  assert.equal(
+    darkGreenSelectorMatches.length,
+    1,
+    'global.css must not contain duplicate dark-mode #00805A SVG text rules',
+  );
+
+  const notFoundPage = readRepoFile('src/pages/404.astro');
+  for (const route of ['/', '/how-it-works', '/spec', '/go', '/es', '/cli']) {
+    assert.match(notFoundPage, new RegExp(`href="${route}"`));
+  }
+
+  const faq = readRepoFile('src/components/FAQ.astro');
+  assert.doesNotMatch(faq, /sorts fields and map keys/);
+  assert.match(faq, /MarshalDeterministic[\s\S]*?sorts map keys/);
+
+  const howItWorks = readRepoFile('src/components/HowItWorks.astro');
+  assert.doesNotMatch(howItWorks, /16 KB/);
+  assert.match(howItWorks, /16 KiB/);
+
+  const productMd = readRepoFile('PRODUCT.md');
+  assert.doesNotMatch(productMd, /web\/src\//);
+  assert.match(productMd, /\/cli/);
+});

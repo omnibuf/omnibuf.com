@@ -31,7 +31,7 @@ Its core wire-format mechanisms are:
 ## Operating Context
 
 - Evaluated alongside standard `.proto` toolchains (`protoc`, `buf`), Go benchmarks (`go test -bench`), Node/V8 benchmarks (`pnpm run bench`), and existing wire formats (`google.golang.org/protobuf`, `@bufbuild/protobuf`, `protobufjs`, FlatBuffers, Cap'n Proto, MessagePack, and JSON).
-- The web site (`web/`) is an Astro + Tailwind CSS static site deployed to Cloudflare Pages with five primary surfaces: Overview (`/`), How It Works (`/how-it-works`), Wire Specification (`/spec`), Go Language Guide (`/go`), and TypeScript & JS Language Guide (`/es`).
+- The web site (`omnibuf.com`) is an Astro + Tailwind CSS static site deployed to Cloudflare Pages with six primary surfaces: Overview (`/`), How It Works (`/how-it-works`), Wire Specification (`/spec`), Go Language Guide (`/go`), TypeScript & JS Language Guide (`/es`), and CLI Guide (`/cli`).
 
 ## Capabilities and Constraints
 
@@ -46,9 +46,9 @@ Its core wire-format mechanisms are:
 
 ## Evidence on Hand
 
-- Reproducible Go benchmark suite in [`omnibuf_bench_test.go`](file:///Users/kevin/Projects/omnibuf/omnibuf_bench_test.go) and [`opaque_table_bench_test.go`](file:///Users/kevin/Projects/omnibuf/opaque_table_bench_test.go), plus TypeScript/JS benchmarks from `omnibuf-es`, summarized in [`web/src/data/benchmarks.ts`](file:///Users/kevin/Projects/omnibuf/web/src/data/benchmarks.ts).
-- Complete Go wire-format implementation in [`omnibuf.go`](file:///Users/kevin/Projects/omnibuf/omnibuf.go), [`array.go`](file:///Users/kevin/Projects/omnibuf/array.go), [`opaque.go`](file:///Users/kevin/Projects/omnibuf/opaque.go), and code generator in [`cmd/protoc-gen-omnibuf/main.go`](file:///Users/kevin/Projects/omnibuf/cmd/protoc-gen-omnibuf/main.go), alongside the TypeScript/JS packages (`@omnibuf/core`, `@omnibuf/web`, `@omnibuf/node`, `@omnibuf/protoc-gen-omnibuf-es`).
-- Wire specification in [`web/src/pages/spec.astro`](file:///Users/kevin/Projects/omnibuf/web/src/pages/spec.astro).
+- Reproducible Go benchmark suite in [`omnibuf_bench_test.go`](file:///Users/kevin/Projects/omnibuf/omnibuf-go/omnibuf_bench_test.go) and [`opaque_table_bench_test.go`](file:///Users/kevin/Projects/omnibuf/omnibuf-go/opaque_table_bench_test.go), plus TypeScript/JS benchmarks in [`bench.ts`](file:///Users/kevin/Projects/omnibuf/omnibuf-es/benchmarks/bench.ts), summarized in [`benchmarks.ts`](file:///Users/kevin/Projects/omnibuf/omnibuf.com/src/data/benchmarks.ts).
+- Complete Go wire-format implementation in [`omnibuf.go`](file:///Users/kevin/Projects/omnibuf/omnibuf-go/omnibuf.go), [`array.go`](file:///Users/kevin/Projects/omnibuf/omnibuf-go/array.go), [`opaque.go`](file:///Users/kevin/Projects/omnibuf/omnibuf-go/opaque.go), and code generator in [`main.go`](file:///Users/kevin/Projects/omnibuf/omnibuf-go/cmd/protoc-gen-omnibuf/main.go), alongside the TypeScript/JS packages (`@omnibuf/core`, `@omnibuf/web`, `@omnibuf/node`, `@omnibuf/protoc-gen-omnibuf-es`).
+- Wire specification in [`spec.astro`](file:///Users/kevin/Projects/omnibuf/omnibuf.com/src/pages/spec.astro).
 - **Absences not to fabricate:** No external customer logos or third-party production case studies exist today; never invent them.
 
 ## Product Principles

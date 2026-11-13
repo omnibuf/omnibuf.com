@@ -45,7 +45,7 @@ const faqItems: FAQItem[] = [
     id: 'faq-deterministic',
     question: 'Is encoding deterministic?',
     paragraphs: [
-      'Standard <code>Marshal</code> is not deterministic because Go randomizes map iteration order. <code>omnibuf.MarshalDeterministic</code> sorts fields and map keys first so tests and hashes get identical bytes.',
+      'Go randomizes map iteration order on every run. Standard <code>Marshal</code> follows map iteration directly, while <code>omnibuf.MarshalDeterministic</code> sorts map keys in ascending order so tests and content hashes see identical bytes.',
     ],
   },
   {
