@@ -18,3 +18,23 @@ test('/es defineMessage snippet and prose match @omnibuf/core FieldSpec', () => 
   assert.match(esPage, /<code>submsg<\/code>/);
   assert.doesNotMatch(esPage, /<code>message<\/code>/);
 });
+
+test('schema-less omnibuf -c and DecodeBlind examples use field_<N> keys', () => {
+  for (const file of ['src/pages/cli.astro', 'src/components/Motivation.astro']) {
+    const src = readRepoFile(file);
+    assert.match(src, /"field_1"/);
+    assert.match(src, /"field_2"/);
+    assert.match(src, /"field_3"/);
+    assert.match(src, /"field_4"/);
+    assert.doesNotMatch(src, />"1"</);
+  }
+  const caps = readRepoFile('src/components/Capabilities.astro');
+  assert.match(caps, /"field_3":/);
+  assert.match(caps, /"field_9":/);
+  assert.doesNotMatch(caps, />"3":</);
+
+  const goPage = readRepoFile('src/pages/go.astro');
+  const esPage = readRepoFile('src/pages/es.astro');
+  assert.match(goPage, /field_1/);
+  assert.match(esPage, /field_1/);
+});

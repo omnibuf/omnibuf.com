@@ -38,5 +38,9 @@ pages-preview:
 pages-deploy:
     pnpm run pages:deploy
 
-# Run full CI checks (format check, lint/typecheck, and production build)
-ci: fmt-check lint build
+# Run site verification tests
+test:
+    pnpm run test
+
+# Run full CI checks (format check, lint/typecheck, production build, and site tests)
+ci: fmt-check lint build test

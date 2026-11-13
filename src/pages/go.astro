@@ -34,7 +34,7 @@ const goFaqItems = [
     id: 'go-faq-blind',
     question: 'How do I decode without a schema?',
     paragraphs: [
-      '<code>omnibuf.DecodeBlind(pkt)</code> returns a map keyed by field number. Setting <code>MarshalOptions{SelfDescribing: true}</code> on encode embeds Field #0 so <code>DecodeBlind</code> keys the map by field name.',
+      '<code>omnibuf.DecodeBlind(pkt)</code> returns a map with synthetic <code>field_1</code>, <code>field_2</code>, ... keys. Setting <code>MarshalOptions{SelfDescribing: true}</code> on encode embeds Field #0 so <code>DecodeBlind</code> keys the map by field name.',
     ],
     codeBlock: field0BlindCode,
     codeLabel: 'Example',
