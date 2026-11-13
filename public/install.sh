@@ -52,8 +52,11 @@ verify_sha256() {
     actual="$(sha256sum "$file" | awk '{print $1}')"
   elif command -v shasum >/dev/null 2>&1; then
     actual="$(shasum -a 256 "$file" | awk '{print $1}')"
+  elif command -v openssl >/dev/null 2>&1; then
+    actual="$(openssl dgst -sha256 "$file" | awk '{print $NF}')"
   else
-    return 0
+    echo "error: no SHA-256 tool found (sha256sum, shasum, or openssl required)" >&2
+    exit 1
   fi
   if [ "$actual" != "$expected" ]; then
     echo "error: SHA-256 mismatch for $file (expected $expected, got $actual)" >&2
@@ -75,10 +78,12 @@ main() {
   curl -fsSL "${base_url}/${archive}" -o "${tmpdir}/${archive}"
   curl -fsSL "${base_url}/checksums.txt" -o "${tmpdir}/checksums.txt"
 
-  expected_sha="$(grep "  ${archive}\$" "${tmpdir}/checksums.txt" | awk '{print $1}')"
-  if [ -n "$expected_sha" ]; then
-    verify_sha256 "${tmpdir}/${archive}" "$expected_sha"
+  expected_sha="$(awk -v a="$archive" '($2 == a || $2 == "*" a) && NF == 2 { print $1; exit }' "${tmpdir}/checksums.txt")"
+  if [ -z "$expected_sha" ]; then
+    echo "error: checksum for ${archive} not found in checksums.txt" >&2
+    exit 1
   fi
+  verify_sha256 "${tmpdir}/${archive}" "$expected_sha"
 
   tar -xzf "${tmpdir}/${archive}" -C "${tmpdir}"
   bin_path="$(find "${tmpdir}" -name "${BIN_NAME}" -type f | head -n 1)"
@@ -93,9 +98,9 @@ main() {
       bin_dir="/usr/local/bin"
     else
       bin_dir="${HOME}/.local/bin"
-      mkdir -p "$bin_dir"
     fi
   fi
+  [ -d "$bin_dir" ] || mkdir -p "$bin_dir"
 
   install -m 0755 "$bin_path" "${bin_dir}/${BIN_NAME}"
   echo "Installed ${BIN_NAME} to ${bin_dir}/${BIN_NAME}"
