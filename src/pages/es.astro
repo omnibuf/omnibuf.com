@@ -25,7 +25,7 @@ const PeerSchema = defineMessage<Peer, 'app.Peer'>('app.Peer', {
   peerId: { fieldNum: 1, name: 'peer_id', type: 'uint32' },
   router: { fieldNum: 2, type: 'string', omitEmpty: true },
   active: { fieldNum: 3, type: 'bool' },
-  prefixes: { fieldNum: 4, type: 'uint32', repeated: true },
+  prefixes: { fieldNum: 4, type: 'uint32[]' },
 });
 
 const peer = create(PeerSchema, {
@@ -286,10 +286,10 @@ const esFaqJsonLd = {
               <code>defineMessage</code> (or class decorators) defines a message schema directly in
               TypeScript for <code>toBinary</code> and <code>fromBinary</code>. No{' '}
               <code>.proto</code> file needed. Each field specifies its field number (
-              <code>1..65535</code>) and wire type (<code>uint32</code>, <code>sint64</code>,{' '}
-              <code>string</code>, <code>message</code>, <code>map</code>). Optional{' '}
-              <code>name</code> and <code>omitEmpty</code> flags control Field #0 names and zero
-              values.
+              <code>1..536,870,911</code>) and field type (<code>uint32</code>, <code>sint64</code>,{' '}
+              <code>string</code>, <code>uint32[]</code>, <code>submsg</code>, <code>map</code>).
+              Optional <code>name</code> and <code>omitEmpty</code> flags control Field #0 names and
+              zero values.
             </p>
           </div>
 
