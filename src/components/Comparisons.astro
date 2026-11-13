@@ -77,10 +77,13 @@ const comparisonLanguageCharts = languageBenchmarkList.map((suite) => {
           >
             {comparisonLanguageCharts.map((preview, idx) => (
               <button
+                id={`comp-butterfly-tab-${preview.key}`}
                 type="button"
                 role="tab"
                 data-butterfly-tab={preview.key}
                 aria-selected={idx === 0 ? 'true' : 'false'}
+                aria-controls={`comp-butterfly-panel-${preview.key}`}
+                tabindex={idx === 0 ? 0 : -1}
                 class:list={[
                   'px-2.5 py-1 rounded border-2 border-ink transition cursor-pointer',
                   idx === 0
@@ -100,7 +103,13 @@ const comparisonLanguageCharts = languageBenchmarkList.map((suite) => {
         </div>
 
         {comparisonLanguageCharts.map((preview, idx) => (
-          <div role="tabpanel" data-butterfly-panel={preview.key} class={idx === 0 ? '' : 'hidden'}>
+          <div
+            id={`comp-butterfly-panel-${preview.key}`}
+            role="tabpanel"
+            aria-labelledby={`comp-butterfly-tab-${preview.key}`}
+            data-butterfly-panel={preview.key}
+            class={idx === 0 ? '' : 'hidden'}
+          >
             <!-- OmniBuf Row -->
             <div
               class="grid grid-cols-2 items-center py-1"
@@ -364,46 +373,51 @@ const comparisonLanguageCharts = languageBenchmarkList.map((suite) => {
 </section>
 
 <script>
-  document.querySelectorAll<HTMLElement>('[data-butterfly-widget]').forEach((widget) => {
-    const tabs = Array.from(widget.querySelectorAll<HTMLButtonElement>('[data-butterfly-tab]'));
-    const panels = Array.from(widget.querySelectorAll<HTMLElement>('[data-butterfly-panel]'));
-    const links = Array.from(widget.querySelectorAll<HTMLElement>('[data-butterfly-link]'));
+  document
+    .querySelectorAll<HTMLElement>('[data-butterfly-widget="comparisons"]')
+    .forEach((widget) => {
+      const tabs = Array.from(widget.querySelectorAll<HTMLButtonElement>('[data-butterfly-tab]'));
+      const panels = Array.from(widget.querySelectorAll<HTMLElement>('[data-butterfly-panel]'));
+      const links = Array.from(widget.querySelectorAll<HTMLElement>('[data-butterfly-link]'));
 
-    function activateLang(key: string) {
-      tabs.forEach((tab) => {
-        const isActive = tab.getAttribute('data-butterfly-tab') === key;
-        tab.setAttribute('aria-selected', isActive ? 'true' : 'false');
-        tab.classList.toggle('bg-acid', isActive);
-        tab.classList.toggle('text-ink', isActive);
-        tab.classList.toggle('shadow-[2px_2px_0px_#111111]', isActive);
-        tab.classList.toggle('bg-white', !isActive);
-        tab.classList.toggle('text-ink/75', !isActive);
-      });
-      panels.forEach((panel) => {
-        panel.classList.toggle('hidden', panel.getAttribute('data-butterfly-panel') !== key);
-      });
-      links.forEach((link) => {
-        link.classList.toggle('hidden', link.getAttribute('data-butterfly-link') !== key);
-      });
-    }
+      function activateLang(key: string) {
+        tabs.forEach((tab) => {
+          const isActive = tab.getAttribute('data-butterfly-tab') === key;
+          tab.setAttribute('aria-selected', isActive ? 'true' : 'false');
+          tab.setAttribute('tabindex', isActive ? '0' : '-1');
+          tab.classList.toggle('bg-acid', isActive);
+          tab.classList.toggle('text-ink', isActive);
+          tab.classList.toggle('shadow-[2px_2px_0px_#111111]', isActive);
+          tab.classList.toggle('bg-white', !isActive);
+          tab.classList.toggle('text-ink/75', !isActive);
+          tab.classList.toggle('hover:bg-[#E5E0D5]', !isActive);
+          tab.classList.toggle('hover:text-ink', !isActive);
+        });
+        panels.forEach((panel) => {
+          panel.classList.toggle('hidden', panel.getAttribute('data-butterfly-panel') !== key);
+        });
+        links.forEach((link) => {
+          link.classList.toggle('hidden', link.getAttribute('data-butterfly-link') !== key);
+        });
+      }
 
-    tabs.forEach((tab, idx) => {
-      tab.addEventListener('click', () => {
-        const key = tab.getAttribute('data-butterfly-tab');
-        if (key) activateLang(key);
-      });
-      tab.addEventListener('keydown', (e) => {
-        if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') {
-          e.preventDefault();
-          const dir = e.key === 'ArrowRight' ? 1 : -1;
-          const next = tabs[(idx + dir + tabs.length) % tabs.length];
-          if (next) {
-            next.focus();
-            const key = next.getAttribute('data-butterfly-tab');
-            if (key) activateLang(key);
+      tabs.forEach((tab, idx) => {
+        tab.addEventListener('click', () => {
+          const key = tab.getAttribute('data-butterfly-tab');
+          if (key) activateLang(key);
+        });
+        tab.addEventListener('keydown', (e) => {
+          if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') {
+            e.preventDefault();
+            const dir = e.key === 'ArrowRight' ? 1 : -1;
+            const next = tabs[(idx + dir + tabs.length) % tabs.length];
+            if (next) {
+              next.focus();
+              const key = next.getAttribute('data-butterfly-tab');
+              if (key) activateLang(key);
+            }
           }
-        }
+        });
       });
     });
-  });
 </script>

@@ -79,10 +79,13 @@ const heroLanguageCharts = languageBenchmarkList.map((suite) => {
             >
               {heroLanguageCharts.map((chart, idx) => (
                 <button
+                  id={`hero-butterfly-tab-${chart.key}`}
                   type="button"
                   role="tab"
                   data-butterfly-tab={chart.key}
                   aria-selected={idx === 0 ? 'true' : 'false'}
+                  aria-controls={`hero-butterfly-panel-${chart.key}`}
+                  tabindex={idx === 0 ? 0 : -1}
                   class:list={[
                     'px-2.5 py-1 rounded border-2 border-ink transition cursor-pointer',
                     idx === 0
@@ -103,7 +106,13 @@ const heroLanguageCharts = languageBenchmarkList.map((suite) => {
           </div>
 
           {heroLanguageCharts.map((chart, idx) => (
-            <div role="tabpanel" data-butterfly-panel={chart.key} class={idx === 0 ? '' : 'hidden'}>
+            <div
+              id={`hero-butterfly-panel-${chart.key}`}
+              role="tabpanel"
+              aria-labelledby={`hero-butterfly-tab-${chart.key}`}
+              data-butterfly-panel={chart.key}
+              class={idx === 0 ? '' : 'hidden'}
+            >
               <!-- Row 1: OmniBuf (Tiny Wings + Callout Arrow) -->
               <div
                 class="grid grid-cols-2 items-center py-1"
@@ -1184,7 +1193,7 @@ const heroLanguageCharts = languageBenchmarkList.map((suite) => {
 </section>
 
 <script>
-  document.querySelectorAll<HTMLElement>('[data-butterfly-widget]').forEach((widget) => {
+  document.querySelectorAll<HTMLElement>('[data-butterfly-widget="hero"]').forEach((widget) => {
     const tabs = Array.from(widget.querySelectorAll<HTMLButtonElement>('[data-butterfly-tab]'));
     const panels = Array.from(widget.querySelectorAll<HTMLElement>('[data-butterfly-panel]'));
     const summaries = Array.from(widget.querySelectorAll<HTMLElement>('[data-butterfly-summary]'));
@@ -1194,11 +1203,14 @@ const heroLanguageCharts = languageBenchmarkList.map((suite) => {
       tabs.forEach((tab) => {
         const isActive = tab.getAttribute('data-butterfly-tab') === key;
         tab.setAttribute('aria-selected', isActive ? 'true' : 'false');
+        tab.setAttribute('tabindex', isActive ? '0' : '-1');
         tab.classList.toggle('bg-acid', isActive);
         tab.classList.toggle('text-ink', isActive);
         tab.classList.toggle('shadow-[2px_2px_0px_#111111]', isActive);
         tab.classList.toggle('bg-[#FAF8F2]', !isActive);
         tab.classList.toggle('text-ink/75', !isActive);
+        tab.classList.toggle('hover:bg-[#E5E0D5]', !isActive);
+        tab.classList.toggle('hover:text-ink', !isActive);
       });
       panels.forEach((panel) => {
         panel.classList.toggle('hidden', panel.getAttribute('data-butterfly-panel') !== key);

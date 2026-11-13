@@ -38,3 +38,21 @@ test('schema-less omnibuf -c and DecodeBlind examples use field_<N> keys', () =>
   assert.match(goPage, /field_1/);
   assert.match(esPage, /field_1/);
 });
+
+test('Hero and Comparisons scope butterfly widget scripts and ARIA tab linkage', () => {
+  const hero = readRepoFile('src/components/Hero.astro');
+  const comparisons = readRepoFile('src/components/Comparisons.astro');
+
+  assert.match(hero, /\[data-butterfly-widget="hero"\]/);
+  assert.doesNotMatch(hero, /querySelectorAll<HTMLElement>\('\[data-butterfly-widget\]'\)/);
+  assert.match(hero, /hover:bg-\[#E5E0D5\]/);
+  assert.match(hero, /aria-controls=/);
+  assert.match(hero, /aria-labelledby=/);
+  assert.match(hero, /tabindex=/);
+
+  assert.match(comparisons, /\[data-butterfly-widget="comparisons"\]/);
+  assert.doesNotMatch(comparisons, /querySelectorAll<HTMLElement>\('\[data-butterfly-widget\]'\)/);
+  assert.match(comparisons, /aria-controls=/);
+  assert.match(comparisons, /aria-labelledby=/);
+  assert.match(comparisons, /tabindex=/);
+});
