@@ -18,7 +18,7 @@ Success on the web surface means an engineer can immediately understand how the 
 
 ## Positioning
 
-Unlike FlatBuffers or Cap'n Proto (which require custom IDLs, arena builders, and larger pointer/vtable overhead) and unlike MessagePack or JSON (which repeat string keys or lack `.proto` schema evolution), OmniBuf compiles standard `.proto` files (or native structs/types) into a self-describing binary wire format that encodes 5.9x faster and decodes up to 7.3x faster than standard Go Protobuf (`google.golang.org/protobuf`), and encodes 2.3x faster and decodes 3.5x faster than `@bufbuild/protobuf` (`protobuf-es`) in TypeScript/JS.
+Unlike FlatBuffers or Cap'n Proto (which require custom IDLs, arena builders, and larger pointer/vtable overhead) and unlike MessagePack or JSON (which repeat string keys or lack `.proto` schema evolution), OmniBuf compiles standard `.proto` files (or native structs/types) into a self-describing binary wire format that encodes 6.0x faster and decodes 5.2x faster than standard Go Protobuf (`google.golang.org/protobuf`) under equal struct reuse, and encodes 2.5x faster and decodes 3.1x faster than `@bufbuild/protobuf` (`protobuf-es`) in TypeScript/JS.
 
 Its core wire-format mechanisms are:
 
@@ -35,7 +35,7 @@ Its core wire-format mechanisms are:
 
 ## Capabilities and Constraints
 
-- **Language support:** The wire specification is language-agnostic, with first-party implementations for Go, TypeScript/JavaScript, Rust, Python, C++20, Java 21, and C# (.NET 8) verified against a shared 584-case conformance suite. Always state runtime trade-offs candidly (such as C `upb` arena-backed lazy parsing vs eager Python dataclass materialization on `/py`).
+- **Language support:** The wire specification is language-agnostic, with first-party implementations for Go, TypeScript/JavaScript, Rust, Python, C++20, Java 21, and C# (.NET 8) verified against a shared 758-case conformance suite. Always state runtime trade-offs candidly (such as C `upb` arena-backed encode vs full 11-field Python decode on `/py`, or two-pass `encoded_len()` sizing on `>16 KiB` nested containers).
 - **Benchmark presentation:** High-level callouts, cards, and prose must use relative multipliers and percentages (such as `5.9x faster`, `7.3x faster`, `40% smaller`) rather than fragile exact `ns/op` or line counts. Detailed benchmark tables and methodology notes remain grounded in reproducible repository benchmarks.
 - **Honest trade-offs:** Every format comparison must acknowledge where competing formats win (for example, Protobuf's ubiquitous multi-language ecosystem and ~7% smaller wire size on dense messages, FlatBuffers/Cap'n Proto's zero-unpack `O(1)` random access into large buffers, MessagePack's schema-free dynamic maps, and JSON's native browser/human readability).
 

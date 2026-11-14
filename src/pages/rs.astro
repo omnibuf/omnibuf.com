@@ -6,6 +6,15 @@ import Benchmarks from '../components/Benchmarks.astro';
 import LanguageStrip from '../components/LanguageStrip.astro';
 import Footer from '../components/Footer.astro';
 
+const cargoFeaturesSnippet = `# Default: derive + buffa + prost
+omnibuf = "0.1"
+
+# buffa + #[derive(OmniBuf)] only
+omnibuf = { version = "0.1", default-features = false, features = ["derive", "buffa"] }
+
+# Pure wire, opaque splicing & blind decode
+omnibuf = { version = "0.1", default-features = false }`;
+
 const deriveRustSnippet = `use omnibuf::{Message, OmniBuf};
 
 #[derive(Debug, Default, PartialEq, OmniBuf)]
@@ -26,10 +35,38 @@ pub struct PeerUpdate {
 let pkt = peer.encode_omnibuf()?;
 let out = PeerUpdate::from_omnibuf(&pkt)?;`;
 
-const prostSnippet = `use omnibuf::prost_codec::{decode_prost, encode_prost};
+const buffaBuildSnippet = `buffa_build::Config::new()
+    .files(&["omnibuf/bench/peer.proto"])
+    .includes(&["proto"])
+    .generate_views(true)
+    .generate_reflection(true)
+    .message_attribute(".", "#[derive(::omnibuf::OmniBuf)]")
+    .oneof_attribute(".", "#[derive(::omnibuf::OmniBuf)]")
+    .compile()?;`;
 
-let pkt: Vec<u8> = encode_prost(&prost_peer)?;
-let out: pb::PeerUpdate = decode_prost(&pkt)?;`;
+const buffaUsageSnippet = `use omnibuf::{EncodeOptions, Message};
+use omnibuf::buffa_codec::{decode_buffa, encode_buffa, encode_buffa_reflect};
+
+// Co-derived #[derive(OmniBuf)] on buffa structs
+let pkt = buffa_peer.encode_omnibuf()?;
+let direct = buffa_pb::PeerUpdate::from_omnibuf(&pkt)?;
+
+// Pre-compiled buffa crates via Reflectable vtables or DescriptorPool
+let pkt = encode_buffa_reflect(&buffa_peer, EncodeOptions::default())?;
+let pkt_pool = encode_buffa(&buffa_peer, &pool, EncodeOptions::default())?;
+let reflected: buffa_pb::PeerUpdate = decode_buffa(&pkt, &pool)?;`;
+
+const prostSnippet = `use omnibuf::{EncodeOptions, Message};
+use omnibuf::prost_codec::{decode_prost, encode_prost};
+
+// Co-derived #[derive(prost::Message, OmniBuf)] via prost_build::Config::type_attribute
+let pkt = prost_peer.encode_omnibuf()?;
+let direct = pb::PeerUpdate::from_omnibuf(&pkt)?;
+
+// Pre-compiled prost + prost-reflect crates
+let pkt = encode_prost(&prost_peer, EncodeOptions::default())?;
+let mut reflected = pb::PeerUpdate::default();
+decode_prost(&pkt, &mut reflected)?;`;
 
 const bufGenRsSnippet = `version: v2
 plugins:
@@ -42,41 +79,50 @@ use omnibuf::Message;
 
 let pkt = peer.encode_omnibuf()?;
 
-let mut view = OpaquePeerUpdate::new(&pkt)?;
-if view.active()? {
-    let city: &str = view.location()?.unwrap().city()?;
-    view.set_sequence(9_876_543_211);
-    let updated: Vec<u8> = view.marshal()?;
+let mut view = OpaquePeerUpdate::try_new(&pkt)?;
+if view.get_active() {
+    let city: &str = view.get_location().get_city();
+    view.set_sequence(view.get_sequence() + 1);
+    let updated: Vec<u8> = view.try_marshal()?;
 }`;
 
-const blindRsCode = `use omnibuf::{EncodeOptions, Message, decode_blind_json};
+const blindRsSnippet = `use std::collections::BTreeMap;
+use omnibuf::{BlindValue, EncodeOptions, Message, decode_blind, decode_blind_json};
 
 let pkt = peer.encode_omnibuf_with_options(EncodeOptions::self_describing())?;
-let json = decode_blind_json(&pkt)?;`;
+let fields: BTreeMap<String, BlindValue> = decode_blind(&pkt)?;
+let json: String = decode_blind_json(&pkt)?;`;
 
 const rsFaqItems = [
   {
-    id: 'rs-faq-borrowing',
-    question: 'Do Opaque getters allocate Strings on read?',
+    id: 'rs-faq-buffa-views',
+    question: "How do buffa *View<'a> types compare with OmniBuf Opaque<'a> views?",
     paragraphs: [
-      "<code>OpaquePeerUpdate&lt;'a&gt;</code> borrows <code>&amp;'a str</code> and <code>&amp;'a [u8]</code> slices straight from the input packet buffer. UTF-8 validity is checked once over the borrowed byte range, and scalar getters decode directly from unaligned little-endian loads.",
+      "<code>buffa</code> generates <code>PeerUpdateView&lt;'a&gt;</code> structs that parse a Protobuf buffer in one upfront pass, populating borrowed <code>&amp;'a str</code> and <code>&amp;'a [u8]</code> slices across every field. <code>OpaquePeerUpdate&lt;'a&gt;</code> wraps the raw OmniBuf slice as a <code>Cow&lt;'a, [u8]&gt;</code> and defers decoding until individual getter calls, stepping over earlier length-prefixed containers in O(1) time per field.",
+      "Pipelines that read most fields of an incoming Protobuf message benefit from <code>buffa</code>'s single-pass <code>*View&lt;'a&gt;</code> borrow. Routing planes and telemetry proxies that inspect one nested header or overwrite a single sequence counter skip full-struct materialization with <code>Opaque&lt;'a&gt;</code> and <code>splice_fields</code>.",
     ],
   },
   {
-    id: 'rs-faq-prost-derive',
-    question: 'How does prost_codec compare to #[derive(OmniBuf)] on prost structs?',
+    id: 'rs-faq-buffa-vs-prost',
+    question: 'What differs under the hood between buffa and prost integration?',
     paragraphs: [
-      '<code>omnibuf::prost_codec</code> walks <code>prost-reflect</code> descriptors at runtime so existing generated crates need zero build-script edits. Attaching <code>#[derive(::omnibuf::OmniBuf)]</code> via <code>prost_build::Config::type_attribute</code> switches to static monomorphized field dispatch and matches full plugin codegen speed.',
+      '<code>prost</code> encodes schema metadata inside <code>#[prost(...)]</code> field attributes, boxes recursive messages in <code>Option&lt;Box&lt;T&gt;&gt;</code>, and stores enums as bare <code>i32</code> values. <code>buffa</code> emits <code>/// Field N: `name`</code> doc attributes, wraps singular sub-messages in <code>buffa::MessageField&lt;T&gt;</code>, preserves unknown enum discriminants via <code>buffa::EnumValue&lt;E&gt;</code>, and exposes zero-allocation <code>Reflectable</code> vtables.',
+      '<code>#[derive(OmniBuf)]</code> recognizes both field layouts natively at macro expansion time. At runtime, <code>buffa_codec::encode_buffa_reflect</code> reads <code>buffa</code> structs in place through their <code>Reflectable</code> vtable, whereas <code>prost_codec::encode_prost</code> converts through <code>prost_reflect::DynamicMessage</code>.',
     ],
   },
   {
-    id: 'rs-faq-blind',
-    question: 'What does decode_blind produce when Field #0 is absent?',
+    id: 'rs-faq-untrusted-limits',
+    question: 'How are untrusted network payloads bounded before allocation?',
     paragraphs: [
-      'Raw packets still carry explicit 4-bit wire types on every tag, so <code>decode_blind</code> emits synthetic <code>field_1</code>, <code>field_2</code>, ... keys with exact integer signs, booleans, floats, strings, and Base64 byte slices. Passing <code>EncodeOptions::self_describing()</code> prepends Field #0 so keys resolve to their schema names.',
+      '<code>DecodeOptions</code> caps packet byte length (<code>max_message_bytes</code>), cumulative array and map element counts (<code>max_elements</code>), total heap reservation (<code>max_alloc_bytes</code>), and recursion depth (<code>max_depth</code>, capped at 32). All four checks run ahead of owned value allocation in <code>from_slice_with_options</code>, <code>decode_buffa_with_options</code>, <code>decode_prost_with_options</code>, and <code>decode_blind_with_options</code>, verified across <code>758/758</code> conformance cases.',
     ],
-    codeBlock: blindRsCode,
-    codeLabel: 'Example',
+  },
+  {
+    id: 'rs-faq-no-protobuf-deps',
+    question: 'Can crates depend on omnibuf with zero Protobuf dependencies?',
+    paragraphs: [
+      'Setting <code>default-features = false</code> disables <code>derive</code>, <code>buffa</code>, and <code>prost</code>. Only the core Prefix-Varint wire encoder, zero-copy decoder, <code>Field #0</code> schema reader, <code>opaque::splice_fields</code>, and <code>decode_blind</code> compile, leaving <code>itoa</code> and <code>ryu</code> as the sole dependencies. Adding <code>features = [&quot;derive&quot;]</code> re-enables <code>#[derive(OmniBuf)]</code> for standalone Rust structs.',
+    ],
   },
 ];
 
@@ -97,8 +143,8 @@ const rsFaqJsonLd = {
 ---
 
 <Layout
-  title="OmniBuf for Rust | #[derive(OmniBuf)], prost & protoc-gen-omnibuf-rs"
-  description="Use OmniBuf in Rust: derive codecs on plain Rust structs, transcode prost messages, or generate single-pass encoders and zero-copy Opaque<'a> views with buf."
+  title="OmniBuf for Rust | #[derive(OmniBuf)], buffa, prost & protoc-gen-omnibuf-rs"
+  description="Use OmniBuf in Rust: derive codecs on native structs, co-derive or transcode buffa and prost Protobuf messages, or generate zero-copy Opaque<'a> packet views with buf."
 >
   <Navbar currentPage="rs" />
 
@@ -112,23 +158,32 @@ const rsFaqJsonLd = {
         </span>
       </h1>
 
-      <div class="mt-6 grid lg:grid-cols-12 gap-6 lg:gap-8 items-end">
+      <div class="mt-6 grid lg:grid-cols-12 gap-6 lg:gap-8 items-start">
         <div class="lg:col-span-7 space-y-4">
           <p class="text-lg sm:text-2xl text-ink/85 font-medium leading-snug">
             Annotate native structs with{' '}
             <a href="#derive-macro" class="doc-link">
               <code>#[derive(OmniBuf)]</code>
             </a>
-            , bridge existing{' '}
+            , integrate{' '}
+            <a href="#buffa-types" class="doc-link">
+              <code>buffa</code>
+            </a>{' '}
+            and{' '}
             <a href="#prost-types" class="doc-link">
-              <code>prost</code> messages
-            </a>
-            , or run{' '}
+              <code>prost</code>
+            </a>{' '}
+            Protobuf messages, or run{' '}
             <a href="#plugin-codegen" class="doc-link">
               <code>protoc-gen-omnibuf-rs</code>
             </a>{' '}
-            through <code>buf generate</code> for zero-copy <code>Opaque&lt;&apos;a&gt;</code>{' '}
-            packet views. Release-mode numbers sit{' '}
+            via <code>buf generate</code> for zero-copy <code>Opaque&lt;&apos;a&gt;</code> packet
+            views and{' '}
+            <a href="#blind-decode" class="doc-link">
+              <code>decode_blind</code>
+            </a>{' '}
+            inspection. All four tiers pass <code>758/758</code> conformance cases. Release-mode
+            numbers sit{' '}
             <a href="#benchmarks" class="doc-link">
               below
             </a>
@@ -144,7 +199,7 @@ const rsFaqJsonLd = {
           </div>
         </div>
 
-        <div class="lg:col-span-5 min-w-0">
+        <div class="lg:col-span-5 space-y-3 min-w-0">
           <div class="p-4 sm:p-5 bg-ink text-paper rounded-md font-mono text-xs sm:text-sm overflow-x-auto leading-relaxed border-2 border-ink shadow-[4px_4px_0px_#111111]">
             <div class="flex items-center justify-between gap-2 mb-2 pb-2 border-b border-paper/15">
               <div class="text-xs font-bold uppercase text-acid">Add Rust Crate</div>
@@ -158,6 +213,20 @@ const rsFaqJsonLd = {
             </div>
             <pre class="leading-relaxed whitespace-pre"><code><span class="text-paper/75 select-none">$ </span>cargo add omnibuf</code></pre>
           </div>
+
+          <div class="p-4 sm:p-5 bg-ink text-paper rounded-md font-mono text-xs sm:text-sm overflow-x-auto leading-relaxed border-2 border-ink shadow-[4px_4px_0px_#111111] [&>pre]:!bg-transparent [&>pre]:!p-0 [&>pre]:!m-0 [&>pre]:!border-0">
+            <div class="flex items-center justify-between gap-2 mb-2 pb-2 border-b border-paper/15">
+              <div class="text-xs font-bold uppercase text-acid">Cargo.toml Features</div>
+              <button
+                type="button"
+                data-copy={cargoFeaturesSnippet}
+                class="copy-snippet-btn min-w-[4.75rem] text-center px-2.5 py-1 text-xs font-bold uppercase bg-paper/15 hover:bg-acid hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-acid text-paper border border-paper/30 rounded shrink-0 transition"
+              >
+                Copy
+              </button>
+            </div>
+            <Code code={cargoFeaturesSnippet} lang="toml" theme="github-dark" />
+          </div>
         </div>
       </div>
     </section>
@@ -168,13 +237,14 @@ const rsFaqJsonLd = {
     >
       <div class="max-w-3xl mb-8">
         <h2 class="text-3xl sm:text-5xl font-bold tracking-tight uppercase leading-none">
-          Three ways to use{' '}
+          Ways to use{' '}
           <span class="font-serif italic font-normal normal-case text-[#FF4F18]">
             OmniBuf in Rust.
           </span>
         </h2>
         <p class="mt-3 text-lg sm:text-xl text-ink/80 font-medium">
-          Every tier emits identical wire packets.
+          Every integration path emits identical wire bytes and passes <code>758/758</code>{' '}
+          cross-language conformance cases.
         </p>
       </div>
 
@@ -189,10 +259,10 @@ const rsFaqJsonLd = {
             </h3>
             <p class="text-base sm:text-lg text-ink/85 leading-relaxed">
               <code>#[derive(OmniBuf)]</code> expands straight into single-pass Prefix-Varint writes
-              and unrolled tag-switch loops at compile time. No <code>.proto</code> build step
-              required. Field attributes declare wire IDs, optional ZigZag or fixed-width overrides
-              (<code>wire = &quot;sint&quot;</code>, <code>&quot;fixed64&quot;</code>), and Field #0
-              names.
+              and unrolled tag-switch loops at compile time. Zero <code>.proto</code> build scripts
+              are needed. Field attributes declare wire IDs, ZigZag or fixed-width overrides (
+              <code>wire = &quot;sint&quot;</code>, <code>&quot;fixed64&quot;</code>),{' '}
+              <code>oneof</code> variant tags, and <code>Field #0</code> names.
             </p>
           </div>
 
@@ -214,26 +284,93 @@ const rsFaqJsonLd = {
         </div>
 
         <div
+          id="buffa-types"
+          class="scroll-mt-16 py-8 sm:py-12 grid lg:grid-cols-12 gap-6 lg:gap-8 items-start"
+        >
+          <div class="lg:col-span-5 space-y-3.5 min-w-0">
+            <h3 class="text-2xl sm:text-3xl font-bold uppercase tracking-tight leading-snug">
+              Protobuf messages with buffa
+            </h3>
+            <p class="text-base sm:text-lg text-ink/85 leading-relaxed">
+              First-class support for <code>anthropics/buffa</code> (
+              <code>features = [&quot;buffa&quot;]</code>, active by default) covers both static
+              co-derivation and runtime reflection. Attaching{' '}
+              <code>#[derive(::omnibuf::OmniBuf)]</code> via{' '}
+              <code>buffa_build::Config::message_attribute</code> and <code>oneof_attribute</code>{' '}
+              parses <code>/// Field N:</code> doc comments, unwraps{' '}
+              <code>buffa::MessageField&lt;T&gt;</code>, <code>buffa::EnumValue&lt;E&gt;</code>, and{' '}
+              <code>Option&lt;...&gt;</code> oneofs, and emits an unrolled zero-reflection codec.
+            </p>
+            <p class="text-base sm:text-lg text-ink/85 leading-relaxed">
+              Pre-compiled <code>buffa</code> crates keep their <code>build.rs</code> untouched
+              through <code>omnibuf::buffa_codec</code>. <code>encode_buffa_reflect</code> walks{' '}
+              <code>Reflectable</code> vtables directly in memory with zero intermediate Protobuf
+              buffers, while <code>encode_buffa</code> and <code>decode_buffa</code> transcode
+              against any <code>Arc&lt;buffa_descriptor::DescriptorPool&gt;</code>.
+            </p>
+          </div>
+
+          <div class="lg:col-span-7 space-y-3.5 min-w-0">
+            <div class="p-4 sm:p-5 bg-ink text-paper rounded-md font-mono text-xs sm:text-sm overflow-x-auto leading-relaxed border-2 border-ink [&>pre]:!bg-transparent [&>pre]:!p-0 [&>pre]:!m-0 [&>pre]:!border-0">
+              <div class="flex items-center justify-between gap-2 mb-2.5 pb-2 border-b border-paper/15">
+                <div class="text-xs font-bold uppercase text-acid">
+                  build.rs &middot; Co-Derive with buffa-build
+                </div>
+                <button
+                  type="button"
+                  data-copy={buffaBuildSnippet}
+                  class="copy-snippet-btn min-w-[4.75rem] text-center px-2.5 py-1 text-xs font-bold uppercase bg-paper/15 hover:bg-acid hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-acid text-paper border border-paper/30 rounded shrink-0 transition"
+                >
+                  Copy
+                </button>
+              </div>
+              <Code code={buffaBuildSnippet} lang="rust" theme="github-dark" />
+            </div>
+
+            <div class="p-4 sm:p-5 bg-ink text-paper rounded-md font-mono text-xs sm:text-sm overflow-x-auto leading-relaxed border-2 border-ink [&>pre]:!bg-transparent [&>pre]:!p-0 [&>pre]:!m-0 [&>pre]:!border-0">
+              <div class="flex items-center justify-between gap-2 mb-2.5 pb-2 border-b border-paper/15">
+                <div class="text-xs font-bold uppercase text-acid">
+                  buffa Co-Derive &amp; buffa_codec
+                </div>
+                <button
+                  type="button"
+                  data-copy={buffaUsageSnippet}
+                  class="copy-snippet-btn min-w-[4.75rem] text-center px-2.5 py-1 text-xs font-bold uppercase bg-paper/15 hover:bg-acid hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-acid text-paper border border-paper/30 rounded shrink-0 transition"
+                >
+                  Copy
+                </button>
+              </div>
+              <Code code={buffaUsageSnippet} lang="rust" theme="github-dark" />
+            </div>
+          </div>
+        </div>
+
+        <div
           id="prost-types"
           class="scroll-mt-16 py-8 sm:py-12 grid lg:grid-cols-12 gap-6 lg:gap-8 items-start"
         >
           <div class="lg:col-span-5 space-y-3.5 min-w-0">
             <h3 class="text-2xl sm:text-3xl font-bold uppercase tracking-tight leading-snug">
-              Existing prost and prost-reflect messages
+              Protobuf messages with prost
             </h3>
             <p class="text-base sm:text-lg text-ink/85 leading-relaxed">
-              Crates already built around <code>prost</code> and <code>tonic</code> pass their
-              existing structs to <code>encode_prost</code> and <code>decode_prost</code>. Both
-              static <code>ReflectMessage</code> types and runtime <code>DynamicMessage</code>{' '}
-              descriptors round-trip cleanly across all scalar, <code>oneof</code>, repeated, and
-              map fields.
+              Workspaces built around <code>prost</code> and <code>tonic</code> pair static
+              co-derivation with runtime descriptors (<code>features = [&quot;prost&quot;]</code>,
+              active by default). Passing <code>#[derive(::omnibuf::OmniBuf)]</code> to{' '}
+              <code>prost_build::Config::type_attribute</code> compiles <code>#[prost(...)]</code>{' '}
+              field tags into monomorphized <code>Message</code> and <code>Oneof</code> impls.
+              Upstream crates implementing <code>prost_reflect::ReflectMessage</code> or{' '}
+              <code>DynamicMessage</code> pass directly into <code>encode_prost</code> and{' '}
+              <code>decode_prost</code>.
             </p>
           </div>
 
           <div class="lg:col-span-7 min-w-0">
             <div class="p-4 sm:p-5 bg-ink text-paper rounded-md font-mono text-xs sm:text-sm overflow-x-auto leading-relaxed border-2 border-ink [&>pre]:!bg-transparent [&>pre]:!p-0 [&>pre]:!m-0 [&>pre]:!border-0">
               <div class="flex items-center justify-between gap-2 mb-2.5 pb-2 border-b border-paper/15">
-                <div class="text-xs font-bold uppercase text-acid">prost Integration</div>
+                <div class="text-xs font-bold uppercase text-acid">
+                  prost Co-Derive &amp; prost_codec
+                </div>
                 <button
                   type="button"
                   data-copy={prostSnippet}
@@ -253,14 +390,16 @@ const rsFaqJsonLd = {
         >
           <div class="lg:col-span-5 space-y-3.5 min-w-0">
             <h3 class="text-2xl sm:text-3xl font-bold uppercase tracking-tight leading-snug">
-              Generated code with protoc-gen-omnibuf-rs
+              Generated views with protoc-gen-omnibuf-rs
             </h3>
             <p class="text-base sm:text-lg text-ink/85 leading-relaxed">
               Pointing <code>buf.gen.yaml</code> at <code>protoc-gen-omnibuf-rs</code> generates
               owned Rust structs paired with lifetime-bound <code>Opaque&lt;&apos;a&gt;</code>{' '}
-              views. Lookups hop over earlier field headers by byte length in ~93 ns and borrow{' '}
-              <code>&amp;str</code> directly from the packet slice. Calling <code>marshal()</code>{' '}
-              splices modified fields and copies untouched spans verbatim.
+              views. Getters hop across preceding field headers by byte length and borrow{' '}
+              <code>&amp;str</code> and <code>&amp;[u8]</code> straight from the packet slice.{' '}
+              <code>try_new</code> and <code>try_marshal</code> validate untrusted buffers up front,
+              while <code>splice_fields</code> rewrites dirty fields in place and copies clean spans
+              verbatim.
             </p>
           </div>
 
@@ -311,6 +450,44 @@ const rsFaqJsonLd = {
             </div>
           </div>
         </div>
+
+        <div
+          id="blind-decode"
+          class="scroll-mt-16 py-8 sm:py-12 grid lg:grid-cols-12 gap-6 lg:gap-8 items-start"
+        >
+          <div class="lg:col-span-5 space-y-3.5 min-w-0">
+            <h3 class="text-2xl sm:text-3xl font-bold uppercase tracking-tight leading-snug">
+              Schema-less inspection with decode_blind
+            </h3>
+            <p class="text-base sm:text-lg text-ink/85 leading-relaxed">
+              Every OmniBuf tag carries an explicit 4-bit wire type. <code>decode_blind</code> and{' '}
+              <code>decode_blind_json</code> inspect arbitrary wire slices with zero compile-time
+              schemas, emitting synthetic <code>field_1</code>, <code>field_2</code>, ... keys with
+              exact integer signs, booleans, IEEE-754 <code>-0.0</code>, UTF-8 strings, and Base64
+              byte slices. Passing <code>EncodeOptions::self_describing()</code> prepends{' '}
+              <code>Field #0</code> (<code>SchemaMeta</code>) so keys resolve to declared field
+              names.
+            </p>
+          </div>
+
+          <div class="lg:col-span-7 min-w-0">
+            <div class="p-4 sm:p-5 bg-ink text-paper rounded-md font-mono text-xs sm:text-sm overflow-x-auto leading-relaxed border-2 border-ink [&>pre]:!bg-transparent [&>pre]:!p-0 [&>pre]:!m-0 [&>pre]:!border-0">
+              <div class="flex items-center justify-between gap-2 mb-2.5 pb-2 border-b border-paper/15">
+                <div class="text-xs font-bold uppercase text-acid">
+                  decode_blind &amp; Field #0 SchemaMeta
+                </div>
+                <button
+                  type="button"
+                  data-copy={blindRsSnippet}
+                  class="copy-snippet-btn min-w-[4.75rem] text-center px-2.5 py-1 text-xs font-bold uppercase bg-paper/15 hover:bg-acid hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-acid text-paper border border-paper/30 rounded shrink-0 transition"
+                >
+                  Copy
+                </button>
+              </div>
+              <Code code={blindRsSnippet} lang="rust" theme="github-dark" />
+            </div>
+          </div>
+        </div>
       </div>
     </section>
 
@@ -341,23 +518,6 @@ const rsFaqJsonLd = {
               {item.paragraphs.map((paragraph) => (
                 <p set:html={paragraph} />
               ))}
-              {item.codeBlock && (
-                <div class="bg-ink text-paper p-4 sm:p-5 rounded-md border-2 border-ink font-mono text-xs sm:text-sm leading-relaxed overflow-x-auto [&>pre]:!bg-transparent [&>pre]:!p-0 [&>pre]:!m-0 [&>pre]:!border-0">
-                  <div class="flex items-center justify-between gap-2 mb-2.5 pb-2 border-b border-paper/15">
-                    <div class="text-xs font-bold uppercase text-acid">
-                      {item.codeLabel ?? 'Example'}
-                    </div>
-                    <button
-                      type="button"
-                      data-copy={item.codeBlock}
-                      class="copy-snippet-btn min-w-[4.75rem] text-center px-2.5 py-1 text-xs font-bold uppercase bg-paper/15 hover:bg-acid hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-acid text-paper border border-paper/30 rounded shrink-0 transition"
-                    >
-                      Copy
-                    </button>
-                  </div>
-                  <Code code={item.codeBlock} lang="rust" theme="github-dark" />
-                </div>
-              )}
             </div>
           </div>
         ))}

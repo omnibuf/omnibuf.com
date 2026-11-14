@@ -149,14 +149,13 @@ if view.GetActive() && view.GetAsn() == 64512 {
           or splicing raw packets.
         </p>
         <p class="text-base sm:text-lg text-ink/85 leading-relaxed">
-          Reusing buffers and structs, generated code is <strong>6x faster on encode</strong> and{' '}
-          <strong>7x faster on decode</strong> than standard Go Protobuf, or{' '}
-          <strong>2x faster on decode</strong> when allocating a new struct and copying strings
-          every time. The generator covers messages with field numbers <code>1..65535</code> and
-          supports <code>map&lt;string, uint64&gt;</code> fields directly; generated{' '}
-          <code>Opaque</code> views track dirty fields up to field number <code>63</code>. Messages
-          with <code>oneof</code>, other map key/value combinations, or <code>optional</code>{' '}
-          presence work through <code>omnibuf.Marshal</code> and <code>omnibuf.Unmarshal</code>.
+          Reusing buffers and structs across codecs, generated code runs{' '}
+          <strong>6x faster on encode</strong> and <strong>5x faster on decode</strong> than
+          standard Go Protobuf, and grows embedded sub-messages past 16 KiB{' '}
+          <strong>nearly 8x faster</strong> via <code>Opaque</code> splicing. The generator covers
+          field numbers <code>1..65535</code>, explicit <code>optional</code> presence,{' '}
+          <code>oneof</code> unions, generalized typed maps, and arbitrary dirty-field counts on{' '}
+          <code>Opaque</code> views.
         </p>
       </div>
 

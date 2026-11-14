@@ -517,9 +517,15 @@ html.dark .bg-\[\#E5E0D5\]\/70 {
 }
 
 html.dark .hover\:bg-\[\#E5E0D5\]:hover,
+html.dark .focus-visible\:bg-\[\#E5E0D5\]:focus-visible,
 html.dark .hover\:bg-\[\#FAF8F2\]:hover {
-  background-color: #262b36 !important;
+  background-color: #2b313e !important;
   color: #f4f0e6 !important;
+}
+
+html.dark .hover\:bg-\[\#E5E0D5\]:hover [class*='text-ink/'],
+html.dark .focus-visible\:bg-\[\#E5E0D5\]:focus-visible [class*='text-ink/'] {
+  color: rgba(244, 240, 230, 0.88) !important;
 }
 
 html.dark .hover\:bg-ink\/5:hover {
@@ -605,14 +611,24 @@ html.dark .bg-acid.text-ink,
 html.dark .bg-acid .text-ink,
 html.dark .hover\:bg-acid:hover,
 html.dark .hover\:bg-acid:hover.hover\:text-ink,
+html.dark .hover\:bg-acid:hover .text-ink,
 html.dark .group:hover .group-hover\:bg-acid,
 html.dark .group:hover .group-hover\:bg-acid .text-ink,
 html.dark details[open] > summary.group-open\:bg-acid,
 html.dark a[data-spec-link][data-active='true'],
-html.dark a[data-search-item][data-active='true'],
-html.dark a[data-search-item][data-active='true'] * {
+html.dark a[data-search-item][data-active='true'] {
   background-color: #d4ff33 !important;
   color: #111111 !important;
+}
+
+html.dark a[data-search-item][data-active='true'] * {
+  color: #111111 !important;
+}
+
+html.dark .bg-acid [class*='text-ink/'],
+html.dark .hover\:bg-acid:hover [class*='text-ink/'],
+html.dark .group:hover .group-hover\:bg-acid [class*='text-ink/'] {
+  color: rgba(17, 17, 17, 0.78) !important;
 }
 
 dialog#search-dialog::backdrop {

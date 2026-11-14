@@ -58,7 +58,7 @@ const pyFaqItems = [
     id: 'py-faq-speed',
     question: 'How does omnibuf compare against upb, protobuf-py, and msgspec under the hood?',
     paragraphs: [
-      '<code>omnibuf</code> ships a compiled PyO3 extension (<code>omnibuf._omnibuf_ext</code>) built directly on <code>omnibuf-rs</code>. It reads and populates CPython slot descriptors in Rust, beating <code>protobuf-py</code> by 1.6x on encode and 2.0x on decode and edging out C <code>msgspec</code> on standard Python dataclasses. Google&apos;s C <code>upb</code> backend stays faster on full-message serialize and lazy parse because fields live inside a C arena until accessed in Python, whereas <code>Opaque</code> views beat <code>upb</code> by 1.9x on nested field reads and 3.3x on single-field edits.',
+      '<code>omnibuf</code> ships a compiled Rust extension built directly on <code>omnibuf-rs</code>. It populates CPython slot descriptors in one native pass, decoding and materializing all 11 Python fields 2.2x faster than Google&apos;s C <code>upb</code> backend and 1.5x faster than <code>protobuf-py</code>, and edging out C <code>msgspec</code>. Google&apos;s C <code>upb</code> backend stays ahead on full-message serialize because fields already sit inside its C arena, whereas <code>Opaque</code> views beat <code>upb</code> by 2.0x on nested field reads and 1.4x on targeted mutations.',
     ],
   },
   {
@@ -177,8 +177,8 @@ const pyFaqJsonLd = {
           </span>
         </h2>
         <p class="mt-3 text-lg sm:text-xl text-ink/80 font-medium">
-          Strict <code>py.typed</code> annotations across Python 3.11+, accelerated by{' '}
-          <code>omnibuf._omnibuf_ext</code>.
+          Strict <code>py.typed</code> annotations across Python 3.11+, backed by a native Rust
+          codec.
         </p>
       </div>
 

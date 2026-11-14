@@ -60,7 +60,7 @@ const csFaqItems = [
     id: 'cs-faq-expressions',
     question: 'Why is [OmniBufField] nearly as fast as generated code on .NET 8?',
     paragraphs: [
-      '<code>OmniBufSerializer</code> compiles typed <code>System.Linq.Expressions</code> delegates once per type, avoiding per-field reflection and primitive boxing. On RyuJIT Dynamic PGO, <code>[OmniBufField]</code> decodes in 756 ns against 659 ns for generated partial methods and 816 ns for <code>Google.Protobuf</code>.',
+      '<code>OmniBufSerializer</code> compiles typed <code>System.Linq.Expressions</code> delegates once per type, avoiding per-field reflection and primitive boxing. Under RyuJIT Dynamic PGO, <code>[OmniBufField]</code> decodes within 20% of generated partial methods while still edging out <code>Google.Protobuf</code>.',
     ],
   },
   {

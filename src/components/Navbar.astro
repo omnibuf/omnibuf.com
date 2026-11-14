@@ -67,27 +67,39 @@ const isMultiColDropdown = languages.length >= 5;
 
           <div
             class:list={[
-              'absolute left-0 mt-2 bg-[#FAF8F2] border-2 border-ink rounded-md shadow-[4px_4px_0px_#111111] py-1.5 z-50',
+              'absolute left-0 mt-2 bg-[#FAF8F2] border-2 border-ink rounded-md shadow-[4px_4px_0px_#111111] z-50 overflow-hidden',
               isMultiColDropdown
-                ? 'w-[26rem] grid grid-cols-2 gap-px bg-ink/15'
-                : 'w-64 divide-y divide-ink/15',
+                ? 'w-[26rem] grid grid-cols-2'
+                : 'w-64 divide-y divide-ink/15 py-1.5',
             ]}
           >
-            {languages.map((lang) => {
+            {languages.map((lang, idx) => {
               const isActive = currentPage === lang.key;
+              const totalRows = Math.ceil(languages.length / 2);
+              const rowIdx = Math.floor(idx / 2);
+              const cellBorders = isMultiColDropdown
+                ? [
+                    idx % 2 === 0 ? 'border-r border-ink/15' : '',
+                    rowIdx < totalRows - 1 ? 'border-b border-ink/15' : '',
+                  ]
+                    .filter(Boolean)
+                    .join(' ')
+                : '';
               return (
                 <a
                   href={lang.href}
                   aria-current={isActive ? 'page' : undefined}
-                  class={`flex items-center justify-between gap-3 px-3.5 py-2 text-sm font-bold transition-colors ${
-                    isActive ? 'bg-acid text-ink' : 'bg-[#FAF8F2] text-ink hover:bg-[#E5E0D5]'
+                  class={`flex items-center justify-between gap-3 px-3.5 py-2.5 text-sm font-bold transition-colors focus-visible:outline-none ${cellBorders} ${
+                    isActive
+                      ? 'bg-acid text-ink'
+                      : 'bg-[#FAF8F2] text-ink hover:bg-[#E5E0D5] focus-visible:bg-[#E5E0D5]'
                   }`}
                 >
                   <div class="min-w-0">
                     <div class="truncate">{lang.label}</div>
                     <div
-                      class={`text-[11px] font-normal truncate ${
-                        isActive ? 'text-ink/80' : 'text-ink/60'
+                      class={`text-[11px] font-normal truncate transition-colors ${
+                        isActive ? 'text-ink/80' : 'text-ink/70'
                       }`}
                     >
                       {lang.shortPackage}

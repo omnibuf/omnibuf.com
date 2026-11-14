@@ -55,9 +55,9 @@ String json = OmniBufBlind.decodeBlindJson(pkt);`;
 const javaFaqItems = [
   {
     id: 'java-faq-encode',
-    question: 'Why does protobuf-java edge out full encode by 32 ns in the chart?',
+    question: 'Why does protobuf-java lead on the 39 KiB Large Embedded Message Encode test?',
     paragraphs: [
-      '<code>protobuf-java</code> builds immutable message objects and caches <code>memoizedSerializedSize</code> inside each instance on the first warmup pass, so repeated <code>toByteArray()</code> calls on the same object skip its length-computation pass. On decode, nested field reads, and single-field splicing, generated OmniBuf classes run 1.3x to 10.3x faster.',
+      '<code>protobuf-java</code> builds immutable message instances that cache pre-encoded UTF-8 <code>ByteString</code> buffers and <code>memoizedSerializedSize</code> after the first warmup pass. Repeated <code>toByteArray()</code> calls on an unchanged 39 KiB object copy cached byte arrays with zero UTF-8 conversion or length-slot shifts. On the canonical 11-field message, decode, nested field reads, and embedded message growth, generated OmniBuf classes match or beat <code>protobuf-java</code> by up to 10.2x.',
     ],
   },
   {
