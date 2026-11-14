@@ -35,7 +35,7 @@ Its core wire-format mechanisms are:
 
 ## Capabilities and Constraints
 
-- **Language support:** The wire specification is language-agnostic, with first-party implementations for Go, TypeScript/JavaScript, Rust, Python, C++20, Java 21, and C# (.NET 8) verified against a shared 584-case conformance suite. Always state runtime trade-offs candidly (including pure-Python vs native C/Rust extensions on `/py`).
+- **Language support:** The wire specification is language-agnostic, with first-party implementations for Go, TypeScript/JavaScript, Rust, Python, C++20, Java 21, and C# (.NET 8) verified against a shared 584-case conformance suite. Always state runtime trade-offs candidly (such as C `upb` arena-backed lazy parsing vs eager Python dataclass materialization on `/py`).
 - **Benchmark presentation:** High-level callouts, cards, and prose must use relative multipliers and percentages (such as `5.9x faster`, `7.3x faster`, `40% smaller`) rather than fragile exact `ns/op` or line counts. Detailed benchmark tables and methodology notes remain grounded in reproducible repository benchmarks.
 - **Honest trade-offs:** Every format comparison must acknowledge where competing formats win (for example, Protobuf's ubiquitous multi-language ecosystem and ~7% smaller wire size on dense messages, FlatBuffers/Cap'n Proto's zero-unpack `O(1)` random access into large buffers, MessagePack's schema-free dynamic maps, and JSON's native browser/human readability).
 
@@ -55,5 +55,5 @@ Its core wire-format mechanisms are:
 
 1. **Show the bytes, not buzzwords:** Every performance or ergonomic claim should trace directly to a concrete wire-format layout or codegen decision.
 2. **Relative headlines, reproducible receipts:** Lead with durable multipliers and percentages in headlines and prose, backed by reproducible benchmark suites in the repository.
-3. **Credibility through candor:** Be upfront about what OmniBuf does not do (it is not a zero-unpack pointer graph like FlatBuffers, and it currently ships for Go and TypeScript/JavaScript).
+3. **Credibility through candor:** Be upfront about what OmniBuf does not do (it is not a zero-unpack pointer graph like FlatBuffers, and denser LEB128 Protobuf saves ~7% on wire bytes).
 4. **Drop-in schema ergonomics:** Preserve the `.proto` and native struct/type authoring workflow so adopting OmniBuf never requires learning a custom IDL.
