@@ -1,4 +1,4 @@
-export type LanguageKey = 'go' | 'es';
+export type LanguageKey = 'go' | 'es' | 'rs' | 'py' | 'cpp' | 'java' | 'cs';
 
 export type PageKey = 'home' | 'how-it-works' | 'spec' | 'cli' | LanguageKey | 'none';
 
@@ -32,6 +32,56 @@ export const languages: LanguageEntry[] = [
     repoUrl: 'https://github.com/omnibuf/omnibuf-es',
     packageLabel: '@omnibuf/core',
     shortPackage: '@omnibuf/core',
+    status: 'experimental',
+  },
+  {
+    key: 'rs',
+    label: 'Rust',
+    shortLabel: 'Rust',
+    href: '/rs',
+    repoUrl: 'https://github.com/omnibuf',
+    packageLabel: 'omnibuf',
+    shortPackage: 'omnibuf crate',
+    status: 'experimental',
+  },
+  {
+    key: 'py',
+    label: 'Python',
+    shortLabel: 'Python',
+    href: '/py',
+    repoUrl: 'https://github.com/omnibuf',
+    packageLabel: 'omnibuf',
+    shortPackage: 'omnibuf (PyPI)',
+    status: 'experimental',
+  },
+  {
+    key: 'cpp',
+    label: 'C++',
+    shortLabel: 'C++',
+    href: '/cpp',
+    repoUrl: 'https://github.com/omnibuf',
+    packageLabel: 'omnibuf/omnibuf.hpp',
+    shortPackage: 'C++20 headers',
+    status: 'experimental',
+  },
+  {
+    key: 'java',
+    label: 'Java',
+    shortLabel: 'Java',
+    href: '/java',
+    repoUrl: 'https://github.com/omnibuf',
+    packageLabel: 'com.omnibuf:omnibuf-java',
+    shortPackage: 'com.omnibuf',
+    status: 'experimental',
+  },
+  {
+    key: 'cs',
+    label: 'C# / .NET',
+    shortLabel: 'C#',
+    href: '/cs',
+    repoUrl: 'https://github.com/omnibuf',
+    packageLabel: 'OmniBuf',
+    shortPackage: 'OmniBuf (.NET 8)',
     status: 'experimental',
   },
 ];

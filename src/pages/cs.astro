@@ -1,0 +1,364 @@
+---
+import { Code } from 'astro:components';
+import Layout from '../layouts/Layout.astro';
+import Navbar from '../components/Navbar.astro';
+import Benchmarks from '../components/Benchmarks.astro';
+import LanguageStrip from '../components/LanguageStrip.astro';
+import Footer from '../components/Footer.astro';
+
+const attributeCsSnippet = `using OmniBuf;
+
+[OmniBufMessage(TypeName = "SensorSample")]
+public sealed record SensorSample(
+    [property: OmniBufField(1, Name = "sensor_id")] string SensorId,
+    [property: OmniBufField(2, Name = "celsius")] double Celsius,
+    [property: OmniBufField(3, Name = "seq")] ulong Seq);
+
+var sample = new SensorSample("rack-42-inlet", 21.75, 1042UL);
+byte[] pkt = OmniBufSerializer.Marshal(sample);
+SensorSample outSample = OmniBufSerializer.Unmarshal<SensorSample>(pkt);`;
+
+const googleProtoCsSnippet = `using Omnibuf.Bench;
+using OmniBuf;
+
+byte[] pkt = OmniBufProtobuf.Marshal(peer);
+PeerUpdate copy = OmniBufProtobuf.Unmarshal<PeerUpdate>(pkt);`;
+
+const bufGenCsSnippet = `version: v2
+clean: true
+plugins:
+  - protoc_builtin: csharp
+    out: src/Generated
+  - local: protoc-gen-omnibuf-cs
+    out: src/Generated`;
+
+const generatedCsSnippet = `using Omnibuf.Bench;
+using OmniBuf;
+
+byte[] pkt = peer.MarshalOmniBuf();
+
+var view = new OpaquePeerUpdate(pkt);
+string city = view.GetLocationCity();
+
+view.Sequence = 9_876_543_211UL;
+byte[] updated = view.MarshalOmniBuf();`;
+
+const blindCsCode = `using OmniBuf;
+
+byte[] pkt = OmniBufSerializer.Marshal(sample, new MarshalOptions { SelfDescribing = true });
+string json = OmniBufBlind.DecodeBlindJson(pkt);`;
+
+const csFaqItems = [
+  {
+    id: 'cs-faq-partial',
+    question: 'Why does protoc-gen-omnibuf-cs pair with protoc_builtin: csharp?',
+    paragraphs: [
+      '<code>Google.Protobuf</code> generates <code>sealed partial class</code> message types in C#. <code>protoc-gen-omnibuf-cs</code> emits companion <code>partial class</code> files adding <code>MarshalOmniBuf()</code> and <code>ParseOmniBuf(ReadOnlySpan&lt;byte&gt;)</code> directly onto your existing message types alongside standalone <code>Opaque*</code> views.',
+    ],
+  },
+  {
+    id: 'cs-faq-expressions',
+    question: 'Why is [OmniBufField] nearly as fast as generated code on .NET 8?',
+    paragraphs: [
+      '<code>OmniBufSerializer</code> compiles typed <code>System.Linq.Expressions</code> delegates once per type, avoiding per-field reflection and primitive boxing. On RyuJIT Dynamic PGO, <code>[OmniBufField]</code> decodes in 756 ns against 659 ns for generated partial methods and 816 ns for <code>Google.Protobuf</code>.',
+    ],
+  },
+  {
+    id: 'cs-faq-blind',
+    question: 'How does OmniBufBlind inspect schema-less packets?',
+    paragraphs: [
+      '<code>OmniBufBlind.DecodeBlind(pkt)</code> reads 4-bit wire tags into a dictionary with <code>field_1</code>, <code>field_2</code>, ... keys, or maps Field #0 names when <code>SelfDescribing = true</code> was set on encode.',
+    ],
+    codeBlock: blindCsCode,
+    codeLabel: 'Example',
+  },
+];
+
+const stripHtml = (s: string) => s.replace(/<[^>]+>/g, '');
+
+const csFaqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: csFaqItems.map((item) => ({
+    '@type': 'Question',
+    name: item.question,
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: item.paragraphs.map(stripHtml).join('\n\n'),
+    },
+  })),
+};
+---
+
+<Layout
+  title="OmniBuf for C# & .NET 8 | [OmniBufField] Records, Google.Protobuf & protoc-gen-omnibuf-cs"
+  description="Use OmniBuf on .NET 8: annotate C# records and classes, serialize Google.Protobuf.IMessage types, or generate Span-based partial methods and Opaque views with buf."
+>
+  <Navbar currentPage="cs" />
+
+  <main id="main-content">
+    <section class="relative pt-10 pb-8 sm:pt-16 sm:pb-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+      <h1 class="text-[2.6rem] sm:text-7xl lg:text-[5.5rem] font-bold tracking-tight leading-[0.94] text-ink uppercase">
+        OmniBuf
+        <br />
+        <span class="font-serif italic font-normal normal-case text-[#FF4F18] text-[3.1rem] sm:text-8xl lg:text-[6.2rem]">
+          for C# &amp; .NET.
+        </span>
+      </h1>
+
+      <div class="mt-6 grid lg:grid-cols-12 gap-6 lg:gap-8 items-end">
+        <div class="lg:col-span-7 space-y-4">
+          <p class="text-lg sm:text-2xl text-ink/85 font-medium leading-snug">
+            Decorate C# classes, structs, and positional records with{' '}
+            <a href="#attributes" class="doc-link">
+              <code>[OmniBufField]</code>
+            </a>
+            , serialize existing{' '}
+            <a href="#google-protobuf" class="doc-link">
+              <code>Google.Protobuf.IMessage</code>
+            </a>{' '}
+            types, or extend generated partial classes with{' '}
+            <a href="#plugin-codegen" class="doc-link">
+              <code>protoc-gen-omnibuf-cs</code>
+            </a>
+            . RyuJIT .NET 8 benchmarks sit{' '}
+            <a href="#benchmarks" class="doc-link">
+              below
+            </a>
+            .
+          </p>
+          <div class="flex flex-wrap gap-3 font-mono text-sm sm:text-base pt-1 no-print">
+            <a href="#benchmarks" class="os-btn px-4 py-2.5 bg-acid text-ink font-bold rounded-md">
+              C# Benchmarks &rarr;
+            </a>
+            <a href="/spec" class="os-btn px-4 py-2.5 bg-[#FAF8F2] text-ink font-bold rounded-md">
+              Wire Specification &rarr;
+            </a>
+          </div>
+        </div>
+
+        <div class="lg:col-span-5 min-w-0">
+          <div class="p-4 sm:p-5 bg-ink text-paper rounded-md font-mono text-xs sm:text-sm overflow-x-auto leading-relaxed border-2 border-ink shadow-[4px_4px_0px_#111111]">
+            <div class="flex items-center justify-between gap-2 mb-2 pb-2 border-b border-paper/15">
+              <div class="text-xs font-bold uppercase text-acid">Add .NET Package</div>
+              <button
+                type="button"
+                data-copy="dotnet add package OmniBuf"
+                class="copy-snippet-btn min-w-[4.75rem] text-center px-2.5 py-1 text-xs font-bold uppercase bg-paper/15 hover:bg-acid hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-acid text-paper border border-paper/30 rounded shrink-0 transition"
+              >
+                Copy
+              </button>
+            </div>
+            <pre class="leading-relaxed whitespace-pre"><code><span class="text-paper/75 select-none">$ </span>dotnet add package OmniBuf</code></pre>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section
+      id="quickstart"
+      class="scroll-mt-16 py-12 sm:py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto border-t-2 border-ink/15"
+    >
+      <div class="max-w-3xl mb-8">
+        <h2 class="text-3xl sm:text-5xl font-bold tracking-tight uppercase leading-none">
+          Three ways to use{' '}
+          <span class="font-serif italic font-normal normal-case text-[#FF4F18]">
+            OmniBuf in C#.
+          </span>
+        </h2>
+        <p class="mt-3 text-lg sm:text-xl text-ink/80 font-medium">
+          Built around <code>ReadOnlySpan&lt;byte&gt;</code>,{' '}
+          <code>BitOperations.TrailingZeroCount</code>, and <code>BinaryPrimitives</code>.
+        </p>
+      </div>
+
+      <div class="border-t-2 border-ink divide-y-2 divide-ink/20">
+        <div
+          id="attributes"
+          class="scroll-mt-16 py-8 sm:py-12 grid lg:grid-cols-12 gap-6 lg:gap-8 items-start"
+        >
+          <div class="lg:col-span-5 space-y-3.5 min-w-0">
+            <h3 class="text-2xl sm:text-3xl font-bold uppercase tracking-tight leading-snug">
+              Attribute-annotated C# records and classes
+            </h3>
+            <p class="text-base sm:text-lg text-ink/85 leading-relaxed">
+              <code>[OmniBufMessage]</code> and <code>[OmniBufField]</code> work on mutable classes,
+              value structs, and immutable C# positional records. <code>OmniBufSerializer</code>{' '}
+              compiles expression-tree encoders and decoders once per type.
+            </p>
+          </div>
+
+          <div class="lg:col-span-7 min-w-0">
+            <div class="p-4 sm:p-5 bg-ink text-paper rounded-md font-mono text-xs sm:text-sm overflow-x-auto leading-relaxed border-2 border-ink [&>pre]:!bg-transparent [&>pre]:!p-0 [&>pre]:!m-0 [&>pre]:!border-0">
+              <div class="flex items-center justify-between gap-2 mb-2.5 pb-2 border-b border-paper/15">
+                <div class="text-xs font-bold uppercase text-acid">[OmniBufField] C# Record</div>
+                <button
+                  type="button"
+                  data-copy={attributeCsSnippet}
+                  class="copy-snippet-btn min-w-[4.75rem] text-center px-2.5 py-1 text-xs font-bold uppercase bg-paper/15 hover:bg-acid hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-acid text-paper border border-paper/30 rounded shrink-0 transition"
+                >
+                  Copy
+                </button>
+              </div>
+              <Code code={attributeCsSnippet} lang="csharp" theme="github-dark" />
+            </div>
+          </div>
+        </div>
+
+        <div
+          id="google-protobuf"
+          class="scroll-mt-16 py-8 sm:py-12 grid lg:grid-cols-12 gap-6 lg:gap-8 items-start"
+        >
+          <div class="lg:col-span-5 space-y-3.5 min-w-0">
+            <h3 class="text-2xl sm:text-3xl font-bold uppercase tracking-tight leading-snug">
+              Standard Google.Protobuf.IMessage types
+            </h3>
+            <p class="text-base sm:text-lg text-ink/85 leading-relaxed">
+              ASP.NET Core and gRPC projects already generating <code>Google.Protobuf</code> classes
+              pass any <code>IMessage</code> directly to <code>OmniBufProtobuf.Marshal</code> and{' '}
+              <code>OmniBufProtobuf.Unmarshal&lt;T&gt;</code>.
+            </p>
+          </div>
+
+          <div class="lg:col-span-7 min-w-0">
+            <div class="p-4 sm:p-5 bg-ink text-paper rounded-md font-mono text-xs sm:text-sm overflow-x-auto leading-relaxed border-2 border-ink [&>pre]:!bg-transparent [&>pre]:!p-0 [&>pre]:!m-0 [&>pre]:!border-0">
+              <div class="flex items-center justify-between gap-2 mb-2.5 pb-2 border-b border-paper/15">
+                <div class="text-xs font-bold uppercase text-acid">Google.Protobuf Bridge</div>
+                <button
+                  type="button"
+                  data-copy={googleProtoCsSnippet}
+                  class="copy-snippet-btn min-w-[4.75rem] text-center px-2.5 py-1 text-xs font-bold uppercase bg-paper/15 hover:bg-acid hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-acid text-paper border border-paper/30 rounded shrink-0 transition"
+                >
+                  Copy
+                </button>
+              </div>
+              <Code code={googleProtoCsSnippet} lang="csharp" theme="github-dark" />
+            </div>
+          </div>
+        </div>
+
+        <div
+          id="plugin-codegen"
+          class="scroll-mt-16 py-8 sm:py-12 grid lg:grid-cols-12 gap-6 lg:gap-8 items-start"
+        >
+          <div class="lg:col-span-5 space-y-3.5 min-w-0">
+            <h3 class="text-2xl sm:text-3xl font-bold uppercase tracking-tight leading-snug">
+              Generated partial classes with protoc-gen-omnibuf-cs
+            </h3>
+            <p class="text-base sm:text-lg text-ink/85 leading-relaxed">
+              Adding <code>protoc-gen-omnibuf-cs</code> to <code>buf.gen.yaml</code> attaches direct{' '}
+              <code>Span&lt;byte&gt;</code> encoders and decoders onto generated C# partial classes
+              and emits <code>Opaque*</code> views. Single-field sequence updates complete in ~134
+              ns.
+            </p>
+          </div>
+
+          <div class="lg:col-span-7 space-y-3.5 min-w-0">
+            <div class="p-4 sm:p-5 bg-ink text-paper rounded-md font-mono text-xs sm:text-sm overflow-x-auto leading-relaxed border-2 border-ink [&>pre]:!bg-transparent [&>pre]:!p-0 [&>pre]:!m-0 [&>pre]:!border-0">
+              <div class="flex items-center justify-between gap-2 mb-2.5 pb-2 border-b border-paper/15">
+                <div class="text-xs font-bold uppercase text-acid">buf.gen.yaml</div>
+                <button
+                  type="button"
+                  data-copy={bufGenCsSnippet}
+                  class="copy-snippet-btn min-w-[4.75rem] text-center px-2.5 py-1 text-xs font-bold uppercase bg-paper/15 hover:bg-acid hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-acid text-paper border border-paper/30 rounded shrink-0 transition"
+                >
+                  Copy
+                </button>
+              </div>
+              <Code code={bufGenCsSnippet} lang="yaml" theme="github-dark" />
+            </div>
+
+            <div class="p-4 sm:p-5 bg-ink text-paper rounded-md font-mono text-xs sm:text-sm overflow-x-auto leading-relaxed border-2 border-ink">
+              <div class="flex items-center justify-between gap-2 mb-2.5 pb-2 border-b border-paper/15">
+                <div class="text-xs font-bold uppercase text-acid">
+                  Lint &amp; Generate with Buf
+                </div>
+                <button
+                  type="button"
+                  data-copy="buf lint && buf generate"
+                  class="copy-snippet-btn min-w-[4.75rem] text-center px-2.5 py-1 text-xs font-bold uppercase bg-paper/15 hover:bg-acid hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-acid text-paper border border-paper/30 rounded shrink-0 transition"
+                >
+                  Copy
+                </button>
+              </div>
+              <pre class="leading-relaxed whitespace-pre"><code><span class="text-paper/75 select-none">$ </span>buf lint
+<span class="text-paper/75 select-none">$ </span><span class="text-acid font-bold">buf generate</span></code></pre>
+            </div>
+
+            <div class="p-4 sm:p-5 bg-ink text-paper rounded-md font-mono text-xs sm:text-sm overflow-x-auto leading-relaxed border-2 border-ink [&>pre]:!bg-transparent [&>pre]:!p-0 [&>pre]:!m-0 [&>pre]:!border-0">
+              <div class="flex items-center justify-between gap-2 mb-2.5 pb-2 border-b border-paper/15">
+                <div class="text-xs font-bold uppercase text-acid">
+                  Generated Partial Class &amp; Opaque Splice
+                </div>
+                <button
+                  type="button"
+                  data-copy={generatedCsSnippet}
+                  class="copy-snippet-btn min-w-[4.75rem] text-center px-2.5 py-1 text-xs font-bold uppercase bg-paper/15 hover:bg-acid hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-acid text-paper border border-paper/30 rounded shrink-0 transition"
+                >
+                  Copy
+                </button>
+              </div>
+              <Code code={generatedCsSnippet} lang="csharp" theme="github-dark" />
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <Benchmarks lang="cs" />
+
+    <section
+      id="cs-faq"
+      class="scroll-mt-16 py-16 sm:py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto border-t-2 border-ink/15"
+    >
+      <div class="max-w-3xl mb-10">
+        <h2 class="text-3xl sm:text-5xl font-bold tracking-tight uppercase leading-none">
+          C# &amp; .NET{' '}
+          <span class="font-serif italic font-normal normal-case text-[#FF4F18]">questions.</span>
+        </h2>
+      </div>
+
+      <div class="border-t-2 border-ink divide-y-2 divide-ink/20">
+        {csFaqItems.map((item) => (
+          <div
+            id={item.id}
+            class="scroll-mt-16 py-8 sm:py-10 grid lg:grid-cols-12 gap-6 lg:gap-8 items-start"
+          >
+            <h3 class="lg:col-span-5 text-xl sm:text-2xl font-bold uppercase tracking-tight text-ink leading-snug">
+              {item.question}
+            </h3>
+
+            <div class="lg:col-span-7 space-y-3.5 text-base sm:text-lg text-ink/85 leading-relaxed max-w-[65ch] min-w-0">
+              {item.paragraphs.map((paragraph) => (
+                <p set:html={paragraph} />
+              ))}
+              {item.codeBlock && (
+                <div class="bg-ink text-paper p-4 sm:p-5 rounded-md border-2 border-ink font-mono text-xs sm:text-sm leading-relaxed overflow-x-auto [&>pre]:!bg-transparent [&>pre]:!p-0 [&>pre]:!m-0 [&>pre]:!border-0">
+                  <div class="flex items-center justify-between gap-2 mb-2.5 pb-2 border-b border-paper/15">
+                    <div class="text-xs font-bold uppercase text-acid">
+                      {item.codeLabel ?? 'Example'}
+                    </div>
+                    <button
+                      type="button"
+                      data-copy={item.codeBlock}
+                      class="copy-snippet-btn min-w-[4.75rem] text-center px-2.5 py-1 text-xs font-bold uppercase bg-paper/15 hover:bg-acid hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-acid text-paper border border-paper/30 rounded shrink-0 transition"
+                    >
+                      Copy
+                    </button>
+                  </div>
+                  <Code code={item.codeBlock} lang="csharp" theme="github-dark" />
+                </div>
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <script is:inline type="application/ld+json" set:html={JSON.stringify(csFaqJsonLd)} />
+    </section>
+
+    <LanguageStrip currentPage="cs" />
+  </main>
+
+  <Footer />
+</Layout>

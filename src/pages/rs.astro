@@ -1,0 +1,373 @@
+---
+import { Code } from 'astro:components';
+import Layout from '../layouts/Layout.astro';
+import Navbar from '../components/Navbar.astro';
+import Benchmarks from '../components/Benchmarks.astro';
+import LanguageStrip from '../components/LanguageStrip.astro';
+import Footer from '../components/Footer.astro';
+
+const deriveRustSnippet = `use omnibuf::{Message, OmniBuf};
+
+#[derive(Debug, Default, PartialEq, OmniBuf)]
+#[omnibuf(name = "PeerUpdate")]
+pub struct PeerUpdate {
+    #[omnibuf(id = 1, name = "asn")]
+    pub asn: u32,
+    #[omnibuf(id = 2, name = "router_id")]
+    pub router_id: String,
+    #[omnibuf(id = 3, name = "active")]
+    pub active: bool,
+    #[omnibuf(id = 5, name = "rssi_dbm", wire = "sint")]
+    pub rssi_dbm: i32,
+    #[omnibuf(id = 7, name = "tags")]
+    pub tags: Vec<String>,
+}
+
+let pkt = peer.encode_omnibuf()?;
+let out = PeerUpdate::from_omnibuf(&pkt)?;`;
+
+const prostSnippet = `use omnibuf::prost_codec::{decode_prost, encode_prost};
+
+let pkt: Vec<u8> = encode_prost(&prost_peer)?;
+let out: pb::PeerUpdate = decode_prost(&pkt)?;`;
+
+const bufGenRsSnippet = `version: v2
+plugins:
+  - local: protoc-gen-omnibuf-rs
+    out: src/gen
+    strategy: all`;
+
+const generatedRsSnippet = `use crate::gen::omnibuf::bench::{OpaquePeerUpdate, PeerUpdate};
+use omnibuf::Message;
+
+let pkt = peer.encode_omnibuf()?;
+
+let mut view = OpaquePeerUpdate::new(&pkt)?;
+if view.active()? {
+    let city: &str = view.location()?.unwrap().city()?;
+    view.set_sequence(9_876_543_211);
+    let updated: Vec<u8> = view.marshal()?;
+}`;
+
+const blindRsCode = `use omnibuf::{EncodeOptions, Message, decode_blind_json};
+
+let pkt = peer.encode_omnibuf_with_options(EncodeOptions::self_describing())?;
+let json = decode_blind_json(&pkt)?;`;
+
+const rsFaqItems = [
+  {
+    id: 'rs-faq-borrowing',
+    question: 'Do Opaque getters allocate Strings on read?',
+    paragraphs: [
+      "<code>OpaquePeerUpdate&lt;'a&gt;</code> borrows <code>&amp;'a str</code> and <code>&amp;'a [u8]</code> slices straight from the input packet buffer. UTF-8 validity is checked once over the borrowed byte range, and scalar getters decode directly from unaligned little-endian loads.",
+    ],
+  },
+  {
+    id: 'rs-faq-prost-derive',
+    question: 'How does prost_codec compare to #[derive(OmniBuf)] on prost structs?',
+    paragraphs: [
+      '<code>omnibuf::prost_codec</code> walks <code>prost-reflect</code> descriptors at runtime so existing generated crates need zero build-script edits. Attaching <code>#[derive(::omnibuf::OmniBuf)]</code> via <code>prost_build::Config::type_attribute</code> switches to static monomorphized field dispatch and matches full plugin codegen speed.',
+    ],
+  },
+  {
+    id: 'rs-faq-blind',
+    question: 'What does decode_blind produce when Field #0 is absent?',
+    paragraphs: [
+      'Raw packets still carry explicit 4-bit wire types on every tag, so <code>decode_blind</code> emits synthetic <code>field_1</code>, <code>field_2</code>, ... keys with exact integer signs, booleans, floats, strings, and Base64 byte slices. Passing <code>EncodeOptions::self_describing()</code> prepends Field #0 so keys resolve to their schema names.',
+    ],
+    codeBlock: blindRsCode,
+    codeLabel: 'Example',
+  },
+];
+
+const stripHtml = (s: string) => s.replace(/<[^>]+>/g, '');
+
+const rsFaqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: rsFaqItems.map((item) => ({
+    '@type': 'Question',
+    name: item.question,
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: item.paragraphs.map(stripHtml).join('\n\n'),
+    },
+  })),
+};
+---
+
+<Layout
+  title="OmniBuf for Rust | #[derive(OmniBuf)], prost & protoc-gen-omnibuf-rs"
+  description="Use OmniBuf in Rust: derive codecs on plain Rust structs, transcode prost messages, or generate single-pass encoders and zero-copy Opaque<'a> views with buf."
+>
+  <Navbar currentPage="rs" />
+
+  <main id="main-content">
+    <section class="relative pt-10 pb-8 sm:pt-16 sm:pb-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+      <h1 class="text-[2.6rem] sm:text-7xl lg:text-[5.5rem] font-bold tracking-tight leading-[0.94] text-ink uppercase">
+        OmniBuf
+        <br />
+        <span class="font-serif italic font-normal normal-case text-[#FF4F18] text-[3.1rem] sm:text-8xl lg:text-[6.2rem]">
+          for Rust.
+        </span>
+      </h1>
+
+      <div class="mt-6 grid lg:grid-cols-12 gap-6 lg:gap-8 items-end">
+        <div class="lg:col-span-7 space-y-4">
+          <p class="text-lg sm:text-2xl text-ink/85 font-medium leading-snug">
+            Annotate native structs with{' '}
+            <a href="#derive-macro" class="doc-link">
+              <code>#[derive(OmniBuf)]</code>
+            </a>
+            , bridge existing{' '}
+            <a href="#prost-types" class="doc-link">
+              <code>prost</code> messages
+            </a>
+            , or run{' '}
+            <a href="#plugin-codegen" class="doc-link">
+              <code>protoc-gen-omnibuf-rs</code>
+            </a>{' '}
+            through <code>buf generate</code> for zero-copy <code>Opaque&lt;&apos;a&gt;</code>{' '}
+            packet views. Release-mode numbers sit{' '}
+            <a href="#benchmarks" class="doc-link">
+              below
+            </a>
+            .
+          </p>
+          <div class="flex flex-wrap gap-3 font-mono text-sm sm:text-base pt-1 no-print">
+            <a href="#benchmarks" class="os-btn px-4 py-2.5 bg-acid text-ink font-bold rounded-md">
+              Rust Benchmarks &rarr;
+            </a>
+            <a href="/spec" class="os-btn px-4 py-2.5 bg-[#FAF8F2] text-ink font-bold rounded-md">
+              Wire Specification &rarr;
+            </a>
+          </div>
+        </div>
+
+        <div class="lg:col-span-5 min-w-0">
+          <div class="p-4 sm:p-5 bg-ink text-paper rounded-md font-mono text-xs sm:text-sm overflow-x-auto leading-relaxed border-2 border-ink shadow-[4px_4px_0px_#111111]">
+            <div class="flex items-center justify-between gap-2 mb-2 pb-2 border-b border-paper/15">
+              <div class="text-xs font-bold uppercase text-acid">Add Rust Crate</div>
+              <button
+                type="button"
+                data-copy="cargo add omnibuf"
+                class="copy-snippet-btn min-w-[4.75rem] text-center px-2.5 py-1 text-xs font-bold uppercase bg-paper/15 hover:bg-acid hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-acid text-paper border border-paper/30 rounded shrink-0 transition"
+              >
+                Copy
+              </button>
+            </div>
+            <pre class="leading-relaxed whitespace-pre"><code><span class="text-paper/75 select-none">$ </span>cargo add omnibuf</code></pre>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section
+      id="quickstart"
+      class="scroll-mt-16 py-12 sm:py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto border-t-2 border-ink/15"
+    >
+      <div class="max-w-3xl mb-8">
+        <h2 class="text-3xl sm:text-5xl font-bold tracking-tight uppercase leading-none">
+          Three ways to use{' '}
+          <span class="font-serif italic font-normal normal-case text-[#FF4F18]">
+            OmniBuf in Rust.
+          </span>
+        </h2>
+        <p class="mt-3 text-lg sm:text-xl text-ink/80 font-medium">
+          Every tier emits identical wire packets.
+        </p>
+      </div>
+
+      <div class="border-t-2 border-ink divide-y-2 divide-ink/20">
+        <div
+          id="derive-macro"
+          class="scroll-mt-16 py-8 sm:py-12 grid lg:grid-cols-12 gap-6 lg:gap-8 items-start"
+        >
+          <div class="lg:col-span-5 space-y-3.5 min-w-0">
+            <h3 class="text-2xl sm:text-3xl font-bold uppercase tracking-tight leading-snug">
+              Procedural #[derive(OmniBuf)] structs
+            </h3>
+            <p class="text-base sm:text-lg text-ink/85 leading-relaxed">
+              <code>#[derive(OmniBuf)]</code> expands straight into single-pass Prefix-Varint writes
+              and unrolled tag-switch loops at compile time. No <code>.proto</code> build step
+              required. Field attributes declare wire IDs, optional ZigZag or fixed-width overrides
+              (<code>wire = &quot;sint&quot;</code>, <code>&quot;fixed64&quot;</code>), and Field #0
+              names.
+            </p>
+          </div>
+
+          <div class="lg:col-span-7 min-w-0">
+            <div class="p-4 sm:p-5 bg-ink text-paper rounded-md font-mono text-xs sm:text-sm overflow-x-auto leading-relaxed border-2 border-ink [&>pre]:!bg-transparent [&>pre]:!p-0 [&>pre]:!m-0 [&>pre]:!border-0">
+              <div class="flex items-center justify-between gap-2 mb-2.5 pb-2 border-b border-paper/15">
+                <div class="text-xs font-bold uppercase text-acid">#[derive(OmniBuf)]</div>
+                <button
+                  type="button"
+                  data-copy={deriveRustSnippet}
+                  class="copy-snippet-btn min-w-[4.75rem] text-center px-2.5 py-1 text-xs font-bold uppercase bg-paper/15 hover:bg-acid hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-acid text-paper border border-paper/30 rounded shrink-0 transition"
+                >
+                  Copy
+                </button>
+              </div>
+              <Code code={deriveRustSnippet} lang="rust" theme="github-dark" />
+            </div>
+          </div>
+        </div>
+
+        <div
+          id="prost-types"
+          class="scroll-mt-16 py-8 sm:py-12 grid lg:grid-cols-12 gap-6 lg:gap-8 items-start"
+        >
+          <div class="lg:col-span-5 space-y-3.5 min-w-0">
+            <h3 class="text-2xl sm:text-3xl font-bold uppercase tracking-tight leading-snug">
+              Existing prost and prost-reflect messages
+            </h3>
+            <p class="text-base sm:text-lg text-ink/85 leading-relaxed">
+              Crates already built around <code>prost</code> and <code>tonic</code> pass their
+              existing structs to <code>encode_prost</code> and <code>decode_prost</code>. Both
+              static <code>ReflectMessage</code> types and runtime <code>DynamicMessage</code>{' '}
+              descriptors round-trip cleanly across all scalar, <code>oneof</code>, repeated, and
+              map fields.
+            </p>
+          </div>
+
+          <div class="lg:col-span-7 min-w-0">
+            <div class="p-4 sm:p-5 bg-ink text-paper rounded-md font-mono text-xs sm:text-sm overflow-x-auto leading-relaxed border-2 border-ink [&>pre]:!bg-transparent [&>pre]:!p-0 [&>pre]:!m-0 [&>pre]:!border-0">
+              <div class="flex items-center justify-between gap-2 mb-2.5 pb-2 border-b border-paper/15">
+                <div class="text-xs font-bold uppercase text-acid">prost Integration</div>
+                <button
+                  type="button"
+                  data-copy={prostSnippet}
+                  class="copy-snippet-btn min-w-[4.75rem] text-center px-2.5 py-1 text-xs font-bold uppercase bg-paper/15 hover:bg-acid hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-acid text-paper border border-paper/30 rounded shrink-0 transition"
+                >
+                  Copy
+                </button>
+              </div>
+              <Code code={prostSnippet} lang="rust" theme="github-dark" />
+            </div>
+          </div>
+        </div>
+
+        <div
+          id="plugin-codegen"
+          class="scroll-mt-16 py-8 sm:py-12 grid lg:grid-cols-12 gap-6 lg:gap-8 items-start"
+        >
+          <div class="lg:col-span-5 space-y-3.5 min-w-0">
+            <h3 class="text-2xl sm:text-3xl font-bold uppercase tracking-tight leading-snug">
+              Generated code with protoc-gen-omnibuf-rs
+            </h3>
+            <p class="text-base sm:text-lg text-ink/85 leading-relaxed">
+              Pointing <code>buf.gen.yaml</code> at <code>protoc-gen-omnibuf-rs</code> generates
+              owned Rust structs paired with lifetime-bound <code>Opaque&lt;&apos;a&gt;</code>{' '}
+              views. Lookups hop over earlier field headers by byte length in ~93 ns and borrow{' '}
+              <code>&amp;str</code> directly from the packet slice. Calling <code>marshal()</code>{' '}
+              splices modified fields and copies untouched spans verbatim.
+            </p>
+          </div>
+
+          <div class="lg:col-span-7 space-y-3.5 min-w-0">
+            <div class="p-4 sm:p-5 bg-ink text-paper rounded-md font-mono text-xs sm:text-sm overflow-x-auto leading-relaxed border-2 border-ink [&>pre]:!bg-transparent [&>pre]:!p-0 [&>pre]:!m-0 [&>pre]:!border-0">
+              <div class="flex items-center justify-between gap-2 mb-2.5 pb-2 border-b border-paper/15">
+                <div class="text-xs font-bold uppercase text-acid">buf.gen.yaml</div>
+                <button
+                  type="button"
+                  data-copy={bufGenRsSnippet}
+                  class="copy-snippet-btn min-w-[4.75rem] text-center px-2.5 py-1 text-xs font-bold uppercase bg-paper/15 hover:bg-acid hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-acid text-paper border border-paper/30 rounded shrink-0 transition"
+                >
+                  Copy
+                </button>
+              </div>
+              <Code code={bufGenRsSnippet} lang="yaml" theme="github-dark" />
+            </div>
+
+            <div class="p-4 sm:p-5 bg-ink text-paper rounded-md font-mono text-xs sm:text-sm overflow-x-auto leading-relaxed border-2 border-ink">
+              <div class="flex items-center justify-between gap-2 mb-2.5 pb-2 border-b border-paper/15">
+                <div class="text-xs font-bold uppercase text-acid">Generate with Buf</div>
+                <button
+                  type="button"
+                  data-copy="cargo install protoc-gen-omnibuf-rs && buf generate"
+                  class="copy-snippet-btn min-w-[4.75rem] text-center px-2.5 py-1 text-xs font-bold uppercase bg-paper/15 hover:bg-acid hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-acid text-paper border border-paper/30 rounded shrink-0 transition"
+                >
+                  Copy
+                </button>
+              </div>
+              <pre class="leading-relaxed whitespace-pre"><code><span class="text-paper/75 select-none">$ </span>cargo install protoc-gen-omnibuf-rs
+<span class="text-paper/75 select-none">$ </span><span class="text-acid font-bold">buf generate</span></code></pre>
+            </div>
+
+            <div class="p-4 sm:p-5 bg-ink text-paper rounded-md font-mono text-xs sm:text-sm overflow-x-auto leading-relaxed border-2 border-ink [&>pre]:!bg-transparent [&>pre]:!p-0 [&>pre]:!m-0 [&>pre]:!border-0">
+              <div class="flex items-center justify-between gap-2 mb-2.5 pb-2 border-b border-paper/15">
+                <div class="text-xs font-bold uppercase text-acid">
+                  Zero-Copy Opaque&lt;&apos;a&gt; Lookup &amp; Splice
+                </div>
+                <button
+                  type="button"
+                  data-copy={generatedRsSnippet}
+                  class="copy-snippet-btn min-w-[4.75rem] text-center px-2.5 py-1 text-xs font-bold uppercase bg-paper/15 hover:bg-acid hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-acid text-paper border border-paper/30 rounded shrink-0 transition"
+                >
+                  Copy
+                </button>
+              </div>
+              <Code code={generatedRsSnippet} lang="rust" theme="github-dark" />
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <Benchmarks lang="rs" />
+
+    <section
+      id="rs-faq"
+      class="scroll-mt-16 py-16 sm:py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto border-t-2 border-ink/15"
+    >
+      <div class="max-w-3xl mb-10">
+        <h2 class="text-3xl sm:text-5xl font-bold tracking-tight uppercase leading-none">
+          Rust{' '}
+          <span class="font-serif italic font-normal normal-case text-[#FF4F18]">questions.</span>
+        </h2>
+      </div>
+
+      <div class="border-t-2 border-ink divide-y-2 divide-ink/20">
+        {rsFaqItems.map((item) => (
+          <div
+            id={item.id}
+            class="scroll-mt-16 py-8 sm:py-10 grid lg:grid-cols-12 gap-6 lg:gap-8 items-start"
+          >
+            <h3 class="lg:col-span-5 text-xl sm:text-2xl font-bold uppercase tracking-tight text-ink leading-snug">
+              {item.question}
+            </h3>
+
+            <div class="lg:col-span-7 space-y-3.5 text-base sm:text-lg text-ink/85 leading-relaxed max-w-[65ch] min-w-0">
+              {item.paragraphs.map((paragraph) => (
+                <p set:html={paragraph} />
+              ))}
+              {item.codeBlock && (
+                <div class="bg-ink text-paper p-4 sm:p-5 rounded-md border-2 border-ink font-mono text-xs sm:text-sm leading-relaxed overflow-x-auto [&>pre]:!bg-transparent [&>pre]:!p-0 [&>pre]:!m-0 [&>pre]:!border-0">
+                  <div class="flex items-center justify-between gap-2 mb-2.5 pb-2 border-b border-paper/15">
+                    <div class="text-xs font-bold uppercase text-acid">
+                      {item.codeLabel ?? 'Example'}
+                    </div>
+                    <button
+                      type="button"
+                      data-copy={item.codeBlock}
+                      class="copy-snippet-btn min-w-[4.75rem] text-center px-2.5 py-1 text-xs font-bold uppercase bg-paper/15 hover:bg-acid hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-acid text-paper border border-paper/30 rounded shrink-0 transition"
+                    >
+                      Copy
+                    </button>
+                  </div>
+                  <Code code={item.codeBlock} lang="rust" theme="github-dark" />
+                </div>
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <script is:inline type="application/ld+json" set:html={JSON.stringify(rsFaqJsonLd)} />
+    </section>
+
+    <LanguageStrip currentPage="rs" />
+  </main>
+
+  <Footer />
+</Layout>

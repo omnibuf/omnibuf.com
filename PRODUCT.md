@@ -31,11 +31,11 @@ Its core wire-format mechanisms are:
 ## Operating Context
 
 - Evaluated alongside standard `.proto` toolchains (`protoc`, `buf`), Go benchmarks (`go test -bench`), Node/V8 benchmarks (`pnpm run bench`), and existing wire formats (`google.golang.org/protobuf`, `@bufbuild/protobuf`, `protobufjs`, FlatBuffers, Cap'n Proto, MessagePack, and JSON).
-- The web site (`omnibuf.com`) is an Astro + Tailwind CSS static site deployed to Cloudflare Pages with six primary surfaces: Overview (`/`), How It Works (`/how-it-works`), Wire Specification (`/spec`), Go Language Guide (`/go`), TypeScript & JS Language Guide (`/es`), and CLI Guide (`/cli`).
+- The web site (`omnibuf.com`) is an Astro + Tailwind CSS static site deployed to Cloudflare Pages with eleven primary surfaces: Overview (`/`), How It Works (`/how-it-works`), Wire Specification (`/spec`), Language Guides (`/go`, `/es`, `/rs`, `/py`, `/cpp`, `/java`, `/cs`), and CLI Guide (`/cli`).
 
 ## Capabilities and Constraints
 
-- **Language support:** The wire specification is language-agnostic, with first-party implementations for Go (`github.com/omnibuf/omnibuf-go`) and TypeScript/JavaScript (`github.com/omnibuf/omnibuf-es`). Always state this candidly.
+- **Language support:** The wire specification is language-agnostic, with first-party implementations for Go, TypeScript/JavaScript, Rust, Python, C++20, Java 21, and C# (.NET 8) verified against a shared 584-case conformance suite. Always state runtime trade-offs candidly (including pure-Python vs native C/Rust extensions on `/py`).
 - **Benchmark presentation:** High-level callouts, cards, and prose must use relative multipliers and percentages (such as `5.9x faster`, `7.3x faster`, `40% smaller`) rather than fragile exact `ns/op` or line counts. Detailed benchmark tables and methodology notes remain grounded in reproducible repository benchmarks.
 - **Honest trade-offs:** Every format comparison must acknowledge where competing formats win (for example, Protobuf's ubiquitous multi-language ecosystem and ~7% smaller wire size on dense messages, FlatBuffers/Cap'n Proto's zero-unpack `O(1)` random access into large buffers, MessagePack's schema-free dynamic maps, and JSON's native browser/human readability).
 

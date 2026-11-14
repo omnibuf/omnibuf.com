@@ -44,16 +44,36 @@ const comparisonLanguageCharts = languageBenchmarkList.map((suite) => {
       <span class="font-serif italic font-normal normal-case text-[#FF4F18]">other formats.</span>
     </h2>
     <p class="mt-3 text-lg sm:text-xl text-ink/80 font-medium leading-relaxed">
-      Wire size is the same across languages, and encode/decode speed depends on the runtime. Full
-      numbers and test setup are on the{' '}
+      Wire size is identical across languages, and encode/decode speed tracks each runtime. Full
+      numbers and test setups live on the{' '}
       <a href="/go#benchmarks" class="doc-link">
-        Go benchmarks
-      </a>{' '}
-      and{' '}
+        Go
+      </a>
+      ,{' '}
       <a href="/es#benchmarks" class="doc-link">
-        TypeScript &amp; JS benchmarks
+        TypeScript &amp; JS
+      </a>
+      ,{' '}
+      <a href="/rs#benchmarks" class="doc-link">
+        Rust
+      </a>
+      ,{' '}
+      <a href="/cpp#benchmarks" class="doc-link">
+        C++
+      </a>
+      ,{' '}
+      <a href="/cs#benchmarks" class="doc-link">
+        C#
+      </a>
+      ,{' '}
+      <a href="/java#benchmarks" class="doc-link">
+        Java
+      </a>
+      , and{' '}
+      <a href="/py#benchmarks" class="doc-link">
+        Python
       </a>{' '}
-      pages.
+      benchmark pages.
     </p>
   </div>
 
@@ -73,7 +93,7 @@ const comparisonLanguageCharts = languageBenchmarkList.map((suite) => {
           <div
             role="tablist"
             aria-label="Select runtime speed comparison language"
-            class="inline-flex items-center gap-1.5 font-mono text-xs font-bold uppercase"
+            class="inline-flex flex-wrap items-center gap-1.5 font-mono text-xs font-bold uppercase"
           >
             {comparisonLanguageCharts.map((preview, idx) => (
               <button
@@ -85,7 +105,7 @@ const comparisonLanguageCharts = languageBenchmarkList.map((suite) => {
                 aria-controls={`comp-butterfly-panel-${preview.key}`}
                 tabindex={idx === 0 ? 0 : -1}
                 class:list={[
-                  'px-2.5 py-1 rounded border-2 border-ink transition cursor-pointer',
+                  'px-2 py-1 rounded border-2 border-ink transition cursor-pointer',
                   idx === 0
                     ? 'bg-acid text-ink shadow-[2px_2px_0px_#111111]'
                     : 'bg-white text-ink/75 hover:bg-[#E5E0D5] hover:text-ink',
@@ -132,13 +152,13 @@ const comparisonLanguageCharts = languageBenchmarkList.map((suite) => {
                 </svg>
                 <div
                   class="h-4 bench-bar-omni border-2 border-ink rounded-l-sm shadow-[1px_1px_0px_#111111] shrink-0"
-                  style={`width: ${preview.omni.encPct}%;`}
+                  style={`width: min(${preview.omni.encPct}%, calc(100% - 1.5rem));`}
                 />
               </div>
               <div class="flex items-center justify-start pl-0.5 border-l-2 border-ink min-w-0">
                 <div
                   class="h-4 bench-bar-omni border-2 border-ink rounded-r-sm shadow-[1px_1px_0px_#111111] shrink-0"
-                  style={`width: ${preview.omni.decPct}%;`}
+                  style={`width: min(${preview.omni.decPct}%, calc(100% - 5.75rem));`}
                 />
                 <svg
                   class="w-5 h-3.5 text-[#FF4F18] shrink-0 mx-1"

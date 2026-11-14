@@ -44,10 +44,23 @@ test('schema-less omnibuf -c and DecodeBlind examples use field_<N> keys', () =>
   assert.match(caps, /"field_9":/);
   assert.doesNotMatch(caps, />"3":</);
 
-  const goPage = readRepoFile('src/pages/go.astro');
-  const esPage = readRepoFile('src/pages/es.astro');
-  assert.match(goPage, /field_1/);
-  assert.match(esPage, /field_1/);
+  for (const langFile of [
+    'src/pages/go.astro',
+    'src/pages/es.astro',
+    'src/pages/rs.astro',
+    'src/pages/py.astro',
+    'src/pages/cpp.astro',
+    'src/pages/java.astro',
+    'src/pages/cs.astro',
+  ]) {
+    const page = readRepoFile(langFile);
+    assert.match(page, /field_1/);
+    assert.doesNotMatch(page, /—|&mdash;/);
+    assert.doesNotMatch(page, /paying for|paying the price|pay the cost/i);
+  }
+  const pyPage = readRepoFile('src/pages/py.astro');
+  assert.match(pyPage, /protobuf-py/);
+  assert.match(pyPage, /buf generate/);
 });
 
 test('Hero and Comparisons scope butterfly widget scripts and ARIA tab linkage', () => {
@@ -206,7 +219,19 @@ test('CSS, 404 routes, FAQ deterministic wording, HowItWorks KiB units, and PROD
   );
 
   const notFoundPage = readRepoFile('src/pages/404.astro');
-  for (const route of ['/', '/how-it-works', '/spec', '/go', '/es', '/cli']) {
+  for (const route of [
+    '/',
+    '/how-it-works',
+    '/spec',
+    '/go',
+    '/es',
+    '/rs',
+    '/py',
+    '/cpp',
+    '/java',
+    '/cs',
+    '/cli',
+  ]) {
     assert.match(notFoundPage, new RegExp(`href="${route}"`));
   }
 
