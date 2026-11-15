@@ -6,7 +6,15 @@ import Benchmarks from '../components/Benchmarks.astro';
 import LanguageStrip from '../components/LanguageStrip.astro';
 import Footer from '../components/Footer.astro';
 
-let mavenVersion = '0.1.0';
+let mavenVersion = '0.1.1';
+const isNewerSemver = (candidate: string, current: string) => {
+  const pa = candidate.split(/[.-]/).map((n) => Number.parseInt(n, 10) || 0);
+  const pb = current.split(/[.-]/).map((n) => Number.parseInt(n, 10) || 0);
+  for (let i = 0; i < 3; i++) {
+    if ((pa[i] ?? 0) !== (pb[i] ?? 0)) return (pa[i] ?? 0) > (pb[i] ?? 0);
+  }
+  return false;
+};
 try {
   const res = await fetch(
     'https://repo1.maven.org/maven2/com/omnibuf/omnibuf-java/maven-metadata.xml',
@@ -15,7 +23,7 @@ try {
   if (res.ok) {
     const xml = await res.text();
     const match = xml.match(/<release>([0-9A-Za-z._-]+)<\/release>/);
-    if (match?.[1]) {
+    if (match?.[1] && isNewerSemver(match[1], mavenVersion)) {
       mavenVersion = match[1];
     }
   }
@@ -75,7 +83,7 @@ const javaFaqItems = [
     id: 'java-faq-encode',
     question: 'Why does protobuf-java lead on the 39 KiB Large Embedded Message Encode test?',
     paragraphs: [
-      '<code>protobuf-java</code> builds immutable message instances that cache pre-encoded UTF-8 <code>ByteString</code> buffers and <code>memoizedSerializedSize</code> after the first warmup pass. Repeated <code>toByteArray()</code> calls on an unchanged 39 KiB object copy cached byte arrays with zero UTF-8 conversion or length-slot shifts. On the canonical 11-field message, decode, nested field reads, and embedded message growth, generated OmniBuf classes match or beat <code>protobuf-java</code> by up to 10.2x.',
+      'Immutable <code>protobuf-java</code> messages cache <code>memoizedSerializedSize</code> and UTF-8 <code>ByteString</code> slices. Repeated <code>toByteArray()</code> calls allocate the exact 39,227-byte array upfront and copy cached bytes in one pass (4.38 µs). Mutable OmniBuf classes never cache stale sizes, streaming UTF-8 into a pooled encoder and copying out in 5.04 µs. OmniBuf leads every other Java benchmark by 1.16x to 8.2x.',
     ],
   },
   {
@@ -284,8 +292,8 @@ const javaFaqJsonLd = {
             <p class="text-base sm:text-lg text-ink/85 leading-relaxed">
               <code>protoc-gen-omnibuf-java</code> emits mutable model classes, static{' '}
               <code>&lt;Msg&gt;OmniBuf</code> codecs, and <code>Opaque&lt;Msg&gt;</code> views over
-              raw <code>byte[]</code> packets. Splicing a single 64-bit sequence field takes ~144 ns
-              on OpenJDK 21.
+              raw <code>byte[]</code> packets. Checking a nested string and splicing a 64-bit
+              sequence field takes 294 ns end-to-end on OpenJDK 21.
             </p>
           </div>
 
@@ -402,6 +410,14 @@ const javaFaqJsonLd = {
     const coordEl = document.getElementById('java-maven-coord');
     const copyBtn = document.getElementById('java-maven-copy-btn');
     if (coordEl && copyBtn) {
+      const isNewer = (candidate: string, current: string) => {
+        const pa = candidate.split(/[.-]/).map((n) => Number.parseInt(n, 10) || 0);
+        const pb = current.split(/[.-]/).map((n) => Number.parseInt(n, 10) || 0);
+        for (let i = 0; i < 3; i++) {
+          if ((pa[i] ?? 0) !== (pb[i] ?? 0)) return (pa[i] ?? 0) > (pb[i] ?? 0);
+        }
+        return false;
+      };
       void (async () => {
         try {
           const res = await fetch(
@@ -411,6 +427,8 @@ const javaFaqJsonLd = {
           const data = (await res.json()) as { value?: string };
           const raw = (data.value ?? '').replace(/^v/, '').trim();
           if (!/^\d+\.\d+\.\d+(?:[-+][0-9A-Za-z.-]+)?$/.test(raw)) return;
+          const currentVer = (coordEl.textContent ?? '').split(':').pop()?.trim() ?? '0.0.0';
+          if (!isNewer(raw, currentVer)) return;
           const coord = `com.omnibuf:omnibuf-java:${raw}`;
           coordEl.textContent = coord;
           copyBtn.setAttribute('data-copy', coord);
