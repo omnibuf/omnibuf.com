@@ -94,9 +94,10 @@ const wireTypeRows: WireTypeRow[] = [
             <span class="font-serif italic font-normal normal-case text-[#FF4F18]">packet.</span>
           </h2>
           <p class="text-base sm:text-lg text-ink/85 leading-relaxed">
-            Fields go on the wire back-to-back as <code>[Tag][Value]</code> pairs, so an empty
-            message is 0 bytes. Each tag is a Prefix-Varint with the field number in the upper bits
-            and a <strong>4-bit wire type (0..15)</strong> in the bottom 4 bits:
+            Fields go on the wire back-to-back as <code>[Tag][Value]</code> pairs: an empty message
+            is 0 bytes, and concatenating two buffers merges them just as Protobuf does. Each tag is
+            a Prefix-Varint with the field number in the upper bits and a{' '}
+            <strong>4-bit wire type (0..15)</strong> in the bottom 4 bits:
           </p>
           <div class="p-3.5 bg-[#FAF8F2] border-2 border-ink rounded-md font-mono space-y-1">
             <div class="text-sm sm:text-base font-bold">
