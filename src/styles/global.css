@@ -691,12 +691,23 @@ html.dark .bench-bar-competitor {
   }
 }
 
-.hero-tab-progress {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  height: 2.5px;
+.hero-panel-progress-track {
+  height: 5px;
+  width: 100%;
+  background-color: rgba(17, 17, 17, 0.1);
+  border-top: 1.5px solid #111111;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+html.dark .hero-panel-progress-track {
+  background-color: rgba(244, 240, 230, 0.12);
+  border-top-color: #454d5e;
+}
+
+.hero-panel-progress {
+  height: 100%;
+  width: 100%;
   background-color: #ff4f18;
   transform-origin: left center;
   transform: scaleX(0);
@@ -704,9 +715,7 @@ html.dark .bench-bar-competitor {
   pointer-events: none;
 }
 
-[data-butterfly-widget='hero'][data-autorotate='running']
-  [data-butterfly-tab][aria-selected='true']
-  .hero-tab-progress {
+[data-butterfly-widget='hero'][data-autorotate='running'] .hero-panel-progress {
   opacity: 1;
   animation: hero-tab-cycle var(--hero-cycle-ms, 5000ms) linear forwards;
 }
@@ -1057,7 +1066,8 @@ html.dark svg rect[fill='#D4FF33'] + text[fill='#111111'] + text[fill='#111111']
     animation: none !important;
   }
 
-  .hero-tab-progress {
+  .hero-panel-progress-track,
+  .hero-panel-progress {
     display: none !important;
   }
 

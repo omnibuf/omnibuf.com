@@ -58,7 +58,7 @@ const pyFaqItems = [
     id: 'py-faq-speed',
     question: 'How does omnibuf compare against upb, protobuf-py, and msgspec under the hood?',
     paragraphs: [
-      '<code>omnibuf</code> ships a compiled Rust extension atop <code>omnibuf-rs</code>. It reads and populates CPython slot byte offsets directly from native code, encoding in 501 to 527 ns (ahead of Google&apos;s C <code>upb</code> at 565 ns, 1.6x faster than C <code>msgspec</code>, and 2.3x faster than <code>protobuf-py</code>) and materializing all 11 decoded fields 2.3x faster than <code>upb</code>. Lazy <code>Opaque</code> views beat <code>upb</code> by 1.8x on nested field lookups and 1.4x on single-field mutations.',
+      '<code>omnibuf</code> ships a compiled Rust extension atop <code>omnibuf-rs</code>. It reads and populates Python object slots directly from native code, encoding ahead of Google&apos;s C <code>upb</code> backend, C <code>msgspec</code>, and <code>protobuf-py</code>, and decoding full messages over 2x faster than <code>upb</code>. Lazy <code>Opaque</code> views read nested fields and splice single-field mutations nearly 2x faster than <code>upb</code>.',
     ],
   },
   {

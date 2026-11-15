@@ -83,7 +83,7 @@ const javaFaqItems = [
     id: 'java-faq-encode',
     question: 'Why does protobuf-java lead on the 39 KiB Large Embedded Message Encode test?',
     paragraphs: [
-      'Immutable <code>protobuf-java</code> messages cache <code>memoizedSerializedSize</code> and UTF-8 <code>ByteString</code> slices. Repeated <code>toByteArray()</code> calls allocate the exact 39,227-byte array upfront and copy cached bytes in one pass (4.38 µs). Mutable OmniBuf classes never cache stale sizes, streaming UTF-8 into a pooled encoder and copying out in 5.04 µs. OmniBuf leads every other Java benchmark by 1.16x to 8.2x.',
+      'Immutable <code>protobuf-java</code> messages cache <code>memoizedSerializedSize</code> and UTF-8 <code>ByteString</code> slices. Repeated <code>toByteArray()</code> calls allocate the exact 39,227-byte array upfront and copy cached bytes in one pass (4.38 µs). Mutable OmniBuf classes never cache stale sizes, streaming UTF-8 into a pooled encoder and copying out in 5.04 µs. OmniBuf leads every other Java benchmark, up to about 8x faster on single-field reads.',
     ],
   },
   {

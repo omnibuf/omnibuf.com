@@ -67,6 +67,7 @@ test('Hero and Comparisons scope butterfly widget scripts and ARIA tab linkage',
   const hero = readRepoFile('src/components/Hero.astro');
   const comparisons = readRepoFile('src/components/Comparisons.astro');
   const globalCss = readRepoFile('src/styles/global.css');
+  const benchmarksData = readRepoFile('src/data/benchmarks.ts');
 
   assert.match(hero, /\[data-butterfly-widget="hero"\]/);
   assert.doesNotMatch(hero, /querySelectorAll<HTMLElement>\('\[data-butterfly-widget\]'\)/);
@@ -76,9 +77,21 @@ test('Hero and Comparisons scope butterfly widget scripts and ARIA tab linkage',
   assert.match(hero, /tabindex=/);
   assert.match(hero, /MANUAL_PAUSE_MS\s*=\s*90_000/);
   assert.match(hero, /data-autorotate=/);
+  assert.match(hero, /data-butterfly-next/);
+  assert.match(hero, /hero-panel-progress/);
   assert.match(hero, /prefers-reduced-motion:\s*reduce/);
   assert.match(hero, /\[grid-area:1\/1\]/);
+  assert.match(hero, /\.proto Schemas or Plain Structs &rarr; Wire Encodings/);
+  assert.doesNotMatch(hero, /Plain Structs \(No \.proto\)/);
   assert.match(globalCss, /@keyframes hero-tab-cycle/);
+
+  assert.doesNotMatch(benchmarksData, /canonical 11-field/);
+  const summaryMatches = [...benchmarksData.matchAll(/heroSummaryHtml:\s*'([^']+)'/g)];
+  assert.equal(summaryMatches.length, 7);
+  for (const [, html] of summaryMatches) {
+    assert.doesNotMatch(html, /[0-9]+\.[0-9]+x/);
+    assert.doesNotMatch(html, /encoded_len/);
+  }
 
   assert.match(comparisons, /\[data-butterfly-widget="comparisons"\]/);
   assert.doesNotMatch(comparisons, /querySelectorAll<HTMLElement>\('\[data-butterfly-widget\]'\)/);

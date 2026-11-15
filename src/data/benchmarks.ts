@@ -70,7 +70,7 @@ export const formatProfiles: Record<string, FormatProfile> = {
     name: 'Protobuf',
     url: 'https://protobuf.dev/',
     verdict:
-      'Protobuf is ~7% smaller on the wire (341 B vs 366 B) and has libraries for almost every language on earth. OmniBuf keeps the same .proto schemas and generated structs, encodes in a single pass (~6.0x faster in Go), decodes ~5.2x faster under equal struct reuse, and does not need the .proto file to inspect a packet.',
+      'Protobuf is about 7% smaller on the wire (341 B vs 366 B) and has libraries for almost every language on earth. OmniBuf keeps the same .proto schemas and generated structs, encodes in a single pass (around 6x faster in Go), decodes around 5x faster, and does not need the .proto file to inspect a packet.',
     stats: [
       { label: 'Wire Size', score: 100 },
       { label: 'Encode Speed', score: 45 },
@@ -916,7 +916,7 @@ export const languageBenchmarks: Record<LanguageKey, LanguageBenchmarkSuite> = {
     ctaLabel: 'See full results',
     competitorsLabel: "Protobuf, FlatBuffers, Avro, Cap'n Proto, MsgPack, JSON",
     heroSummaryHtml:
-      'In our Go benchmarks, OmniBuf runs <strong>6.0x faster on encode and 5.2x faster on decode</strong> than standard Go Protobuf under equal struct reuse. Growing an embedded sub-message past 16 KiB runs <strong>7.8x faster</strong> via <code>Opaque</code> splicing, and against <code>encoding/json</code> on plain Go structs OmniBuf is <strong>over 17x faster</strong> at half the byte size. Read <a href="/how-it-works" class="doc-link">how the wire format works</a> or check the <a href="/spec" class="doc-link">wire specification</a>.',
+      'In Go, OmniBuf encodes and decodes <strong>around 5x to 6x faster</strong> than Protobuf. Plain Go structs with struct tags run <strong>around 6x to 10x faster</strong> than standard JSON at roughly half the wire size. Generated views read or splice single fields in place. Explore the <a href="/go" class="doc-link">Go runtime</a>.',
     categories: goSpeedCategories,
     butterflyEncodeRows: (goEncodeCat?.rows ?? []).filter(
       (r) => (r.baseline || !r.highlight) && r.name !== 'JSON (encoding/json/v2)',
@@ -946,7 +946,7 @@ export const languageBenchmarks: Record<LanguageKey, LanguageBenchmarkSuite> = {
     ctaLabel: 'See full results',
     competitorsLabel: 'protobufjs, protobuf-es, google-protobuf, MsgPack, JSON',
     heroSummaryHtml:
-      'In TypeScript and JavaScript on Node.js v24, <code>@omnibuf/core</code> encodes <strong>2.5x faster</strong> and decodes <strong>3.1x faster</strong> than <code>@bufbuild/protobuf</code> (<code>protobuf-es</code>), reads a nested field <strong>10.2x faster</strong>, and splices targeted updates <strong>2.2x faster</strong>. Against native <code>JSON.stringify</code> and <code>JSON.parse</code>, it runs nearly <strong>2x faster</strong> at less than half the byte size. Read <a href="/how-it-works" class="doc-link">how the wire format works</a> or check the <a href="/spec" class="doc-link">wire specification</a>.',
+      'TypeScript and JavaScript apps encode and decode <strong>around 2x to 3x faster</strong> with OmniBuf than with Protobuf-ES, and read individual nested fields <strong>about 10x faster</strong>. Against built-in JSON in Node.js and browsers, OmniBuf runs <strong>about 2x faster</strong> at less than half the byte size. Explore the <a href="/es" class="doc-link">TypeScript runtime</a>.',
     categories: esBenchmarkCategories,
     butterflyEncodeRows: esEncodeCat?.rows ?? [],
     butterflyDecodeRows: esDecodeCat?.rows ?? [],
@@ -971,7 +971,7 @@ export const languageBenchmarks: Record<LanguageKey, LanguageBenchmarkSuite> = {
     ctaLabel: 'See full results',
     competitorsLabel: 'buffa, prost, rmp-serde, serde_json',
     heroSummaryHtml:
-      'In Rust (<code>rustc 1.94.0</code>), <code>omnibuf</code> encodes and decodes ahead of both <code>buffa</code> and <code>prost</code> on canonical 11-field allocations. Zero-copy <code>Opaque</code> views borrow nested <code>&amp;str</code> fields <strong>5.3x faster</strong> than <code>buffa</code>&apos;s <code>PeerUpdateView</code> (<strong>9.6x faster</strong> than <code>prost</code>) and splice single-field updates <strong>3.6x to 4.7x faster</strong>, while two-pass <code>encoded_len()</code> pre-sizing keeps <code>buffa</code> and <code>prost</code> ahead when encoding fresh &gt;16 KiB nested messages. Check the <a href="/rs" class="doc-link">Rust guide</a>.',
+      'OmniBuf&apos;s Rust crate edges ahead of both buffa and prost on full message encode and decode, and runs <strong>around 3x to 4x faster</strong> than JSON. Zero-copy views borrow nested strings <strong>about 5x to 10x faster</strong> and splice single-field updates <strong>around 4x faster</strong>. Explore the <a href="/rs" class="doc-link">Rust runtime</a>.',
     categories: rsBenchmarkCategories,
     butterflyEncodeRows: primaryAndCompetitors(rsEncodeCat.rows),
     butterflyDecodeRows: primaryAndCompetitors(rsDecodeCat.rows),
@@ -996,7 +996,7 @@ export const languageBenchmarks: Record<LanguageKey, LanguageBenchmarkSuite> = {
     ctaLabel: 'See full results',
     competitorsLabel: 'protobuf-py (Rust), upb (C), msgspec (C), msgpack (C), json (C)',
     heroSummaryHtml:
-      'In Python 3.14, <code>omnibuf</code> leads every tested codec on both encode and decode. Direct CPython slot reads outrun Google&apos;s C <code>upb</code> backend, C <code>msgspec</code>, and <code>protobuf-py</code> during serialization, and full decode materializes all 11 fields <strong>2.3x faster</strong> than <code>upb</code>. <code>Opaque</code> views read nested fields <strong>1.8x faster</strong> than <code>upb</code> and splice single-field updates <strong>1.4x faster</strong> (<strong>3.2x</strong> vs <code>protobuf-py</code>). See the <a href="/py" class="doc-link">Python guide</a>.',
+      'Python&apos;s compiled Rust extension outpaces Google&apos;s C Protobuf backend, msgspec, and stdlib JSON on both encode and decode. Full message decoding finishes <strong>over 2x faster</strong> than Google Protobuf, and lazy views read nested fields <strong>nearly 2x faster</strong>. Explore the <a href="/py" class="doc-link">Python runtime</a>.',
     categories: pyBenchmarkCategories,
     butterflyEncodeRows: primaryAndCompetitors(pyEncodeCat.rows),
     butterflyDecodeRows: primaryAndCompetitors(pyDecodeCat.rows),
@@ -1021,7 +1021,7 @@ export const languageBenchmarks: Record<LanguageKey, LanguageBenchmarkSuite> = {
     ctaLabel: 'See full results',
     competitorsLabel: 'Protobuf (LEB128 Wire), JSON',
     heroSummaryHtml:
-      'In C++20 (Apple Clang 21 <code>-O3</code>), generated OmniBuf headers encode and decode ahead of LEB128 Protobuf wire encoding on the canonical <code>PeerUpdate</code> struct, while Protobuf&apos;s two-pass sizing leads when encoding fresh &gt;16 KiB nested sub-messages. <code>Opaque</code> views read nested <code>std::string_view</code> slices <strong>4.9x faster</strong>, splice scalar updates <strong>2.2x faster</strong>, and grow embedded messages <strong>1.6x faster</strong>. See the <a href="/cpp" class="doc-link">C++20 guide</a>.',
+      'The header-only C++20 library encodes and decodes faster than Protobuf wire encoding and runs <strong>around 3x faster</strong> than JSON. Zero-copy views read nested string slices <strong>about 5x faster</strong> than Protobuf and splice scalar updates <strong>over 2x faster</strong>. Explore the <a href="/cpp" class="doc-link">C++ runtime</a>.',
     categories: cppBenchmarkCategories,
     butterflyEncodeRows: primaryAndCompetitors(cppEncodeCat.rows),
     butterflyDecodeRows: primaryAndCompetitors(cppDecodeCat.rows),
@@ -1046,7 +1046,7 @@ export const languageBenchmarks: Record<LanguageKey, LanguageBenchmarkSuite> = {
     ctaLabel: 'See full results',
     competitorsLabel: 'protobuf-java, FlatBuffers, Jackson JSON, Jackson MsgPack',
     heroSummaryHtml:
-      'On OpenJDK 21, generated OmniBuf classes beat <code>protobuf-java</code> on both encode (<strong>1.16x</strong>) and full decode (<strong>1.45x</strong>), edge ahead of <code>FlatBuffers</code> on full object decode, read a nested string field <strong>8.2x faster</strong> than <code>protobuf-java</code>, splice single-field updates <strong>4.9x faster</strong>, and grow embedded messages past 16 KiB <strong>8.1x faster</strong>. See the <a href="/java" class="doc-link">Java guide</a>.',
+      'Java services encode and decode faster with OmniBuf than with Java Protobuf, and run <strong>around 4x to 5x faster</strong> than Jackson JSON. Generated views read nested fields <strong>about 8x faster</strong> than Protobuf and splice single-field updates <strong>about 5x faster</strong>. Explore the <a href="/java" class="doc-link">Java runtime</a>.',
     categories: javaBenchmarkCategories,
     butterflyEncodeRows: primaryAndCompetitors(javaEncodeCat.rows),
     butterflyDecodeRows: primaryAndCompetitors(javaDecodeCat.rows),
@@ -1071,7 +1071,7 @@ export const languageBenchmarks: Record<LanguageKey, LanguageBenchmarkSuite> = {
     ctaLabel: 'See full results',
     competitorsLabel: 'Google.Protobuf, MessagePack-CSharp, System.Text.Json',
     heroSummaryHtml:
-      'On .NET 8 RyuJIT, generated OmniBuf classes encode <strong>2.1x faster</strong> than <code>Google.Protobuf</code> and <strong>2.0x faster</strong> than <code>MessagePack-CSharp</code>, while decoding <strong>1.2x faster</strong> than <code>Google.Protobuf</code> and <strong>4.4x faster</strong> than <code>System.Text.Json</code>. Targeted <code>Opaque</code> splicing runs <strong>4.1x faster</strong> than <code>Google.Protobuf</code> and grows &gt;16 KiB sub-messages <strong>2.9x faster</strong>. See the <a href="/cs" class="doc-link">C# guide</a>.',
+      'On .NET, OmniBuf encodes <strong>about 2x faster</strong> than Google Protobuf and decodes <strong>over 4x faster</strong> than System.Text.Json. Span-based views read nested fields <strong>nearly 6x faster</strong> than Protobuf and splice single-field updates <strong>about 4x faster</strong>. Explore the <a href="/cs" class="doc-link">C# runtime</a>.',
     categories: csBenchmarkCategories,
     butterflyEncodeRows: primaryAndCompetitors(csEncodeCat.rows),
     butterflyDecodeRows: primaryAndCompetitors(csDecodeCat.rows),
