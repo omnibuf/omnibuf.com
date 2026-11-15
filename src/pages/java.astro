@@ -6,6 +6,24 @@ import Benchmarks from '../components/Benchmarks.astro';
 import LanguageStrip from '../components/LanguageStrip.astro';
 import Footer from '../components/Footer.astro';
 
+let mavenVersion = '0.1.0';
+try {
+  const res = await fetch(
+    'https://repo1.maven.org/maven2/com/omnibuf/omnibuf-java/maven-metadata.xml',
+    { signal: AbortSignal.timeout(4000) },
+  );
+  if (res.ok) {
+    const xml = await res.text();
+    const match = xml.match(/<release>([0-9A-Za-z._-]+)<\/release>/);
+    if (match?.[1]) {
+      mavenVersion = match[1];
+    }
+  }
+} catch {
+  // Keep fallback coordinate during offline builds
+}
+const mavenCoordinate = `com.omnibuf:omnibuf-java:${mavenVersion}`;
+
 const recordJavaSnippet = `import com.omnibuf.OmniBufMapper;
 import com.omnibuf.annotation.OmniBufField;
 import com.omnibuf.annotation.OmniBufMessage;
@@ -155,14 +173,15 @@ const javaFaqJsonLd = {
             <div class="flex items-center justify-between gap-2 mb-2 pb-2 border-b border-paper/15">
               <div class="text-xs font-bold uppercase text-acid">Maven Coordinate</div>
               <button
+                id="java-maven-copy-btn"
                 type="button"
-                data-copy="com.omnibuf:omnibuf-java:0.1.0"
+                data-copy={mavenCoordinate}
                 class="copy-snippet-btn min-w-[4.75rem] text-center px-2.5 py-1 text-xs font-bold uppercase bg-paper/15 hover:bg-acid hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-acid text-paper border border-paper/30 rounded shrink-0 transition"
               >
                 Copy
               </button>
             </div>
-            <pre class="leading-relaxed whitespace-pre"><code>com.omnibuf:omnibuf-java:0.1.0</code></pre>
+            <pre class="leading-relaxed whitespace-pre"><code id="java-maven-coord">{mavenCoordinate}</code></pre>
           </div>
         </div>
       </div>
@@ -378,4 +397,27 @@ const javaFaqJsonLd = {
   </main>
 
   <Footer />
+
+  <script>
+    const coordEl = document.getElementById('java-maven-coord');
+    const copyBtn = document.getElementById('java-maven-copy-btn');
+    if (coordEl && copyBtn) {
+      void (async () => {
+        try {
+          const res = await fetch(
+            'https://img.shields.io/maven-central/v/com.omnibuf/omnibuf-java.json',
+          );
+          if (!res.ok) return;
+          const data = (await res.json()) as { value?: string };
+          const raw = (data.value ?? '').replace(/^v/, '').trim();
+          if (!/^\d+\.\d+\.\d+(?:[-+][0-9A-Za-z.-]+)?$/.test(raw)) return;
+          const coord = `com.omnibuf:omnibuf-java:${raw}`;
+          coordEl.textContent = coord;
+          copyBtn.setAttribute('data-copy', coord);
+        } catch {
+          // Keep build-time coordinate on network failure
+        }
+      })();
+    }
+  </script>
 </Layout>
