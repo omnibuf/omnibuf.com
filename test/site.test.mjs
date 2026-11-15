@@ -75,6 +75,8 @@ test('Hero and Comparisons scope butterfly widget scripts and ARIA tab linkage',
   assert.match(hero, /aria-controls=/);
   assert.match(hero, /aria-labelledby=/);
   assert.match(hero, /tabindex=/);
+  assert.match(hero, /CYCLE_MS\s*=\s*14_000/);
+  assert.match(hero, /--hero-cycle-ms:\s*14000ms/);
   assert.match(hero, /MANUAL_PAUSE_MS\s*=\s*90_000/);
   assert.match(hero, /data-autorotate=/);
   assert.match(hero, /data-butterfly-next/);
@@ -83,6 +85,9 @@ test('Hero and Comparisons scope butterfly widget scripts and ARIA tab linkage',
   assert.match(hero, /\[grid-area:1\/1\]/);
   assert.match(hero, /\.proto Schemas or Plain Structs &rarr; Wire Encodings/);
   assert.doesNotMatch(hero, /Plain Structs \(No \.proto\)/);
+  for (const stackedFile of ['Peer.java', 'Peer.cs', 'peer.hpp', 'peer.py', 'peer.rs', 'peer.ts']) {
+    assert.match(hero, new RegExp(stackedFile.replace('.', '\\.')));
+  }
   assert.match(globalCss, /@keyframes hero-tab-cycle/);
 
   assert.doesNotMatch(benchmarksData, /canonical 11-field/);

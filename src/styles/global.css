@@ -717,7 +717,7 @@ html.dark .hero-panel-progress-track {
 
 [data-butterfly-widget='hero'][data-autorotate='running'] .hero-panel-progress {
   opacity: 1;
-  animation: hero-tab-cycle var(--hero-cycle-ms, 5000ms) linear forwards;
+  animation: hero-tab-cycle var(--hero-cycle-ms, 14000ms) linear forwards;
 }
 
 .hero-butterfly-summary[data-active='false'] {

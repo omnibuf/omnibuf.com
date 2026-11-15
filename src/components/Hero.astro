@@ -24,6 +24,15 @@ const heroLanguageCharts = languageBenchmarkList.map((suite) => {
     restRows,
   };
 });
+
+const stackedPeerFiles = [
+  { step: 6, file: 'Peer.java' },
+  { step: 5, file: 'Peer.cs' },
+  { step: 4, file: 'peer.hpp' },
+  { step: 3, file: 'peer.py' },
+  { step: 2, file: 'peer.rs' },
+  { step: 1, file: 'peer.ts' },
+];
 ---
 
 <section class="relative pt-10 pb-14 sm:pt-16 sm:pb-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
@@ -57,7 +66,7 @@ const heroLanguageCharts = languageBenchmarkList.map((suite) => {
       class="grid lg:grid-cols-12 gap-5 items-stretch"
       data-butterfly-widget="hero"
       data-autorotate="idle"
-      style="--hero-cycle-ms: 5000ms;"
+      style="--hero-cycle-ms: 14000ms;"
     >
       <div class="lg:col-span-7 flex flex-col justify-between bg-[#FAF8F2] border-2 border-ink shadow-[6px_6px_0px_#111111] rounded-md overflow-hidden">
         <div class="p-5 sm:p-6 flex-1 grid items-center text-base sm:text-xl font-medium text-ink/90 leading-relaxed">
@@ -301,32 +310,32 @@ const heroLanguageCharts = languageBenchmarkList.map((suite) => {
     <div class="p-4 sm:p-6 bg-[#FAF8F2]">
       <!-- DESKTOP SVG (Horizontal Tree) -->
       <svg
-        viewBox="0 0 860 440"
-        class="hidden md:block w-full max-h-[430px] mx-auto"
+        viewBox="0 0 860 502"
+        class="hidden md:block w-full max-h-[495px] mx-auto"
         role="img"
-        aria-label="Diagram showing peer.proto branching to Protobuf encoding, JSON encoding, and OmniBuf encoding, alongside a plain Go struct in peer.go pointing directly to OmniBuf encoding."
+        aria-label="Diagram showing peer.proto branching to Protobuf encoding, JSON encoding, and OmniBuf encoding, alongside peer.go with Peer.java, Peer.cs, peer.hpp, peer.py, peer.rs, and peer.ts stacked behind it pointing directly to OmniBuf encoding."
       >
         <!-- TOP-LEFT NODE: .PROTO FILE -->
-        <rect x="22" y="26" width="262" height="184" rx="8" fill="#111111" />
+        <rect x="22" y="24" width="278" height="160" rx="8" fill="#111111" />
         <rect
           x="16"
-          y="20"
-          width="262"
-          height="184"
+          y="18"
+          width="278"
+          height="160"
           rx="8"
           fill="#FAF8F2"
           stroke="#111111"
           stroke-width="2.5"
         />
         <path
-          d="M 16 28 Q 16 20 24 20 L 270 20 Q 278 20 278 28 L 278 56 L 16 56 Z"
+          d="M 16 26 Q 16 18 24 18 L 286 18 Q 294 18 294 26 L 294 54 L 16 54 Z"
           fill="#111111"
         />
-        <circle cx="36" cy="38" r="5" fill="#FF4F18" />
-        <circle cx="52" cy="38" r="5" fill="#D4FF33" />
+        <circle cx="36" cy="36" r="5" fill="#FF4F18" />
+        <circle cx="52" cy="36" r="5" fill="#D4FF33" />
         <text
           x="70"
-          y="43"
+          y="41"
           font-family="IBM Plex Mono, monospace"
           font-size="14"
           font-weight="700"
@@ -337,7 +346,7 @@ const heroLanguageCharts = languageBenchmarkList.map((suite) => {
 
         <text
           x="34"
-          y="92"
+          y="84"
           font-family="IBM Plex Mono, monospace"
           font-size="14.5"
           font-weight="700"
@@ -345,13 +354,13 @@ const heroLanguageCharts = languageBenchmarkList.map((suite) => {
         >
           message Peer &#123;
         </text>
-        <text x="50" y="122" font-family="IBM Plex Mono, monospace" font-size="14" fill="#111111">
+        <text x="50" y="112" font-family="IBM Plex Mono, monospace" font-size="14" fill="#111111">
           <tspan fill="#FF4F18" font-weight="700">
             uint32
           </tspan>{' '}
           id = 1;
         </text>
-        <text x="50" y="150" font-family="IBM Plex Mono, monospace" font-size="14" fill="#111111">
+        <text x="50" y="138" font-family="IBM Plex Mono, monospace" font-size="14" fill="#111111">
           <tspan fill="#FF4F18" font-weight="700">
             string
           </tspan>{' '}
@@ -359,7 +368,7 @@ const heroLanguageCharts = languageBenchmarkList.map((suite) => {
         </text>
         <text
           x="34"
-          y="180"
+          y="164"
           font-family="IBM Plex Mono, monospace"
           font-size="14.5"
           font-weight="700"
@@ -368,40 +377,75 @@ const heroLanguageCharts = languageBenchmarkList.map((suite) => {
           &#125;
         </text>
 
-        <!-- BOTTOM-LEFT NODE: PLAIN GO STRUCT (NO .PROTO) -->
-        <rect x="22" y="242" width="262" height="184" rx="8" fill="#111111" />
+        <!-- BOTTOM-LEFT STACK: OTHER SUPPORTED LANGUAGES BEHIND peer.go (SHIFTING UP AND LEFT) -->
+        {stackedPeerFiles.map(({ step, file }) => {
+          const bx = 58 - step * 7;
+          const by = 318 - step * 19;
+          return (
+            <g>
+              <rect x={bx} y={by} width="236" height="158" rx="7" fill="#FAF8F2" />
+              <rect x={bx} y={by} width="236" height="24" rx="7" fill="#E5E0D5" />
+              <rect x={bx} y={by + 16} width="236" height="8" fill="#E5E0D5" />
+              <rect
+                x={bx}
+                y={by}
+                width="236"
+                height="158"
+                rx="7"
+                fill="none"
+                stroke="#111111"
+                stroke-width="2"
+              />
+              <circle cx={bx + 14} cy={by + 9.5} r="3" fill="#FF4F18" opacity="0.8" />
+              <circle cx={bx + 24} cy={by + 9.5} r="3" fill="#111111" opacity="0.28" />
+              <text
+                x={bx + 36}
+                y={by + 13.3}
+                font-family="IBM Plex Mono, monospace"
+                font-size="11"
+                font-weight="700"
+                fill="#111111"
+              >
+                {file}
+              </text>
+            </g>
+          );
+        })}
+
+        <!-- FRONT CARD OF STACK: PLAIN GO STRUCT (peer.go) -->
+        <rect x="64" y="324" width="236" height="162" rx="8" fill="#111111" />
         <rect
-          x="16"
-          y="236"
-          width="262"
-          height="184"
+          x="58"
+          y="318"
+          width="236"
+          height="162"
           rx="8"
           fill="#FAF8F2"
           stroke="#111111"
           stroke-width="2.5"
         />
         <path
-          d="M 16 244 Q 16 236 24 236 L 270 236 Q 278 236 278 244 L 278 272 L 16 272 Z"
+          d="M 58 326 Q 58 318 66 318 L 286 318 Q 294 318 294 326 L 294 352 L 58 352 Z"
           fill="#111111"
         />
-        <circle cx="36" cy="254" r="5" fill="#FF4F18" />
-        <circle cx="52" cy="254" r="5" fill="#D4FF33" />
+        <circle cx="76" cy="335" r="4.5" fill="#FF4F18" />
+        <circle cx="91" cy="335" r="4.5" fill="#D4FF33" />
         <text
-          x="70"
-          y="259"
+          x="107"
+          y="340"
           font-family="IBM Plex Mono, monospace"
-          font-size="14"
+          font-size="13.5"
           font-weight="700"
           fill="#FAF8F2"
         >
           peer.go
         </text>
         <text
-          x="264"
-          y="258"
+          x="282"
+          y="339"
           text-anchor="end"
           font-family="IBM Plex Mono, monospace"
-          font-size="11"
+          font-size="10.5"
           font-weight="700"
           fill="#D4FF33"
         >
@@ -409,34 +453,34 @@ const heroLanguageCharts = languageBenchmarkList.map((suite) => {
         </text>
 
         <text
-          x="32"
-          y="308"
+          x="72"
+          y="382"
           font-family="IBM Plex Mono, monospace"
-          font-size="14"
+          font-size="13.5"
           font-weight="700"
           fill="#111111"
         >
           type Peer struct &#123;
         </text>
-        <text y="338" font-family="IBM Plex Mono, monospace" font-size="13.5" fill="#111111">
-          <tspan x="46">ID</tspan>
-          <tspan x="90" fill="#FF4F18" font-weight="700">
+        <text y="409" font-family="IBM Plex Mono, monospace" font-size="13" fill="#111111">
+          <tspan x="84">ID</tspan>
+          <tspan x="124" fill="#FF4F18" font-weight="700">
             uint32
           </tspan>
-          <tspan x="148">`omnibuf:"1"`</tspan>
+          <tspan x="178">`omnibuf:"1"`</tspan>
         </text>
-        <text y="366" font-family="IBM Plex Mono, monospace" font-size="13.5" fill="#111111">
-          <tspan x="46">Host</tspan>
-          <tspan x="90" fill="#FF4F18" font-weight="700">
+        <text y="436" font-family="IBM Plex Mono, monospace" font-size="13" fill="#111111">
+          <tspan x="84">Host</tspan>
+          <tspan x="124" fill="#FF4F18" font-weight="700">
             string
           </tspan>
-          <tspan x="148">`omnibuf:"2"`</tspan>
+          <tspan x="178">`omnibuf:"2"`</tspan>
         </text>
         <text
-          x="32"
-          y="396"
+          x="72"
+          y="463"
           font-family="IBM Plex Mono, monospace"
-          font-size="14"
+          font-size="13.5"
           font-weight="700"
           fill="#111111"
         >
@@ -444,55 +488,55 @@ const heroLanguageCharts = languageBenchmarkList.map((suite) => {
         </text>
 
         <!-- ROUTING ARROWS (ZERO CROSSINGS) -->
-        <!-- Stem from peer.proto right edge (284, 112) to fork (318, 112) -->
-        <path d="M 284 112 L 318 112" fill="none" stroke="#111111" stroke-width="2.5" />
-        <!-- peer.proto -> Protobuf (y = 77) -->
+        <!-- Stem from peer.proto right edge (300, 98) to fork (330, 98) -->
+        <path d="M 300 98 L 330 98" fill="none" stroke="#111111" stroke-width="2.5" />
+        <!-- peer.proto -> Protobuf (y = 79) -->
         <path
-          d="M 318 112 L 318 91 Q 318 77 332 77 L 348 77"
+          d="M 330 98 L 330 91 Q 330 79 342 79 L 354 79"
           fill="none"
           stroke="#111111"
           stroke-width="2.5"
           stroke-dasharray="5 4"
         />
-        <polygon points="346,70 360,77 346,84" fill="#111111" />
-        <!-- peer.proto -> JSON (y = 217) -->
+        <polygon points="352,72 366,79 352,86" fill="#111111" />
+        <!-- peer.proto -> JSON (y = 239) -->
         <path
-          d="M 318 112 L 318 203 Q 318 217 332 217 L 348 217"
+          d="M 330 98 L 330 225 Q 330 239 344 239 L 354 239"
           fill="none"
           stroke="#111111"
           stroke-width="2.5"
           stroke-dasharray="5 4"
         />
-        <polygon points="346,210 360,217 346,224" fill="#111111" />
-        <!-- peer.proto -> OmniBuf upper entry (y = 342) -->
+        <polygon points="352,232 366,239 352,246" fill="#111111" />
+        <!-- peer.proto -> OmniBuf upper entry (y = 382) -->
         <path
-          d="M 318 217 L 318 328 Q 318 342 332 342 L 346 342"
+          d="M 330 239 L 330 368 Q 330 382 344 382 L 352 382"
           fill="none"
           stroke="#FF4F18"
           stroke-width="3.5"
         />
-        <polygon points="344,334 360,342 344,350" fill="#FF4F18" />
-        <circle cx="318" cy="112" r="4.5" fill="#111111" />
-        <circle cx="318" cy="217" r="4" fill="#111111" />
+        <polygon points="350,374 366,382 350,390" fill="#FF4F18" />
+        <circle cx="330" cy="98" r="4.5" fill="#111111" />
+        <circle cx="330" cy="239" r="4" fill="#111111" />
 
-        <!-- peer.go -> OmniBuf ONLY (straight horizontal at y = 378) -->
-        <path d="M 284 378 L 346 378" fill="none" stroke="#FF4F18" stroke-width="3.5" />
-        <polygon points="344,370 360,378 344,386" fill="#FF4F18" />
+        <!-- peer.go -> OmniBuf ONLY (straight horizontal at y = 432) -->
+        <path d="M 300 432 L 352 432" fill="none" stroke="#FF4F18" stroke-width="3.5" />
+        <polygon points="350,424 366,432 350,440" fill="#FF4F18" />
 
         <!-- OUTPUT 1: PROTOBUF -->
-        <rect x="370" y="26" width="474" height="114" rx="8" fill="#111111" />
+        <rect x="374" y="24" width="470" height="122" rx="8" fill="#111111" />
         <rect
-          x="364"
-          y="20"
-          width="474"
-          height="114"
+          x="368"
+          y="18"
+          width="470"
+          height="122"
           rx="8"
           fill="#FAF8F2"
           stroke="#111111"
           stroke-width="2.5"
         />
         <text
-          x="386"
+          x="390"
           y="54"
           font-family="Space Grotesk, sans-serif"
           font-size="20"
@@ -522,13 +566,13 @@ const heroLanguageCharts = languageBenchmarkList.map((suite) => {
         >
           STANDARD
         </text>
-        <text x="386" y="86" font-family="IBM Plex Mono, monospace" font-size="14" fill="#111111">
+        <text x="390" y="88" font-family="IBM Plex Mono, monospace" font-size="14" fill="#111111">
           <tspan fill="#00805A" font-weight="700">
             ✓
           </tspan>{' '}
           Compact binary size
         </text>
-        <text x="386" y="112" font-family="IBM Plex Mono, monospace" font-size="14" fill="#111111">
+        <text x="390" y="116" font-family="IBM Plex Mono, monospace" font-size="14" fill="#111111">
           <tspan fill="#FF4F18" font-weight="700">
             ✗
           </tspan>{' '}
@@ -536,20 +580,20 @@ const heroLanguageCharts = languageBenchmarkList.map((suite) => {
         </text>
 
         <!-- OUTPUT 2: JSON -->
-        <rect x="370" y="166" width="474" height="114" rx="8" fill="#111111" />
+        <rect x="374" y="184" width="470" height="122" rx="8" fill="#111111" />
         <rect
-          x="364"
-          y="160"
-          width="474"
-          height="114"
+          x="368"
+          y="178"
+          width="470"
+          height="122"
           rx="8"
           fill="#FAF8F2"
           stroke="#111111"
           stroke-width="2.5"
         />
         <text
-          x="386"
-          y="194"
+          x="390"
+          y="214"
           font-family="Space Grotesk, sans-serif"
           font-size="20"
           font-weight="700"
@@ -559,7 +603,7 @@ const heroLanguageCharts = languageBenchmarkList.map((suite) => {
         </text>
         <rect
           x="658"
-          y="174"
+          y="194"
           width="160"
           height="26"
           rx="4"
@@ -569,7 +613,7 @@ const heroLanguageCharts = languageBenchmarkList.map((suite) => {
         />
         <text
           x="738"
-          y="191"
+          y="211"
           text-anchor="middle"
           font-family="IBM Plex Mono, monospace"
           font-size="12"
@@ -578,13 +622,13 @@ const heroLanguageCharts = languageBenchmarkList.map((suite) => {
         >
           EASIER DEBUGGING
         </text>
-        <text x="386" y="226" font-family="IBM Plex Mono, monospace" font-size="14" fill="#111111">
+        <text x="390" y="248" font-family="IBM Plex Mono, monospace" font-size="14" fill="#111111">
           <tspan fill="#00805A" font-weight="700">
             ✓
           </tspan>{' '}
           Easy to inspect without a schema
         </text>
-        <text x="386" y="252" font-family="IBM Plex Mono, monospace" font-size="14" fill="#111111">
+        <text x="390" y="276" font-family="IBM Plex Mono, monospace" font-size="14" fill="#111111">
           <tspan fill="#FF4F18" font-weight="700">
             ✗
           </tspan>{' '}
@@ -592,20 +636,20 @@ const heroLanguageCharts = languageBenchmarkList.map((suite) => {
         </text>
 
         <!-- OUTPUT 3: OMNIBUF -->
-        <rect x="370" y="306" width="474" height="120" rx="8" fill="#FF4F18" />
+        <rect x="374" y="344" width="470" height="142" rx="8" fill="#FF4F18" />
         <rect
-          x="364"
-          y="300"
-          width="474"
-          height="120"
+          x="368"
+          y="338"
+          width="470"
+          height="142"
           rx="8"
           fill="#111111"
           stroke="#111111"
           stroke-width="2.5"
         />
         <text
-          x="386"
-          y="334"
+          x="390"
+          y="376"
           font-family="Space Grotesk, sans-serif"
           font-size="20"
           font-weight="700"
@@ -613,10 +657,10 @@ const heroLanguageCharts = languageBenchmarkList.map((suite) => {
         >
           OmniBuf Encoding
         </text>
-        <rect x="628" y="314" width="190" height="26" rx="4" fill="#D4FF33" />
+        <rect x="628" y="356" width="190" height="26" rx="4" fill="#D4FF33" />
         <text
           x="723"
-          y="331"
+          y="373"
           text-anchor="middle"
           font-family="IBM Plex Mono, monospace"
           font-size="12"
@@ -626,8 +670,8 @@ const heroLanguageCharts = languageBenchmarkList.map((suite) => {
           SPEED + DEBUGGABILITY
         </text>
         <text
-          x="386"
-          y="366"
+          x="390"
+          y="416"
           font-family="IBM Plex Mono, monospace"
           font-size="13.5"
           font-weight="600"
@@ -639,8 +683,8 @@ const heroLanguageCharts = languageBenchmarkList.map((suite) => {
           Works with .proto schemas or plain structs
         </text>
         <text
-          x="386"
-          y="394"
+          x="390"
+          y="448"
           font-family="IBM Plex Mono, monospace"
           font-size="13.5"
           font-weight="600"
@@ -655,10 +699,10 @@ const heroLanguageCharts = languageBenchmarkList.map((suite) => {
 
       <!-- MOBILE SVG (Vertical Layout) -->
       <svg
-        viewBox="0 0 360 726"
+        viewBox="0 0 360 834"
         class="block md:hidden w-full max-w-[380px] mx-auto h-auto"
         role="img"
-        aria-label="Vertical diagram showing peer.proto branching to Protobuf, JSON, and OmniBuf, and peer.go pointing directly into OmniBuf."
+        aria-label="Vertical diagram showing peer.proto branching to Protobuf, JSON, and OmniBuf, and peer.go with Peer.java, Peer.cs, peer.hpp, peer.py, peer.rs, and peer.ts stacked behind it pointing directly into OmniBuf."
       >
         <!-- TOP NODE: .PROTO FILE -->
         <rect x="18" y="18" width="328" height="140" rx="8" fill="#111111" />
@@ -893,31 +937,66 @@ const heroLanguageCharts = languageBenchmarkList.map((suite) => {
           Around 5x to 6x faster
         </text>
 
-        <!-- DIRECT UPWARD ARROW FROM peer.go -> OmniBuf ONLY -->
+        <!-- DIRECT UPWARD ARROW FROM PLAIN STRUCT STACK -> OmniBuf ONLY -->
         <path d="M 202 568 L 202 544" fill="none" stroke="#FF4F18" stroke-width="3.5" />
         <polygon points="194,548 202,534 210,548" fill="#FF4F18" />
 
-        <!-- BOTTOM NODE: PLAIN GO STRUCT (NO .PROTO) -->
-        <rect x="68" y="574" width="276" height="140" rx="8" fill="#111111" />
+        <!-- BOTTOM STACK: OTHER SUPPORTED LANGUAGES BEHIND peer.go (SHIFTING UP AND LEFT) -->
+        {stackedPeerFiles.map(({ step, file }) => {
+          const mx = 76 - step * 6;
+          const my = 678 - step * 18;
+          return (
+            <g>
+              <rect x={mx} y={my} width="264" height="134" rx="7" fill="#FAF8F2" />
+              <rect x={mx} y={my} width="264" height="23" rx="7" fill="#E5E0D5" />
+              <rect x={mx} y={my + 15} width="264" height="8" fill="#E5E0D5" />
+              <rect
+                x={mx}
+                y={my}
+                width="264"
+                height="134"
+                rx="7"
+                fill="none"
+                stroke="#111111"
+                stroke-width="2"
+              />
+              <circle cx={mx + 14} cy={my + 9} r="2.8" fill="#FF4F18" opacity="0.8" />
+              <circle cx={mx + 23} cy={my + 9} r="2.8" fill="#111111" opacity="0.28" />
+              <text
+                x={mx + 35}
+                y={my + 12.6}
+                font-family="IBM Plex Mono, monospace"
+                font-size="10.5"
+                font-weight="700"
+                fill="#111111"
+              >
+                {file}
+              </text>
+            </g>
+          );
+        })}
+
+        <!-- FRONT CARD OF BOTTOM STACK: PLAIN GO STRUCT (peer.go) -->
+        <rect x="80" y="682" width="264" height="138" rx="8" fill="#111111" />
         <rect
-          x="64"
-          y="570"
-          width="276"
-          height="140"
+          x="76"
+          y="678"
+          width="264"
+          height="138"
           rx="8"
           fill="#FAF8F2"
           stroke="#111111"
           stroke-width="2.5"
         />
         <path
-          d="M 64 578 Q 64 570 72 570 L 332 570 Q 340 570 340 578 L 340 602 L 64 602 Z"
+          d="M 76 686 Q 76 678 84 678 L 332 678 Q 340 678 340 686 L 340 708 L 76 708 Z"
           fill="#111111"
         />
-        <circle cx="82" cy="586" r="4.5" fill="#FF4F18" />
-        <circle cx="96" cy="586" r="4.5" fill="#D4FF33" />
+        <circle cx="93" cy="693" r="4.5" fill="#FF4F18" />
+        <circle cx="107" cy="693" r="4.5" fill="#D4FF33" />
         <text
-          x="112"
-          y="591"
+          x="122"
+          y="698"
           font-family="IBM Plex Mono, monospace"
           font-size="13"
           font-weight="700"
@@ -927,7 +1006,7 @@ const heroLanguageCharts = languageBenchmarkList.map((suite) => {
         </text>
         <text
           x="328"
-          y="590"
+          y="697"
           text-anchor="end"
           font-family="IBM Plex Mono, monospace"
           font-size="10.5"
@@ -938,34 +1017,34 @@ const heroLanguageCharts = languageBenchmarkList.map((suite) => {
         </text>
 
         <text
-          x="78"
-          y="626"
+          x="90"
+          y="733"
           font-family="IBM Plex Mono, monospace"
-          font-size="13.5"
+          font-size="13"
           font-weight="700"
           fill="#111111"
         >
           type Peer struct &#123;
         </text>
-        <text y="650" font-family="IBM Plex Mono, monospace" font-size="12.5" fill="#111111">
-          <tspan x="90">ID</tspan>
-          <tspan x="132" fill="#FF4F18" font-weight="700">
+        <text y="757" font-family="IBM Plex Mono, monospace" font-size="12" fill="#111111">
+          <tspan x="102">ID</tspan>
+          <tspan x="140" fill="#FF4F18" font-weight="700">
             uint32
           </tspan>
-          <tspan x="186">`omnibuf:"1"`</tspan>
+          <tspan x="192">`omnibuf:"1"`</tspan>
         </text>
-        <text y="673" font-family="IBM Plex Mono, monospace" font-size="12.5" fill="#111111">
-          <tspan x="90">Host</tspan>
-          <tspan x="132" fill="#FF4F18" font-weight="700">
+        <text y="780" font-family="IBM Plex Mono, monospace" font-size="12" fill="#111111">
+          <tspan x="102">Host</tspan>
+          <tspan x="140" fill="#FF4F18" font-weight="700">
             string
           </tspan>
-          <tspan x="186">`omnibuf:"2"`</tspan>
+          <tspan x="192">`omnibuf:"2"`</tspan>
         </text>
         <text
-          x="78"
-          y="695"
+          x="90"
+          y="802"
           font-family="IBM Plex Mono, monospace"
-          font-size="13.5"
+          font-size="13"
           font-weight="700"
           fill="#111111"
         >
@@ -977,7 +1056,7 @@ const heroLanguageCharts = languageBenchmarkList.map((suite) => {
 </section>
 
 <script>
-  const CYCLE_MS = 5000;
+  const CYCLE_MS = 14_000;
   const MANUAL_PAUSE_MS = 90_000;
 
   document.querySelectorAll<HTMLElement>('[data-butterfly-widget="hero"]').forEach((widget) => {
