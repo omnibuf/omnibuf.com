@@ -681,9 +681,165 @@ html.dark .bench-bar-competitor {
   background-color: #949da8;
 }
 
+/* Hero Auto-Rotating Butterfly Chart & Summary Transitions */
+@keyframes hero-tab-cycle {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+.hero-tab-progress {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 2.5px;
+  background-color: #ff4f18;
+  transform-origin: left center;
+  transform: scaleX(0);
+  opacity: 0;
+  pointer-events: none;
+}
+
+[data-butterfly-widget='hero'][data-autorotate='running']
+  [data-butterfly-tab][aria-selected='true']
+  .hero-tab-progress {
+  opacity: 1;
+  animation: hero-tab-cycle var(--hero-cycle-ms, 5000ms) linear forwards;
+}
+
+.hero-butterfly-summary[data-active='false'] {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transform: translateY(6px);
+  transition:
+    opacity 140ms ease-out,
+    transform 140ms ease-out,
+    visibility 0s linear 140ms;
+}
+
+.hero-butterfly-summary[data-active='true'] {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transform: translateY(0);
+  transition:
+    opacity 280ms cubic-bezier(0.16, 1, 0.3, 1) 40ms,
+    transform 280ms cubic-bezier(0.16, 1, 0.3, 1) 40ms,
+    visibility 0s linear 0s;
+}
+
+.hero-butterfly-panel[data-active='false'] {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition:
+    opacity 130ms ease-out,
+    visibility 0s linear 130ms;
+}
+
+.hero-butterfly-panel[data-active='true'] {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transition:
+    opacity 200ms cubic-bezier(0.16, 1, 0.3, 1),
+    visibility 0s linear 0s;
+}
+
+.butterfly-wing-enc {
+  transform-origin: right center;
+}
+
+.butterfly-wing-dec {
+  transform-origin: left center;
+}
+
+.hero-butterfly-panel[data-active='false'] .butterfly-wing-enc,
+.hero-butterfly-panel[data-active='false'] .butterfly-wing-dec {
+  transform: scaleX(0.16);
+  transition: transform 130ms ease-out;
+}
+
+.hero-butterfly-panel[data-active='true'] .butterfly-wing-enc,
+.hero-butterfly-panel[data-active='true'] .butterfly-wing-dec {
+  transform: scaleX(1);
+  transition: transform 380ms cubic-bezier(0.16, 1, 0.3, 1) var(--row-delay, 0ms);
+}
+
+.hero-butterfly-panel[data-active='false'] .butterfly-omni-tag-left {
+  opacity: 0;
+  transform: translateX(5px);
+  transition:
+    opacity 110ms ease-out,
+    transform 110ms ease-out;
+}
+
+.hero-butterfly-panel[data-active='true'] .butterfly-omni-tag-left {
+  opacity: 1;
+  transform: translateX(0);
+  transition:
+    opacity 260ms cubic-bezier(0.16, 1, 0.3, 1) 65ms,
+    transform 260ms cubic-bezier(0.16, 1, 0.3, 1) 65ms;
+}
+
+.hero-butterfly-panel[data-active='false'] .butterfly-omni-tag-right {
+  opacity: 0;
+  transform: translateX(-5px);
+  transition:
+    opacity 110ms ease-out,
+    transform 110ms ease-out;
+}
+
+.hero-butterfly-panel[data-active='true'] .butterfly-omni-tag-right {
+  opacity: 1;
+  transform: translateX(0);
+  transition:
+    opacity 260ms cubic-bezier(0.16, 1, 0.3, 1) 65ms,
+    transform 260ms cubic-bezier(0.16, 1, 0.3, 1) 65ms;
+}
+
+.hero-butterfly-panel[data-active='false'] .butterfly-callout {
+  opacity: 0;
+  transform: translateY(4px);
+  transition:
+    opacity 110ms ease-out,
+    transform 110ms ease-out;
+}
+
+.hero-butterfly-panel[data-active='true'] .butterfly-callout {
+  opacity: 1;
+  transform: translateY(0);
+  transition:
+    opacity 260ms cubic-bezier(0.16, 1, 0.3, 1) 85ms,
+    transform 260ms cubic-bezier(0.16, 1, 0.3, 1) 85ms;
+}
+
+.hero-butterfly-link[data-active='false'] {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.hero-butterfly-link[data-active='true'] {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transition: opacity 200ms ease-out;
+}
+
 /* Borders & Dividers in Dark Mode */
 html.dark .border-ink {
   border-color: #454d5e !important;
+}
+
+html.dark .shadow-\[6px_6px_0px_\#111111\],
+html.dark .shadow-\[6px_6px_0px_\#111\] {
+  box-shadow: 6px 6px 0px #050608 !important;
 }
 
 html.dark .shadow-\[4px_4px_0px_\#111111\],
@@ -898,6 +1054,20 @@ html.dark svg rect[fill='#D4FF33'] + text[fill='#111111'] + text[fill='#111111']
   .doc-link,
   .spec-anchor {
     transition: none !important;
+    animation: none !important;
+  }
+
+  .hero-tab-progress {
+    display: none !important;
+  }
+
+  .hero-butterfly-summary[data-active='false'],
+  .hero-butterfly-panel[data-active='false'] .butterfly-wing-enc,
+  .hero-butterfly-panel[data-active='false'] .butterfly-wing-dec,
+  .hero-butterfly-panel[data-active='false'] .butterfly-omni-tag-left,
+  .hero-butterfly-panel[data-active='false'] .butterfly-omni-tag-right,
+  .hero-butterfly-panel[data-active='false'] .butterfly-callout {
+    transform: none !important;
   }
 }
 

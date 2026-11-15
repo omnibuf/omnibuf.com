@@ -66,6 +66,7 @@ test('schema-less omnibuf -c and DecodeBlind examples use field_<N> keys', () =>
 test('Hero and Comparisons scope butterfly widget scripts and ARIA tab linkage', () => {
   const hero = readRepoFile('src/components/Hero.astro');
   const comparisons = readRepoFile('src/components/Comparisons.astro');
+  const globalCss = readRepoFile('src/styles/global.css');
 
   assert.match(hero, /\[data-butterfly-widget="hero"\]/);
   assert.doesNotMatch(hero, /querySelectorAll<HTMLElement>\('\[data-butterfly-widget\]'\)/);
@@ -73,6 +74,11 @@ test('Hero and Comparisons scope butterfly widget scripts and ARIA tab linkage',
   assert.match(hero, /aria-controls=/);
   assert.match(hero, /aria-labelledby=/);
   assert.match(hero, /tabindex=/);
+  assert.match(hero, /MANUAL_PAUSE_MS\s*=\s*90_000/);
+  assert.match(hero, /data-autorotate=/);
+  assert.match(hero, /prefers-reduced-motion:\s*reduce/);
+  assert.match(hero, /\[grid-area:1\/1\]/);
+  assert.match(globalCss, /@keyframes hero-tab-cycle/);
 
   assert.match(comparisons, /\[data-butterfly-widget="comparisons"\]/);
   assert.doesNotMatch(comparisons, /querySelectorAll<HTMLElement>\('\[data-butterfly-widget\]'\)/);
