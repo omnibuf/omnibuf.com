@@ -114,28 +114,20 @@ const pyFaqJsonLd = {
       <div class="mt-6 grid lg:grid-cols-12 gap-6 lg:gap-8 items-end">
         <div class="lg:col-span-7 space-y-4">
           <p class="text-lg sm:text-2xl text-ink/85 font-medium leading-snug">
-            Pass{' '}
+            Ships prebuilt native wheels for Python 3.11+ with full static type annotations. Encode
+            and decode{' '}
             <a href="#protobuf-py" class="doc-link">
-              <code>protobuf-py</code> messages
-            </a>{' '}
-            directly to <code>omnibuf.marshal</code>, decorate typed{' '}
+              Protobuf messages
+            </a>
+            ,{' '}
             <a href="#dataclasses" class="doc-link">
-              Python dataclasses
+              typed dataclasses
             </a>
-            , or run{' '}
+            , or{' '}
             <a href="#plugin-codegen" class="doc-link">
-              <code>protoc-gen-omnibuf-py</code>
-            </a>{' '}
-            with <code>buf generate</code>, all backed by the same Rust wire engine as{' '}
-            <a href="/rs" class="doc-link">
-              <code>omnibuf-rs</code>
+              Buf-generated slotted classes
             </a>
-            . Benchmark numbers against <code>upb</code>, <code>protobuf-py</code>, and{' '}
-            <code>msgspec</code> are{' '}
-            <a href="#benchmarks" class="doc-link">
-              below
-            </a>
-            .
+            , complete with lazy views over raw byte buffers and schema-less dictionary decoding.
           </p>
           <div class="flex flex-wrap gap-3 font-mono text-sm sm:text-base pt-1 no-print">
             <a
@@ -185,8 +177,7 @@ const pyFaqJsonLd = {
           </span>
         </h2>
         <p class="mt-3 text-lg sm:text-xl text-ink/80 font-medium">
-          Strict <code>py.typed</code> annotations across Python 3.11+, backed by a native Rust
-          codec.
+          All three produce identical wire bytes and include full static type hints.
         </p>
       </div>
 

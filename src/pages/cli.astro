@@ -56,16 +56,16 @@ omnibuf decode --schema descriptors.pb --type demo.v1.PeerUpdate packet.obuf`;
       <div class="mt-6 grid lg:grid-cols-12 gap-6 lg:gap-8 items-start">
         <div class="lg:col-span-6 space-y-4">
           <p class="text-lg sm:text-2xl text-ink/85 font-medium leading-snug">
-            <code>omnibuf</code> is a <code>jq</code>-style command-line tool for OmniBuf packets.
-            Point it at raw wire bytes to decode actual field values to JSON, filter messages with{' '}
+            Command-line inspector and converter for OmniBuf packets. Decode raw wire bytes to JSON,
+            filter nested fields with{' '}
             <a href="#jq-queries" class="doc-link">
-              <code>jq</code> expressions
+              jq expressions
             </a>
             , or{' '}
             <a href="#encode-json" class="doc-link">
               encode JSON
             </a>{' '}
-            into self-describing wire packets.
+            into self-describing packets.
           </p>
           <div class="flex flex-wrap gap-3 font-mono text-sm sm:text-base pt-1 no-print">
             <a
