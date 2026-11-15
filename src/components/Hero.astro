@@ -41,7 +41,7 @@ const stackedPeerFiles = [
       href="/spec"
       class="inline-flex flex-wrap items-center gap-2 px-3 py-1.5 bg-[#FAF8F2] text-ink border-2 border-ink shadow-[2px_2px_0px_#111111] hover:bg-acid transition rounded font-mono text-xs sm:text-sm font-bold"
     >
-      <span class="px-1.5 py-0.5 bg-[#FF4F18] text-white border border-ink rounded-sm uppercase text-[11px] leading-none">
+      <span class="px-1.5 py-0.5 bg-[#FF4F18] text-white border border-ink rounded-sm uppercase text-xs leading-none">
         Experimental
       </span>
       <span>v0.1 Draft Wire Format &rarr;</span>
@@ -49,17 +49,17 @@ const stackedPeerFiles = [
   </div>
 
   <h1 class="text-[2.6rem] sm:text-7xl lg:text-[5.5rem] font-bold tracking-tight leading-[0.94] text-ink uppercase">
-    A binary format to replace
+    A modern wire format
     <br />
     <span class="font-serif italic font-normal normal-case text-[#FF4F18] text-[3.1rem] sm:text-8xl lg:text-[6.2rem]">
-      Protobuf and JSON.
+      for structs and Protobuf.
     </span>
   </h1>
 
   <div class="mt-8 space-y-5">
     <!-- prettier-ignore -->
     <p class="max-w-4xl text-lg sm:text-2xl font-medium leading-snug text-ink/90">
-      I built OmniBuf to replace both <a href="https://protobuf.dev/programming-guides/encoding/" target="_blank" rel="noopener noreferrer" class="doc-link">Protobuf</a> and <strong>JSON</strong>. It is a binary serialization format where raw packets remain readable on their own, individual fields can be read or updated in place, and schemas are optional. Plug it into <a href="https://grpc.io/" target="_blank" rel="noopener noreferrer" class="doc-link">gRPC</a> and <a href="https://connectrpc.com/" target="_blank" rel="noopener noreferrer" class="doc-link">Connect</a> with your existing <code>.proto</code> files, or serialize native structs and classes across <a href="/go" class="doc-link">Go</a>, <a href="/es" class="doc-link">TypeScript</a>, <a href="/rs" class="doc-link">Rust</a>, <a href="/py" class="doc-link">Python</a>, <a href="/cpp" class="doc-link">C++</a>, <a href="/java" class="doc-link">Java</a>, and <a href="/cs" class="doc-link">C#</a>.
+      I built OmniBuf as an evolution of <a href="https://protobuf.dev/programming-guides/encoding/" target="_blank" rel="noopener noreferrer" class="doc-link">Protobuf</a> with a smoother on-ramp to schemas. It is faster and completely parsable without a schema. Start by tagging plain structs and classes in <a href="/go" class="doc-link">Go</a>, <a href="/es" class="doc-link">TypeScript</a>, <a href="/rs" class="doc-link">Rust</a>, <a href="/py" class="doc-link">Python</a>, <a href="/cpp" class="doc-link">C++</a>, <a href="/java" class="doc-link">Java</a>, or <a href="/cs" class="doc-link">C#</a>, then move to <code>.proto</code> files for <a href="https://connectrpc.com/" target="_blank" rel="noopener noreferrer" class="doc-link">Connect</a> and <a href="https://grpc.io/" target="_blank" rel="noopener noreferrer" class="doc-link">gRPC</a> on the exact same wire format.
     </p>
 
     <div
@@ -255,7 +255,7 @@ const stackedPeerFiles = [
                       stroke-linejoin="round"
                     />
                   </svg>
-                  <span class="font-mono text-[11px] font-bold uppercase px-2 py-1 bg-[#E5E0D5] border border-ink text-ink text-center leading-tight rounded-sm">
+                  <span class="font-mono text-xs font-bold uppercase px-2 py-1 bg-[#E5E0D5] border border-ink text-ink text-center leading-tight rounded-sm">
                     {chart.competitorsLabel}
                   </span>
                   <svg
