@@ -18,10 +18,12 @@ pkt, err := omnibuf.Marshal(&Peer{
 var out Peer
 err = omnibuf.Unmarshal(pkt, &out)`;
 
-const pbGoSnippet = `pkt, err := omnibuf.Marshal(msg)
+const pbGoSnippet = `import "github.com/omnibuf/omnibuf-go/omnibufproto"
+
+pkt, err := omnibufproto.Marshal(msg)
 
 var out pb.Peer
-err = omnibuf.Unmarshal(pkt, &out)`;
+err = omnibufproto.Unmarshal(pkt, &out)`;
 
 const bufGenYamlSnippet = `version: v2
 plugins:
@@ -70,6 +72,7 @@ if view.GetActive() && view.GetAsn() == 64512 {
           Plain Go structs
         </h3>
         <p class="text-base sm:text-lg text-ink/85 leading-relaxed">
+          Core <code>github.com/omnibuf/omnibuf-go</code> has zero external dependencies.{' '}
           <code>omnibuf.Marshal</code> and <code>omnibuf.Unmarshal</code> serialize plain Go structs
           using <code>omnibuf:"..."</code> field tags. On the first call for a struct type, the
           library builds and caches a dispatch table with the struct's memory offsets so later calls
@@ -107,16 +110,33 @@ if view.GetActive() && view.GetAsn() == 64512 {
           Standard Protobuf structs
         </h3>
         <p class="text-base sm:text-lg text-ink/85 leading-relaxed">
-          Pass any <code>.pb.go</code> struct from <code>protoc-gen-go</code> straight to{' '}
-          <code>omnibuf.Marshal</code> and <code>omnibuf.Unmarshal</code>. No extra compiler plugin
-          required. On the first call for a message type, the runtime reads its protobuf descriptor
-          and caches the struct field offsets. Full support for <code>oneof</code>, explicit{' '}
-          <code>optional</code> presence, maps, and field numbers up to <code>536,870,911</code> (at
-          roughly 2x the speed of <code>google.golang.org/protobuf</code>).
+          Protobuf descriptor support lives in the separate <code>omnibufproto</code> submodule so
+          native-struct services never pull in <code>google.golang.org/protobuf</code>. Pass any{' '}
+          <code>.pb.go</code> struct from <code>protoc-gen-go</code> straight to{' '}
+          <code>omnibufproto.Marshal</code> and <code>omnibufproto.Unmarshal</code>. No extra
+          compiler plugin required. On the first call for a message type, the adapter reads its
+          protobuf descriptor and caches the struct field offsets, covering <code>oneof</code>,
+          explicit <code>optional</code> presence, maps, and field numbers up to{' '}
+          <code>536,870,911</code> at roughly 2x the speed of{' '}
+          <code>google.golang.org/protobuf</code>.
         </p>
       </div>
 
-      <div class="lg:col-span-7 min-w-0">
+      <div class="lg:col-span-7 space-y-3.5 min-w-0">
+        <div class="p-4 sm:p-5 bg-ink text-paper rounded-md font-mono text-xs sm:text-sm overflow-x-auto leading-relaxed border-2 border-ink">
+          <div class="flex items-center justify-between gap-2 mb-2.5 pb-2 border-b border-paper/15">
+            <div class="text-xs font-bold uppercase text-acid">Install Protobuf Bridge</div>
+            <button
+              type="button"
+              data-copy="go get github.com/omnibuf/omnibuf-go/omnibufproto"
+              class="copy-snippet-btn min-w-[4.75rem] text-center px-2.5 py-1 text-xs font-bold uppercase bg-paper/15 hover:bg-acid hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-acid text-paper border border-paper/30 rounded shrink-0 transition"
+            >
+              Copy
+            </button>
+          </div>
+          <pre class="leading-relaxed whitespace-pre"><code><span class="text-paper/75 select-none">$ </span>go get github.com/omnibuf/omnibuf-go/omnibufproto</code></pre>
+        </div>
+
         <div class="p-4 sm:p-5 bg-ink text-paper rounded-md font-mono text-xs sm:text-sm overflow-x-auto leading-relaxed border-2 border-ink [&>pre]:!bg-transparent [&>pre]:!p-0 [&>pre]:!m-0 [&>pre]:!border-0">
           <div class="flex items-center justify-between gap-2 mb-2.5 pb-2 border-b border-paper/15">
             <div class="text-xs font-bold uppercase text-acid">Standard Protobuf Structs</div>

@@ -9,7 +9,13 @@ Website, wire format specification, and documentation for **OmniBuf** ([omnibuf.
 
 - **Go Library & `protoc-gen-omnibuf`**: [`omnibuf/omnibuf-go`](https://github.com/omnibuf/omnibuf-go)
 - **TypeScript / JavaScript (`@omnibuf/*`)**: [`omnibuf/omnibuf-es`](https://github.com/omnibuf/omnibuf-es)
-- **CLI & Conformance Runner (`omnibuf`)**: [`omnibuf/omnibuf-cli`](https://github.com/omnibuf/omnibuf-cli)
+- **Rust Crate & Derive Macro**: [`omnibuf/omnibuf-rs`](https://github.com/omnibuf/omnibuf-rs)
+- **Python Wheels & Code Generator**: [`omnibuf/omnibuf-py`](https://github.com/omnibuf/omnibuf-py)
+- **C++20 Header-Only Library**: [`omnibuf/omnibuf-cpp`](https://github.com/omnibuf/omnibuf-cpp)
+- **Java 21 Runtime & Code Generator**: [`omnibuf/omnibuf-java`](https://github.com/omnibuf/omnibuf-java)
+- **C# / .NET 8 Runtime & Code Generator**: [`omnibuf/omnibuf-cs`](https://github.com/omnibuf/omnibuf-cs)
+- **CLI Inspector (`omnibuf`)**: [`omnibuf/omnibuf-cli`](https://github.com/omnibuf/omnibuf-cli)
+- **Browser DevTools Extension**: [`omnibuf/omnibuf-devtools`](https://github.com/omnibuf/omnibuf-devtools)
 
 ## Development
 

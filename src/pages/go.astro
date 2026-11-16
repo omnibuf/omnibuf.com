@@ -52,7 +52,7 @@ const goFaqItems = [
     id: 'go-faq-plugin',
     question: 'Do I need protoc-gen-omnibuf?',
     paragraphs: [
-      'It is optional. <code>omnibuf.Marshal</code> and <code>omnibuf.Unmarshal</code> work directly on tagged Go structs and standard <code>.pb.go</code> types; <code>protoc-gen-omnibuf</code> adds generated <code>Opaque</code> views and single-pass struct methods.',
+      'Code generation is optional. Core <code>omnibuf.Marshal</code> and <code>omnibuf.Unmarshal</code> serialize tagged Go structs with zero external dependencies, while the separate <code>omnibufproto</code> submodule handles standard <code>.pb.go</code> messages via <code>protoreflect</code>. Adding <code>protoc-gen-omnibuf</code> compiles single-pass struct methods and lazy <code>Opaque</code> packet views.',
     ],
   },
 ];
@@ -93,7 +93,7 @@ const goFaqJsonLd = {
       <div class="mt-6 grid lg:grid-cols-12 gap-6 lg:gap-8 items-end">
         <div class="lg:col-span-7 space-y-4">
           <p class="text-lg sm:text-2xl text-ink/85 font-medium leading-snug">
-            Use OmniBuf in Go with{' '}
+            Zero-dependency runtime for Go. Serialize{' '}
             <a href="#struct-tags" class="doc-link">
               tagged structs
             </a>
@@ -103,7 +103,7 @@ const goFaqJsonLd = {
             </a>
             , or{' '}
             <a href="#plugin-tiers" class="doc-link">
-              Buf code generation
+              Buf-generated types
             </a>
             . Generated packet views read and update individual fields in place on raw byte slices,
             and self-describing payloads decode straight to maps or JSON.
