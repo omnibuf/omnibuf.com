@@ -1,46 +1,130 @@
 ---
 import { cliNavPage, languages, primaryNavPages, specNavPage } from '../data/languages';
+
+const linkClass =
+  'font-mono text-xs sm:text-sm font-medium text-ink/80 hover:text-ink hover:underline underline-offset-4 decoration-2 decoration-[#FF4F18] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink rounded-sm transition-colors';
 ---
 
-<footer class="border-t-2 border-ink bg-[#FAF8F2] py-10 px-4 sm:px-6 font-mono text-sm sm:text-base select-none">
-  <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-4">
-    <div>
-      <strong>OmniBuf</strong> &bull; Fast, Self-Describing Binary Wire Format for{' '}
-      <code>.proto</code> &amp; Native Structs
+<footer class="border-t-2 border-ink bg-[#FAF8F2] pt-12 pb-8 px-4 sm:px-6 lg:px-8 no-print">
+  <div class="max-w-7xl mx-auto">
+    <div class="grid grid-cols-1 md:grid-cols-12 gap-10 md:gap-8 items-start">
+      <!-- Brand Lockup -->
+      <div class="md:col-span-5 space-y-3.5">
+        <a
+          href="/"
+          class="inline-flex items-center gap-2 font-mono font-bold text-sm sm:text-base bg-ink text-paper border-2 border-ink px-3 py-1 rounded shadow-[2px_2px_0px_#FF4F18] hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-[3px_3px_0px_#FF4F18] transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink"
+        >
+          <span class="w-2.5 h-2.5 bg-acid inline-block shrink-0"></span>
+          <span>OmniBuf</span>
+        </a>
+        <p class="text-sm sm:text-base text-ink/80 leading-relaxed max-w-[36ch]">
+          Fast, self-describing binary wire format for <code>.proto</code> schemas and native
+          structs.
+        </p>
+        <div class="flex flex-wrap items-center gap-2 pt-0.5 font-mono text-[11px] text-ink/65">
+          <span class="px-2 py-0.5 bg-[#E5E0D5] border border-ink/30 rounded font-bold text-ink/80">
+            Apache-2.0
+          </span>
+          <span>&middot;</span>
+          <span>Wire Format v1</span>
+        </div>
+      </div>
+
+      <!-- Navigation Columns -->
+      <div class="md:col-span-7 grid grid-cols-2 sm:grid-cols-3 gap-8">
+        <div>
+          <div class="font-mono text-[11px] font-bold uppercase tracking-wider text-ink/55 mb-3">
+            Documentation
+          </div>
+          <ul class="space-y-2">
+            {primaryNavPages.map((p) => (
+              <li>
+                <a href={p.href} class={linkClass}>
+                  {p.label}
+                </a>
+              </li>
+            ))}
+            <li>
+              <a href={specNavPage.href} class={linkClass}>
+                {specNavPage.label}
+              </a>
+            </li>
+            <li>
+              <a href={cliNavPage.href} class={linkClass}>
+                {cliNavPage.label}
+              </a>
+            </li>
+          </ul>
+        </div>
+
+        <div>
+          <div class="font-mono text-[11px] font-bold uppercase tracking-wider text-ink/55 mb-3">
+            Languages
+          </div>
+          <ul class="grid grid-cols-2 gap-x-4 gap-y-2">
+            {languages.map((lang) => (
+              <li>
+                <a href={lang.href} class={linkClass}>
+                  {lang.shortLabel}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        <div class="col-span-2 sm:col-span-1">
+          <div class="font-mono text-[11px] font-bold uppercase tracking-wider text-ink/55 mb-3">
+            Community &amp; Tools
+          </div>
+          <ul class="space-y-2">
+            <li>
+              <a
+                href="https://github.com/omnibuf"
+                target="_blank"
+                rel="noopener noreferrer"
+                class={linkClass}
+              >
+                GitHub
+              </a>
+            </li>
+            <li>
+              <a
+                href="https://github.com/orgs/omnibuf/discussions"
+                target="_blank"
+                rel="noopener noreferrer"
+                class={linkClass}
+              >
+                Discussions
+              </a>
+            </li>
+            <li>
+              <a
+                href="https://github.com/omnibuf/omnibuf-vscode"
+                target="_blank"
+                rel="noopener noreferrer"
+                class={linkClass}
+              >
+                VS Code Extension
+              </a>
+            </li>
+            <li>
+              <a
+                href="https://github.com/omnibuf/omnibuf-vim"
+                target="_blank"
+                rel="noopener noreferrer"
+                class={linkClass}
+              >
+                Vim Plugin
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
     </div>
-    <div class="flex flex-wrap items-center gap-5">
-      {primaryNavPages.map((p) => (
-        <a href={p.href} class="doc-link">
-          {p.label}
-        </a>
-      ))}
-      <a href={specNavPage.href} class="doc-link">
-        {specNavPage.label}
-      </a>
-      {languages.map((lang) => (
-        <a href={lang.href} class="doc-link">
-          {lang.label}
-        </a>
-      ))}
-      <a href={cliNavPage.href} class="doc-link">
-        {cliNavPage.label}
-      </a>
-      <a
-        href="https://github.com/orgs/omnibuf/discussions"
-        target="_blank"
-        rel="noopener noreferrer"
-        class="doc-link"
-      >
-        Discussions
-      </a>
-      <a
-        href="https://github.com/omnibuf"
-        target="_blank"
-        rel="noopener noreferrer"
-        class="doc-link"
-      >
-        GitHub
-      </a>
+
+    <div class="mt-10 pt-5 border-t border-ink/15 flex flex-wrap items-center justify-between gap-2 font-mono text-xs text-ink/60">
+      <span>&copy; {new Date().getFullYear()} OmniBuf</span>
+      <span>Zero-dependency runtimes &middot; Open specification</span>
     </div>
   </div>
 </footer>
