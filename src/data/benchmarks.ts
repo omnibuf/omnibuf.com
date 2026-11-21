@@ -184,15 +184,15 @@ export const benchmarkCategories: BenchmarkCategory[] = [
     methodology:
       "Serializing the 11-field Go struct into a reused byte slice. FlatBuffers and Cap'n Proto times include building the buffer from the struct.",
     rows: [
-      { name: 'OmniBuf (Generated)', val: 123, highlight: true, baseline: true },
-      { name: 'OmniBuf (Go Struct Tags)', val: 351, highlight: true },
-      { name: 'Avro (Raw Binary)', val: 537 },
-      { name: 'FlatBuffers', val: 723 },
-      { name: 'Protobuf', val: 723 },
-      { name: "Cap'n Proto", val: 1318 },
-      { name: 'MessagePack', val: 2050 },
-      { name: 'JSON (encoding/json)', val: 2180 },
-      { name: 'JSON (encoding/json/v2)', val: 2201 },
+      { name: 'OmniBuf (Generated)', val: 104, highlight: true, baseline: true },
+      { name: 'OmniBuf (Go Struct Tags)', val: 346, highlight: true },
+      { name: 'Avro (Raw Binary)', val: 414 },
+      { name: 'Protobuf', val: 557 },
+      { name: 'FlatBuffers', val: 560 },
+      { name: "Cap'n Proto", val: 1020 },
+      { name: 'MessagePack', val: 1592 },
+      { name: 'JSON (encoding/json/v2)', val: 1686 },
+      { name: 'JSON (encoding/json)', val: 1690 },
     ],
   },
   {
@@ -202,15 +202,15 @@ export const benchmarkCategories: BenchmarkCategory[] = [
     methodology:
       'Unpacking and reading all 11 fields into a reused destination struct across every codec, including Protobuf.',
     rows: [
-      { name: 'OmniBuf (Generated)', val: 228, highlight: true, baseline: true },
-      { name: 'FlatBuffers', val: 251 },
-      { name: 'OmniBuf (Go Struct Tags)', val: 452, highlight: true },
-      { name: 'Avro (Raw Binary)', val: 534 },
-      { name: "Cap'n Proto", val: 977 },
-      { name: 'Protobuf', val: 1196 },
-      { name: 'MessagePack', val: 2776 },
-      { name: 'JSON (encoding/json/v2)', val: 3538 },
-      { name: 'JSON (encoding/json)', val: 4483 },
+      { name: 'OmniBuf (Generated)', val: 184, highlight: true, baseline: true },
+      { name: 'FlatBuffers', val: 193 },
+      { name: 'OmniBuf (Go Struct Tags)', val: 360, highlight: true },
+      { name: 'Avro (Raw Binary)', val: 409 },
+      { name: "Cap'n Proto", val: 769 },
+      { name: 'Protobuf', val: 955 },
+      { name: 'MessagePack', val: 2183 },
+      { name: 'JSON (encoding/json/v2)', val: 2733 },
+      { name: 'JSON (encoding/json)', val: 3445 },
     ],
   },
   {
@@ -220,12 +220,12 @@ export const benchmarkCategories: BenchmarkCategory[] = [
     methodology:
       "Reading a nested string field directly from the raw byte slice. Cap'n Proto and FlatBuffers use offset tables; OmniBuf hops over preceding field headers by length.",
     rows: [
-      { name: "Cap'n Proto", val: 6 },
-      { name: 'FlatBuffers', val: 35 },
-      { name: 'OmniBuf', val: 110, highlight: true, baseline: true },
-      { name: 'Avro (Raw Binary)', val: 614 },
-      { name: 'MessagePack', val: 789 },
-      { name: 'Protobuf', val: 1269 },
+      { name: "Cap'n Proto", val: 5 },
+      { name: 'FlatBuffers', val: 27 },
+      { name: 'OmniBuf', val: 85, highlight: true, baseline: true },
+      { name: 'Avro (Raw Binary)', val: 472 },
+      { name: 'MessagePack', val: 601 },
+      { name: 'Protobuf', val: 995 },
     ],
   },
   {
@@ -235,14 +235,14 @@ export const benchmarkCategories: BenchmarkCategory[] = [
     methodology:
       'Checking a nested city string, incrementing the 64-bit sequence counter, and returning the updated packet. OmniBuf splices the field in place; the others decode and re-encode.',
     rows: [
-      { name: 'OmniBuf (Opaque Splice)', val: 284, highlight: true, baseline: true },
-      { name: 'FlatBuffers', val: 987 },
-      { name: 'Avro (Raw Binary)', val: 1107 },
-      { name: 'Protobuf', val: 2041 },
-      { name: "Cap'n Proto", val: 2434 },
-      { name: 'MessagePack', val: 5072 },
-      { name: 'JSON (encoding/json/v2)', val: 5897 },
-      { name: 'JSON (encoding/json)', val: 6838 },
+      { name: 'OmniBuf (Opaque Splice)', val: 219, highlight: true, baseline: true },
+      { name: 'FlatBuffers', val: 767 },
+      { name: 'Avro (Raw Binary)', val: 855 },
+      { name: 'Protobuf', val: 1596 },
+      { name: "Cap'n Proto", val: 1882 },
+      { name: 'MessagePack', val: 3967 },
+      { name: 'JSON (encoding/json/v2)', val: 4501 },
+      { name: 'JSON (encoding/json)', val: 5412 },
     ],
   },
   {
@@ -252,15 +252,15 @@ export const benchmarkCategories: BenchmarkCategory[] = [
     methodology:
       'Serializing a 39 KiB packet whose 20 KiB and 18 KiB nested sub-messages exceed the 2-byte 16,383 B length reservation and trigger 2B-to-4B header shifts.',
     rows: [
-      { name: 'FlatBuffers', val: 1435 },
-      { name: 'OmniBuf (Generated)', val: 1863, highlight: true, baseline: true },
-      { name: 'Protobuf', val: 2172 },
-      { name: 'OmniBuf (Go Struct Tags)', val: 2943, highlight: true },
-      { name: 'Avro (Raw Binary)', val: 9697 },
-      { name: "Cap'n Proto", val: 10183 },
-      { name: 'MessagePack', val: 16719 },
-      { name: 'JSON (encoding/json/v2)', val: 40548 },
-      { name: 'JSON (encoding/json)', val: 40662 },
+      { name: 'OmniBuf (Generated)', val: 650, highlight: true, baseline: true },
+      { name: 'FlatBuffers', val: 1079 },
+      { name: 'Protobuf', val: 1697 },
+      { name: 'OmniBuf (Go Struct Tags)', val: 1698, highlight: true },
+      { name: 'Avro (Raw Binary)', val: 6572 },
+      { name: "Cap'n Proto", val: 7688 },
+      { name: 'MessagePack', val: 11973 },
+      { name: 'JSON (encoding/json/v2)', val: 31618 },
+      { name: 'JSON (encoding/json)', val: 32753 },
     ],
   },
   {
@@ -270,14 +270,14 @@ export const benchmarkCategories: BenchmarkCategory[] = [
     methodology:
       'Growing a nested string field past 16 KiB ahead of 32 trailing Neighbor entries via Opaque splicing vs full decode and re-encode.',
     rows: [
-      { name: 'OmniBuf (Opaque Splice)', val: 1155, highlight: true, baseline: true },
-      { name: 'FlatBuffers', val: 3811 },
-      { name: 'Avro (Raw Binary)', val: 7275 },
-      { name: 'Protobuf', val: 8852 },
-      { name: "Cap'n Proto", val: 11181 },
-      { name: 'MessagePack', val: 29713 },
-      { name: 'JSON (encoding/json/v2)', val: 43438 },
-      { name: 'JSON (encoding/json)', val: 47119 },
+      { name: 'OmniBuf (Opaque Splice)', val: 861, highlight: true, baseline: true },
+      { name: 'FlatBuffers', val: 2981 },
+      { name: 'Avro (Raw Binary)', val: 5689 },
+      { name: 'Protobuf', val: 6905 },
+      { name: "Cap'n Proto", val: 8441 },
+      { name: 'MessagePack', val: 23410 },
+      { name: 'JSON (encoding/json/v2)', val: 32940 },
+      { name: 'JSON (encoding/json)', val: 35446 },
     ],
   },
   {
@@ -308,6 +308,10 @@ export const esBenchmarkCategories: EsBenchmarkCategory[] = [
     maxVal: 6800,
     methodology: 'Serializing the 11-field PeerUpdate object into a fresh Uint8Array (366 B).',
     rows: [
+      { name: 'protobufjs', val: 1256, ops: '601,356 ops/s', sizeBytes: 341 },
+      { name: 'JSON', val: 1789, ops: '410,052 ops/s', sizeBytes: 791 },
+      { name: '@msgpack/msgpack', val: 3297, ops: '218,175 ops/s', sizeBytes: 622 },
+      { name: 'google-protobuf', val: 4578, ops: '151,089 ops/s', sizeBytes: 341 },
       {
         name: 'OmniBuf',
         val: 1239,
@@ -316,16 +320,12 @@ export const esBenchmarkCategories: EsBenchmarkCategory[] = [
         highlight: true,
         baseline: true,
       },
-      { name: 'protobufjs', val: 1663, ops: '601,356 ops/s', sizeBytes: 341 },
-      { name: 'JSON', val: 2439, ops: '410,052 ops/s', sizeBytes: 791 },
       {
         name: '@bufbuild/protobuf (protobuf-es)',
         val: 3065,
         ops: '326,303 ops/s',
         sizeBytes: 341,
       },
-      { name: '@msgpack/msgpack', val: 4583, ops: '218,175 ops/s', sizeBytes: 622 },
-      { name: 'google-protobuf', val: 6619, ops: '151,089 ops/s', sizeBytes: 341 },
     ],
   },
   {
@@ -334,12 +334,12 @@ export const esBenchmarkCategories: EsBenchmarkCategory[] = [
     maxVal: 4500,
     methodology: 'Decoding Uint8Array into a fresh PeerUpdate object and reading all 11 fields.',
     rows: [
-      { name: 'OmniBuf', val: 1385, ops: '722,273 ops/s', highlight: true, baseline: true },
-      { name: 'protobufjs', val: 2548, ops: '392,432 ops/s' },
-      { name: 'JSON', val: 2647, ops: '377,826 ops/s' },
-      { name: 'google-protobuf', val: 3611, ops: '276,952 ops/s' },
-      { name: '@msgpack/msgpack', val: 3832, ops: '260,973 ops/s' },
-      { name: '@bufbuild/protobuf (protobuf-es)', val: 4281, ops: '233,604 ops/s' },
+      { name: 'OmniBuf', val: 954, ops: '722,273 ops/s', highlight: true, baseline: true },
+      { name: 'protobufjs', val: 1901, ops: '392,432 ops/s' },
+      { name: 'JSON', val: 1969, ops: '377,826 ops/s' },
+      { name: 'google-protobuf', val: 2866, ops: '276,952 ops/s' },
+      { name: '@msgpack/msgpack', val: 2963, ops: '260,973 ops/s' },
+      { name: '@bufbuild/protobuf (protobuf-es)', val: 3240, ops: '233,604 ops/s' },
     ],
   },
   {
@@ -349,12 +349,12 @@ export const esBenchmarkCategories: EsBenchmarkCategory[] = [
     methodology:
       'Reading a nested city string from a Uint8Array. The other JS libraries decode the whole message first; OmniBuf skips earlier fields by byte length.',
     rows: [
-      { name: 'OmniBuf', val: 399, ops: '2,507,169 ops/s', highlight: true, baseline: true },
-      { name: 'protobufjs', val: 1549, ops: '645,519 ops/s' },
-      { name: 'JSON', val: 2296, ops: '435,596 ops/s' },
-      { name: 'google-protobuf', val: 3319, ops: '301,279 ops/s' },
-      { name: '@msgpack/msgpack', val: 3612, ops: '276,825 ops/s' },
-      { name: '@bufbuild/protobuf (protobuf-es)', val: 4060, ops: '246,330 ops/s' },
+      { name: 'OmniBuf', val: 298, ops: '2,507,169 ops/s', highlight: true, baseline: true },
+      { name: 'protobufjs', val: 1167, ops: '645,519 ops/s' },
+      { name: 'JSON', val: 1751, ops: '435,596 ops/s' },
+      { name: 'google-protobuf', val: 2527, ops: '301,279 ops/s' },
+      { name: '@msgpack/msgpack', val: 2774, ops: '276,825 ops/s' },
+      { name: '@bufbuild/protobuf (protobuf-es)', val: 2945, ops: '246,330 ops/s' },
     ],
   },
   {
@@ -364,12 +364,12 @@ export const esBenchmarkCategories: EsBenchmarkCategory[] = [
     methodology:
       'Checking a nested city string, incrementing the sequence number from the packet, and returning an updated Uint8Array.',
     rows: [
-      { name: 'OmniBuf', val: 3377, ops: '296,102 ops/s', highlight: true, baseline: true },
-      { name: 'protobufjs', val: 4045, ops: '247,240 ops/s' },
-      { name: 'JSON', val: 4833, ops: '206,891 ops/s' },
-      { name: '@bufbuild/protobuf (protobuf-es)', val: 7300, ops: '136,979 ops/s' },
-      { name: '@msgpack/msgpack', val: 8069, ops: '123,926 ops/s' },
-      { name: 'google-protobuf', val: 9815, ops: '101,888 ops/s' },
+      { name: 'OmniBuf', val: 2921, ops: '296,102 ops/s', highlight: true, baseline: true },
+      { name: 'protobufjs', val: 3120, ops: '247,240 ops/s' },
+      { name: 'JSON', val: 3609, ops: '206,891 ops/s' },
+      { name: '@bufbuild/protobuf (protobuf-es)', val: 5219, ops: '136,979 ops/s' },
+      { name: '@msgpack/msgpack', val: 6092, ops: '123,926 ops/s' },
+      { name: 'google-protobuf', val: 7067, ops: '101,888 ops/s' },
     ],
   },
   {
@@ -379,8 +379,10 @@ export const esBenchmarkCategories: EsBenchmarkCategory[] = [
     methodology:
       'Serializing a 39 KiB packet whose 20 KiB and 18 KiB nested messages exceed the 2-byte 16,383 B length reservation.',
     rows: [
-      { name: 'protobufjs', val: 22363, ops: '44,716 ops/s', sizeBytes: 39227 },
-      { name: 'google-protobuf', val: 23821, ops: '41,980 ops/s', sizeBytes: 39227 },
+      { name: 'protobufjs', val: 16692, ops: '44,716 ops/s', sizeBytes: 39227 },
+      { name: 'google-protobuf', val: 19305, ops: '41,980 ops/s', sizeBytes: 39227 },
+      { name: 'JSON', val: 25417, ops: '28,562 ops/s', sizeBytes: 39669 },
+      { name: '@msgpack/msgpack', val: 88928, ops: '8,408 ops/s', sizeBytes: 39504 },
       {
         name: 'OmniBuf',
         val: 30841,
@@ -395,8 +397,6 @@ export const esBenchmarkCategories: EsBenchmarkCategory[] = [
         ops: '32,395 ops/s',
         sizeBytes: 39227,
       },
-      { name: 'JSON', val: 35011, ops: '28,562 ops/s', sizeBytes: 39669 },
-      { name: '@msgpack/msgpack', val: 118938, ops: '8,408 ops/s', sizeBytes: 39504 },
     ],
   },
   {
@@ -406,12 +406,12 @@ export const esBenchmarkCategories: EsBenchmarkCategory[] = [
     methodology:
       'Growing a nested string field past 16 KiB ahead of 32 trailing Neighbor entries and emitting an updated Uint8Array.',
     rows: [
-      { name: 'OmniBuf', val: 23039, ops: '43,405 ops/s', highlight: true, baseline: true },
-      { name: 'protobufjs', val: 29282, ops: '34,150 ops/s' },
-      { name: 'JSON', val: 35580, ops: '28,106 ops/s' },
-      { name: '@bufbuild/protobuf (protobuf-es)', val: 37191, ops: '26,888 ops/s' },
-      { name: 'google-protobuf', val: 41997, ops: '23,811 ops/s' },
-      { name: '@msgpack/msgpack', val: 106284, ops: '9,409 ops/s' },
+      { name: 'OmniBuf', val: 19338, ops: '43,405 ops/s', highlight: true, baseline: true },
+      { name: 'protobufjs', val: 22411, ops: '34,150 ops/s' },
+      { name: 'JSON', val: 25767, ops: '28,106 ops/s' },
+      { name: '@bufbuild/protobuf (protobuf-es)', val: 27968, ops: '26,888 ops/s' },
+      { name: 'google-protobuf', val: 31845, ops: '23,811 ops/s' },
+      { name: '@msgpack/msgpack', val: 79295, ops: '9,409 ops/s' },
     ],
   },
 ];
@@ -424,12 +424,12 @@ export const rsBenchmarkCategories: BenchmarkCategory[] = [
     maxVal: 1100,
     methodology: 'Serializing PeerUpdate into a freshly allocated Vec<u8> across every library.',
     rows: [
-      { name: 'OmniBuf (#[derive(OmniBuf)])', val: 237, sizeBytes: 366, highlight: true },
-      { name: 'OmniBuf (Generated)', val: 240, sizeBytes: 366, highlight: true, baseline: true },
-      { name: 'buffa (Protobuf)', val: 259, sizeBytes: 341 },
-      { name: 'prost (Protobuf)', val: 298, sizeBytes: 341 },
-      { name: 'rmp-serde (MessagePack)', val: 831, sizeBytes: 626 },
-      { name: 'serde_json', val: 1039, sizeBytes: 803 },
+      { name: 'OmniBuf (Generated)', val: 204, sizeBytes: 366, highlight: true, baseline: true },
+      { name: 'buffa (Protobuf)', val: 207, sizeBytes: 341 },
+      { name: 'OmniBuf (#[derive(OmniBuf)])', val: 209, sizeBytes: 366, highlight: true },
+      { name: 'prost (Protobuf)', val: 233, sizeBytes: 341 },
+      { name: 'rmp-serde (MessagePack)', val: 644, sizeBytes: 626 },
+      { name: 'serde_json', val: 801, sizeBytes: 803 },
     ],
   },
   {
@@ -438,12 +438,12 @@ export const rsBenchmarkCategories: BenchmarkCategory[] = [
     maxVal: 1750,
     methodology: 'Decoding &[u8] into a fresh owned PeerUpdate struct and reading all 11 fields.',
     rows: [
-      { name: 'OmniBuf (Generated)', val: 549, highlight: true, baseline: true },
-      { name: 'OmniBuf (#[derive(OmniBuf)])', val: 553, highlight: true },
-      { name: 'buffa (Protobuf)', val: 679 },
-      { name: 'prost (Protobuf)', val: 872 },
-      { name: 'rmp-serde (MessagePack)', val: 1139 },
-      { name: 'serde_json', val: 1664 },
+      { name: 'OmniBuf (#[derive(OmniBuf)])', val: 434, highlight: true },
+      { name: 'OmniBuf (Generated)', val: 455, highlight: true, baseline: true },
+      { name: 'buffa (Protobuf)', val: 522 },
+      { name: 'prost (Protobuf)', val: 691 },
+      { name: 'rmp-serde (MessagePack)', val: 875 },
+      { name: 'serde_json', val: 1300 },
     ],
   },
   {
@@ -453,11 +453,11 @@ export const rsBenchmarkCategories: BenchmarkCategory[] = [
     methodology:
       'Borrowing a nested &str directly from &[u8] via OpaquePeerUpdate vs buffa PeerUpdateView vs full decode.',
     rows: [
-      { name: 'OmniBuf (Generated)', val: 90, highlight: true, baseline: true },
-      { name: 'buffa (Protobuf)', val: 476 },
-      { name: 'prost (Protobuf)', val: 859 },
-      { name: 'rmp-serde (MessagePack)', val: 1129 },
-      { name: 'serde_json', val: 1656 },
+      { name: 'OmniBuf (Generated)', val: 73, highlight: true, baseline: true },
+      { name: 'buffa (Protobuf)', val: 375 },
+      { name: 'prost (Protobuf)', val: 677 },
+      { name: 'rmp-serde (MessagePack)', val: 943 },
+      { name: 'serde_json', val: 1291 },
     ],
   },
   {
@@ -467,11 +467,11 @@ export const rsBenchmarkCategories: BenchmarkCategory[] = [
     methodology:
       'Checking a nested city string and splicing an incremented 64-bit sequence counter into &[u8] vs decode and re-encode.',
     rows: [
-      { name: 'OmniBuf (Generated)', val: 260, highlight: true, baseline: true },
-      { name: 'buffa (Protobuf)', val: 936 },
-      { name: 'prost (Protobuf)', val: 1188 },
-      { name: 'rmp-serde (MessagePack)', val: 1998 },
-      { name: 'serde_json', val: 2807 },
+      { name: 'OmniBuf (Generated)', val: 224, highlight: true, baseline: true },
+      { name: 'buffa (Protobuf)', val: 720 },
+      { name: 'prost (Protobuf)', val: 993 },
+      { name: 'rmp-serde (MessagePack)', val: 1524 },
+      { name: 'serde_json', val: 2142 },
     ],
   },
   {
@@ -481,9 +481,11 @@ export const rsBenchmarkCategories: BenchmarkCategory[] = [
     methodology:
       'Serializing a 39 KiB packet into Vec::with_capacity(128). Two-pass encoded_len() pre-sizing in buffa and prost avoids single-pass 2B-to-4B header shifts.',
     rows: [
-      { name: 'buffa (Protobuf)', val: 1086, sizeBytes: 39227 },
-      { name: 'prost (Protobuf)', val: 1848, sizeBytes: 39227 },
-      { name: 'rmp-serde (MessagePack)', val: 2045, sizeBytes: 39508 },
+      { name: 'prost (Protobuf)', val: 1078, sizeBytes: 39227 },
+      { name: 'rmp-serde (MessagePack)', val: 1676, sizeBytes: 39508 },
+      { name: 'buffa (Protobuf)', val: 1909, sizeBytes: 39227 },
+      { name: 'OmniBuf (#[derive(OmniBuf)])', val: 1987, sizeBytes: 39256, highlight: true },
+      { name: 'serde_json', val: 14475, sizeBytes: 39681 },
       {
         name: 'OmniBuf (Generated)',
         val: 2832,
@@ -491,8 +493,6 @@ export const rsBenchmarkCategories: BenchmarkCategory[] = [
         highlight: true,
         baseline: true,
       },
-      { name: 'OmniBuf (#[derive(OmniBuf)])', val: 2918, sizeBytes: 39256, highlight: true },
-      { name: 'serde_json', val: 18620, sizeBytes: 39681 },
     ],
   },
   {
@@ -502,11 +502,11 @@ export const rsBenchmarkCategories: BenchmarkCategory[] = [
     methodology:
       'Growing a nested string field past 16 KiB ahead of 32 trailing Neighbor entries via Opaque splicing vs full decode and re-encode.',
     rows: [
-      { name: 'OmniBuf (Generated)', val: 2411, highlight: true, baseline: true },
-      { name: 'buffa (Protobuf)', val: 4443 },
-      { name: 'prost (Protobuf)', val: 5154 },
-      { name: 'rmp-serde (MessagePack)', val: 8196 },
-      { name: 'serde_json', val: 19840 },
+      { name: 'OmniBuf (Generated)', val: 1563, highlight: true, baseline: true },
+      { name: 'buffa (Protobuf)', val: 3523 },
+      { name: 'prost (Protobuf)', val: 4080 },
+      { name: 'rmp-serde (MessagePack)', val: 6335 },
+      { name: 'serde_json', val: 15400 },
     ],
   },
 ];
@@ -520,13 +520,13 @@ export const pyBenchmarkCategories: BenchmarkCategory[] = [
     methodology:
       'Serializing PeerUpdate into fresh bytes across native Rust and C extensions (omnibuf, upb, protobuf-py, msgspec, msgpack, stdlib json).',
     rows: [
-      { name: 'OmniBuf (Generated)', val: 484, sizeBytes: 366, highlight: true, baseline: true },
-      { name: 'OmniBuf (@dataclass)', val: 494, sizeBytes: 366, highlight: true },
-      { name: 'google.protobuf (upb)', val: 564, sizeBytes: 341 },
-      { name: 'msgspec', val: 815, sizeBytes: 634 },
-      { name: 'protobuf-py', val: 1222, sizeBytes: 341 },
-      { name: 'msgpack', val: 2173, sizeBytes: 634 },
-      { name: 'json (stdlib)', val: 6202, sizeBytes: 874 },
+      { name: 'OmniBuf (Generated)', val: 379, sizeBytes: 366, highlight: true, baseline: true },
+      { name: 'OmniBuf (@dataclass)', val: 385, sizeBytes: 366, highlight: true },
+      { name: 'google.protobuf (upb)', val: 443, sizeBytes: 341 },
+      { name: 'msgspec', val: 632, sizeBytes: 634 },
+      { name: 'protobuf-py', val: 968, sizeBytes: 341 },
+      { name: 'msgpack', val: 1674, sizeBytes: 634 },
+      { name: 'json (stdlib)', val: 4876, sizeBytes: 874 },
     ],
   },
   {
@@ -536,13 +536,13 @@ export const pyBenchmarkCategories: BenchmarkCategory[] = [
     methodology:
       'Decoding bytes and reading all 11 fields in Python. Accessing every field forces upb to materialize Python strings and sub-messages out of its C arena.',
     rows: [
-      { name: 'OmniBuf (@dataclass)', val: 2754, highlight: true },
-      { name: 'OmniBuf (Generated)', val: 2757, highlight: true, baseline: true },
-      { name: 'msgspec', val: 2869 },
-      { name: 'protobuf-py', val: 4145 },
-      { name: 'msgpack', val: 5218 },
-      { name: 'google.protobuf (upb)', val: 5888 },
-      { name: 'json (stdlib)', val: 7914 },
+      { name: 'OmniBuf (Generated)', val: 2036, highlight: true, baseline: true },
+      { name: 'OmniBuf (@dataclass)', val: 2043, highlight: true },
+      { name: 'msgspec', val: 2205 },
+      { name: 'protobuf-py', val: 3158 },
+      { name: 'msgpack', val: 3991 },
+      { name: 'google.protobuf (upb)', val: 4622 },
+      { name: 'json (stdlib)', val: 6121 },
     ],
   },
   {
@@ -551,12 +551,12 @@ export const pyBenchmarkCategories: BenchmarkCategory[] = [
     maxVal: 6500,
     methodology: 'OpaquePeerUpdate header-hop lookup vs native C and Rust extension decode.',
     rows: [
-      { name: 'OmniBuf (Generated)', val: 525, highlight: true, baseline: true },
-      { name: 'google.protobuf (upb)', val: 1016 },
-      { name: 'msgspec', val: 1518 },
-      { name: 'protobuf-py', val: 2869 },
-      { name: 'msgpack', val: 3620 },
-      { name: 'json (stdlib)', val: 6350 },
+      { name: 'OmniBuf (Generated)', val: 506, highlight: true, baseline: true },
+      { name: 'google.protobuf (upb)', val: 775 },
+      { name: 'msgspec', val: 1171 },
+      { name: 'protobuf-py', val: 2168 },
+      { name: 'msgpack', val: 2713 },
+      { name: 'json (stdlib)', val: 4827 },
     ],
   },
   {
@@ -566,12 +566,12 @@ export const pyBenchmarkCategories: BenchmarkCategory[] = [
     methodology:
       'Checking a nested city string and splicing an updated sequence number vs full decode and re-encode.',
     rows: [
-      { name: 'OmniBuf (Generated)', val: 1301, highlight: true, baseline: true },
-      { name: 'google.protobuf (upb)', val: 1758 },
-      { name: 'msgspec', val: 2374 },
-      { name: 'protobuf-py', val: 4200 },
-      { name: 'msgpack', val: 5841 },
-      { name: 'json (stdlib)', val: 12953 },
+      { name: 'OmniBuf (Generated)', val: 821, highlight: true, baseline: true },
+      { name: 'google.protobuf (upb)', val: 1354 },
+      { name: 'msgspec', val: 1837 },
+      { name: 'protobuf-py', val: 3227 },
+      { name: 'msgpack', val: 4472 },
+      { name: 'json (stdlib)', val: 9891 },
     ],
   },
   {
@@ -581,9 +581,12 @@ export const pyBenchmarkCategories: BenchmarkCategory[] = [
     methodology:
       'Serializing a 39 KiB packet whose 20 KiB and 18 KiB nested strings trigger 2B-to-4B container header expansion.',
     rows: [
-      { name: 'msgspec', val: 2239, sizeBytes: 39516 },
-      { name: 'google.protobuf (upb)', val: 2726, sizeBytes: 39227 },
-      { name: 'OmniBuf (@dataclass)', val: 3102, sizeBytes: 39256, highlight: true },
+      { name: 'msgspec', val: 1866, sizeBytes: 39516 },
+      { name: 'google.protobuf (upb)', val: 2260, sizeBytes: 39227 },
+      { name: 'OmniBuf (@dataclass)', val: 2563, sizeBytes: 39256, highlight: true },
+      { name: 'msgpack', val: 3177, sizeBytes: 39516 },
+      { name: 'protobuf-py', val: 3371, sizeBytes: 39227 },
+      { name: 'json (stdlib)', val: 67520, sizeBytes: 39752 },
       {
         name: 'OmniBuf (Generated)',
         val: 3221,
@@ -591,9 +594,6 @@ export const pyBenchmarkCategories: BenchmarkCategory[] = [
         highlight: true,
         baseline: true,
       },
-      { name: 'msgpack', val: 3902, sizeBytes: 39516 },
-      { name: 'protobuf-py', val: 4073, sizeBytes: 39227 },
-      { name: 'json (stdlib)', val: 85390, sizeBytes: 39752 },
     ],
   },
   {
@@ -603,12 +603,12 @@ export const pyBenchmarkCategories: BenchmarkCategory[] = [
     methodology:
       'Growing a nested string field past 16 KiB ahead of 32 trailing Neighbor entries via Opaque splicing vs full decode and re-encode.',
     rows: [
-      { name: 'OmniBuf (Generated)', val: 4291, highlight: true, baseline: true },
-      { name: 'google.protobuf (upb)', val: 6003 },
-      { name: 'msgspec', val: 9196 },
-      { name: 'protobuf-py', val: 17490 },
-      { name: 'msgpack', val: 24198 },
-      { name: 'json (stdlib)', val: 82162 },
+      { name: 'OmniBuf (Generated)', val: 2486, highlight: true, baseline: true },
+      { name: 'google.protobuf (upb)', val: 4458 },
+      { name: 'msgspec', val: 7198 },
+      { name: 'protobuf-py', val: 13682 },
+      { name: 'msgpack', val: 18526 },
+      { name: 'json (stdlib)', val: 63944 },
     ],
   },
 ];
@@ -622,10 +622,10 @@ export const cppBenchmarkCategories: BenchmarkCategory[] = [
     methodology:
       'Serializing PeerUpdate into a fresh std::vector<uint8_t> against in-tree LEB128 Protobuf and JSON codecs.',
     rows: [
-      { name: 'OmniBuf (Generated)', val: 281, sizeBytes: 366, highlight: true, baseline: true },
-      { name: 'Protobuf (LEB128 Wire)', val: 284, sizeBytes: 341 },
-      { name: 'OmniBuf (C++ Struct)', val: 340, sizeBytes: 366, highlight: true },
-      { name: 'JSON', val: 671, sizeBytes: 803 },
+      { name: 'Protobuf (LEB128 Wire)', val: 254, sizeBytes: 341 },
+      { name: 'OmniBuf (Generated)', val: 299, sizeBytes: 366, highlight: true, baseline: true },
+      { name: 'OmniBuf (C++ Struct)', val: 361, sizeBytes: 366, highlight: true },
+      { name: 'JSON', val: 550, sizeBytes: 803 },
     ],
   },
   {
@@ -634,10 +634,10 @@ export const cppBenchmarkCategories: BenchmarkCategory[] = [
     maxVal: 1800,
     methodology: 'Decoding into a fresh C++20 PeerUpdate struct and reading all 11 fields.',
     rows: [
-      { name: 'OmniBuf (Generated)', val: 657, highlight: true, baseline: true },
-      { name: 'OmniBuf (C++ Struct)', val: 743, highlight: true },
-      { name: 'Protobuf (LEB128 Wire)', val: 789 },
-      { name: 'JSON', val: 1686 },
+      { name: 'OmniBuf (Generated)', val: 535, highlight: true, baseline: true },
+      { name: 'OmniBuf (C++ Struct)', val: 604, highlight: true },
+      { name: 'Protobuf (LEB128 Wire)', val: 652 },
+      { name: 'JSON', val: 1400 },
     ],
   },
   {
@@ -647,9 +647,9 @@ export const cppBenchmarkCategories: BenchmarkCategory[] = [
     methodology:
       'Returning std::string_view into the packet via OpaquePeerUpdate vs full message decode.',
     rows: [
-      { name: 'OmniBuf (Generated)', val: 121, highlight: true, baseline: true },
-      { name: 'Protobuf (LEB128 Wire)', val: 591 },
-      { name: 'JSON', val: 1485 },
+      { name: 'OmniBuf (Generated)', val: 101, highlight: true, baseline: true },
+      { name: 'Protobuf (LEB128 Wire)', val: 501 },
+      { name: 'JSON', val: 1246 },
     ],
   },
   {
@@ -659,9 +659,9 @@ export const cppBenchmarkCategories: BenchmarkCategory[] = [
     methodology:
       'Checking a nested city string and splicing an updated sequence counter via OpaquePeerUpdate vs full decode and re-encode.',
     rows: [
-      { name: 'OmniBuf (Generated)', val: 427, highlight: true, baseline: true },
-      { name: 'Protobuf (LEB128 Wire)', val: 885 },
-      { name: 'JSON', val: 2194 },
+      { name: 'OmniBuf (Generated)', val: 297, highlight: true, baseline: true },
+      { name: 'Protobuf (LEB128 Wire)', val: 762 },
+      { name: 'JSON', val: 1829 },
     ],
   },
   {
@@ -671,7 +671,9 @@ export const cppBenchmarkCategories: BenchmarkCategory[] = [
     methodology:
       'Serializing a 39 KiB packet whose >16 KiB nested sub-messages trigger 2B-to-4B header expansion vs Protobuf two-pass sizing.',
     rows: [
-      { name: 'Protobuf (LEB128 Wire)', val: 4140, sizeBytes: 39227 },
+      { name: 'OmniBuf (C++ Struct)', val: 1931, sizeBytes: 39256, highlight: true },
+      { name: 'Protobuf (LEB128 Wire)', val: 2135, sizeBytes: 39227 },
+      { name: 'JSON', val: 39988, sizeBytes: 39681 },
       {
         name: 'OmniBuf (Generated)',
         val: 5242,
@@ -679,8 +681,6 @@ export const cppBenchmarkCategories: BenchmarkCategory[] = [
         highlight: true,
         baseline: true,
       },
-      { name: 'OmniBuf (C++ Struct)', val: 5298, sizeBytes: 39256, highlight: true },
-      { name: 'JSON', val: 53706, sizeBytes: 39681 },
     ],
   },
   {
@@ -690,9 +690,9 @@ export const cppBenchmarkCategories: BenchmarkCategory[] = [
     methodology:
       'Growing a nested string field past 16 KiB ahead of 32 trailing Neighbor entries via Opaque splicing vs full decode and re-encode.',
     rows: [
-      { name: 'OmniBuf (Generated)', val: 3581, highlight: true, baseline: true },
-      { name: 'Protobuf (LEB128 Wire)', val: 5907 },
-      { name: 'JSON', val: 37049 },
+      { name: 'OmniBuf (Generated)', val: 1834, highlight: true, baseline: true },
+      { name: 'Protobuf (LEB128 Wire)', val: 4340 },
+      { name: 'JSON', val: 28300 },
     ],
   },
 ];
@@ -706,13 +706,13 @@ export const javaBenchmarkCategories: BenchmarkCategory[] = [
     methodology:
       'Serializing PeerUpdate into a fresh byte[] across generated OmniBuf, protobuf-java, FlatBuffers, and Jackson.',
     rows: [
-      { name: 'OmniBuf (Generated)', val: 315, sizeBytes: 366, highlight: true, baseline: true },
-      { name: 'Protobuf (protobuf-java)', val: 364, sizeBytes: 341 },
-      { name: 'OmniBuf (@OmniBufField)', val: 662, sizeBytes: 366, highlight: true },
-      { name: 'FlatBuffers', val: 1021, sizeBytes: 600 },
-      { name: 'OmniBuf (Protobuf)', val: 1358, sizeBytes: 366, highlight: true },
-      { name: 'JSON (Jackson)', val: 1559, sizeBytes: 803 },
-      { name: 'MessagePack (Jackson)', val: 2401, sizeBytes: 626 },
+      { name: 'OmniBuf (Generated)', val: 246, sizeBytes: 366, highlight: true, baseline: true },
+      { name: 'Protobuf (protobuf-java)', val: 260, sizeBytes: 341 },
+      { name: 'OmniBuf (@OmniBufField)', val: 514, sizeBytes: 366, highlight: true },
+      { name: 'FlatBuffers', val: 795, sizeBytes: 600 },
+      { name: 'OmniBuf (Protobuf)', val: 1034, sizeBytes: 366, highlight: true },
+      { name: 'JSON (Jackson)', val: 1158, sizeBytes: 803 },
+      { name: 'MessagePack (Jackson)', val: 1955, sizeBytes: 626 },
     ],
   },
   {
@@ -721,13 +721,13 @@ export const javaBenchmarkCategories: BenchmarkCategory[] = [
     maxVal: 4500,
     methodology: 'Decoding byte[] into a fresh PeerUpdate object and reading all 11 fields.',
     rows: [
-      { name: 'OmniBuf (Generated)', val: 1045, highlight: true, baseline: true },
-      { name: 'OmniBuf (@OmniBufField)', val: 1056, highlight: true },
-      { name: 'FlatBuffers', val: 1061 },
-      { name: 'Protobuf (protobuf-java)', val: 1520 },
-      { name: 'OmniBuf (Protobuf)', val: 2704, highlight: true },
-      { name: 'JSON (Jackson)', val: 2950 },
-      { name: 'MessagePack (Jackson)', val: 4346 },
+      { name: 'OmniBuf (@OmniBufField)', val: 763, highlight: true },
+      { name: 'OmniBuf (Generated)', val: 857, highlight: true, baseline: true },
+      { name: 'FlatBuffers', val: 860 },
+      { name: 'Protobuf (protobuf-java)', val: 1321 },
+      { name: 'OmniBuf (Protobuf)', val: 2150, highlight: true },
+      { name: 'JSON (Jackson)', val: 2309 },
+      { name: 'MessagePack (Jackson)', val: 3575 },
     ],
   },
   {
@@ -737,11 +737,11 @@ export const javaBenchmarkCategories: BenchmarkCategory[] = [
     methodology:
       'Reading a nested city string via FlatBuffers vtables or OpaquePeerUpdate vs full decode.',
     rows: [
-      { name: 'FlatBuffers', val: 24 },
-      { name: 'OmniBuf (Generated)', val: 127, highlight: true, baseline: true },
-      { name: 'Protobuf (protobuf-java)', val: 1036 },
-      { name: 'JSON (Jackson)', val: 2607 },
-      { name: 'MessagePack (Jackson)', val: 3991 },
+      { name: 'FlatBuffers', val: 15 },
+      { name: 'OmniBuf (Generated)', val: 77, highlight: true, baseline: true },
+      { name: 'Protobuf (protobuf-java)', val: 883 },
+      { name: 'JSON (Jackson)', val: 1959 },
+      { name: 'MessagePack (Jackson)', val: 3121 },
     ],
   },
   {
@@ -751,11 +751,11 @@ export const javaBenchmarkCategories: BenchmarkCategory[] = [
     methodology:
       'Checking a nested city string and splicing an updated sequence counter via OpaquePeerUpdate vs full decode and re-encode.',
     rows: [
-      { name: 'OmniBuf (Generated)', val: 294, highlight: true, baseline: true },
-      { name: 'FlatBuffers', val: 1453 },
-      { name: 'Protobuf (protobuf-java)', val: 1454 },
-      { name: 'JSON (Jackson)', val: 4166 },
-      { name: 'MessagePack (Jackson)', val: 6453 },
+      { name: 'OmniBuf (Generated)', val: 255, highlight: true, baseline: true },
+      { name: 'FlatBuffers', val: 1122 },
+      { name: 'Protobuf (protobuf-java)', val: 1123 },
+      { name: 'JSON (Jackson)', val: 3214 },
+      { name: 'MessagePack (Jackson)', val: 5040 },
     ],
   },
   {
@@ -765,7 +765,12 @@ export const javaBenchmarkCategories: BenchmarkCategory[] = [
     methodology:
       'Serializing a 39 KiB packet with >16 KiB nested strings. Immutable protobuf-java reuses cached ByteString UTF-8 bytes and memoizedSerializedSize.',
     rows: [
-      { name: 'Protobuf (protobuf-java)', val: 4384, sizeBytes: 39227 },
+      { name: 'Protobuf (protobuf-java)', val: 3659, sizeBytes: 39227 },
+      { name: 'OmniBuf (@OmniBufField)', val: 4125, sizeBytes: 39256, highlight: true },
+      { name: 'OmniBuf (Protobuf)', val: 4700, sizeBytes: 39256, highlight: true },
+      { name: 'JSON (Jackson)', val: 48886, sizeBytes: 39681 },
+      { name: 'FlatBuffers', val: 60626, sizeBytes: 39488 },
+      { name: 'MessagePack (Jackson)', val: 90249, sizeBytes: 39508 },
       {
         name: 'OmniBuf (Generated)',
         val: 5044,
@@ -773,11 +778,6 @@ export const javaBenchmarkCategories: BenchmarkCategory[] = [
         highlight: true,
         baseline: true,
       },
-      { name: 'OmniBuf (@OmniBufField)', val: 5211, sizeBytes: 39256, highlight: true },
-      { name: 'OmniBuf (Protobuf)', val: 6004, sizeBytes: 39256, highlight: true },
-      { name: 'JSON (Jackson)', val: 62896, sizeBytes: 39681 },
-      { name: 'FlatBuffers', val: 77382, sizeBytes: 39488 },
-      { name: 'MessagePack (Jackson)', val: 116427, sizeBytes: 39508 },
     ],
   },
   {
@@ -787,11 +787,11 @@ export const javaBenchmarkCategories: BenchmarkCategory[] = [
     methodology:
       'Growing a nested string field past 16 KiB ahead of 32 trailing Neighbor entries via Opaque splicing vs full decode and re-encode.',
     rows: [
-      { name: 'OmniBuf (Generated)', val: 3020, highlight: true, baseline: true },
-      { name: 'Protobuf (protobuf-java)', val: 24464 },
-      { name: 'FlatBuffers', val: 46102 },
-      { name: 'JSON (Jackson)', val: 48786 },
-      { name: 'MessagePack (Jackson)', val: 87759 },
+      { name: 'OmniBuf (Generated)', val: 2320, highlight: true, baseline: true },
+      { name: 'Protobuf (protobuf-java)', val: 19332 },
+      { name: 'FlatBuffers', val: 36126 },
+      { name: 'JSON (Jackson)', val: 37974 },
+      { name: 'MessagePack (Jackson)', val: 68812 },
     ],
   },
 ];
@@ -804,11 +804,11 @@ export const csBenchmarkCategories: BenchmarkCategory[] = [
     maxVal: 1200,
     methodology: 'Serializing PeerUpdate into a fresh byte[] on .NET 8 RyuJIT.',
     rows: [
-      { name: 'OmniBuf (Generated)', val: 308, sizeBytes: 366, highlight: true, baseline: true },
-      { name: 'OmniBuf ([OmniBufField])', val: 478, sizeBytes: 366, highlight: true },
-      { name: 'MessagePack-CSharp', val: 607, sizeBytes: 626 },
-      { name: 'Google.Protobuf', val: 655, sizeBytes: 341 },
-      { name: 'System.Text.Json', val: 1122, sizeBytes: 803 },
+      { name: 'OmniBuf (Generated)', val: 317, sizeBytes: 366, highlight: true, baseline: true },
+      { name: 'OmniBuf ([OmniBufField])', val: 343, sizeBytes: 366, highlight: true },
+      { name: 'MessagePack-CSharp', val: 457, sizeBytes: 626 },
+      { name: 'Google.Protobuf', val: 492, sizeBytes: 341 },
+      { name: 'System.Text.Json', val: 849, sizeBytes: 803 },
     ],
   },
   {
@@ -818,11 +818,11 @@ export const csBenchmarkCategories: BenchmarkCategory[] = [
     methodology:
       'Decoding ReadOnlySpan<byte> into a fresh PeerUpdate instance and reading all 11 fields.',
     rows: [
-      { name: 'OmniBuf (Generated)', val: 743, highlight: true, baseline: true },
-      { name: 'OmniBuf ([OmniBufField])', val: 896, highlight: true },
-      { name: 'Google.Protobuf', val: 900 },
-      { name: 'MessagePack-CSharp', val: 1300 },
-      { name: 'System.Text.Json', val: 3279 },
+      { name: 'OmniBuf (Generated)', val: 623, highlight: true, baseline: true },
+      { name: 'OmniBuf ([OmniBufField])', val: 677, highlight: true },
+      { name: 'Google.Protobuf', val: 688 },
+      { name: 'MessagePack-CSharp', val: 994 },
+      { name: 'System.Text.Json', val: 2689 },
     ],
   },
   {
@@ -831,10 +831,10 @@ export const csBenchmarkCategories: BenchmarkCategory[] = [
     maxVal: 3300,
     methodology: 'Reading a nested city string via OpaquePeerUpdate vs full message decode.',
     rows: [
-      { name: 'OmniBuf (Generated)', val: 144, highlight: true, baseline: true },
-      { name: 'Google.Protobuf', val: 820 },
-      { name: 'MessagePack-CSharp', val: 1200 },
-      { name: 'System.Text.Json', val: 3169 },
+      { name: 'OmniBuf (Generated)', val: 110, highlight: true, baseline: true },
+      { name: 'Google.Protobuf', val: 627 },
+      { name: 'MessagePack-CSharp', val: 921 },
+      { name: 'System.Text.Json', val: 2617 },
     ],
   },
   {
@@ -844,10 +844,10 @@ export const csBenchmarkCategories: BenchmarkCategory[] = [
     methodology:
       'Checking a nested city string and splicing an updated sequence counter via OpaquePeerUpdate vs full decode and re-encode.',
     rows: [
-      { name: 'OmniBuf (Generated)', val: 365, highlight: true, baseline: true },
-      { name: 'Google.Protobuf', val: 1499 },
-      { name: 'MessagePack-CSharp', val: 1845 },
-      { name: 'System.Text.Json', val: 4370 },
+      { name: 'OmniBuf (Generated)', val: 289, highlight: true, baseline: true },
+      { name: 'Google.Protobuf', val: 1150 },
+      { name: 'MessagePack-CSharp', val: 1458 },
+      { name: 'System.Text.Json', val: 3659 },
     ],
   },
   {
@@ -857,7 +857,10 @@ export const csBenchmarkCategories: BenchmarkCategory[] = [
     methodology:
       'Serializing a 39 KiB packet whose >16 KiB nested sub-messages trigger 2B-to-4B header expansion.',
     rows: [
-      { name: 'MessagePack-CSharp', val: 6186, sizeBytes: 39508 },
+      { name: 'MessagePack-CSharp', val: 4317, sizeBytes: 39508 },
+      { name: 'OmniBuf ([OmniBufField])', val: 4346, sizeBytes: 39256, highlight: true },
+      { name: 'System.Text.Json', val: 6745, sizeBytes: 39681 },
+      { name: 'Google.Protobuf', val: 20077, sizeBytes: 39227 },
       {
         name: 'OmniBuf (Generated)',
         val: 6649,
@@ -865,9 +868,6 @@ export const csBenchmarkCategories: BenchmarkCategory[] = [
         highlight: true,
         baseline: true,
       },
-      { name: 'OmniBuf ([OmniBufField])', val: 6946, sizeBytes: 39256, highlight: true },
-      { name: 'System.Text.Json', val: 9047, sizeBytes: 39681 },
-      { name: 'Google.Protobuf', val: 26575, sizeBytes: 39227 },
     ],
   },
   {
@@ -877,10 +877,10 @@ export const csBenchmarkCategories: BenchmarkCategory[] = [
     methodology:
       'Growing a nested string field past 16 KiB ahead of 32 trailing Neighbor entries via Opaque splicing vs full decode and re-encode.',
     rows: [
-      { name: 'OmniBuf (Generated)', val: 6629, highlight: true, baseline: true },
-      { name: 'MessagePack-CSharp', val: 9000 },
-      { name: 'Google.Protobuf', val: 19480 },
-      { name: 'System.Text.Json', val: 20479 },
+      { name: 'OmniBuf (Generated)', val: 3873, highlight: true, baseline: true },
+      { name: 'MessagePack-CSharp', val: 6827 },
+      { name: 'Google.Protobuf', val: 14634 },
+      { name: 'System.Text.Json', val: 15803 },
     ],
   },
 ];

@@ -114,7 +114,7 @@ const rsFaqItems = [
     id: 'rs-faq-untrusted-limits',
     question: 'How are untrusted network payloads bounded before allocation?',
     paragraphs: [
-      '<code>DecodeOptions</code> caps packet byte length (<code>max_message_bytes</code>), cumulative array and map element counts (<code>max_elements</code>), total heap reservation (<code>max_alloc_bytes</code>), and recursion depth (<code>max_depth</code>, capped at 32). All four checks run ahead of owned value allocation in <code>from_slice_with_options</code>, <code>decode_buffa_with_options</code>, <code>decode_prost_with_options</code>, and <code>decode_blind_with_options</code>, verified across <code>758/758</code> conformance cases.',
+      '<code>DecodeOptions</code> caps packet byte length (<code>max_message_bytes</code>), cumulative array and map element counts (<code>max_elements</code>), total heap reservation (<code>max_alloc_bytes</code>), and recursion depth (<code>max_depth</code>, capped at 32). All four checks run ahead of owned value allocation in <code>from_slice_with_options</code>, <code>decode_buffa_with_options</code>, <code>decode_prost_with_options</code>, and <code>decode_blind_with_options</code>, verified across <code>992/992</code> conformance cases.',
     ],
   },
   {
