@@ -799,11 +799,12 @@ WireSubMsg (12): [ByteLen: Prefix-Varint][Message field stream]</code></pre>
           so a field scanner steps from tag to tag in <code>O(fields)</code> time (<code>O(1)</code>{' '}
           per skipped field) and never visits inner container items. Lookup APIs MUST document
           whether they return the last occurrence, all occurrences, or a recursively merged value,
-          and whether skipping unknown fields bypasses full inner validation. Both blind decoders
-          and schema-aware decoders MUST validate UTF-8 on every <code>WireString</code> field
-          (including unknown fields), validate container headers and nesting depth on unknown
-          containers, and skip unreferenced <code>WireBytes</code>, fixed-width, varint, and{' '}
-          <code>WireExtended</code> payloads by length or width.
+          and whether skipping unread fields bypasses inner validation. Decoders MUST validate UTF-8
+          on every <code>WireString</code> field they decode (including every string read by{' '}
+          <code>DecodeBlind</code>, known strings in schema-aware decode, and strings read via lazy{' '}
+          <code>Opaque</code> getters). Unread or unknown <code>WireString</code> fields MAY be
+          skipped in <code>O(1)</code> by <code>ByteLen</code> without scanning their payload bytes,
+          while standalone full-packet validators validate UTF-8 across all strings.
         </p>
 
         <h2 id="sec-8">8. Optional Naming Metadata (Field #0)</h2>
@@ -878,7 +879,9 @@ WireSubMsg (12): [ByteLen: Prefix-Varint][Message field stream]</code></pre>
             require an exact end boundary.
           </li>
           <li>
-            All <code>WireString</code> values (including unknown fields) MUST contain valid UTF-8.
+            <code>WireString</code> values MUST contain valid UTF-8, and decoders MUST reject
+            invalid UTF-8 on every <code>WireString</code> they read or decode (unread or skipped{' '}
+            <code>WireString</code> fields MAY be skipped by <code>ByteLen</code>; see Section 7).
             Arbitrary binary data MUST use <code>WireBytes</code>.
           </li>
           <li>
