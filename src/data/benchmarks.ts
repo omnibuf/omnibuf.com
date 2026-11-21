@@ -613,19 +613,20 @@ export const pyBenchmarkCategories: BenchmarkCategory[] = [
   },
 ];
 
-// C++20 results from omnibuf-cpp/testdata/benchmarks.json (Apple Clang 21.0.0 -O3)
+// C++20 results from omnibuf-cpp/testdata/benchmarks.json (Apple Clang 21.0.0 -O3, libprotobuf 36.2)
 export const cppBenchmarkCategories: BenchmarkCategory[] = [
   {
     title: 'Full Message Encode Speed',
     unit: 'ns',
     maxVal: 650,
     methodology:
-      'Serializing PeerUpdate into a fresh std::vector<uint8_t> against in-tree LEB128 Protobuf and JSON codecs.',
+      'Serializing PeerUpdate into a fresh std::vector<uint8_t> against official libprotobuf (C++), an in-tree LEB128 wire codec, and JSON.',
     rows: [
-      { name: 'OmniBuf (Generated)', val: 188, sizeBytes: 366, highlight: true, baseline: true },
+      { name: 'OmniBuf (Generated)', val: 204, sizeBytes: 366, highlight: true, baseline: true },
       { name: 'OmniBuf (C++ Struct)', val: 205, sizeBytes: 366, highlight: true },
-      { name: 'Protobuf (LEB128 Wire)', val: 215, sizeBytes: 341 },
-      { name: 'JSON', val: 475, sizeBytes: 803 },
+      { name: 'Protobuf (LEB128 Wire)', val: 213, sizeBytes: 341 },
+      { name: 'Protobuf (libprotobuf)', val: 249, sizeBytes: 341 },
+      { name: 'JSON', val: 464, sizeBytes: 803 },
     ],
   },
   {
@@ -634,10 +635,11 @@ export const cppBenchmarkCategories: BenchmarkCategory[] = [
     maxVal: 1800,
     methodology: 'Decoding into a fresh C++20 PeerUpdate struct and reading all 11 fields.',
     rows: [
-      { name: 'OmniBuf (Generated)', val: 482, highlight: true, baseline: true },
-      { name: 'OmniBuf (C++ Struct)', val: 537, highlight: true },
-      { name: 'Protobuf (LEB128 Wire)', val: 586 },
-      { name: 'JSON', val: 1303 },
+      { name: 'OmniBuf (Generated)', val: 475, highlight: true, baseline: true },
+      { name: 'OmniBuf (C++ Struct)', val: 519, highlight: true },
+      { name: 'Protobuf (LEB128 Wire)', val: 576 },
+      { name: 'Protobuf (libprotobuf)', val: 998 },
+      { name: 'JSON', val: 1274 },
     ],
   },
   {
@@ -648,8 +650,9 @@ export const cppBenchmarkCategories: BenchmarkCategory[] = [
       'Returning std::string_view into the packet via OpaquePeerUpdate vs full message decode.',
     rows: [
       { name: 'OmniBuf (Generated)', val: 98, highlight: true, baseline: true },
-      { name: 'Protobuf (LEB128 Wire)', val: 432 },
-      { name: 'JSON', val: 1141 },
+      { name: 'Protobuf (LEB128 Wire)', val: 449 },
+      { name: 'Protobuf (libprotobuf)', val: 839 },
+      { name: 'JSON', val: 1127 },
     ],
   },
   {
@@ -659,9 +662,10 @@ export const cppBenchmarkCategories: BenchmarkCategory[] = [
     methodology:
       'Checking a nested city string and splicing an updated sequence counter via OpaquePeerUpdate vs full decode and re-encode.',
     rows: [
-      { name: 'OmniBuf (Generated)', val: 294, highlight: true, baseline: true },
-      { name: 'Protobuf (LEB128 Wire)', val: 656 },
-      { name: 'JSON', val: 1625 },
+      { name: 'OmniBuf (Generated)', val: 293, highlight: true, baseline: true },
+      { name: 'Protobuf (LEB128 Wire)', val: 653 },
+      { name: 'Protobuf (libprotobuf)', val: 1098 },
+      { name: 'JSON', val: 1606 },
     ],
   },
   {
@@ -671,10 +675,11 @@ export const cppBenchmarkCategories: BenchmarkCategory[] = [
     methodology:
       'Serializing a 39 KiB packet whose >16 KiB nested sub-messages trigger 2B-to-4B header expansion vs Protobuf two-pass sizing.',
     rows: [
-      { name: 'OmniBuf (Generated)', val: 1320, sizeBytes: 39256, highlight: true, baseline: true },
-      { name: 'OmniBuf (C++ Struct)', val: 1377, sizeBytes: 39256, highlight: true },
-      { name: 'Protobuf (LEB128 Wire)', val: 1654, sizeBytes: 39227 },
-      { name: 'JSON', val: 40227, sizeBytes: 39681 },
+      { name: 'OmniBuf (Generated)', val: 1433, sizeBytes: 39256, highlight: true, baseline: true },
+      { name: 'OmniBuf (C++ Struct)', val: 1508, sizeBytes: 39256, highlight: true },
+      { name: 'Protobuf (LEB128 Wire)', val: 1906, sizeBytes: 39227 },
+      { name: 'Protobuf (libprotobuf)', val: 2963, sizeBytes: 39227 },
+      { name: 'JSON', val: 40563, sizeBytes: 39681 },
     ],
   },
   {
@@ -684,9 +689,10 @@ export const cppBenchmarkCategories: BenchmarkCategory[] = [
     methodology:
       'Growing a nested string field past 16 KiB ahead of 32 trailing Neighbor entries via Opaque splicing vs full decode and re-encode.',
     rows: [
-      { name: 'OmniBuf (Generated)', val: 1718, highlight: true, baseline: true },
-      { name: 'Protobuf (LEB128 Wire)', val: 3540 },
-      { name: 'JSON', val: 27697 },
+      { name: 'OmniBuf (Generated)', val: 1699, highlight: true, baseline: true },
+      { name: 'Protobuf (LEB128 Wire)', val: 3488 },
+      { name: 'Protobuf (libprotobuf)', val: 5750 },
+      { name: 'JSON', val: 27781 },
     ],
   },
 ];
@@ -1013,20 +1019,25 @@ export const languageBenchmarks: Record<LanguageKey, LanguageBenchmarkSuite> = {
       '11-field <code>PeerUpdate</code> struct on Apple Clang 21 (<code>-O3 -DNDEBUG</code>, C++20). <strong>Shorter bars = Faster.</strong>',
     href: '/cpp#benchmarks',
     ctaLabel: 'See full results',
-    competitorsLabel: 'Protobuf (LEB128 Wire), JSON',
+    competitorsLabel: 'libprotobuf, Protobuf (LEB128 Wire), JSON',
     heroSummaryHtml:
-      'The header-only C++20 library encodes and decodes faster than Protobuf wire encoding and runs <strong>around 3x faster</strong> than JSON. Zero-copy views read nested string slices <strong>about 5x faster</strong> than Protobuf and splice scalar updates <strong>over 2x faster</strong>. Explore the <a href="/cpp" class="doc-link">C++ runtime</a>.',
+      'The header-only C++20 library decodes <strong>over 2x faster</strong> than official <code>libprotobuf</code> and encodes faster across both small and large embedded messages. Zero-copy views read nested string slices <strong>over 8x faster</strong> than <code>libprotobuf</code> and splice scalar updates <strong>nearly 4x faster</strong>. Explore the <a href="/cpp" class="doc-link">C++ runtime</a>.',
     categories: cppBenchmarkCategories,
-    butterflyEncodeRows: primaryAndCompetitors(cppEncodeCat.rows),
-    butterflyDecodeRows: primaryAndCompetitors(cppDecodeCat.rows),
+    butterflyEncodeRows: (cppEncodeCat?.rows ?? []).filter(
+      (r) => (r.baseline || !r.highlight) && r.name !== 'Protobuf (LEB128 Wire)',
+    ),
+    butterflyDecodeRows: (cppDecodeCat?.rows ?? []).filter(
+      (r) => (r.baseline || !r.highlight) && r.name !== 'Protobuf (LEB128 Wire)',
+    ),
     hardwareLines: [
       'CPU: Apple M1 Pro (darwin/arm64)',
       'Compiler: Apple Clang 21.0.0 (-O3, C++20)',
+      'Peer: libprotobuf 36.2 + in-tree LEB128 & JSON',
       'Command: just bench',
     ],
     environmentParagraphs: [
-      'Compiled with Apple Clang 21.0.0 (<code>-O3 -DNDEBUG -std=c++20</code>) on an Apple M1 Pro Mac. Zero-dependency <code>omnibuf-cpp</code> headers are benchmarked against in-tree LEB128 Protobuf wire and JSON codecs operating on the exact same <code>PeerUpdate</code> struct, UTF-8 validation rules, and 11-field checksum sink.',
-      'Benchmark source lives in <a href="https://github.com/omnibuf/omnibuf-cpp/blob/main/benchmarks/peer_bench.cpp" target="_blank" rel="noopener noreferrer" class="doc-link font-mono">benchmarks/peer_bench.cpp</a>, with recorded output in <a href="https://github.com/omnibuf/omnibuf-cpp/blob/main/testdata/benchmarks.json" target="_blank" rel="noopener noreferrer" class="doc-link font-mono">testdata/benchmarks.json</a>.',
+      'Compiled with Apple Clang 21.0.0 (<code>-O3 -DNDEBUG -std=c++20</code>) on an Apple M1 Pro Mac. Zero-dependency <code>omnibuf-cpp</code> headers are benchmarked against official <code>libprotobuf</code> 36.2 (<code>google::protobuf::Message</code>), an in-tree LEB128 Protobuf wire codec, and JSON on the exact same <code>PeerUpdate</code> workload, UTF-8 rules, and 11-field checksum sink.',
+      'Benchmark source lives in <a href="https://github.com/omnibuf/omnibuf-cpp/blob/main/benchmarks/peer_bench.cpp" target="_blank" rel="noopener noreferrer" class="doc-link font-mono">benchmarks/peer_bench.cpp</a> and <a href="https://github.com/omnibuf/omnibuf-cpp/blob/main/benchmarks/libprotobuf_peer.cpp" target="_blank" rel="noopener noreferrer" class="doc-link font-mono">benchmarks/libprotobuf_peer.cpp</a>, with recorded output in <a href="https://github.com/omnibuf/omnibuf-cpp/blob/main/testdata/benchmarks.json" target="_blank" rel="noopener noreferrer" class="doc-link font-mono">testdata/benchmarks.json</a>.',
     ],
   },
   java: {
