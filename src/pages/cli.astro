@@ -266,58 +266,104 @@ omnibuf decode --schema descriptors.pb --type demo.v1.PeerUpdate packet.obuf`;
                     </thead>
                     <tbody class="divide-y divide-ink/15 text-ink">
                       <tr>
-                        <td class="py-2.5 px-3"><code>true</code> / <code>false</code></td>
+                        <td class="py-2.5 px-3">
+                          <code>true</code> / <code>false</code>
+                        </td>
                         <td class="py-2.5 px-3">
                           <code>WireBoolTrue</code> (3) / <code>WireBoolFalse</code> (2)
                         </td>
-                        <td class="py-2.5 px-3"><code>bool</code></td>
+                        <td class="py-2.5 px-3">
+                          <code>bool</code>
+                        </td>
                       </tr>
                       <tr>
-                        <td class="py-2.5 px-3">Non-negative integer (<code>0..2^64-1</code>)</td>
-                        <td class="py-2.5 px-3"><code>WireUint</code> (0)</td>
-                        <td class="py-2.5 px-3"><code>uint32</code> / <code>uint64</code></td>
+                        <td class="py-2.5 px-3">
+                          Non-negative integer (<code>0..2^64-1</code>)
+                        </td>
+                        <td class="py-2.5 px-3">
+                          <code>WireUint</code> (0)
+                        </td>
+                        <td class="py-2.5 px-3">
+                          <code>uint32</code> / <code>uint64</code>
+                        </td>
                       </tr>
                       <tr>
-                        <td class="py-2.5 px-3">Negative integer (<code>-2^63..-1</code>)</td>
-                        <td class="py-2.5 px-3"><code>WireSint</code> (1, ZigZag)</td>
-                        <td class="py-2.5 px-3"><code>sint32</code> / <code>sint64</code></td>
+                        <td class="py-2.5 px-3">
+                          Negative integer (<code>-2^63..-1</code>)
+                        </td>
+                        <td class="py-2.5 px-3">
+                          <code>WireSint</code> (1, ZigZag)
+                        </td>
+                        <td class="py-2.5 px-3">
+                          <code>sint32</code> / <code>sint64</code>
+                        </td>
                       </tr>
                       <tr>
-                        <td class="py-2.5 px-3">Decimal, exponent (<code>.</code>/<code>e</code>), or &gt;64-bit</td>
-                        <td class="py-2.5 px-3"><code>WireFloat64</code> (9, 8B LE)</td>
-                        <td class="py-2.5 px-3"><code>double</code></td>
+                        <td class="py-2.5 px-3">
+                          Decimal, exponent (<code>.</code>/<code>e</code>), or &gt;64-bit
+                        </td>
+                        <td class="py-2.5 px-3">
+                          <code>WireFloat64</code> (9, 8B LE)
+                        </td>
+                        <td class="py-2.5 px-3">
+                          <code>double</code>
+                        </td>
                       </tr>
                       <tr>
-                        <td class="py-2.5 px-3">String (<code>"FRA"</code>)</td>
-                        <td class="py-2.5 px-3"><code>WireString</code> (10, UTF-8)</td>
-                        <td class="py-2.5 px-3"><code>string</code></td>
+                        <td class="py-2.5 px-3">
+                          String (<code>"FRA"</code>)
+                        </td>
+                        <td class="py-2.5 px-3">
+                          <code>WireString</code> (10, UTF-8)
+                        </td>
+                        <td class="py-2.5 px-3">
+                          <code>string</code>
+                        </td>
                       </tr>
                       <tr>
-                        <td class="py-2.5 px-3"><code>"base64:..."</code> (valid std base64)</td>
-                        <td class="py-2.5 px-3"><code>WireBytes</code> (11, raw bytes)</td>
-                        <td class="py-2.5 px-3"><code>bytes</code></td>
+                        <td class="py-2.5 px-3">
+                          <code>"base64:..."</code> (valid std base64)
+                        </td>
+                        <td class="py-2.5 px-3">
+                          <code>WireBytes</code> (11, raw bytes)
+                        </td>
+                        <td class="py-2.5 px-3">
+                          <code>bytes</code>
+                        </td>
                       </tr>
                       <tr>
-                        <td class="py-2.5 px-3">Nested object (<code>&#123;...&#125;</code>)</td>
-                        <td class="py-2.5 px-3"><code>WireSubMsg</code> (12)</td>
-                        <td class="py-2.5 px-3"><code>message</code></td>
+                        <td class="py-2.5 px-3">
+                          Nested object (<code>&#123;...&#125;</code>)
+                        </td>
+                        <td class="py-2.5 px-3">
+                          <code>WireSubMsg</code> (12)
+                        </td>
+                        <td class="py-2.5 px-3">
+                          <code>message</code>
+                        </td>
                       </tr>
                       <tr>
-                        <td class="py-2.5 px-3">Homogeneous array (<code>[...]</code>)</td>
+                        <td class="py-2.5 px-3">
+                          Homogeneous array (<code>[...]</code>)
+                        </td>
                         <td class="py-2.5 px-3">
                           <code>WireArray</code> (13)
                           <div class="text-[11px] font-sans text-ink/70 mt-0.5">
                             Numbers widen across elements: <code>WireUint</code> &rarr;{' '}
-                            <code>WireSint</code> &rarr; <code>WireFloat64</code>. All-base64
-                            string arrays encode as <code>WireBytes</code>. Objects share one field
-                            table. Mixed types and nested arrays fail; empty arrays and{' '}
-                            <code>null</code> elements are omitted.
+                            <code>WireSint</code> &rarr; <code>WireFloat64</code>. All-base64 string
+                            arrays encode as <code>WireBytes</code>. Objects share one field table.
+                            Mixed types and nested arrays fail; empty arrays and <code>null</code>{' '}
+                            elements are omitted.
                           </div>
                         </td>
-                        <td class="py-2.5 px-3"><code>repeated T</code></td>
+                        <td class="py-2.5 px-3">
+                          <code>repeated T</code>
+                        </td>
                       </tr>
                       <tr>
-                        <td class="py-2.5 px-3"><code>null</code></td>
+                        <td class="py-2.5 px-3">
+                          <code>null</code>
+                        </td>
                         <td class="py-2.5 px-3">Omitted (absent field)</td>
                         <td class="py-2.5 px-3">unset field</td>
                       </tr>
