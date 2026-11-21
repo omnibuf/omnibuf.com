@@ -65,7 +65,7 @@ const isMultiColDropdown = languages.length >= 5;
             </span>
           </summary>
 
-          <div class="absolute left-0 top-full pt-2 z-50">
+          <div class="lang-dropdown-panel absolute left-0 top-full pt-2 z-50">
             <div
               class:list={[
                 'bg-[#FAF8F2] border-2 border-ink rounded-md shadow-[4px_4px_0px_#111111] overflow-hidden',
@@ -460,21 +460,45 @@ const isMultiColDropdown = languages.length >= 5;
   );
 
   if (langNavMenu) {
+    const HOVER_CLOSE_DELAY_MS = 260;
+    const FADE_OUT_MS = 140;
     let hoverCloseTimer: number | null = null;
-    langNavMenu.addEventListener('pointerenter', (e) => {
-      if (e.pointerType !== 'mouse') return;
+    let fadeCloseTimer: number | null = null;
+
+    const cancelLangClose = () => {
       if (hoverCloseTimer !== null) {
         window.clearTimeout(hoverCloseTimer);
         hoverCloseTimer = null;
       }
+      if (fadeCloseTimer !== null) {
+        window.clearTimeout(fadeCloseTimer);
+        fadeCloseTimer = null;
+      }
+      delete langNavMenu.dataset.closing;
+    };
+
+    langNavMenu.addEventListener('pointerenter', (e) => {
+      if (e.pointerType !== 'mouse') return;
+      cancelLangClose();
       langNavMenu.open = true;
     });
     langNavMenu.addEventListener('pointerleave', (e) => {
-      if (e.pointerType !== 'mouse') return;
+      if (e.pointerType !== 'mouse' || !langNavMenu.open) return;
+      cancelLangClose();
       hoverCloseTimer = window.setTimeout(() => {
-        langNavMenu.open = false;
         hoverCloseTimer = null;
-      }, 120);
+        langNavMenu.dataset.closing = 'true';
+        fadeCloseTimer = window.setTimeout(() => {
+          fadeCloseTimer = null;
+          langNavMenu.open = false;
+          delete langNavMenu.dataset.closing;
+        }, FADE_OUT_MS);
+      }, HOVER_CLOSE_DELAY_MS);
+    });
+    langNavMenu.addEventListener('toggle', () => {
+      if (!langNavMenu.open) {
+        cancelLangClose();
+      }
     });
   }
 
@@ -871,3 +895,24 @@ const isMultiColDropdown = languages.length >= 5;
     }
   });
 </script>
+
+<style>
+  #lang-nav-menu .lang-dropdown-panel {
+    opacity: 1;
+    transform: translateY(0);
+    transition:
+      opacity 140ms ease-out,
+      transform 140ms ease-out;
+  }
+
+  #lang-nav-menu[data-closing='true'] .lang-dropdown-panel {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    #lang-nav-menu .lang-dropdown-panel {
+      transition: none;
+    }
+  }
+</style>
