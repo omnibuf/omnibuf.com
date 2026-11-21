@@ -35,11 +35,12 @@ const suite = languageBenchmarks[lang];
             {cat.methodology}
           </p>
           {(() => {
+            const sortedRows = [...cat.rows].sort((a, b) => a.val - b.val);
             const omniVal =
-              cat.rows.find((row) => row.baseline)?.val ??
-              cat.rows.find((row) => row.highlight)?.val ??
-              cat.rows[0].val;
-            return cat.rows.map((r) => {
+              sortedRows.find((row) => row.baseline)?.val ??
+              sortedRows.find((row) => row.highlight)?.val ??
+              sortedRows[0].val;
+            return sortedRows.map((r) => {
               const numPct = Math.max(2, Math.min(100, (r.val / cat.maxVal) * 100));
               const pct = numPct.toFixed(1);
               let ratioStr = r.ratio ?? '1.0x (base)';

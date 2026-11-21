@@ -308,10 +308,6 @@ export const esBenchmarkCategories: EsBenchmarkCategory[] = [
     maxVal: 6800,
     methodology: 'Serializing the 11-field PeerUpdate object into a fresh Uint8Array (366 B).',
     rows: [
-      { name: 'protobufjs', val: 1256, ops: '601,356 ops/s', sizeBytes: 341 },
-      { name: 'JSON', val: 1789, ops: '410,052 ops/s', sizeBytes: 791 },
-      { name: '@msgpack/msgpack', val: 3297, ops: '218,175 ops/s', sizeBytes: 622 },
-      { name: 'google-protobuf', val: 4578, ops: '151,089 ops/s', sizeBytes: 341 },
       {
         name: 'OmniBuf',
         val: 1239,
@@ -320,12 +316,16 @@ export const esBenchmarkCategories: EsBenchmarkCategory[] = [
         highlight: true,
         baseline: true,
       },
+      { name: 'protobufjs', val: 1256, ops: '601,356 ops/s', sizeBytes: 341 },
+      { name: 'JSON', val: 1789, ops: '410,052 ops/s', sizeBytes: 791 },
       {
         name: '@bufbuild/protobuf (protobuf-es)',
         val: 3065,
         ops: '326,303 ops/s',
         sizeBytes: 341,
       },
+      { name: '@msgpack/msgpack', val: 3297, ops: '218,175 ops/s', sizeBytes: 622 },
+      { name: 'google-protobuf', val: 4578, ops: '151,089 ops/s', sizeBytes: 341 },
     ],
   },
   {
@@ -382,7 +382,6 @@ export const esBenchmarkCategories: EsBenchmarkCategory[] = [
       { name: 'protobufjs', val: 16692, ops: '44,716 ops/s', sizeBytes: 39227 },
       { name: 'google-protobuf', val: 19305, ops: '41,980 ops/s', sizeBytes: 39227 },
       { name: 'JSON', val: 25417, ops: '28,562 ops/s', sizeBytes: 39669 },
-      { name: '@msgpack/msgpack', val: 88928, ops: '8,408 ops/s', sizeBytes: 39504 },
       {
         name: 'OmniBuf',
         val: 30841,
@@ -397,6 +396,7 @@ export const esBenchmarkCategories: EsBenchmarkCategory[] = [
         ops: '32,395 ops/s',
         sizeBytes: 39227,
       },
+      { name: '@msgpack/msgpack', val: 88928, ops: '8,408 ops/s', sizeBytes: 39504 },
     ],
   },
   {
@@ -585,8 +585,6 @@ export const pyBenchmarkCategories: BenchmarkCategory[] = [
       { name: 'google.protobuf (upb)', val: 2260, sizeBytes: 39227 },
       { name: 'OmniBuf (@dataclass)', val: 2563, sizeBytes: 39256, highlight: true },
       { name: 'msgpack', val: 3177, sizeBytes: 39516 },
-      { name: 'protobuf-py', val: 3371, sizeBytes: 39227 },
-      { name: 'json (stdlib)', val: 67520, sizeBytes: 39752 },
       {
         name: 'OmniBuf (Generated)',
         val: 3221,
@@ -594,6 +592,8 @@ export const pyBenchmarkCategories: BenchmarkCategory[] = [
         highlight: true,
         baseline: true,
       },
+      { name: 'protobuf-py', val: 3371, sizeBytes: 39227 },
+      { name: 'json (stdlib)', val: 67520, sizeBytes: 39752 },
     ],
   },
   {
@@ -768,9 +768,6 @@ export const javaBenchmarkCategories: BenchmarkCategory[] = [
       { name: 'Protobuf (protobuf-java)', val: 3659, sizeBytes: 39227 },
       { name: 'OmniBuf (@OmniBufField)', val: 4125, sizeBytes: 39256, highlight: true },
       { name: 'OmniBuf (Protobuf)', val: 4700, sizeBytes: 39256, highlight: true },
-      { name: 'JSON (Jackson)', val: 48886, sizeBytes: 39681 },
-      { name: 'FlatBuffers', val: 60626, sizeBytes: 39488 },
-      { name: 'MessagePack (Jackson)', val: 90249, sizeBytes: 39508 },
       {
         name: 'OmniBuf (Generated)',
         val: 5044,
@@ -778,6 +775,9 @@ export const javaBenchmarkCategories: BenchmarkCategory[] = [
         highlight: true,
         baseline: true,
       },
+      { name: 'JSON (Jackson)', val: 48886, sizeBytes: 39681 },
+      { name: 'FlatBuffers', val: 60626, sizeBytes: 39488 },
+      { name: 'MessagePack (Jackson)', val: 90249, sizeBytes: 39508 },
     ],
   },
   {
