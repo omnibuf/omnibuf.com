@@ -65,53 +65,55 @@ const isMultiColDropdown = languages.length >= 5;
             </span>
           </summary>
 
-          <div
-            class:list={[
-              'absolute left-0 mt-2 bg-[#FAF8F2] border-2 border-ink rounded-md shadow-[4px_4px_0px_#111111] z-50 overflow-hidden',
-              isMultiColDropdown
-                ? 'w-[26rem] grid grid-cols-2'
-                : 'w-64 divide-y divide-ink/15 py-1.5',
-            ]}
-          >
-            {languages.map((lang, idx) => {
-              const isActive = currentPage === lang.key;
-              const totalRows = Math.ceil(languages.length / 2);
-              const rowIdx = Math.floor(idx / 2);
-              const cellBorders = isMultiColDropdown
-                ? [
-                    idx % 2 === 0 ? 'border-r border-ink/15' : '',
-                    rowIdx < totalRows - 1 ? 'border-b border-ink/15' : '',
-                  ]
-                    .filter(Boolean)
-                    .join(' ')
-                : '';
-              return (
-                <a
-                  href={lang.href}
-                  aria-current={isActive ? 'page' : undefined}
-                  class={`flex items-center justify-between gap-3 px-3.5 py-2.5 text-sm font-bold transition-colors focus-visible:outline-none ${cellBorders} ${
-                    isActive
-                      ? 'bg-acid text-ink'
-                      : 'bg-[#FAF8F2] text-ink hover:bg-[#E5E0D5] focus-visible:bg-[#E5E0D5]'
-                  }`}
-                >
-                  <div class="min-w-0">
-                    <div class="truncate">{lang.label}</div>
-                    <div
-                      class={`text-[11px] font-normal truncate transition-colors ${
-                        isActive ? 'text-ink/80' : 'text-ink/70'
-                      }`}
-                    >
-                      {lang.shortPackage}
+          <div class="absolute left-0 top-full pt-2 z-50">
+            <div
+              class:list={[
+                'bg-[#FAF8F2] border-2 border-ink rounded-md shadow-[4px_4px_0px_#111111] overflow-hidden',
+                isMultiColDropdown
+                  ? 'w-[26rem] grid grid-cols-2'
+                  : 'w-64 divide-y divide-ink/15 py-1.5',
+              ]}
+            >
+              {languages.map((lang, idx) => {
+                const isActive = currentPage === lang.key;
+                const totalRows = Math.ceil(languages.length / 2);
+                const rowIdx = Math.floor(idx / 2);
+                const cellBorders = isMultiColDropdown
+                  ? [
+                      idx % 2 === 0 ? 'border-r border-ink/15' : '',
+                      rowIdx < totalRows - 1 ? 'border-b border-ink/15' : '',
+                    ]
+                      .filter(Boolean)
+                      .join(' ')
+                  : '';
+                return (
+                  <a
+                    href={lang.href}
+                    aria-current={isActive ? 'page' : undefined}
+                    class={`flex items-center justify-between gap-3 px-3.5 py-2.5 text-sm font-bold transition-colors focus-visible:outline-none ${cellBorders} ${
+                      isActive
+                        ? 'bg-acid text-ink'
+                        : 'bg-[#FAF8F2] text-ink hover:bg-[#E5E0D5] focus-visible:bg-[#E5E0D5]'
+                    }`}
+                  >
+                    <div class="min-w-0">
+                      <div class="truncate">{lang.label}</div>
+                      <div
+                        class={`text-[11px] font-normal truncate transition-colors ${
+                          isActive ? 'text-ink/80' : 'text-ink/70'
+                        }`}
+                      >
+                        {lang.shortPackage}
+                      </div>
                     </div>
-                  </div>
-                  {isActive && <span class="text-xs shrink-0">&bull;</span>}
-                </a>
-              );
-            })}
-            {isMultiColDropdown && languages.length % 2 === 1 && (
-              <div class="bg-[#FAF8F2]" aria-hidden="true" />
-            )}
+                    {isActive && <span class="text-xs shrink-0">&bull;</span>}
+                  </a>
+                );
+              })}
+              {isMultiColDropdown && languages.length % 2 === 1 && (
+                <div class="bg-[#FAF8F2]" aria-hidden="true" />
+              )}
+            </div>
           </div>
         </details>
 
@@ -451,10 +453,30 @@ const isMultiColDropdown = languages.length >= 5;
 </dialog>
 
 <script>
-  const navMenus = [
-    document.getElementById('mobile-nav-menu') as HTMLDetailsElement | null,
-    document.getElementById('lang-nav-menu') as HTMLDetailsElement | null,
-  ].filter((el): el is HTMLDetailsElement => el !== null);
+  const mobileNavMenu = document.getElementById('mobile-nav-menu') as HTMLDetailsElement | null;
+  const langNavMenu = document.getElementById('lang-nav-menu') as HTMLDetailsElement | null;
+  const navMenus = [mobileNavMenu, langNavMenu].filter(
+    (el): el is HTMLDetailsElement => el !== null,
+  );
+
+  if (langNavMenu) {
+    let hoverCloseTimer: number | null = null;
+    langNavMenu.addEventListener('pointerenter', (e) => {
+      if (e.pointerType !== 'mouse') return;
+      if (hoverCloseTimer !== null) {
+        window.clearTimeout(hoverCloseTimer);
+        hoverCloseTimer = null;
+      }
+      langNavMenu.open = true;
+    });
+    langNavMenu.addEventListener('pointerleave', (e) => {
+      if (e.pointerType !== 'mouse') return;
+      hoverCloseTimer = window.setTimeout(() => {
+        langNavMenu.open = false;
+        hoverCloseTimer = null;
+      }, 120);
+    });
+  }
 
   if (navMenus.length > 0) {
     document.addEventListener('click', (e) => {
