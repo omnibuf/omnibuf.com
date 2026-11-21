@@ -622,10 +622,10 @@ export const cppBenchmarkCategories: BenchmarkCategory[] = [
     methodology:
       'Serializing PeerUpdate into a fresh std::vector<uint8_t> against in-tree LEB128 Protobuf and JSON codecs.',
     rows: [
-      { name: 'OmniBuf (Generated)', val: 232, sizeBytes: 366, highlight: true, baseline: true },
-      { name: 'OmniBuf (C++ Struct)', val: 278, sizeBytes: 366, highlight: true },
-      { name: 'Protobuf (LEB128 Wire)', val: 278, sizeBytes: 341 },
-      { name: 'JSON', val: 485, sizeBytes: 803 },
+      { name: 'OmniBuf (Generated)', val: 188, sizeBytes: 366, highlight: true, baseline: true },
+      { name: 'OmniBuf (C++ Struct)', val: 205, sizeBytes: 366, highlight: true },
+      { name: 'Protobuf (LEB128 Wire)', val: 215, sizeBytes: 341 },
+      { name: 'JSON', val: 475, sizeBytes: 803 },
     ],
   },
   {
@@ -634,10 +634,10 @@ export const cppBenchmarkCategories: BenchmarkCategory[] = [
     maxVal: 1800,
     methodology: 'Decoding into a fresh C++20 PeerUpdate struct and reading all 11 fields.',
     rows: [
-      { name: 'OmniBuf (Generated)', val: 491, highlight: true, baseline: true },
-      { name: 'OmniBuf (C++ Struct)', val: 565, highlight: true },
-      { name: 'Protobuf (LEB128 Wire)', val: 616 },
-      { name: 'JSON', val: 1402 },
+      { name: 'OmniBuf (Generated)', val: 482, highlight: true, baseline: true },
+      { name: 'OmniBuf (C++ Struct)', val: 537, highlight: true },
+      { name: 'Protobuf (LEB128 Wire)', val: 586 },
+      { name: 'JSON', val: 1303 },
     ],
   },
   {
@@ -647,9 +647,9 @@ export const cppBenchmarkCategories: BenchmarkCategory[] = [
     methodology:
       'Returning std::string_view into the packet via OpaquePeerUpdate vs full message decode.',
     rows: [
-      { name: 'OmniBuf (Generated)', val: 101, highlight: true, baseline: true },
-      { name: 'Protobuf (LEB128 Wire)', val: 479 },
-      { name: 'JSON', val: 1158 },
+      { name: 'OmniBuf (Generated)', val: 98, highlight: true, baseline: true },
+      { name: 'Protobuf (LEB128 Wire)', val: 432 },
+      { name: 'JSON', val: 1141 },
     ],
   },
   {
@@ -659,9 +659,9 @@ export const cppBenchmarkCategories: BenchmarkCategory[] = [
     methodology:
       'Checking a nested city string and splicing an updated sequence counter via OpaquePeerUpdate vs full decode and re-encode.',
     rows: [
-      { name: 'OmniBuf (Generated)', val: 297, highlight: true, baseline: true },
-      { name: 'Protobuf (LEB128 Wire)', val: 700 },
-      { name: 'JSON', val: 1660 },
+      { name: 'OmniBuf (Generated)', val: 294, highlight: true, baseline: true },
+      { name: 'Protobuf (LEB128 Wire)', val: 656 },
+      { name: 'JSON', val: 1625 },
     ],
   },
   {
@@ -671,10 +671,10 @@ export const cppBenchmarkCategories: BenchmarkCategory[] = [
     methodology:
       'Serializing a 39 KiB packet whose >16 KiB nested sub-messages trigger 2B-to-4B header expansion vs Protobuf two-pass sizing.',
     rows: [
-      { name: 'Protobuf (LEB128 Wire)', val: 1684, sizeBytes: 39227 },
-      { name: 'OmniBuf (Generated)', val: 1839, sizeBytes: 39256, highlight: true, baseline: true },
-      { name: 'OmniBuf (C++ Struct)', val: 1886, sizeBytes: 39256, highlight: true },
-      { name: 'JSON', val: 40206, sizeBytes: 39681 },
+      { name: 'OmniBuf (Generated)', val: 1320, sizeBytes: 39256, highlight: true, baseline: true },
+      { name: 'OmniBuf (C++ Struct)', val: 1377, sizeBytes: 39256, highlight: true },
+      { name: 'Protobuf (LEB128 Wire)', val: 1654, sizeBytes: 39227 },
+      { name: 'JSON', val: 40227, sizeBytes: 39681 },
     ],
   },
   {
@@ -684,9 +684,9 @@ export const cppBenchmarkCategories: BenchmarkCategory[] = [
     methodology:
       'Growing a nested string field past 16 KiB ahead of 32 trailing Neighbor entries via Opaque splicing vs full decode and re-encode.',
     rows: [
-      { name: 'OmniBuf (Generated)', val: 1742, highlight: true, baseline: true },
-      { name: 'Protobuf (LEB128 Wire)', val: 3661 },
-      { name: 'JSON', val: 27825 },
+      { name: 'OmniBuf (Generated)', val: 1718, highlight: true, baseline: true },
+      { name: 'Protobuf (LEB128 Wire)', val: 3540 },
+      { name: 'JSON', val: 27697 },
     ],
   },
 ];
