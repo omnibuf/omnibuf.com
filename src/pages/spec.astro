@@ -102,11 +102,11 @@ enum WireFormat {
 }
 
 enum TestTier {
-  TEST_TIER_UNSPECIFIED = 0;
-  TEST_TIER_PLUGIN = 1;           // Generated code from protoc-gen-omnibuf-* plugin
-  TEST_TIER_PROTOBUF_TYPES = 2;   // Standard Protobuf descriptors / generated types
-  TEST_TIER_ANNOTATED_STRUCT = 3; // Native structs, classes, or declarative schemas
-  TEST_TIER_BLIND = 4;            // Schema-less inspection (DecodeBlind)
+  TIER_UNSPECIFIED = 0;
+  TIER_PLUGIN = 1;           // Generated code from protoc-gen-omnibuf-* plugin
+  TIER_PROTOBUF_TYPES = 2;   // Standard Protobuf descriptors / generated types
+  TIER_ANNOTATED_STRUCT = 3; // Native structs, classes, or declarative schemas
+  TIER_BLIND = 4;            // Schema-less inspection (DecodeBlind)
 }
 
 // Prefixed by a 4-byte little-endian uint32 byte length on stdin.
@@ -360,9 +360,21 @@ const tocSections = sectionTitles.map((title, index) => ({
           </li>
         </ul>
         <p>
+          Decoding into an existing message object comes in two modes: <strong>replace</strong>{' '}
+          (standard unmarshal) resets any field omitted from the packet to its default value, and
+          the first occurrence of an array or map replaces prior contents before any subsequent
+          occurrences in the same packet append or merge. <strong>Merge</strong> leaves omitted
+          fields intact and appends or merges incoming occurrences onto existing values.
+        </p>
+        <p>
           Schema-aware decoders apply <code>oneof</code> and explicit-presence rules from their
-          schema (a blind reader cannot infer <code>oneof</code> groups), and changing a field's
-          wire type or an array's <code>ElementType</code> is a breaking wire change.
+          schema (a blind reader cannot infer <code>oneof</code> groups). Changing a field's wire
+          type or a collection's element, key, or value type is a breaking wire change: a known
+          field number arriving with an unexpected tag wire type is handled as an unknown field
+          (validated and skipped or preserved), whereas a <code>WireArray</code> or{' '}
+          <code>WireMap</code> on a known collection field whose <code>ElementType</code>,{' '}
+          <code>KeyType</code>, or <code>ValueType</code> mismatches the schema MUST be rejected
+          with a parse error.
         </p>
 
         <h2 id="sec-3">3. Prefix-Varint Encoding</h2>
@@ -715,14 +727,17 @@ WireSubMsg (12): [ByteLen: Prefix-Varint][Message field stream]</code></pre>
           </li>
           <li>
             <code>Count</code> is mandatory for every element type, including submessages and
-            fixed-width numbers. <code>Count = 0</code> is valid and still requires the{' '}
-            <code>ElementType</code> byte.
+            fixed-width numbers. <code>Count = 0</code> is valid, still requires the{' '}
+            <code>ElementType</code> byte, and requires zero trailing bytes (
+            <code>ByteLen == 1 + len(Count)</code>).
           </li>
           <li>
-            Variable-width elements (<code>WireString</code>, <code>WireBytes</code>,{' '}
-            <code>WireSubMsg</code>) each start with their own <code>ByteLen</code> prefix, while
-            fixed-width scalars pack contiguously with no padding. Decoders MUST read all{' '}
-            <code>Count</code> elements and finish on the exact <code>ByteLen</code> boundary.
+            All length-prefixed element types (codes <code>10..15</code>: <code>WireString</code>,{' '}
+            <code>WireBytes</code>, <code>WireSubMsg</code>, <code>WireArray</code>,{' '}
+            <code>WireMap</code>, and <code>WireExtended</code>) each start with their own{' '}
+            <code>ByteLen</code> prefix, while fixed-width scalars pack contiguously with no
+            padding. Decoders MUST read all <code>Count</code> elements and finish on the exact{' '}
+            <code>ByteLen</code> boundary.
           </li>
         </ul>
         <Code code={arrayExamples} lang="text" />
@@ -756,8 +771,10 @@ WireSubMsg (12): [ByteLen: Prefix-Varint][Message field stream]</code></pre>
           </li>
           <li>
             <code>Count</code> records the total number of encoded key/value pairs (<code>0</code>{' '}
-            is valid). Map entries may appear in any order, though deterministic encoders SHOULD
-            sort keys by value.
+            is valid and requires zero trailing bytes: <code>ByteLen == 2 + len(Count)</code>). Map
+            entries may appear in any order, though deterministic encoders SHOULD sort keys in
+            unsigned UTF-8 byte order for <code>WireString</code>, numeric order for signed and
+            unsigned integers, and <code>false</code> before <code>true</code> for booleans.
           </li>
           <li>
             Duplicate keys obey last-entry-wins rules, and a repeated map key with a submessage
@@ -782,10 +799,11 @@ WireSubMsg (12): [ByteLen: Prefix-Varint][Message field stream]</code></pre>
           so a field scanner steps from tag to tag in <code>O(fields)</code> time (<code>O(1)</code>{' '}
           per skipped field) and never visits inner container items. Lookup APIs MUST document
           whether they return the last occurrence, all occurrences, or a recursively merged value,
-          and whether skipping unknown fields bypasses full inner validation. A schema-less blind
-          decoder MUST validate all core-type contents across every field, while schema-aware
-          decoders validate container headers and nesting depth on unknown fields and skip
-          unreferenced scalar and string payload bytes by length.
+          and whether skipping unknown fields bypasses full inner validation. Both blind decoders
+          and schema-aware decoders MUST validate UTF-8 on every <code>WireString</code> field
+          (including unknown fields), validate container headers and nesting depth on unknown
+          containers, and skip unreferenced <code>WireBytes</code>, fixed-width, varint, and{' '}
+          <code>WireExtended</code> payloads by length or width.
         </p>
 
         <h2 id="sec-8">8. Optional Naming Metadata (Field #0)</h2>
@@ -798,12 +816,15 @@ WireSubMsg (12): [ByteLen: Prefix-Varint][Message field stream]</code></pre>
         <Code code={sec8MetaProtoCode} lang="proto" />
         <h3 id="sec-8-2">8.2 Placement, Inheritance &amp; Merge</h3>
         <p>
-          Encoders SHOULD write Field #0 first, and decoders MUST accept it at any position
-          (including multiple Field #0 blocks in concatenated packets) and validate its wire
-          structure even when an external schema is present. Blind readers resolve merged Field #0
-          metadata before emitting field keys (falling back to <code>field_&lt;N&gt;</code> when
-          unnamed) and MUST NOT let presentation names alter numeric field merging or silently
-          overwrite colliding keys.
+          Encoders SHOULD write Field #0 first, and decoders MUST accept it at any position in root
+          or nested <code>WireSubMsg</code> containers (including multiple Field #0 blocks in
+          concatenated packets) and validate its wire structure even when an external schema is
+          present. Any tag with <code>FieldNumber = 0</code> and <code>WireType != 12</code> MUST be
+          rejected at every nesting depth, including inside unknown submessages. Unknown field
+          numbers inside <code>SchemaMeta</code> (reserved for future extensions) are validated and
+          skipped. Blind readers resolve merged Field #0 metadata before emitting field keys
+          (falling back to <code>field_&lt;N&gt;</code> when unnamed) and MUST NOT let presentation
+          names alter numeric field merging or silently overwrite colliding keys.
         </p>
         <p>
           In <code>SchemaMeta</code>, <code>children[N]</code> stores the child naming table for
@@ -838,8 +859,9 @@ WireSubMsg (12): [ByteLen: Prefix-Varint][Message field stream]</code></pre>
           </li>
           <li>
             An array body MUST contain ElementType and Count. Validate its type even when Count is
-            zero. Reject invalid element codes, invalid boolean bytes, mismatched counts, and
-            trailing bytes. For fixed-width elements require
+            zero (<code>Count = 0</code> requires <code>remainingBytes == 0</code>). Reject invalid
+            element codes, invalid boolean bytes, mismatched counts, and trailing bytes. For
+            fixed-width elements require
             <code>count == remainingBytes / width</code> and
             <code>remainingBytes % width == 0</code>.
           </li>
@@ -850,21 +872,31 @@ WireSubMsg (12): [ByteLen: Prefix-Varint][Message field stream]</code></pre>
           </li>
           <li>
             A map body MUST contain KeyType, ValueType, and Count. Validate both type bytes even
-            when empty. Before allocating entries, require{' '}
-            <code>count &lt;= remainingBytes / 2</code>. Check by division (multiplying an untrusted
-            count can overflow). Parse all Count entries and require an exact end boundary.
-          </li>
-          <li>Strings MUST contain valid UTF-8. Arbitrary binary data MUST use WireBytes.</li>
-          <li>
-            Field #0 MUST use WireSubMsg and contain valid SchemaMeta. Its fields map uses
-            <code>KeyType = 0x00, ValueType = 0x0A</code> and its children map uses{' '}
-            <code>KeyType = 0x00, ValueType = 0x0C</code>.
+            when empty (<code>Count = 0</code> requires <code>remainingBytes == 0</code>). Before
+            allocating entries, require <code>count &lt;= remainingBytes / 2</code>. Check by
+            division (multiplying an untrusted count can overflow). Parse all Count entries and
+            require an exact end boundary.
           </li>
           <li>
-            <strong>Nesting &amp; allocation caps:</strong> enforce a default max container depth of
-            32 below the root (including nested collections and <code>SchemaMeta</code> recursion)
-            and configurable message-size / allocation caps so large <code>uint64</code> length
-            prefixes cannot trigger unbounded allocations.
+            All <code>WireString</code> values (including unknown fields) MUST contain valid UTF-8.
+            Arbitrary binary data MUST use <code>WireBytes</code>.
+          </li>
+          <li>
+            Field #0 MUST use <code>WireSubMsg</code> (<code>WireType = 12</code>) and contain valid{' '}
+            <code>SchemaMeta</code>; any tag with <code>FieldNumber = 0</code> and{' '}
+            <code>WireType != 12</code> MUST be rejected at every nesting depth. Its{' '}
+            <code>fields</code> map uses <code>KeyType = 0x00, ValueType = 0x0A</code> and its{' '}
+            <code>children</code> map uses <code>KeyType = 0x00, ValueType = 0x0C</code>.
+          </li>
+          <li>
+            <strong>Nesting &amp; allocation caps:</strong> root messages start at depth{' '}
+            <code>0</code>. Every <code>WireSubMsg</code>, <code>WireArray</code>, and{' '}
+            <code>WireMap</code> container increments depth by <code>+1</code> (so an array or map
+            of submessages increments by <code>+2</code>, and each <code>SchemaMeta.children</code>{' '}
+            hop increments by <code>+2</code>). Decoders MUST enforce a default max container depth
+            of <code>32</code> (rejecting <code>depth &gt; 32</code>) and configurable message-size
+            / allocation caps so large <code>uint64</code> length prefixes cannot trigger unbounded
+            allocations.
           </li>
         </ul>
         <p>
@@ -901,7 +933,10 @@ WireSubMsg (12): [ByteLen: Prefix-Varint][Message field stream]</code></pre>
                 <td>
                   <code>WireSint (1)</code>
                 </td>
-                <td>[ZigZag Value: Prefix-Varint] (low 32 bits retained as signed int32)</td>
+                <td>
+                  [ZigZag Value: Prefix-Varint] (ZigZag-decoded to <code>int64</code>, then low 32
+                  bits retained as two's-complement <code>int32</code>)
+                </td>
               </tr>
               <tr>
                 <td>
@@ -1049,14 +1084,14 @@ WireSubMsg (12): [ByteLen: Prefix-Varint][Message field stream]</code></pre>
         <Code code={sec11ConformanceProtoCode} lang="proto" />
         <p>
           The runner tests four <code>TestTier</code> modes on each vector.{' '}
-          <code>TEST_TIER_PLUGIN (1)</code> exercises code from <code>protoc-gen-omnibuf-*</code>:
+          <code>TIER_PLUGIN (1)</code> exercises code from <code>protoc-gen-omnibuf-*</code>:
           decoding into dirty structs (verifying omitted fields clear), re-encoding, lazy{' '}
           <code>Opaque</code> getters, and in-place wire splicing (<code>test_opaque_splice</code>{' '}
-          and <code>test_opaque_splice_shrink</code>). <code>TEST_TIER_PROTOBUF_TYPES (2)</code>{' '}
+          and <code>test_opaque_splice_shrink</code>). <code>TIER_PROTOBUF_TYPES (2)</code>{' '}
           exercises standard Protobuf descriptors or generated Protobuf structs with no OmniBuf
-          plugin. <code>TEST_TIER_ANNOTATED_STRUCT (3)</code> exercises plain language structs,
-          classes, or runtime schemas (Go <code>omnibuf</code> struct tags; TypeScript{' '}
-          <code>defineMessage</code> or decorators). <code>TEST_TIER_BLIND (4)</code> exercises{' '}
+          plugin. <code>TIER_ANNOTATED_STRUCT (3)</code> exercises plain language structs, classes,
+          or runtime schemas (Go <code>omnibuf</code> struct tags; TypeScript{' '}
+          <code>defineMessage</code> or decorators). <code>TIER_BLIND (4)</code> exercises{' '}
           <code>DecodeBlind</code> / <code>decodeBlind</code>, returning{' '}
           <code>WIRE_FORMAT_JSON</code> keyed by Field #0 <code>SchemaMeta</code> names when present
           or <code>field_&lt;N&gt;</code> fallback keys.
@@ -1066,8 +1101,8 @@ WireSubMsg (12): [ByteLen: Prefix-Varint][Message field stream]</code></pre>
           decodes the client's returned <code>omnibuf_payload</code> and compares decoded values for
           semantic equality. Requests with <code>self_describing = true</code> must return a valid
           Field #0 <code>SchemaMeta</code> block. On malformed or hostile input vectors,{' '}
-          <code>TEST_TIER_BLIND</code> MUST return a non-empty <code>parse_error</code>, and every
-          tier MUST reject the payload cleanly with no crash, panic, or <code>runtime_error</code>.
+          <code>TIER_BLIND</code> MUST return a non-empty <code>parse_error</code>, and every tier
+          MUST reject the payload cleanly with no crash, panic, or <code>runtime_error</code>.
           Unimplemented optional tiers or message types MAY return a non-empty <code>skipped</code>{' '}
           string.
         </p>
