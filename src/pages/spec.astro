@@ -1167,11 +1167,30 @@ WireSubMsg (12): [ByteLen: Prefix-Varint][Message field stream]</code></pre>
   const specLinks = Array.from(document.querySelectorAll<HTMLAnchorElement>('a[data-spec-link]'));
   const subTocContainers = Array.from(document.querySelectorAll<HTMLElement>('div[data-subtoc]'));
   const h3Links = Array.from(document.querySelectorAll<HTMLAnchorElement>('a[data-spec-h3]'));
+  const desktopTocScroll = document.querySelector<HTMLElement>('aside .os-window');
   const mobileSpecLinks = Array.from(
     document.querySelectorAll<HTMLAnchorElement>('a[data-mobile-spec-link]'),
   );
   const mobileTocLabel = document.getElementById('mobile-spec-toc-label');
   const specIds = specLinks.map((l) => l.dataset.specLink || '');
+  let lastActiveTocId = '';
+
+  function scrollDesktopTocToLink(link: HTMLAnchorElement | null) {
+    if (!desktopTocScroll || !link) return;
+    const containerRect = desktopTocScroll.getBoundingClientRect();
+    const linkRect = link.getBoundingClientRect();
+    const pad = 32;
+    if (linkRect.top < containerRect.top + pad || linkRect.bottom > containerRect.bottom - pad) {
+      const targetTop =
+        desktopTocScroll.scrollTop +
+        (linkRect.top - containerRect.top) -
+        (desktopTocScroll.clientHeight - linkRect.height) / 2;
+      desktopTocScroll.scrollTo({
+        top: Math.max(0, targetTop),
+        behavior: 'smooth',
+      });
+    }
+  }
 
   function updateSpecToc() {
     let currentH2 = specIds[0];
@@ -1182,11 +1201,15 @@ WireSubMsg (12): [ByteLen: Prefix-Varint][Message field stream]</code></pre>
       }
     }
 
+    let activeDesktopLink: HTMLAnchorElement | null = null;
     for (const link of specLinks) {
       const isActive = link.dataset.specLink === currentH2;
       link.dataset.active = isActive ? 'true' : 'false';
-      if (isActive && mobileTocLabel) {
-        mobileTocLabel.textContent = `Section: ${link.textContent?.trim() || 'Jump to Spec Section'}`;
+      if (isActive) {
+        activeDesktopLink = link;
+        if (mobileTocLabel) {
+          mobileTocLabel.textContent = `Section: ${link.textContent?.trim() || 'Jump to Spec Section'}`;
+        }
       }
     }
 
@@ -1220,7 +1243,17 @@ WireSubMsg (12): [ByteLen: Prefix-Varint][Message field stream]</code></pre>
     }
 
     for (const l of h3Links) {
-      l.dataset.active = l.dataset.specH3 === currentH3 && currentH3 !== '' ? 'true' : 'false';
+      const isActiveH3 = l.dataset.specH3 === currentH3 && currentH3 !== '';
+      l.dataset.active = isActiveH3 ? 'true' : 'false';
+      if (isActiveH3) {
+        activeDesktopLink = l;
+      }
+    }
+
+    const activeTocId = currentH3 || currentH2 || '';
+    if (activeTocId && activeTocId !== lastActiveTocId) {
+      lastActiveTocId = activeTocId;
+      scrollDesktopTocToLink(activeDesktopLink);
     }
 
     for (const ml of mobileSpecLinks) {
