@@ -873,6 +873,328 @@ export const csBenchmarkCategories: BenchmarkCategory[] = [
   },
 ];
 
+// Swift results from omnibuf-swift/testdata/benchmarks.json (Swift 6.3.2, Apple M1 Pro)
+export const swiftBenchmarkCategories: BenchmarkCategory[] = [
+  {
+    title: 'Full Message Encode Speed',
+    unit: 'ns',
+    maxVal: 22000,
+    methodology: 'Serializing PeerUpdate into a fresh byte buffer in Swift 6 release mode.',
+    rows: [
+      { name: 'OmniBuf (Generated)', val: 355, sizeBytes: 365, highlight: true, baseline: true },
+      { name: 'SwiftProtobuf', val: 1341, sizeBytes: 341 },
+      { name: 'OmniBuf (Struct Schema)', val: 2581, sizeBytes: 365, highlight: true },
+      { name: 'JSON (Foundation)', val: 18525, sizeBytes: 791 },
+    ],
+  },
+  {
+    title: 'Full Message Decode Speed',
+    unit: 'ns',
+    maxVal: 25000,
+    methodology: 'Decoding raw bytes into a fresh PeerUpdate value and reading all 11 fields.',
+    rows: [
+      { name: 'OmniBuf (Generated)', val: 980, highlight: true, baseline: true },
+      { name: 'SwiftProtobuf', val: 2214 },
+      { name: 'OmniBuf (Struct Schema)', val: 5762, highlight: true },
+      { name: 'JSON (Foundation)', val: 21182 },
+    ],
+  },
+  {
+    title: 'Read a Single Nested Field',
+    unit: 'ns',
+    maxVal: 24000,
+    methodology: 'Reading a nested city string via OpaquePeerUpdate vs full message decode.',
+    rows: [
+      { name: 'OmniBuf (Generated)', val: 146, highlight: true, baseline: true },
+      { name: 'SwiftProtobuf', val: 2278 },
+      { name: 'JSON (Foundation)', val: 20555 },
+    ],
+  },
+  {
+    title: 'Selective Single-Field Mutation',
+    unit: 'ns',
+    maxVal: 46000,
+    methodology:
+      'Checking a nested city string and splicing an updated sequence counter via OpaquePeerUpdate vs full decode and re-encode.',
+    rows: [
+      { name: 'OmniBuf (Generated)', val: 513, highlight: true, baseline: true },
+      { name: 'SwiftProtobuf', val: 3702 },
+      { name: 'JSON (Foundation)', val: 39939 },
+    ],
+  },
+  {
+    title: 'Large Embedded Message Encode',
+    unit: 'ns',
+    maxVal: 135000,
+    methodology:
+      'Serializing a 39 KiB packet whose >16 KiB nested sub-messages trigger 2B-to-4B header expansion.',
+    rows: [
+      { name: 'OmniBuf (Generated)', val: 2098, sizeBytes: 39255, highlight: true, baseline: true },
+      { name: 'SwiftProtobuf', val: 2908, sizeBytes: 39227 },
+      { name: 'OmniBuf (Struct Schema)', val: 6600, sizeBytes: 39255, highlight: true },
+      { name: 'JSON (Foundation)', val: 117210, sizeBytes: 39669 },
+    ],
+  },
+  {
+    title: 'Embedded Message Growth',
+    unit: 'ns',
+    maxVal: 215000,
+    methodology:
+      'Growing a nested string field past 16 KiB ahead of 32 trailing Neighbor entries via Opaque splicing vs full decode and re-encode.',
+    rows: [
+      { name: 'OmniBuf (Generated)', val: 1549, highlight: true, baseline: true },
+      { name: 'SwiftProtobuf', val: 17327 },
+      { name: 'JSON (Foundation)', val: 187505 },
+    ],
+  },
+];
+
+// Dart results from omnibuf-dart/testdata/benchmarks.json (Dart 3.14.1 AOT, Apple M1 Pro)
+export const dartBenchmarkCategories: BenchmarkCategory[] = [
+  {
+    title: 'Full Message Encode Speed',
+    unit: 'ns',
+    maxVal: 11000,
+    methodology: 'Serializing PeerUpdate into a fresh Uint8List in Dart 3 AOT native binary.',
+    rows: [
+      { name: 'OmniBuf (Generated)', val: 971, sizeBytes: 365, highlight: true, baseline: true },
+      { name: 'OmniBuf (Schema)', val: 1568, sizeBytes: 365, highlight: true },
+      { name: 'package:protobuf', val: 3761, sizeBytes: 343 },
+      { name: 'dart:convert (JSON)', val: 9414, sizeBytes: 803 },
+    ],
+  },
+  {
+    title: 'Full Message Decode Speed',
+    unit: 'ns',
+    maxVal: 6500,
+    methodology: 'Decoding Uint8List into a fresh PeerUpdate object and reading all 11 fields.',
+    rows: [
+      { name: 'OmniBuf (Generated)', val: 1057, highlight: true, baseline: true },
+      { name: 'OmniBuf (Schema)', val: 3199, highlight: true },
+      { name: 'package:protobuf', val: 5083 },
+      { name: 'dart:convert (JSON)', val: 5468 },
+    ],
+  },
+  {
+    title: 'Read a Single Nested Field',
+    unit: 'ns',
+    maxVal: 6500,
+    methodology: 'Reading a nested city string via OpaquePeerUpdate vs full message decode.',
+    rows: [
+      { name: 'OmniBuf (Opaque)', val: 393, highlight: true, baseline: true },
+      { name: 'package:protobuf', val: 3674 },
+      { name: 'dart:convert (JSON)', val: 5458 },
+    ],
+  },
+  {
+    title: 'Selective Single-Field Mutation',
+    unit: 'ns',
+    maxVal: 18000,
+    methodology:
+      'Checking a nested city string and splicing an updated sequence counter via OpaquePeerUpdate vs full decode and re-encode.',
+    rows: [
+      { name: 'OmniBuf (Opaque Splice)', val: 759, highlight: true, baseline: true },
+      { name: 'package:protobuf', val: 7172 },
+      { name: 'dart:convert (JSON)', val: 15189 },
+    ],
+  },
+  {
+    title: 'Large Embedded Message Encode',
+    unit: 'ns',
+    maxVal: 240000,
+    methodology:
+      'Serializing a 39 KiB packet whose >16 KiB nested sub-messages trigger 2B-to-4B header expansion.',
+    rows: [
+      {
+        name: 'OmniBuf (Generated)',
+        val: 48857,
+        sizeBytes: 39255,
+        highlight: true,
+        baseline: true,
+      },
+      { name: 'package:protobuf', val: 157251, sizeBytes: 39229 },
+      { name: 'dart:convert (JSON)', val: 208392, sizeBytes: 39681 },
+    ],
+  },
+  {
+    title: 'Embedded Message Growth',
+    unit: 'ns',
+    maxVal: 185000,
+    methodology:
+      'Growing a nested string field past 16 KiB ahead of 32 trailing Neighbor entries via Opaque splicing vs full decode and re-encode.',
+    rows: [
+      { name: 'OmniBuf (Opaque Splice)', val: 48002, highlight: true, baseline: true },
+      { name: 'package:protobuf', val: 110549 },
+      { name: 'dart:convert (JSON)', val: 159881 },
+    ],
+  },
+];
+
+// PHP results from omnibuf-php/testdata/benchmarks.json (PHP 8.6.0, Apple M1 Pro)
+export const phpBenchmarkCategories: BenchmarkCategory[] = [
+  {
+    title: 'Full Message Encode Speed',
+    unit: 'ns',
+    maxVal: 125000,
+    methodology: 'Serializing PeerUpdate into a PHP binary string on PHP 8.6.',
+    rows: [
+      { name: 'JSON (stdlib)', val: 2007, sizeBytes: 803 },
+      { name: 'OmniBuf (Generated)', val: 6158, sizeBytes: 365, highlight: true, baseline: true },
+      { name: 'OmniBuf (Attributes)', val: 14415, sizeBytes: 365, highlight: true },
+      { name: 'google/protobuf (PHP)', val: 111699, sizeBytes: 341 },
+    ],
+  },
+  {
+    title: 'Full Message Decode Speed',
+    unit: 'ns',
+    maxVal: 75000,
+    methodology:
+      'Decoding a binary string into a fresh PeerUpdate object and reading all 11 fields.',
+    rows: [
+      { name: 'JSON (stdlib)', val: 5541 },
+      { name: 'OmniBuf (Generated)', val: 20888, highlight: true, baseline: true },
+      { name: 'OmniBuf (Attributes)', val: 33527, highlight: true },
+      { name: 'google/protobuf (PHP)', val: 65076 },
+    ],
+  },
+  {
+    title: 'Read a Single Nested Field',
+    unit: 'ns',
+    maxVal: 70000,
+    methodology: 'Reading a nested city string via OpaquePeerUpdate vs full message decode.',
+    rows: [
+      { name: 'JSON (stdlib)', val: 4816 },
+      { name: 'OmniBuf (Generated)', val: 7451, highlight: true, baseline: true },
+      { name: 'google/protobuf (PHP)', val: 61014 },
+    ],
+  },
+  {
+    title: 'Selective Single-Field Mutation',
+    unit: 'ns',
+    maxVal: 200000,
+    methodology:
+      'Checking a nested city string and splicing an updated sequence counter via OpaquePeerUpdate vs full decode and re-encode.',
+    rows: [
+      { name: 'JSON (stdlib)', val: 6640 },
+      { name: 'OmniBuf (Generated)', val: 17434, highlight: true, baseline: true },
+      { name: 'google/protobuf (PHP)', val: 177032 },
+    ],
+  },
+  {
+    title: 'Large Embedded Message Encode',
+    unit: 'ns',
+    maxVal: 1700000,
+    methodology:
+      'Serializing a 39 KiB packet whose >16 KiB nested sub-messages trigger 2B-to-4B header expansion.',
+    rows: [
+      {
+        name: 'OmniBuf (Generated)',
+        val: 11131,
+        sizeBytes: 39255,
+        highlight: true,
+        baseline: true,
+      },
+      { name: 'OmniBuf (Attributes)', val: 21891, sizeBytes: 39255, highlight: true },
+      { name: 'JSON (stdlib)', val: 30357, sizeBytes: 39681 },
+      { name: 'google/protobuf (PHP)', val: 1523420, sizeBytes: 39227 },
+    ],
+  },
+  {
+    title: 'Embedded Message Growth',
+    unit: 'ns',
+    maxVal: 1650000,
+    methodology:
+      'Growing a nested string field past 16 KiB ahead of 32 trailing Neighbor entries via Opaque splicing vs full decode and re-encode.',
+    rows: [
+      { name: 'OmniBuf (Generated)', val: 17035, highlight: true, baseline: true },
+      { name: 'JSON (stdlib)', val: 40193 },
+      { name: 'google/protobuf (PHP)', val: 1475820 },
+    ],
+  },
+];
+
+// Elixir results from omnibuf-elixir/testdata/benchmarks.json (Elixir 1.18.6 / OTP 27, Apple M1 Pro)
+export const elixirBenchmarkCategories: BenchmarkCategory[] = [
+  {
+    title: 'Full Message Encode Speed',
+    unit: 'ns',
+    maxVal: 9000,
+    methodology: 'Serializing PeerUpdate to a flat binary via iodata on BEAM OTP 27.',
+    rows: [
+      { name: 'OmniBuf (Schema DSL)', val: 2672, sizeBytes: 358, highlight: true },
+      { name: 'OmniBuf (Generated)', val: 2698, sizeBytes: 358, highlight: true, baseline: true },
+      { name: 'Jason (JSON)', val: 6382, sizeBytes: 803 },
+      { name: 'elixir-protobuf', val: 7547, sizeBytes: 341 },
+    ],
+  },
+  {
+    title: 'Full Message Decode Speed',
+    unit: 'ns',
+    maxVal: 9000,
+    methodology: 'Decoding a binary into a fresh PeerUpdate struct and reading all 11 fields.',
+    rows: [
+      { name: 'OmniBuf (Schema DSL)', val: 4604, highlight: true },
+      { name: 'OmniBuf (Generated)', val: 4616, highlight: true, baseline: true },
+      { name: 'elixir-protobuf', val: 5549 },
+      { name: 'Jason (JSON)', val: 7587 },
+    ],
+  },
+  {
+    title: 'Read a Single Nested Field',
+    unit: 'ns',
+    maxVal: 9000,
+    methodology: 'Reading a nested city string via PeerUpdate.Opaque vs full message decode.',
+    rows: [
+      { name: 'OmniBuf (Generated)', val: 1710, highlight: true, baseline: true },
+      { name: 'elixir-protobuf', val: 5660 },
+      { name: 'Jason (JSON)', val: 7727 },
+    ],
+  },
+  {
+    title: 'Selective Single-Field Mutation',
+    unit: 'ns',
+    maxVal: 17000,
+    methodology:
+      'Checking a nested city string and splicing an updated sequence counter via zero-copy BEAM sub-binaries vs full decode and re-encode.',
+    rows: [
+      { name: 'OmniBuf (Generated)', val: 2420, highlight: true, baseline: true },
+      { name: 'elixir-protobuf', val: 13460 },
+      { name: 'Jason (JSON)', val: 14419 },
+    ],
+  },
+  {
+    title: 'Large Embedded Message Encode',
+    unit: 'ns',
+    maxVal: 160000,
+    methodology:
+      'Serializing a 39 KiB packet whose >16 KiB nested sub-messages trigger 2B-to-4B header expansion.',
+    rows: [
+      {
+        name: 'OmniBuf (Generated)',
+        val: 3470,
+        sizeBytes: 39250,
+        highlight: true,
+        baseline: true,
+      },
+      { name: 'OmniBuf (Schema DSL)', val: 3509, sizeBytes: 39250, highlight: true },
+      { name: 'Jason (JSON)', val: 106321, sizeBytes: 39681 },
+      { name: 'elixir-protobuf', val: 138489, sizeBytes: 39227 },
+    ],
+  },
+  {
+    title: 'Embedded Message Growth',
+    unit: 'ns',
+    maxVal: 160000,
+    methodology:
+      'Growing a nested string field past 16 KiB ahead of 32 trailing Neighbor entries via Opaque splicing vs full decode and re-encode.',
+    rows: [
+      { name: 'OmniBuf (Generated)', val: 7751, highlight: true, baseline: true },
+      { name: 'Jason (JSON)', val: 119017 },
+      { name: 'elixir-protobuf', val: 136718 },
+    ],
+  },
+];
+
 const goSpeedCategories = benchmarkCategories.filter((cat) => cat.unit !== 'B');
 const goEncodeCat = benchmarkCategories.find((cat) => cat.title === 'Full Message Encode Speed');
 const goDecodeCat = benchmarkCategories.find((cat) => cat.title === 'Full Message Decode Speed');
@@ -888,6 +1210,14 @@ const javaEncodeCat = javaBenchmarkCategories[0];
 const javaDecodeCat = javaBenchmarkCategories[1];
 const csEncodeCat = csBenchmarkCategories[0];
 const csDecodeCat = csBenchmarkCategories[1];
+const swiftEncodeCat = swiftBenchmarkCategories[0];
+const swiftDecodeCat = swiftBenchmarkCategories[1];
+const dartEncodeCat = dartBenchmarkCategories[0];
+const dartDecodeCat = dartBenchmarkCategories[1];
+const phpEncodeCat = phpBenchmarkCategories[0];
+const phpDecodeCat = phpBenchmarkCategories[1];
+const elixirEncodeCat = elixirBenchmarkCategories[0];
+const elixirDecodeCat = elixirBenchmarkCategories[1];
 
 const primaryAndCompetitors = (rows: BenchmarkRow[]) =>
   rows.filter((r) => Boolean(r.baseline) || !r.highlight);
@@ -1078,6 +1408,106 @@ export const languageBenchmarks: Record<LanguageKey, LanguageBenchmarkSuite> = {
       'Benchmark source lives in <a href="https://github.com/omnibuf/omnibuf-cs/blob/main/src/OmniBuf.Benchmarks/Program.cs" target="_blank" rel="noopener noreferrer" class="doc-link font-mono">src/OmniBuf.Benchmarks/Program.cs</a>, with recorded output in <a href="https://github.com/omnibuf/omnibuf-cs/blob/main/testdata/benchmarks.json" target="_blank" rel="noopener noreferrer" class="doc-link font-mono">testdata/benchmarks.json</a>.',
     ],
   },
+  swift: {
+    key: 'swift',
+    label: 'Swift',
+    shortLabel: 'Swift',
+    headingPrefix: 'Swift 6',
+    subtitleHtml:
+      '11-field <code>PeerUpdate</code> workload on Swift 6.3.2 (Apple M1 Pro) across <code>OmniBuf</code>, <code>SwiftProtobuf</code>, and Foundation <code>JSONEncoder</code> / <code>JSONDecoder</code>. <strong>Shorter bars = Faster.</strong>',
+    href: '/swift#benchmarks',
+    ctaLabel: 'See full results',
+    competitorsLabel: 'SwiftProtobuf, Foundation JSON',
+    heroSummaryHtml:
+      'On Swift 6, OmniBuf encodes <strong>nearly 4x faster</strong> and decodes <strong>over 2x faster</strong> than SwiftProtobuf. Lazy views read nested strings <strong>around 15x faster</strong> than SwiftProtobuf and splice single-field updates <strong>about 7x faster</strong>. Explore the <a href="/swift" class="doc-link">Swift runtime</a>.',
+    categories: swiftBenchmarkCategories,
+    butterflyEncodeRows: primaryAndCompetitors(swiftEncodeCat.rows),
+    butterflyDecodeRows: primaryAndCompetitors(swiftDecodeCat.rows),
+    hardwareLines: [
+      'CPU: Apple M1 Pro (darwin/arm64)',
+      'Compiler: Swift 6.3.2 (-c release)',
+      'Command: just bench',
+    ],
+    environmentParagraphs: [
+      'Compiled with Swift 6.3.2 in release mode on an Apple M1 Pro Mac. Every decode benchmark reads all 11 fields of <code>PeerUpdate</code> into an accumulator sink so lazy wrappers and eager decoders perform the same work.',
+      'Benchmark source lives in <a href="https://github.com/omnibuf/omnibuf-swift/tree/main/Sources/OmniBufBench" target="_blank" rel="noopener noreferrer" class="doc-link font-mono">Sources/OmniBufBench</a>, with recorded output in <a href="https://github.com/omnibuf/omnibuf-swift/blob/main/testdata/benchmarks.json" target="_blank" rel="noopener noreferrer" class="doc-link font-mono">testdata/benchmarks.json</a>.',
+    ],
+  },
+  dart: {
+    key: 'dart',
+    label: 'Dart',
+    shortLabel: 'Dart',
+    headingPrefix: 'Dart 3',
+    subtitleHtml:
+      '11-field <code>PeerUpdate</code> workload on Dart 3.14.1 AOT (Apple M1 Pro) across <code>omnibuf</code>, <code>package:protobuf</code>, and <code>dart:convert</code> JSON. <strong>Shorter bars = Faster.</strong>',
+    href: '/dart#benchmarks',
+    ctaLabel: 'See full results',
+    competitorsLabel: 'package:protobuf, dart:convert (JSON)',
+    heroSummaryHtml:
+      'Compiled Dart 3 AOT binaries encode <strong>nearly 4x faster</strong> and decode <strong>almost 5x faster</strong> with OmniBuf than with <code>package:protobuf</code>. Lazy views read nested fields <strong>over 9x faster</strong> and splice single-field mutations <strong>nearly 10x faster</strong>. Explore the <a href="/dart" class="doc-link">Dart runtime</a>.',
+    categories: dartBenchmarkCategories,
+    butterflyEncodeRows: primaryAndCompetitors(dartEncodeCat.rows),
+    butterflyDecodeRows: primaryAndCompetitors(dartDecodeCat.rows),
+    hardwareLines: [
+      'CPU: Apple M1 Pro (darwin/arm64)',
+      'Runtime: Dart 3.14.1 (AOT native)',
+      'Command: just bench',
+    ],
+    environmentParagraphs: [
+      'Compiled as a native Dart 3.14.1 AOT executable on an Apple M1 Pro Mac. Every decode benchmark touches all 11 fields of <code>PeerUpdate</code> into a checksum sink.',
+      'Benchmark source lives in <a href="https://github.com/omnibuf/omnibuf-dart/blob/main/benchmark/peer_update_bench.dart" target="_blank" rel="noopener noreferrer" class="doc-link font-mono">benchmark/peer_update_bench.dart</a>, with recorded output in <a href="https://github.com/omnibuf/omnibuf-dart/blob/main/testdata/benchmarks.json" target="_blank" rel="noopener noreferrer" class="doc-link font-mono">testdata/benchmarks.json</a>.',
+    ],
+  },
+  php: {
+    key: 'php',
+    label: 'PHP',
+    shortLabel: 'PHP',
+    headingPrefix: 'PHP 8.3+',
+    subtitleHtml:
+      '11-field <code>PeerUpdate</code> workload on PHP 8.6 (Apple M1 Pro) across pure-PHP <code>omnibuf/omnibuf</code>, pure-PHP <code>google/protobuf</code>, and C-backed <code>json_encode</code> / <code>json_decode</code>. <strong>Shorter bars = Faster.</strong>',
+    href: '/php#benchmarks',
+    ctaLabel: 'See full results',
+    competitorsLabel: 'google/protobuf (PHP), JSON (C stdlib)',
+    heroSummaryHtml:
+      'In pure PHP with zero extensions, OmniBuf encodes <strong>about 18x faster</strong> and decodes <strong>over 3x faster</strong> than pure-PHP <code>google/protobuf</code>. On 39 KiB nested payloads, OmniBuf beats even PHP&apos;s C-backed <code>json_encode</code> by <strong>nearly 3x</strong>. Explore the <a href="/php" class="doc-link">PHP runtime</a>.',
+    categories: phpBenchmarkCategories,
+    butterflyEncodeRows: primaryAndCompetitors(phpEncodeCat.rows),
+    butterflyDecodeRows: primaryAndCompetitors(phpDecodeCat.rows),
+    hardwareLines: [
+      'CPU: Apple M1 Pro (darwin/arm64)',
+      'Runtime: PHP 8.6.0 (pure PHP, no C ext)',
+      'Command: just bench',
+    ],
+    environmentParagraphs: [
+      'Measured on PHP 8.6.0 on an Apple M1 Pro Mac with zero native extensions installed. Small-packet stdlib <code>json_encode</code> and <code>json_decode</code> run in C inside the PHP engine; pure-PHP OmniBuf stays an order of magnitude ahead of pure-PHP <code>google/protobuf</code> and overtakes C JSON on 39 KiB nested messages.',
+      'Benchmark source lives in <a href="https://github.com/omnibuf/omnibuf-php/blob/main/benchmarks/bench.php" target="_blank" rel="noopener noreferrer" class="doc-link font-mono">benchmarks/bench.php</a>, with recorded output in <a href="https://github.com/omnibuf/omnibuf-php/blob/main/testdata/benchmarks.json" target="_blank" rel="noopener noreferrer" class="doc-link font-mono">testdata/benchmarks.json</a>.',
+    ],
+  },
+  elixir: {
+    key: 'elixir',
+    label: 'Elixir',
+    shortLabel: 'Elixir',
+    headingPrefix: 'Elixir / BEAM',
+    subtitleHtml:
+      '11-field <code>PeerUpdate</code> workload on Elixir 1.18.6 / OTP 27 (Apple M1 Pro) across <code>omnibuf</code>, <code>elixir-protobuf</code>, and <code>Jason</code> JSON. <strong>Shorter bars = Faster.</strong>',
+    href: '/elixir#benchmarks',
+    ctaLabel: 'See full results',
+    competitorsLabel: 'elixir-protobuf, Jason (JSON)',
+    heroSummaryHtml:
+      'On the BEAM, OmniBuf encodes <strong>nearly 3x faster</strong> than <code>elixir-protobuf</code> and over 2x faster than Jason JSON. Zero-copy sub-binary views read nested strings <strong>over 3x faster</strong> and splice single-field updates <strong>over 5x faster</strong>. Explore the <a href="/elixir" class="doc-link">Elixir runtime</a>.',
+    categories: elixirBenchmarkCategories,
+    butterflyEncodeRows: primaryAndCompetitors(elixirEncodeCat.rows),
+    butterflyDecodeRows: primaryAndCompetitors(elixirDecodeCat.rows),
+    hardwareLines: [
+      'CPU: Apple M1 Pro (darwin/arm64)',
+      'Runtime: Elixir 1.18.6 / Erlang OTP 27',
+      'Command: just bench',
+    ],
+    environmentParagraphs: [
+      'Measured on Elixir 1.18.6 running on Erlang/OTP 27 on an Apple M1 Pro Mac. Both the compile-time <code>OmniBuf.Schema</code> DSL and generated plugin modules emit iodata encoders and binary pattern-matching decoders.',
+      'Benchmark source lives in <a href="https://github.com/omnibuf/omnibuf-elixir/blob/main/bench/peer_bench.exs" target="_blank" rel="noopener noreferrer" class="doc-link font-mono">bench/peer_bench.exs</a>, with recorded output in <a href="https://github.com/omnibuf/omnibuf-elixir/blob/main/testdata/benchmarks.json" target="_blank" rel="noopener noreferrer" class="doc-link font-mono">testdata/benchmarks.json</a>.',
+    ],
+  },
 };
 
 export const languageBenchmarkList: LanguageBenchmarkSuite[] = [
@@ -1088,4 +1518,8 @@ export const languageBenchmarkList: LanguageBenchmarkSuite[] = [
   languageBenchmarks.cpp,
   languageBenchmarks.cs,
   languageBenchmarks.java,
+  languageBenchmarks.swift,
+  languageBenchmarks.dart,
+  languageBenchmarks.php,
+  languageBenchmarks.elixir,
 ];

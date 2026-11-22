@@ -1,4 +1,5 @@
-export type LanguageKey = 'go' | 'es' | 'rs' | 'py' | 'cpp' | 'java' | 'cs';
+export type LanguageKey =
+  'go' | 'es' | 'rs' | 'py' | 'cpp' | 'java' | 'cs' | 'swift' | 'dart' | 'php' | 'elixir';
 
 export type PageKey = 'home' | 'how-it-works' | 'spec' | 'cli' | LanguageKey | 'none';
 
@@ -82,6 +83,46 @@ export const languages: LanguageEntry[] = [
     repoUrl: 'https://github.com/omnibuf/omnibuf-cs',
     packageLabel: 'OmniBuf',
     shortPackage: 'OmniBuf (.NET 8)',
+    status: 'experimental',
+  },
+  {
+    key: 'swift',
+    label: 'Swift',
+    shortLabel: 'Swift',
+    href: '/swift',
+    repoUrl: 'https://github.com/omnibuf/omnibuf-swift',
+    packageLabel: 'omnibuf-swift',
+    shortPackage: 'SwiftPM (Swift 6)',
+    status: 'experimental',
+  },
+  {
+    key: 'dart',
+    label: 'Dart',
+    shortLabel: 'Dart',
+    href: '/dart',
+    repoUrl: 'https://github.com/omnibuf/omnibuf-dart',
+    packageLabel: 'omnibuf',
+    shortPackage: 'omnibuf (pub.dev)',
+    status: 'experimental',
+  },
+  {
+    key: 'php',
+    label: 'PHP',
+    shortLabel: 'PHP',
+    href: '/php',
+    repoUrl: 'https://github.com/omnibuf/omnibuf-php',
+    packageLabel: 'omnibuf/omnibuf',
+    shortPackage: 'Packagist (PHP 8.3+)',
+    status: 'experimental',
+  },
+  {
+    key: 'elixir',
+    label: 'Elixir',
+    shortLabel: 'Elixir',
+    href: '/elixir',
+    repoUrl: 'https://github.com/omnibuf/omnibuf-elixir',
+    packageLabel: 'omnibuf',
+    shortPackage: 'omnibuf (Hex.pm)',
     status: 'experimental',
   },
 ];

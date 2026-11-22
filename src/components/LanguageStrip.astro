@@ -124,6 +124,62 @@ const { currentPage = 'home', id } = Astro.props;
                   <path d="M15 9.5v5M19 9.5v5M13.8 11h6.4M13.8 13.5h6.4" />
                 </svg>
               )}
+              {lang.key === 'swift' && (
+                <svg
+                  class="w-6 h-6 stroke-current"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  aria-hidden="true"
+                >
+                  <path d="M20 15.5c-2.8 3.6-8.4 4.2-13.2 1.1-1-.6-2-1.5-2.8-2.4 2.5 1.3 5.5 1.4 8.2.2-3.4-2.1-6.2-5.3-7.7-8.9 2.4 2 5.2 3.4 8.1 4.1-2-2.1-3.5-4.4-4.2-6.6 2.9 2.1 6.1 4.6 8.4 7.7 1.2-2.6.9-5.3-.5-7.7 3.7 2.8 5.2 7.5 3.7 12.5z" />
+                </svg>
+              )}
+              {lang.key === 'dart' && (
+                <svg
+                  class="w-6 h-6 stroke-current"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  aria-hidden="true"
+                >
+                  <path d="M6.5 6.5L14 4l6 6-2.5 7.5L10 20l-6-6 2.5-7.5z" />
+                  <path d="M6.5 6.5L17.5 17.5" />
+                  <path d="M14 4v6h6" />
+                </svg>
+              )}
+              {lang.key === 'php' && (
+                <svg
+                  class="w-6 h-6 stroke-current"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  aria-hidden="true"
+                >
+                  <ellipse cx="12" cy="12" rx="9.5" ry="6" />
+                  <path d="M7 14v-4h1.6a1.2 1.2 0 0 1 0 2.4H7M11 10v4M11 12h2M13 10v4M15.5 14v-4h1.6a1.2 1.2 0 0 1 0 2.4h-1.6" />
+                </svg>
+              )}
+              {lang.key === 'elixir' && (
+                <svg
+                  class="w-6 h-6 stroke-current"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  aria-hidden="true"
+                >
+                  <path d="M12 3c-3.8 5-6 8.3-6 11.5a6 6 0 0 0 12 0C18 11.3 15.8 8 12 3z" />
+                  <path d="M12 3c-.8 4.2-1.8 7.5-1.2 11.5.4 2.4 1.8 4 3.2 4.5" />
+                </svg>
+              )}
             </span>
             <div class="min-w-0">
               <div class="text-sm sm:text-base font-bold truncate">{lang.label}</div>

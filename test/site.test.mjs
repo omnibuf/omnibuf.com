@@ -52,6 +52,10 @@ test('schema-less omnibuf -c and DecodeBlind examples use field_<N> keys', () =>
     'src/pages/cpp.astro',
     'src/pages/java.astro',
     'src/pages/cs.astro',
+    'src/pages/swift.astro',
+    'src/pages/dart.astro',
+    'src/pages/php.astro',
+    'src/pages/elixir.astro',
   ]) {
     const page = readRepoFile(langFile);
     assert.match(page, /field_1/);
@@ -92,7 +96,7 @@ test('Hero and Comparisons scope butterfly widget scripts and ARIA tab linkage',
 
   assert.doesNotMatch(benchmarksData, /canonical 11-field/);
   const summaryMatches = [...benchmarksData.matchAll(/heroSummaryHtml:\s*'([^']+)'/g)];
-  assert.equal(summaryMatches.length, 7);
+  assert.equal(summaryMatches.length, 11);
   for (const [, html] of summaryMatches) {
     assert.doesNotMatch(html, /[0-9]+\.[0-9]+x/);
     assert.doesNotMatch(html, /encoded_len/);
@@ -254,6 +258,10 @@ test('CSS, 404 routes, FAQ deterministic wording, HowItWorks KiB units, and PROD
     '/cpp',
     '/java',
     '/cs',
+    '/swift',
+    '/dart',
+    '/php',
+    '/elixir',
     '/cli',
   ]) {
     assert.match(notFoundPage, new RegExp(`href="${route}"`));

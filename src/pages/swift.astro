@@ -1,0 +1,375 @@
+---
+import { Code } from 'astro:components';
+import Layout from '../layouts/Layout.astro';
+import Navbar from '../components/Navbar.astro';
+import Benchmarks from '../components/Benchmarks.astro';
+import LanguageStrip from '../components/LanguageStrip.astro';
+import Footer from '../components/Footer.astro';
+
+const swiftInstallSnippet = `dependencies: [
+    .package(url: "https://github.com/omnibuf/omnibuf-swift.git", from: "0.1.0"),
+]`;
+
+const structSwiftSnippet = `import OmniBuf
+
+struct Location: OmniBufStruct, Equatable {
+    var city: String = ""
+    var rack: UInt32 = 0
+
+    static let omniBufSchema = OmniBufStructSchema<Self>(
+        typeName: "Location",
+        fields: [
+            Field.string(3, "city", \\.city),
+            Field.uint32(4, "rack", \\.rack),
+        ]
+    )
+}
+
+let bytes = try Location(city: "FRA", rack: 42).encodeOmniBuf()
+let decoded = try Location.decoded(from: bytes)`;
+
+const swiftProtoSnippet = `import OmniBufProtobuf
+
+let pkt = try OmniBufProtobuf.encode(protoPeer)
+let copy: Omnibuf_Bench_PeerUpdate = try OmniBufProtobuf.decode(from: pkt)`;
+
+const bufGenSwiftSnippet = `version: v2
+clean: true
+plugins:
+  - local: protoc-gen-omnibuf-swift
+    out: Sources/Generated`;
+
+const generatedSwiftSnippet = `import OmniBuf
+
+let pkt = try peer.encodeOmniBuf()
+
+var view = OpaquePeerUpdate(pkt)
+let city = view.getLocation().getCity()
+
+view.setSequence(view.getSequence() + 1)
+let updated = view.marshal()`;
+
+const blindSwiftCode = `import OmniBuf
+
+let pkt = try Location(city: "FRA", rack: 42).encodeOmniBuf(
+    options: EncodeOptions(selfDescribing: true)
+)
+let json = try decodeBlindJSON(pkt)`;
+
+const swiftFaqItems = [
+  {
+    id: 'swift-faq-deps',
+    question: 'Does the core OmniBuf module depend on SwiftProtobuf?',
+    paragraphs: [
+      'No. <code>OmniBuf</code> uses only the Swift standard library and ships the wire reader, single-pass backpatching writer, strict UTF-8 validator, <code>OmniBufStruct</code> schema codec, lazy <code>Opaque</code> scanners, and <code>decodeBlind</code>. Add <code>OmniBufProtobuf</code> only for existing <code>SwiftProtobuf.Message</code> types.',
+    ],
+  },
+  {
+    id: 'swift-faq-plugin',
+    question: 'Where do prebuilt protoc-gen-omnibuf-swift binaries live?',
+    paragraphs: [
+      'Tagged releases on <a href="https://github.com/omnibuf/omnibuf-swift/releases" target="_blank" rel="noopener noreferrer" class="doc-link">GitHub Releases</a> attach <code>darwin-arm64</code> and <code>linux-amd64</code> archives with SHA-256 checksums. You can also build it from source with <code>swift build -c release --product protoc-gen-omnibuf-swift</code>.',
+    ],
+  },
+  {
+    id: 'swift-faq-blind',
+    question: 'How does decodeBlind inspect packets without a schema?',
+    paragraphs: [
+      '<code>decodeBlind(pkt)</code> and <code>decodeBlindJSON(pkt)</code> read 4-bit wire types directly into a <code>BlindValue</code> tree or JSON string. Fields fall back to <code>field_1</code>, <code>field_2</code>, ... unless Field #0 metadata was embedded via <code>selfDescribing: true</code>.',
+    ],
+    codeBlock: blindSwiftCode,
+    codeLabel: 'Example',
+  },
+];
+
+const stripHtml = (s: string) => s.replace(/<[^>]+>/g, '');
+
+const swiftFaqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: swiftFaqItems.map((item) => ({
+    '@type': 'Question',
+    name: item.question,
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: item.paragraphs.map(stripHtml).join('\n\n'),
+    },
+  })),
+};
+---
+
+<Layout
+  title="OmniBuf for Swift 6 | OmniBufStruct, SwiftProtobuf & protoc-gen-omnibuf-swift"
+  description="Use OmniBuf in Swift 6 via SwiftPM: map native Swift structs with key paths, serialize SwiftProtobuf.Message types, or generate single-pass codecs and lazy Opaque views."
+>
+  <Navbar currentPage="swift" />
+
+  <main id="main-content">
+    <section class="relative pt-10 pb-8 sm:pt-16 sm:pb-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+      <h1 class="text-[2.6rem] sm:text-7xl lg:text-[5.5rem] font-bold tracking-tight leading-[0.94] text-ink uppercase">
+        OmniBuf
+        <br />
+        <span class="font-serif italic font-normal normal-case text-[#FF4F18] text-[3.1rem] sm:text-8xl lg:text-[6.2rem]">
+          for Swift 6.
+        </span>
+      </h1>
+
+      <div class="mt-6 grid lg:grid-cols-12 gap-6 lg:gap-8 items-end">
+        <div class="lg:col-span-7 space-y-4">
+          <p class="text-lg sm:text-2xl text-ink/85 font-medium leading-snug">
+            Zero-dependency SwiftPM core for macOS, iOS, and Linux. Map{' '}
+            <a href="#struct-schema" class="doc-link">
+              plain Swift structs with key paths
+            </a>
+            , bridge existing{' '}
+            <a href="#swift-protobuf" class="doc-link">
+              SwiftProtobuf messages
+            </a>
+            , or{' '}
+            <a href="#plugin-codegen" class="doc-link">
+              generate single-pass encoders and lazy Opaque views
+            </a>{' '}
+            for zero-decode field reads and wire splicing.
+          </p>
+          <div class="flex flex-wrap gap-3 font-mono text-sm sm:text-base pt-1 no-print">
+            <a
+              href="https://github.com/omnibuf/omnibuf-swift"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="os-btn px-4 py-2.5 bg-acid text-ink font-bold rounded-md"
+            >
+              GitHub Repository &rarr;
+            </a>
+            <a
+              href="#benchmarks"
+              class="os-btn px-4 py-2.5 bg-[#FAF8F2] text-ink font-bold rounded-md"
+            >
+              Swift Benchmarks &rarr;
+            </a>
+          </div>
+        </div>
+
+        <div class="lg:col-span-5 min-w-0">
+          <div class="p-4 sm:p-5 bg-ink text-paper rounded-md font-mono text-xs sm:text-sm overflow-x-auto leading-relaxed border-2 border-ink shadow-[4px_4px_0px_#111111] [&>pre]:!bg-transparent [&>pre]:!p-0 [&>pre]:!m-0 [&>pre]:!border-0">
+            <div class="flex items-center justify-between gap-2 mb-2 pb-2 border-b border-paper/15">
+              <div class="text-xs font-bold uppercase text-acid">Package.swift</div>
+              <button
+                type="button"
+                data-copy={swiftInstallSnippet}
+                class="copy-snippet-btn min-w-[4.75rem] text-center px-2.5 py-1 text-xs font-bold uppercase bg-paper/15 hover:bg-acid hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-acid text-paper border border-paper/30 rounded shrink-0 transition"
+              >
+                Copy
+              </button>
+            </div>
+            <Code code={swiftInstallSnippet} lang="swift" theme="github-dark" />
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section
+      id="quickstart"
+      class="scroll-mt-16 py-12 sm:py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto border-t-2 border-ink/15"
+    >
+      <div class="max-w-3xl mb-8">
+        <h2 class="text-3xl sm:text-5xl font-bold tracking-tight uppercase leading-none">
+          Three ways to use{' '}
+          <span class="font-serif italic font-normal normal-case text-[#FF4F18]">
+            OmniBuf in Swift.
+          </span>
+        </h2>
+        <p class="mt-3 text-lg sm:text-xl text-ink/80 font-medium">
+          Every path produces identical v0.1 wire bytes on Apple silicon and Linux.
+        </p>
+      </div>
+
+      <div class="border-t-2 border-ink divide-y-2 divide-ink/20">
+        <div
+          id="struct-schema"
+          class="scroll-mt-16 py-8 sm:py-12 grid lg:grid-cols-12 gap-6 lg:gap-8 items-start"
+        >
+          <div class="lg:col-span-5 space-y-3.5 min-w-0">
+            <h3 class="text-2xl sm:text-3xl font-bold uppercase tracking-tight leading-snug">
+              Declarative Swift structs with key paths
+            </h3>
+            <p class="text-base sm:text-lg text-ink/85 leading-relaxed">
+              Conform any Swift value type to <code>OmniBufStruct</code> and list its numbered
+              fields with <code>OmniBufStructSchema</code>. Recursive messages work via{' '}
+              <code>Indirect&lt;T&gt;</code>, with no <code>.proto</code> files or codegen step.
+            </p>
+          </div>
+
+          <div class="lg:col-span-7 min-w-0">
+            <div class="p-4 sm:p-5 bg-ink text-paper rounded-md font-mono text-xs sm:text-sm overflow-x-auto leading-relaxed border-2 border-ink [&>pre]:!bg-transparent [&>pre]:!p-0 [&>pre]:!m-0 [&>pre]:!border-0">
+              <div class="flex items-center justify-between gap-2 mb-2.5 pb-2 border-b border-paper/15">
+                <div class="text-xs font-bold uppercase text-acid">OmniBufStruct Schema</div>
+                <button
+                  type="button"
+                  data-copy={structSwiftSnippet}
+                  class="copy-snippet-btn min-w-[4.75rem] text-center px-2.5 py-1 text-xs font-bold uppercase bg-paper/15 hover:bg-acid hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-acid text-paper border border-paper/30 rounded shrink-0 transition"
+                >
+                  Copy
+                </button>
+              </div>
+              <Code code={structSwiftSnippet} lang="swift" theme="github-dark" />
+            </div>
+          </div>
+        </div>
+
+        <div
+          id="swift-protobuf"
+          class="scroll-mt-16 py-8 sm:py-12 grid lg:grid-cols-12 gap-6 lg:gap-8 items-start"
+        >
+          <div class="lg:col-span-5 space-y-3.5 min-w-0">
+            <h3 class="text-2xl sm:text-3xl font-bold uppercase tracking-tight leading-snug">
+              Existing SwiftProtobuf.Message types
+            </h3>
+            <p class="text-base sm:text-lg text-ink/85 leading-relaxed">
+              The optional <code>OmniBufProtobuf</code> product implements custom{' '}
+              <code>SwiftProtobuf.Visitor</code> and <code>SwiftProtobuf.Decoder</code> drivers.
+              Pass any generated <code>SwiftProtobuf.Message</code> straight through{' '}
+              <code>OmniBufProtobuf.encode</code> and <code>decode</code>.
+            </p>
+          </div>
+
+          <div class="lg:col-span-7 min-w-0">
+            <div class="p-4 sm:p-5 bg-ink text-paper rounded-md font-mono text-xs sm:text-sm overflow-x-auto leading-relaxed border-2 border-ink [&>pre]:!bg-transparent [&>pre]:!p-0 [&>pre]:!m-0 [&>pre]:!border-0">
+              <div class="flex items-center justify-between gap-2 mb-2.5 pb-2 border-b border-paper/15">
+                <div class="text-xs font-bold uppercase text-acid">SwiftProtobuf Bridge</div>
+                <button
+                  type="button"
+                  data-copy={swiftProtoSnippet}
+                  class="copy-snippet-btn min-w-[4.75rem] text-center px-2.5 py-1 text-xs font-bold uppercase bg-paper/15 hover:bg-acid hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-acid text-paper border border-paper/30 rounded shrink-0 transition"
+                >
+                  Copy
+                </button>
+              </div>
+              <Code code={swiftProtoSnippet} lang="swift" theme="github-dark" />
+            </div>
+          </div>
+        </div>
+
+        <div
+          id="plugin-codegen"
+          class="scroll-mt-16 py-8 sm:py-12 grid lg:grid-cols-12 gap-6 lg:gap-8 items-start"
+        >
+          <div class="lg:col-span-5 space-y-3.5 min-w-0">
+            <h3 class="text-2xl sm:text-3xl font-bold uppercase tracking-tight leading-snug">
+              Generated structs and Opaque views
+            </h3>
+            <p class="text-base sm:text-lg text-ink/85 leading-relaxed">
+              <code>protoc-gen-omnibuf-swift</code> emits Swift structs with single-pass
+              backpatching encoders and lazy <code>Opaque*</code> views. Reading a nested string
+              takes ~146 ns and splicing a single counter update takes ~513 ns.
+            </p>
+          </div>
+
+          <div class="lg:col-span-7 space-y-3.5 min-w-0">
+            <div class="p-4 sm:p-5 bg-ink text-paper rounded-md font-mono text-xs sm:text-sm overflow-x-auto leading-relaxed border-2 border-ink [&>pre]:!bg-transparent [&>pre]:!p-0 [&>pre]:!m-0 [&>pre]:!border-0">
+              <div class="flex items-center justify-between gap-2 mb-2.5 pb-2 border-b border-paper/15">
+                <div class="text-xs font-bold uppercase text-acid">buf.gen.yaml</div>
+                <button
+                  type="button"
+                  data-copy={bufGenSwiftSnippet}
+                  class="copy-snippet-btn min-w-[4.75rem] text-center px-2.5 py-1 text-xs font-bold uppercase bg-paper/15 hover:bg-acid hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-acid text-paper border border-paper/30 rounded shrink-0 transition"
+                >
+                  Copy
+                </button>
+              </div>
+              <Code code={bufGenSwiftSnippet} lang="yaml" theme="github-dark" />
+            </div>
+
+            <div class="p-4 sm:p-5 bg-ink text-paper rounded-md font-mono text-xs sm:text-sm overflow-x-auto leading-relaxed border-2 border-ink">
+              <div class="flex items-center justify-between gap-2 mb-2.5 pb-2 border-b border-paper/15">
+                <div class="text-xs font-bold uppercase text-acid">
+                  Lint &amp; Generate with Buf
+                </div>
+                <button
+                  type="button"
+                  data-copy="buf lint && buf generate"
+                  class="copy-snippet-btn min-w-[4.75rem] text-center px-2.5 py-1 text-xs font-bold uppercase bg-paper/15 hover:bg-acid hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-acid text-paper border border-paper/30 rounded shrink-0 transition"
+                >
+                  Copy
+                </button>
+              </div>
+              <pre class="leading-relaxed whitespace-pre"><code><span class="text-paper/75 select-none">$ </span>buf lint
+<span class="text-paper/75 select-none">$ </span><span class="text-acid font-bold">buf generate</span></code></pre>
+            </div>
+
+            <div class="p-4 sm:p-5 bg-ink text-paper rounded-md font-mono text-xs sm:text-sm overflow-x-auto leading-relaxed border-2 border-ink [&>pre]:!bg-transparent [&>pre]:!p-0 [&>pre]:!m-0 [&>pre]:!border-0">
+              <div class="flex items-center justify-between gap-2 mb-2.5 pb-2 border-b border-paper/15">
+                <div class="text-xs font-bold uppercase text-acid">
+                  Generated Struct &amp; Opaque Splice
+                </div>
+                <button
+                  type="button"
+                  data-copy={generatedSwiftSnippet}
+                  class="copy-snippet-btn min-w-[4.75rem] text-center px-2.5 py-1 text-xs font-bold uppercase bg-paper/15 hover:bg-acid hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-acid text-paper border border-paper/30 rounded shrink-0 transition"
+                >
+                  Copy
+                </button>
+              </div>
+              <Code code={generatedSwiftSnippet} lang="swift" theme="github-dark" />
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <Benchmarks lang="swift" />
+
+    <section
+      id="swift-faq"
+      class="scroll-mt-16 py-16 sm:py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto border-t-2 border-ink/15"
+    >
+      <div class="max-w-3xl mb-10">
+        <h2 class="text-3xl sm:text-5xl font-bold tracking-tight uppercase leading-none">
+          Swift{' '}
+          <span class="font-serif italic font-normal normal-case text-[#FF4F18]">questions.</span>
+        </h2>
+      </div>
+
+      <div class="border-t-2 border-ink divide-y-2 divide-ink/20">
+        {swiftFaqItems.map((item) => (
+          <div
+            id={item.id}
+            class="scroll-mt-16 py-8 sm:py-10 grid lg:grid-cols-12 gap-6 lg:gap-8 items-start"
+          >
+            <h3 class="lg:col-span-5 text-xl sm:text-2xl font-bold uppercase tracking-tight text-ink leading-snug">
+              {item.question}
+            </h3>
+
+            <div class="lg:col-span-7 space-y-3.5 text-base sm:text-lg text-ink/85 leading-relaxed max-w-[65ch] min-w-0">
+              {item.paragraphs.map((paragraph) => (
+                <p set:html={paragraph} />
+              ))}
+              {item.codeBlock && (
+                <div class="bg-ink text-paper p-4 sm:p-5 rounded-md border-2 border-ink font-mono text-xs sm:text-sm leading-relaxed overflow-x-auto [&>pre]:!bg-transparent [&>pre]:!p-0 [&>pre]:!m-0 [&>pre]:!border-0">
+                  <div class="flex items-center justify-between gap-2 mb-2.5 pb-2 border-b border-paper/15">
+                    <div class="text-xs font-bold uppercase text-acid">
+                      {item.codeLabel ?? 'Example'}
+                    </div>
+                    <button
+                      type="button"
+                      data-copy={item.codeBlock}
+                      class="copy-snippet-btn min-w-[4.75rem] text-center px-2.5 py-1 text-xs font-bold uppercase bg-paper/15 hover:bg-acid hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-acid text-paper border border-paper/30 rounded shrink-0 transition"
+                    >
+                      Copy
+                    </button>
+                  </div>
+                  <Code code={item.codeBlock} lang="swift" theme="github-dark" />
+                </div>
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <script is:inline type="application/ld+json" set:html={JSON.stringify(swiftFaqJsonLd)} />
+    </section>
+
+    <LanguageStrip currentPage="swift" />
+  </main>
+
+  <Footer />
+</Layout>
