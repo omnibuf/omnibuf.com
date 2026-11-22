@@ -6,6 +6,7 @@ export default {
   printWidth: 100,
   htmlWhitespaceSensitivity: 'strict',
   plugins: ['prettier-plugin-astro', 'prettier-plugin-tailwindcss'],
+  tailwindStylesheet: './src/styles/global.css',
   overrides: [
     {
       files: '*.astro',

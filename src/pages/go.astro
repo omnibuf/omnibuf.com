@@ -179,7 +179,7 @@ const goFaqJsonLd = {
                 <p set:html={paragraph} />
               ))}
               {item.codeBlock && (
-                <div class="bg-ink text-paper p-4 sm:p-5 rounded-md border-2 border-ink font-mono text-xs sm:text-sm leading-relaxed overflow-x-auto [&>pre]:!bg-transparent [&>pre]:!p-0 [&>pre]:!m-0 [&>pre]:!border-0">
+                <div class="bg-ink text-paper p-4 sm:p-5 rounded-md border-2 border-ink font-mono text-xs sm:text-sm leading-relaxed overflow-x-auto [&>pre]:bg-transparent! [&>pre]:p-0! [&>pre]:m-0! [&>pre]:border-0!">
                   <div class="flex items-center justify-between gap-2 mb-2.5 pb-2 border-b border-paper/15">
                     <div class="text-xs font-bold uppercase text-acid">
                       {item.codeLabel ?? 'Example'}

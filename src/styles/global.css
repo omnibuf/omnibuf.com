@@ -1,6 +1,18 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import 'tailwindcss';
+
+@theme {
+  --font-display: 'Space Grotesk', sans-serif;
+  --font-serif: 'Instrument Serif', serif;
+  --font-mono: 'IBM Plex Mono', monospace;
+
+  --color-paper: #f4f0e6;
+  --color-cream: #faf8f2;
+  --color-ink: #111111;
+  --color-acid: #d4ff33;
+  --color-orange: #ff4f18;
+  --color-cobalt: #1e40af;
+  --color-mint: #10b981;
+}
 
 @layer base {
   :root {
@@ -873,12 +885,12 @@ html.dark .border-ink\/15 {
   border-color: rgba(244, 240, 230, 0.16) !important;
 }
 
-html.dark .divide-ink > :not([hidden]) ~ :not([hidden]) {
+html.dark .divide-ink > :not(:last-child) {
   border-color: #454d5e !important;
 }
 
-html.dark .divide-ink\/20 > :not([hidden]) ~ :not([hidden]),
-html.dark .divide-ink\/15 > :not([hidden]) ~ :not([hidden]) {
+html.dark .divide-ink\/20 > :not(:last-child),
+html.dark .divide-ink\/15 > :not(:last-child) {
   border-color: rgba(244, 240, 230, 0.16) !important;
 }
 

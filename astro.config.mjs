@@ -2,9 +2,8 @@ import { copyFile, readdir, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import sitemap from '@astrojs/sitemap';
+import tailwindcss from '@tailwindcss/vite';
 import { defineConfig } from 'astro/config';
-import tailwindcss from 'tailwindcss';
-import tailwindConfig from './tailwind.config.mjs';
 import { cliNavPage, languages, primaryNavPages, specNavPage } from './src/data/languages.ts';
 
 const PAGE_LABELS = Object.fromEntries([
@@ -305,10 +304,6 @@ export default defineConfig({
   site: 'https://omnibuf.com',
   integrations: [sitemap(), checkInternalLinksAndAnchors()],
   vite: {
-    css: {
-      postcss: {
-        plugins: [tailwindcss(tailwindConfig)],
-      },
-    },
+    plugins: [tailwindcss()],
   },
 });
