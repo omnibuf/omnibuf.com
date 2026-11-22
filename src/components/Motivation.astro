@@ -113,11 +113,11 @@ pkt, _ := omnibuf.Marshal(&Node{ID: 1, City: "FRA"})`;
     >
       <div class="lg:col-span-5 space-y-3">
         <h3 class="text-2xl sm:text-3xl font-bold uppercase tracking-tight leading-snug">
-          Use .proto files or plain structs.
+          Use Protobuf types or plain structs.
         </h3>
         <!-- prettier-ignore -->
         <p class="text-base sm:text-lg text-ink/90 leading-relaxed max-w-[60ch]">
-          OmniBuf is a message serialization format, not a new RPC protocol. Most <a href="https://grpc.io/" target="_blank" rel="noopener noreferrer" class="doc-link">gRPC</a> and <a href="https://connectrpc.com/" target="_blank" rel="noopener noreferrer" class="doc-link">Connect</a> libraries let you register a custom wire codec in a few lines of code and keep your existing <code>.proto</code> files. Or skip <code>.proto</code> files altogether: add <a href="/go#struct-tags" class="doc-link">Go struct tags</a> (<code>omnibuf:"1"</code>) or call <a href="/es#define-message" class="doc-link">TypeScript <code>defineMessage</code></a>, and both paths produce the exact same wire bytes.
+          OmniBuf is a message serialization format, not a new RPC protocol. Most <a href="https://grpc.io/" target="_blank" rel="noopener noreferrer" class="doc-link">gRPC</a> and <a href="https://connectrpc.com/" target="_blank" rel="noopener noreferrer" class="doc-link">Connect</a> libraries let you register a custom wire codec in a few lines of code and keep your existing Protobuf message types (or run <code>buf generate</code> for generated fast paths and <code>Opaque</code> views). Or skip Protobuf altogether: add <a href="/go#struct-tags" class="doc-link">Go struct tags</a> (<code>omnibuf:"1"</code>) or call <a href="/es#define-message" class="doc-link">TypeScript <code>defineMessage</code></a>, and both paths produce the exact same wire bytes.
         </p>
       </div>
       <div class="lg:col-span-7 min-w-0">
@@ -128,7 +128,7 @@ pkt, _ := omnibuf.Marshal(&Node{ID: 1, City: "FRA"})`;
           </div>
           <div class="bg-ink text-paper p-4 space-y-3">
             <div class="bg-[#1F1F1F] p-3 rounded border border-paper/15 [&>pre]:bg-transparent! [&>pre]:p-0! [&>pre]:m-0! [&>pre]:border-0! [&>pre]:leading-relaxed [&>pre]:overflow-x-auto">
-              <div class="text-[11px] uppercase font-bold text-paper/65 mb-1">From .proto</div>
+              <div class="text-[11px] uppercase font-bold text-paper/65 mb-1">Protobuf struct</div>
               <Code code={pbStructSnippet} lang="go" theme="github-dark" />
             </div>
             <div class="bg-[#1F1F1F] p-3 rounded border border-paper/15 [&>pre]:bg-transparent! [&>pre]:p-0! [&>pre]:m-0! [&>pre]:border-0! [&>pre]:leading-relaxed [&>pre]:overflow-x-auto">
