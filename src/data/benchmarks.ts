@@ -514,13 +514,13 @@ export const pyBenchmarkCategories: BenchmarkCategory[] = [
     methodology:
       'Serializing PeerUpdate into fresh bytes across native Rust and C extensions (omnibuf, upb, protobuf-py, msgspec, msgpack, stdlib json).',
     rows: [
-      { name: 'OmniBuf (Generated)', val: 411, sizeBytes: 366, highlight: true, baseline: true },
-      { name: 'OmniBuf (@dataclass)', val: 418, sizeBytes: 366, highlight: true },
-      { name: 'google.protobuf (upb)', val: 432, sizeBytes: 341 },
-      { name: 'msgspec', val: 625, sizeBytes: 634 },
-      { name: 'protobuf-py', val: 931, sizeBytes: 341 },
-      { name: 'msgpack', val: 1699, sizeBytes: 634 },
-      { name: 'json (stdlib)', val: 4859, sizeBytes: 874 },
+      { name: 'OmniBuf (Generated)', val: 420, sizeBytes: 366, highlight: true, baseline: true },
+      { name: 'OmniBuf (@dataclass)', val: 430, sizeBytes: 366, highlight: true },
+      { name: 'google.protobuf (upb)', val: 441, sizeBytes: 341 },
+      { name: 'msgspec', val: 637, sizeBytes: 634 },
+      { name: 'protobuf-py', val: 958, sizeBytes: 341 },
+      { name: 'msgpack', val: 1698, sizeBytes: 634 },
+      { name: 'json (stdlib)', val: 4911, sizeBytes: 874 },
     ],
   },
   {
@@ -530,13 +530,13 @@ export const pyBenchmarkCategories: BenchmarkCategory[] = [
     methodology:
       'Decoding bytes and reading all 11 fields in Python. Accessing every field forces upb to materialize Python strings and sub-messages out of its C arena.',
     rows: [
-      { name: 'OmniBuf (Generated)', val: 1942, highlight: true, baseline: true },
-      { name: 'OmniBuf (@dataclass)', val: 1949, highlight: true },
-      { name: 'msgspec', val: 2106 },
-      { name: 'protobuf-py', val: 3348 },
-      { name: 'msgpack', val: 3917 },
-      { name: 'google.protobuf (upb)', val: 4518 },
-      { name: 'json (stdlib)', val: 6193 },
+      { name: 'OmniBuf (@dataclass)', val: 2054, highlight: true },
+      { name: 'OmniBuf (Generated)', val: 2117, highlight: true, baseline: true },
+      { name: 'msgspec', val: 2201 },
+      { name: 'protobuf-py', val: 3199 },
+      { name: 'msgpack', val: 4170 },
+      { name: 'google.protobuf (upb)', val: 4676 },
+      { name: 'json (stdlib)', val: 6247 },
     ],
   },
   {
@@ -545,12 +545,12 @@ export const pyBenchmarkCategories: BenchmarkCategory[] = [
     maxVal: 6500,
     methodology: 'OpaquePeerUpdate header-hop lookup vs native C and Rust extension decode.',
     rows: [
-      { name: 'OmniBuf (Generated)', val: 502, highlight: true, baseline: true },
-      { name: 'google.protobuf (upb)', val: 783 },
-      { name: 'msgspec', val: 1159 },
-      { name: 'protobuf-py', val: 2165 },
-      { name: 'msgpack', val: 2928 },
-      { name: 'json (stdlib)', val: 4828 },
+      { name: 'OmniBuf (Generated)', val: 519, highlight: true, baseline: true },
+      { name: 'google.protobuf (upb)', val: 798 },
+      { name: 'msgspec', val: 1185 },
+      { name: 'protobuf-py', val: 2183 },
+      { name: 'msgpack', val: 2795 },
+      { name: 'json (stdlib)', val: 4905 },
     ],
   },
   {
@@ -560,12 +560,12 @@ export const pyBenchmarkCategories: BenchmarkCategory[] = [
     methodology:
       'Checking a nested city string and splicing an updated sequence number vs full decode and re-encode.',
     rows: [
-      { name: 'OmniBuf (Generated)', val: 808, highlight: true, baseline: true },
-      { name: 'google.protobuf (upb)', val: 1356 },
-      { name: 'msgspec', val: 1826 },
-      { name: 'protobuf-py', val: 3230 },
-      { name: 'msgpack', val: 4529 },
-      { name: 'json (stdlib)', val: 9857 },
+      { name: 'OmniBuf (Generated)', val: 823, highlight: true, baseline: true },
+      { name: 'google.protobuf (upb)', val: 1373 },
+      { name: 'msgspec', val: 1854 },
+      { name: 'protobuf-py', val: 3255 },
+      { name: 'msgpack', val: 4626 },
+      { name: 'json (stdlib)', val: 10061 },
     ],
   },
   {
@@ -575,13 +575,13 @@ export const pyBenchmarkCategories: BenchmarkCategory[] = [
     methodology:
       'Serializing a 39 KiB packet whose 20 KiB and 18 KiB nested strings trigger 4-byte container length pre-sizing.',
     rows: [
-      { name: 'msgspec', val: 1946, sizeBytes: 39516 },
-      { name: 'OmniBuf (@dataclass)', val: 2040, sizeBytes: 39256, highlight: true },
-      { name: 'OmniBuf (Generated)', val: 2138, sizeBytes: 39256, highlight: true, baseline: true },
-      { name: 'google.protobuf (upb)', val: 2230, sizeBytes: 39227 },
-      { name: 'protobuf-py', val: 3162, sizeBytes: 39227 },
-      { name: 'msgpack', val: 3286, sizeBytes: 39516 },
-      { name: 'json (stdlib)', val: 67099, sizeBytes: 39752 },
+      { name: 'msgspec', val: 1893, sizeBytes: 39516 },
+      { name: 'OmniBuf (@dataclass)', val: 2186, sizeBytes: 39256, highlight: true },
+      { name: 'OmniBuf (Generated)', val: 2203, sizeBytes: 39256, highlight: true, baseline: true },
+      { name: 'google.protobuf (upb)', val: 2254, sizeBytes: 39227 },
+      { name: 'msgpack', val: 3306, sizeBytes: 39516 },
+      { name: 'protobuf-py', val: 3398, sizeBytes: 39227 },
+      { name: 'json (stdlib)', val: 69407, sizeBytes: 39752 },
     ],
   },
   {
@@ -591,12 +591,12 @@ export const pyBenchmarkCategories: BenchmarkCategory[] = [
     methodology:
       'Growing a nested string field past 16 KiB ahead of 32 trailing Neighbor entries via Opaque splicing vs full decode and re-encode.',
     rows: [
-      { name: 'OmniBuf (Generated)', val: 2768, highlight: true, baseline: true },
-      { name: 'google.protobuf (upb)', val: 4409 },
-      { name: 'msgspec', val: 7074 },
-      { name: 'protobuf-py', val: 13707 },
-      { name: 'msgpack', val: 18675 },
-      { name: 'json (stdlib)', val: 64558 },
+      { name: 'OmniBuf (Generated)', val: 2606, highlight: true, baseline: true },
+      { name: 'google.protobuf (upb)', val: 4689 },
+      { name: 'msgspec', val: 7222 },
+      { name: 'protobuf-py', val: 14033 },
+      { name: 'msgpack', val: 19173 },
+      { name: 'json (stdlib)', val: 64748 },
     ],
   },
 ];
@@ -1041,16 +1041,16 @@ export const phpBenchmarkCategories: BenchmarkCategory[] = [
     rows: [
       {
         name: 'OmniBuf (ext-omnibuf)',
-        val: 317,
+        val: 313,
         sizeBytes: 365,
         highlight: true,
         baseline: true,
       },
-      { name: 'google/protobuf (C ext)', val: 420, sizeBytes: 341 },
-      { name: 'JSON (stdlib)', val: 1412, sizeBytes: 803 },
-      { name: 'OmniBuf (Generated)', val: 4584, sizeBytes: 365, highlight: true },
-      { name: 'OmniBuf (Attributes)', val: 11416, sizeBytes: 365, highlight: true },
-      { name: 'google/protobuf (pure PHP)', val: 86075, sizeBytes: 341 },
+      { name: 'google/protobuf (C ext)', val: 433, sizeBytes: 341 },
+      { name: 'JSON (stdlib)', val: 1427, sizeBytes: 803 },
+      { name: 'OmniBuf (Generated)', val: 4638, sizeBytes: 365, highlight: true },
+      { name: 'OmniBuf (Attributes)', val: 11166, sizeBytes: 365, highlight: true },
+      { name: 'google/protobuf (pure PHP)', val: 88290, sizeBytes: 341 },
     ],
   },
   {
@@ -1060,12 +1060,12 @@ export const phpBenchmarkCategories: BenchmarkCategory[] = [
     methodology:
       'Decoding a binary string into a fresh PeerUpdate object and reading all 11 fields.',
     rows: [
-      { name: 'OmniBuf (ext-omnibuf)', val: 955, highlight: true, baseline: true },
-      { name: 'google/protobuf (C ext)', val: 3678 },
-      { name: 'JSON (stdlib)', val: 4214 },
-      { name: 'OmniBuf (Generated)', val: 15899, highlight: true },
-      { name: 'OmniBuf (Attributes)', val: 25670, highlight: true },
-      { name: 'google/protobuf (pure PHP)', val: 49895 },
+      { name: 'OmniBuf (ext-omnibuf)', val: 1002, highlight: true, baseline: true },
+      { name: 'google/protobuf (C ext)', val: 3720 },
+      { name: 'JSON (stdlib)', val: 4383 },
+      { name: 'OmniBuf (Generated)', val: 16274, highlight: true },
+      { name: 'OmniBuf (Attributes)', val: 26207, highlight: true },
+      { name: 'google/protobuf (pure PHP)', val: 55913 },
     ],
   },
   {
@@ -1074,11 +1074,11 @@ export const phpBenchmarkCategories: BenchmarkCategory[] = [
     maxVal: 52000,
     methodology: 'Reading a nested city string via OpaquePeerUpdate vs full message decode.',
     rows: [
-      { name: 'OmniBuf (ext-omnibuf)', val: 174, highlight: true, baseline: true },
-      { name: 'google/protobuf (C ext)', val: 959 },
-      { name: 'JSON (stdlib)', val: 3700 },
-      { name: 'OmniBuf (Generated)', val: 5706, highlight: true },
-      { name: 'google/protobuf (pure PHP)', val: 48442 },
+      { name: 'OmniBuf (ext-omnibuf)', val: 175, highlight: true, baseline: true },
+      { name: 'google/protobuf (C ext)', val: 999 },
+      { name: 'JSON (stdlib)', val: 3723 },
+      { name: 'OmniBuf (Generated)', val: 5788, highlight: true },
+      { name: 'google/protobuf (pure PHP)', val: 47764 },
     ],
   },
   {
@@ -1089,10 +1089,10 @@ export const phpBenchmarkCategories: BenchmarkCategory[] = [
       'Checking a nested city string and splicing an updated sequence counter via OpaquePeerUpdate vs full decode and re-encode.',
     rows: [
       { name: 'OmniBuf (ext-omnibuf)', val: 505, highlight: true, baseline: true },
-      { name: 'google/protobuf (C ext)', val: 1471 },
-      { name: 'JSON (stdlib)', val: 5075 },
-      { name: 'OmniBuf (Generated)', val: 9980, highlight: true },
-      { name: 'google/protobuf (pure PHP)', val: 137135 },
+      { name: 'google/protobuf (C ext)', val: 1515 },
+      { name: 'JSON (stdlib)', val: 5229 },
+      { name: 'OmniBuf (Generated)', val: 10075, highlight: true },
+      { name: 'google/protobuf (pure PHP)', val: 138642 },
     ],
   },
   {
@@ -1104,16 +1104,16 @@ export const phpBenchmarkCategories: BenchmarkCategory[] = [
     rows: [
       {
         name: 'OmniBuf (ext-omnibuf)',
-        val: 949,
+        val: 853,
         sizeBytes: 39255,
         highlight: true,
         baseline: true,
       },
       { name: 'google/protobuf (C ext)', val: 2195, sizeBytes: 39227 },
-      { name: 'OmniBuf (Generated)', val: 8738, sizeBytes: 39255, highlight: true },
-      { name: 'OmniBuf (Attributes)', val: 18372, sizeBytes: 39255, highlight: true },
-      { name: 'JSON (stdlib)', val: 23540, sizeBytes: 39681 },
-      { name: 'google/protobuf (pure PHP)', val: 1160962, sizeBytes: 39227 },
+      { name: 'OmniBuf (Generated)', val: 8968, sizeBytes: 39255, highlight: true },
+      { name: 'OmniBuf (Attributes)', val: 17380, sizeBytes: 39255, highlight: true },
+      { name: 'JSON (stdlib)', val: 24784, sizeBytes: 39681 },
+      { name: 'google/protobuf (pure PHP)', val: 1177080, sizeBytes: 39227 },
     ],
   },
   {
@@ -1123,11 +1123,11 @@ export const phpBenchmarkCategories: BenchmarkCategory[] = [
     methodology:
       'Growing a nested string field past 16 KiB ahead of 32 trailing Neighbor entries via Opaque splicing vs full decode and re-encode.',
     rows: [
-      { name: 'OmniBuf (ext-omnibuf)', val: 2182, highlight: true, baseline: true },
-      { name: 'google/protobuf (C ext)', val: 6358 },
-      { name: 'OmniBuf (Generated)', val: 10390, highlight: true },
-      { name: 'JSON (stdlib)', val: 30674 },
-      { name: 'google/protobuf (pure PHP)', val: 1137293 },
+      { name: 'OmniBuf (ext-omnibuf)', val: 2033, highlight: true, baseline: true },
+      { name: 'google/protobuf (C ext)', val: 6270 },
+      { name: 'OmniBuf (Generated)', val: 10354, highlight: true },
+      { name: 'JSON (stdlib)', val: 31112 },
+      { name: 'google/protobuf (pure PHP)', val: 1157604 },
     ],
   },
 ];
@@ -1148,9 +1148,9 @@ export const elixirBenchmarkCategories: BenchmarkCategory[] = [
         highlight: true,
         baseline: true,
       },
-      { name: 'OmniBuf (Pure Elixir)', val: 2288, sizeBytes: 358, highlight: true },
-      { name: 'Jason (JSON)', val: 4865, sizeBytes: 803 },
-      { name: 'elixir-protobuf', val: 5952, sizeBytes: 341 },
+      { name: 'OmniBuf (Pure Elixir)', val: 2258, sizeBytes: 358, highlight: true },
+      { name: 'Jason (JSON)', val: 5024, sizeBytes: 803 },
+      { name: 'elixir-protobuf', val: 6261, sizeBytes: 341 },
     ],
   },
   {
@@ -1159,10 +1159,10 @@ export const elixirBenchmarkCategories: BenchmarkCategory[] = [
     maxVal: 7000,
     methodology: 'Decoding a binary into a fresh PeerUpdate struct and reading all 11 fields.',
     rows: [
-      { name: 'OmniBuf (Rust NIF)', val: 1464, highlight: true, baseline: true },
-      { name: 'OmniBuf (Pure Elixir)', val: 3589, highlight: true },
-      { name: 'elixir-protobuf', val: 4284 },
-      { name: 'Jason (JSON)', val: 5811 },
+      { name: 'OmniBuf (Rust NIF)', val: 1482, highlight: true, baseline: true },
+      { name: 'OmniBuf (Pure Elixir)', val: 3662, highlight: true },
+      { name: 'elixir-protobuf', val: 4364 },
+      { name: 'Jason (JSON)', val: 5858 },
     ],
   },
   {
@@ -1171,10 +1171,10 @@ export const elixirBenchmarkCategories: BenchmarkCategory[] = [
     maxVal: 7000,
     methodology: 'Reading a nested city string via PeerUpdate.Opaque vs full message decode.',
     rows: [
-      { name: 'OmniBuf (Rust NIF)', val: 401, highlight: true, baseline: true },
-      { name: 'OmniBuf (Pure Elixir)', val: 1376, highlight: true },
-      { name: 'elixir-protobuf', val: 4259 },
-      { name: 'Jason (JSON)', val: 5862 },
+      { name: 'OmniBuf (Rust NIF)', val: 387, highlight: true, baseline: true },
+      { name: 'OmniBuf (Pure Elixir)', val: 1383, highlight: true },
+      { name: 'elixir-protobuf', val: 4340 },
+      { name: 'Jason (JSON)', val: 5929 },
     ],
   },
   {
@@ -1184,10 +1184,10 @@ export const elixirBenchmarkCategories: BenchmarkCategory[] = [
     methodology:
       'Checking a nested city string and splicing an updated sequence counter via zero-copy BEAM sub-binaries vs full decode and re-encode.',
     rows: [
-      { name: 'OmniBuf (Rust NIF)', val: 661, highlight: true, baseline: true },
-      { name: 'OmniBuf (Pure Elixir)', val: 1930, highlight: true },
-      { name: 'elixir-protobuf', val: 10926 },
-      { name: 'Jason (JSON)', val: 11953 },
+      { name: 'OmniBuf (Rust NIF)', val: 621, highlight: true, baseline: true },
+      { name: 'OmniBuf (Pure Elixir)', val: 1943, highlight: true },
+      { name: 'elixir-protobuf', val: 10947 },
+      { name: 'Jason (JSON)', val: 11553 },
     ],
   },
   {
@@ -1199,14 +1199,14 @@ export const elixirBenchmarkCategories: BenchmarkCategory[] = [
     rows: [
       {
         name: 'OmniBuf (Rust NIF)',
-        val: 2913,
+        val: 2969,
         sizeBytes: 39250,
         highlight: true,
         baseline: true,
       },
-      { name: 'OmniBuf (Pure Elixir)', val: 3452, sizeBytes: 39250, highlight: true },
-      { name: 'Jason (JSON)', val: 83774, sizeBytes: 39681 },
-      { name: 'elixir-protobuf', val: 105867, sizeBytes: 39227 },
+      { name: 'OmniBuf (Pure Elixir)', val: 3001, sizeBytes: 39250, highlight: true },
+      { name: 'Jason (JSON)', val: 82649, sizeBytes: 39681 },
+      { name: 'elixir-protobuf', val: 107260, sizeBytes: 39227 },
     ],
   },
   {
@@ -1216,10 +1216,10 @@ export const elixirBenchmarkCategories: BenchmarkCategory[] = [
     methodology:
       'Growing a nested string field past 16 KiB ahead of 32 trailing Neighbor entries via Opaque splicing vs full decode and re-encode.',
     rows: [
-      { name: 'OmniBuf (Rust NIF)', val: 4794, highlight: true, baseline: true },
-      { name: 'OmniBuf (Pure Elixir)', val: 6648, highlight: true },
-      { name: 'Jason (JSON)', val: 90603 },
-      { name: 'elixir-protobuf', val: 108545 },
+      { name: 'OmniBuf (Rust NIF)', val: 4530, highlight: true, baseline: true },
+      { name: 'OmniBuf (Pure Elixir)', val: 6499, highlight: true },
+      { name: 'Jason (JSON)', val: 90459 },
+      { name: 'elixir-protobuf', val: 104200 },
     ],
   },
 ];
