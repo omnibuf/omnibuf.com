@@ -61,7 +61,7 @@ const phpFaqItems = [
     id: 'php-faq-ext',
     question: 'Does omnibuf/omnibuf require a PECL or C extension?',
     paragraphs: [
-      'No. The package is 100% pure PHP 8.3+ (64-bit) with no native build step. It installs anywhere Composer runs and encodes around 18x faster than pure-PHP <code>google/protobuf</code>.',
+      'No. Pure PHP 8.3+ (64-bit) works out of the box anywhere Composer runs, encoding around 18x faster than pure-PHP <code>google/protobuf</code>. An optional Rust-backed <code>ext-omnibuf</code> PHP extension is included in <code>ext/</code> and detected automatically when loaded, beating Google&apos;s C <code>ext-protobuf</code> across all six benchmarks.',
     ],
   },
   {
@@ -117,7 +117,8 @@ const phpFaqJsonLd = {
       <div class="mt-6 grid lg:grid-cols-12 gap-6 lg:gap-8 items-end">
         <div class="lg:col-span-7 space-y-4">
           <p class="text-lg sm:text-2xl text-ink/85 font-medium leading-snug">
-            Pure PHP 8.3+ library on Packagist with a bundled Composer plugin binary. Annotate{' '}
+            Pure PHP 8.3+ library on Packagist with a bundled Composer plugin binary and an optional
+            Rust-backed <code>ext-omnibuf</code> extension. Annotate{' '}
             <a href="#attributes" class="doc-link">
               plain PHP classes with attributes
             </a>
@@ -128,8 +129,8 @@ const phpFaqJsonLd = {
             , or{' '}
             <a href="#plugin-codegen" class="doc-link">
               generate typed classes and lazy Opaque views
-            </a>{' '}
-            with zero PECL extensions.
+            </a>
+            .
           </p>
           <div class="flex flex-wrap gap-3 font-mono text-sm sm:text-base pt-1 no-print">
             <a
@@ -157,7 +158,7 @@ const phpFaqJsonLd = {
           </div>
         </div>
 
-        <div class="lg:col-span-5 min-w-0">
+        <div class="lg:col-span-5 min-w-0 space-y-3">
           <div class="p-4 sm:p-5 bg-ink text-paper rounded-md font-mono text-xs sm:text-sm overflow-x-auto leading-relaxed border-2 border-ink shadow-[4px_4px_0px_#111111]">
             <div class="flex items-center justify-between gap-2 mb-2 pb-2 border-b border-paper/15">
               <div class="text-xs font-bold uppercase text-acid">Install via Composer</div>
@@ -170,6 +171,24 @@ const phpFaqJsonLd = {
               </button>
             </div>
             <pre class="leading-relaxed whitespace-pre"><code><span class="text-paper/75 select-none">$ </span>composer require omnibuf/omnibuf</code></pre>
+          </div>
+
+          <div class="p-4 sm:p-5 bg-ink text-paper rounded-md font-mono text-xs sm:text-sm overflow-x-auto leading-relaxed border-2 border-ink shadow-[4px_4px_0px_#111111]">
+            <div class="flex items-center justify-between gap-2 mb-2 pb-2 border-b border-paper/15">
+              <div class="text-xs font-bold uppercase text-acid">
+                Optional: ext-omnibuf (Rust native)
+              </div>
+              <button
+                type="button"
+                data-copy="cd vendor/omnibuf/omnibuf/ext/rust && cargo build --release && cd .. && phpize && ./configure && make && php -d extension=modules/omnibuf.so -m"
+                class="copy-snippet-btn min-w-[4.75rem] text-center px-2.5 py-1 text-xs font-bold uppercase bg-paper/15 hover:bg-acid hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-acid text-paper border border-paper/30 rounded shrink-0 transition"
+              >
+                Copy
+              </button>
+            </div>
+            <pre class="leading-relaxed whitespace-pre"><code><span class="text-paper/75 select-none">$ </span>cd vendor/omnibuf/omnibuf/ext/rust &amp;&amp; cargo build --release
+<span class="text-paper/75 select-none">$ </span>cd .. &amp;&amp; phpize &amp;&amp; ./configure &amp;&amp; make
+<span class="text-paper/75 select-none">$ </span>php -d extension=modules/omnibuf.so -m</code></pre>
           </div>
         </div>
       </div>
