@@ -3,7 +3,9 @@ import { Code } from 'astro:components';
 import Layout from '../layouts/Layout.astro';
 import Navbar from '../components/Navbar.astro';
 import LanguageStrip from '../components/LanguageStrip.astro';
+import TypeMappingTable from '../components/TypeMappingTable.astro';
 import Footer from '../components/Footer.astro';
+import { defaultTypeMappings } from '../data/typeMappings';
 
 let mavenVersion = '0.1.1';
 const isNewerSemver = (candidate: string, current: string) => {
@@ -241,6 +243,8 @@ const javaFaqJsonLd = {
               <Code code={recordJavaSnippet} lang="java" theme="github-dark" />
             </div>
           </div>
+
+          <TypeMappingTable {...defaultTypeMappings.java} />
         </div>
 
         <div

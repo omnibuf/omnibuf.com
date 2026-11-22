@@ -3,7 +3,9 @@ import { Code } from 'astro:components';
 import Layout from '../layouts/Layout.astro';
 import Navbar from '../components/Navbar.astro';
 import LanguageStrip from '../components/LanguageStrip.astro';
+import TypeMappingTable from '../components/TypeMappingTable.astro';
 import Footer from '../components/Footer.astro';
+import { defaultTypeMappings } from '../data/typeMappings';
 
 const attributePhpSnippet = `<?php
 use OmniBuf\\Attributes\\OmniBufField;
@@ -232,6 +234,8 @@ const phpFaqJsonLd = {
               <Code code={attributePhpSnippet} lang="php" theme="github-dark" />
             </div>
           </div>
+
+          <TypeMappingTable {...defaultTypeMappings.php} />
         </div>
 
         <div

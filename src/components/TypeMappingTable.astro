@@ -1,0 +1,68 @@
+---
+export interface TypeMappingRow {
+  nativeType: string;
+  protoType: string;
+  wireType: string;
+  overrides: string;
+}
+
+interface Props {
+  title: string;
+  nativeLabel: string;
+  overrideLabel?: string;
+  rows: TypeMappingRow[];
+  noteHtml?: string;
+}
+
+const { title, nativeLabel, overrideLabel = 'Explicit Overrides', rows, noteHtml } = Astro.props;
+---
+
+<div class="lg:col-span-12 os-window overflow-hidden">
+  <div class="os-titlebar bg-[#E5E0D5]">
+    <span class="font-mono text-xs sm:text-sm font-bold uppercase text-ink">{title}</span>
+    <div class="os-stripes"></div>
+    <span class="font-mono text-xs font-bold uppercase text-ink/75 hidden sm:inline">
+      Default unless overridden
+    </span>
+  </div>
+  <div class="bg-[#FAF8F2] overflow-x-auto">
+    <table class="w-full text-left border-collapse font-mono text-xs sm:text-sm">
+      <thead>
+        <tr class="border-b-2 border-ink bg-[#E5E0D5]/45 text-ink uppercase text-[11px] sm:text-xs">
+          <th scope="col" class="py-2.5 px-3.5 sm:px-4 font-bold">
+            {nativeLabel}
+          </th>
+          <th scope="col" class="py-2.5 px-3.5 sm:px-4 font-bold">
+            Default Protobuf Type
+          </th>
+          <th scope="col" class="py-2.5 px-3.5 sm:px-4 font-bold">
+            Wire Type
+          </th>
+          <th scope="col" class="py-2.5 px-3.5 sm:px-4 font-bold">
+            {overrideLabel}
+          </th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-ink/15">
+        {rows.map((row) => (
+          <tr class="hover:bg-[#E5E0D5]/30 transition-colors">
+            <td class="py-2 px-3.5 sm:px-4 font-bold text-ink whitespace-nowrap">
+              {row.nativeType}
+            </td>
+            <td class="py-2 px-3.5 sm:px-4 text-ink whitespace-nowrap">{row.protoType}</td>
+            <td class="py-2 px-3.5 sm:px-4 text-[#FF4F18] font-semibold whitespace-nowrap">
+              {row.wireType}
+            </td>
+            <td class="py-2 px-3.5 sm:px-4 text-ink/80">{row.overrides}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+    {noteHtml && (
+      <p
+        class="px-3.5 sm:px-4 py-2.5 border-t border-ink/20 bg-[#E5E0D5]/30 font-sans text-xs sm:text-sm text-ink/85 leading-relaxed"
+        set:html={noteHtml}
+      />
+    )}
+  </div>
+</div>

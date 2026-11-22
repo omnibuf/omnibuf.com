@@ -1,5 +1,7 @@
 ---
 import { Code } from 'astro:components';
+import TypeMappingTable from './TypeMappingTable.astro';
+import { defaultTypeMappings } from '../data/typeMappings';
 
 const structTagSnippet = `type Peer struct {
 	ID       uint64            \`omnibuf:"1,name=peer_id"\`
@@ -98,6 +100,8 @@ if view.GetActive() && view.GetAsn() == 64512 {
           <Code code={structTagSnippet} lang="go" theme="github-dark" />
         </div>
       </div>
+
+      <TypeMappingTable {...defaultTypeMappings.go} />
     </div>
 
     <!-- 2. Standard Protobuf Structs -->

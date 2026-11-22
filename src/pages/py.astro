@@ -3,7 +3,9 @@ import { Code } from 'astro:components';
 import Layout from '../layouts/Layout.astro';
 import Navbar from '../components/Navbar.astro';
 import LanguageStrip from '../components/LanguageStrip.astro';
+import TypeMappingTable from '../components/TypeMappingTable.astro';
 import Footer from '../components/Footer.astro';
+import { defaultTypeMappings } from '../data/typeMappings';
 
 const protobufPySnippet = `import omnibuf
 from app.gen import peer_pb
@@ -256,6 +258,8 @@ const pyFaqJsonLd = {
               <Code code={dataclassPySnippet} lang="python" theme="github-dark" />
             </div>
           </div>
+
+          <TypeMappingTable {...defaultTypeMappings.py} />
         </div>
 
         <div

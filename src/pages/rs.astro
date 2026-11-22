@@ -3,7 +3,9 @@ import { Code } from 'astro:components';
 import Layout from '../layouts/Layout.astro';
 import Navbar from '../components/Navbar.astro';
 import LanguageStrip from '../components/LanguageStrip.astro';
+import TypeMappingTable from '../components/TypeMappingTable.astro';
 import Footer from '../components/Footer.astro';
+import { defaultTypeMappings } from '../data/typeMappings';
 
 const cargoFeaturesSnippet = `# Default: derive + buffa + prost
 omnibuf = "0.1"
@@ -288,6 +290,8 @@ const rsFaqJsonLd = {
               <Code code={deriveRustSnippet} lang="rust" theme="github-dark" />
             </div>
           </div>
+
+          <TypeMappingTable {...defaultTypeMappings.rs} />
         </div>
 
         <div

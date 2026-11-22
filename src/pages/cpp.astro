@@ -3,7 +3,9 @@ import { Code } from 'astro:components';
 import Layout from '../layouts/Layout.astro';
 import Navbar from '../components/Navbar.astro';
 import LanguageStrip from '../components/LanguageStrip.astro';
+import TypeMappingTable from '../components/TypeMappingTable.astro';
 import Footer from '../components/Footer.astro';
+import { defaultTypeMappings } from '../data/typeMappings';
 
 const structTraitsSnippet = `#include "omnibuf/omnibuf.hpp"
 
@@ -214,6 +216,8 @@ const cppFaqJsonLd = {
               <Code code={structTraitsSnippet} lang="cpp" theme="github-dark" />
             </div>
           </div>
+
+          <TypeMappingTable {...defaultTypeMappings.cpp} />
         </div>
 
         <div
