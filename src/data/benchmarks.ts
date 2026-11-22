@@ -1361,7 +1361,7 @@ export const languageBenchmarks: Record<LanguageKey, LanguageBenchmarkSuite> = {
     key: 'cpp',
     label: 'C++',
     shortLabel: 'C++',
-    headingPrefix: 'C++20',
+    headingPrefix: 'C++',
     subtitleHtml:
       '11-field <code>PeerUpdate</code> struct on Apple Clang 21 (<code>-O3 -DNDEBUG</code>, C++20). <strong>Shorter bars = Faster.</strong>',
     href: '/benchmarks?lang=cpp',
@@ -1391,7 +1391,7 @@ export const languageBenchmarks: Record<LanguageKey, LanguageBenchmarkSuite> = {
     key: 'java',
     label: 'Java',
     shortLabel: 'Java',
-    headingPrefix: 'Java 21',
+    headingPrefix: 'Java',
     subtitleHtml:
       '11-field <code>PeerUpdate</code> workload on OpenJDK 21.0.13 (C2 JIT) across <code>com.omnibuf</code>, <code>protobuf-java</code>, <code>FlatBuffers</code>, Jackson JSON, and Jackson MessagePack. <strong>Shorter bars = Faster.</strong>',
     href: '/benchmarks?lang=java',
@@ -1416,7 +1416,7 @@ export const languageBenchmarks: Record<LanguageKey, LanguageBenchmarkSuite> = {
     key: 'cs',
     label: 'C# / .NET',
     shortLabel: 'C#',
-    headingPrefix: 'C# & .NET 8',
+    headingPrefix: 'C# & .NET',
     subtitleHtml:
       '11-field <code>PeerUpdate</code> workload on .NET 8.0.29 (RyuJIT) across <code>OmniBuf</code>, <code>Google.Protobuf</code>, <code>MessagePack-CSharp</code>, and <code>System.Text.Json</code>. <strong>Shorter bars = Faster.</strong>',
     href: '/benchmarks?lang=cs',
@@ -1441,7 +1441,7 @@ export const languageBenchmarks: Record<LanguageKey, LanguageBenchmarkSuite> = {
     key: 'swift',
     label: 'Swift',
     shortLabel: 'Swift',
-    headingPrefix: 'Swift 6',
+    headingPrefix: 'Swift',
     subtitleHtml:
       '11-field <code>PeerUpdate</code> workload on Swift 6.3.2 (Apple M1 Pro) across <code>OmniBuf</code>, <code>SwiftProtobuf</code>, and Foundation <code>JSONEncoder</code> / <code>JSONDecoder</code>. <strong>Shorter bars = Faster.</strong>',
     href: '/benchmarks?lang=swift',
@@ -1466,7 +1466,7 @@ export const languageBenchmarks: Record<LanguageKey, LanguageBenchmarkSuite> = {
     key: 'dart',
     label: 'Dart',
     shortLabel: 'Dart',
-    headingPrefix: 'Dart 3',
+    headingPrefix: 'Dart',
     subtitleHtml:
       '11-field <code>PeerUpdate</code> workload on Dart 3.14.1 AOT (Apple M1 Pro) across <code>omnibuf</code>, <code>package:protobuf</code>, and <code>dart:convert</code> JSON. <strong>Shorter bars = Faster.</strong>',
     href: '/benchmarks?lang=dart',
@@ -1491,7 +1491,7 @@ export const languageBenchmarks: Record<LanguageKey, LanguageBenchmarkSuite> = {
     key: 'php',
     label: 'PHP',
     shortLabel: 'PHP',
-    headingPrefix: 'PHP 8.3+',
+    headingPrefix: 'PHP',
     subtitleHtml:
       '11-field <code>PeerUpdate</code> workload on PHP 8.6 (Apple M1 Pro) across optional <code>ext-omnibuf</code> (Rust), pure-PHP <code>omnibuf/omnibuf</code>, PECL <code>ext-protobuf</code> (C <code>upb</code>), pure-PHP <code>google/protobuf</code>, and C-backed <code>json_encode</code> / <code>json_decode</code>. <strong>Shorter bars = Faster.</strong>',
     href: '/benchmarks?lang=php',
@@ -1516,7 +1516,7 @@ export const languageBenchmarks: Record<LanguageKey, LanguageBenchmarkSuite> = {
     key: 'elixir',
     label: 'Elixir',
     shortLabel: 'Elixir',
-    headingPrefix: 'Elixir / BEAM',
+    headingPrefix: 'Elixir',
     subtitleHtml:
       '11-field <code>PeerUpdate</code> workload on Elixir 1.18.6 / OTP 27 (Apple M1 Pro) across optional Rustler NIF (<code>omnibuf-rs</code>), pure-Elixir <code>omnibuf</code>, <code>elixir-protobuf</code>, and <code>Jason</code> JSON. <strong>Shorter bars = Faster.</strong>',
     href: '/benchmarks?lang=elixir',

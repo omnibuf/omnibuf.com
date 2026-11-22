@@ -109,7 +109,7 @@ const phpFaqJsonLd = {
         OmniBuf
         <br />
         <span class="font-serif italic font-normal normal-case text-[#FF4F18] text-[3.1rem] sm:text-8xl lg:text-[6.2rem]">
-          for PHP 8.3+.
+          for PHP.
         </span>
       </h1>
 
@@ -175,19 +175,17 @@ const phpFaqJsonLd = {
           <div class="p-4 sm:p-5 bg-ink text-paper rounded-md font-mono text-xs sm:text-sm overflow-x-auto leading-relaxed border-2 border-ink shadow-[4px_4px_0px_#111111]">
             <div class="flex items-center justify-between gap-2 mb-2 pb-2 border-b border-paper/15">
               <div class="text-xs font-bold uppercase text-acid">
-                Optional: ext-omnibuf (Rust native)
+                Optional: Prebuilt ext-omnibuf
               </div>
               <button
                 type="button"
-                data-copy="cd vendor/omnibuf/omnibuf/ext/rust && cargo build --release && cd .. && phpize && ./configure && make && php -d extension=modules/omnibuf.so -m"
+                data-copy="curl -fsSL https://raw.githubusercontent.com/omnibuf/omnibuf-php/main/scripts/install-ext.sh | sh"
                 class="copy-snippet-btn min-w-[4.75rem] text-center px-2.5 py-1 text-xs font-bold uppercase bg-paper/15 hover:bg-acid hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-acid text-paper border border-paper/30 rounded shrink-0 transition"
               >
                 Copy
               </button>
             </div>
-            <pre class="leading-relaxed whitespace-pre"><code><span class="text-paper/75 select-none">$ </span>cd vendor/omnibuf/omnibuf/ext/rust &amp;&amp; cargo build --release
-<span class="text-paper/75 select-none">$ </span>cd .. &amp;&amp; phpize &amp;&amp; ./configure &amp;&amp; make
-<span class="text-paper/75 select-none">$ </span>php -d extension=modules/omnibuf.so -m</code></pre>
+            <pre class="leading-relaxed whitespace-pre"><code><span class="text-paper/75 select-none">$ </span>curl -fsSL https://raw.githubusercontent.com/omnibuf/omnibuf-php/main/scripts/install-ext.sh | sh</code></pre>
           </div>
         </div>
       </div>
