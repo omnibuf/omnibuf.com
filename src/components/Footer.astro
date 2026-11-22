@@ -1,5 +1,11 @@
 ---
-import { cliNavPage, languages, primaryNavPages, specNavPage } from '../data/languages';
+import {
+  benchmarksNavPage,
+  cliNavPage,
+  languages,
+  primaryNavPages,
+  specNavPage,
+} from '../data/languages';
 
 const linkClass =
   'font-mono text-xs sm:text-sm font-medium text-ink/80 hover:text-ink hover:underline underline-offset-4 decoration-2 decoration-[#FF4F18] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink rounded-sm transition-colors';
@@ -42,6 +48,11 @@ const linkClass =
                 </a>
               </li>
             ))}
+            <li>
+              <a href={benchmarksNavPage.href} class={linkClass}>
+                {benchmarksNavPage.label}
+              </a>
+            </li>
             <li>
               <a href={specNavPage.href} class={linkClass}>
                 {specNavPage.label}

@@ -4,10 +4,17 @@ import { fileURLToPath } from 'node:url';
 import sitemap from '@astrojs/sitemap';
 import tailwindcss from '@tailwindcss/vite';
 import { defineConfig } from 'astro/config';
-import { cliNavPage, languages, primaryNavPages, specNavPage } from './src/data/languages.ts';
+import {
+  benchmarksNavPage,
+  cliNavPage,
+  languages,
+  primaryNavPages,
+  specNavPage,
+} from './src/data/languages.ts';
 
 const PAGE_LABELS = Object.fromEntries([
   ...primaryNavPages.map((p) => [p.href, p.label]),
+  [benchmarksNavPage.href, benchmarksNavPage.label],
   [specNavPage.href, specNavPage.label],
   ...languages.map((l) => [l.href, l.label]),
   [cliNavPage.href, cliNavPage.label],
@@ -15,6 +22,7 @@ const PAGE_LABELS = Object.fromEntries([
 
 const PAGE_ORDER = [
   ...primaryNavPages.map((p) => p.href),
+  benchmarksNavPage.href,
   specNavPage.href,
   ...languages.map((l) => l.href),
   cliNavPage.href,
@@ -251,7 +259,8 @@ function checkInternalLinksAndAnchors() {
               hash = href.slice(1);
             } else if (href.startsWith('/')) {
               const [rawPath, rawHash = ''] = href.split('#');
-              targetRoute = normalizeRoute(rawPath || '/');
+              const [rawPathNoQuery] = rawPath.split('?');
+              targetRoute = normalizeRoute(rawPathNoQuery || '/');
               hash = rawHash;
             } else {
               continue;

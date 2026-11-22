@@ -1,0 +1,1094 @@
+---
+import Footer from '../components/Footer.astro';
+import Navbar from '../components/Navbar.astro';
+import { benchmarkCategories, languageBenchmarkList, type BenchmarkRow } from '../data/benchmarks';
+import { languages, type LanguageKey } from '../data/languages';
+import Layout from '../layouts/Layout.astro';
+
+function formatMetric(val: number, unit: string): string {
+  if (unit === 'ns') {
+    if (val >= 1_000_000) {
+      return `${(val / 1_000_000).toFixed(2)} ms`;
+    }
+    if (val >= 10_000) {
+      return `${(val / 1_000).toFixed(1)} µs`;
+    }
+  }
+  return `${val.toLocaleString('en-US')} ${unit}`;
+}
+
+function formatMultiplier(competitorVal: number | null, omniVal: number): string {
+  if (competitorVal === null || omniVal <= 0) return 'n/a';
+  if (competitorVal === omniVal) return '1.0x';
+  if (competitorVal > omniVal) {
+    const ratio = competitorVal / omniVal;
+    return ratio >= 10 ? `${Math.round(ratio)}x faster` : `${ratio.toFixed(1)}x faster`;
+  }
+  const ratio = omniVal / competitorVal;
+  return `${ratio.toFixed(1)}x slower`;
+}
+
+function findPrimaryProtobuf(rows: BenchmarkRow[]): BenchmarkRow | undefined {
+  const candidates = rows.filter(
+    (r) =>
+      !r.highlight &&
+      /protobuf|prost|buffa|libprotobuf|upb|swiftprotobuf|package:protobuf|elixir-protobuf/i.test(
+        r.name,
+      ) &&
+      !/pure php|leb128 wire/i.test(r.name),
+  );
+  if (candidates.length === 0) return undefined;
+  return (
+    candidates.find((r) =>
+      /^(Protobuf|@bufbuild\/protobuf|prost|google\/protobuf \(upb|libprotobuf|protobuf-java|Google\.Protobuf|SwiftProtobuf|package:protobuf|google\/protobuf \(C ext|elixir-protobuf)/i.test(
+        r.name,
+      ),
+    ) ?? candidates[0]
+  );
+}
+
+function findPrimaryJson(rows: BenchmarkRow[]): BenchmarkRow | undefined {
+  const candidates = rows.filter((r) => !r.highlight && /json|jason/i.test(r.name));
+  if (candidates.length === 0) return undefined;
+  return candidates.find((r) => !/json\/v2/i.test(r.name)) ?? candidates[0];
+}
+
+function shortCompetitorName(name: string | null): string {
+  if (!name) return '';
+  return name
+    .replace(/^Protobuf \(([^)]+)\)$/i, '$1')
+    .replace(/^JSON \(([^)]+)\)$/i, '$1')
+    .replace(/^([^(]+) \(Protobuf\)$/i, '$1')
+    .replace(/^([^(]+) \(JSON\)$/i, '$1')
+    .replace(/^google\/protobuf \(C ext\)$/i, 'ext-protobuf')
+    .replace(/^json \(stdlib\)$/i, 'stdlib json')
+    .replace(/^encoding\/json$/i, 'encoding/json');
+}
+
+interface CrossLangBenchDef {
+  slug: string;
+  shortLabel: string;
+  title: string;
+  summary: string;
+}
+
+const crossLangDefs: CrossLangBenchDef[] = [
+  {
+    slug: 'decode',
+    shortLabel: 'Full Decode',
+    title: 'Full Message Decode Speed',
+    summary:
+      'Unpacking and reading all 11 fields of PeerUpdate into a destination struct and checksum sink across every codec.',
+  },
+  {
+    slug: 'encode',
+    shortLabel: 'Full Encode',
+    title: 'Full Message Encode Speed',
+    summary:
+      'Serializing the 11-field PeerUpdate struct into a byte buffer. Tests single-pass 2-byte length slots and Prefix-Varint writes.',
+  },
+  {
+    slug: 'nested-read',
+    shortLabel: 'Nested Read',
+    title: 'Read a Single Nested Field',
+    summary:
+      'Extracting a single nested city string directly from raw wire bytes by hopping over preceding fields by byte length.',
+  },
+  {
+    slug: 'splice',
+    shortLabel: 'Field Splice',
+    title: 'Selective Single-Field Mutation',
+    summary:
+      'Checking a nested city string, incrementing a 64-bit sequence counter, and splicing only the dirty field back into the packet.',
+  },
+  {
+    slug: 'large-embed',
+    shortLabel: 'Large Embed',
+    title: 'Large Embedded Message Encode',
+    summary:
+      'Encoding a ~39 KiB message with embedded sub-messages exceeding the 16 KiB 2-byte slot to exercise the 4-byte length path.',
+  },
+  {
+    slug: 'growth',
+    shortLabel: 'Growth',
+    title: 'Embedded Message Growth',
+    summary:
+      'Scaling behavior as embedded sub-message payloads grow, checking for linear O(N) performance across container sizes.',
+  },
+];
+
+const langMetaByKey = new Map(languages.map((l) => [l.key, l]));
+
+const crossLangPanels = crossLangDefs.map((def) => {
+  const rawEntries = languageBenchmarkList
+    .map((suite) => {
+      const cat = suite.categories.find((c) => c.title === def.title);
+      if (!cat) return null;
+      const omniRow =
+        cat.rows.find((r) => r.baseline) ?? cat.rows.find((r) => r.highlight) ?? cat.rows[0];
+      const protoRow = findPrimaryProtobuf(cat.rows);
+      const jsonRow = findPrimaryJson(cat.rows);
+      const meta = langMetaByKey.get(suite.key);
+      return {
+        key: suite.key,
+        label: suite.label,
+        shortLabel: suite.shortLabel,
+        href: meta?.href ?? `/${suite.key}`,
+        runtimeLabel: omniRow.name,
+        val: omniRow.val,
+        unit: cat.unit,
+        protoVal: protoRow?.val ?? null,
+        protoName: protoRow?.name ?? null,
+        jsonVal: jsonRow?.val ?? null,
+        jsonName: jsonRow?.name ?? null,
+      };
+    })
+    .filter((entry): entry is NonNullable<typeof entry> => entry !== null)
+    .sort((a, b) => a.val - b.val);
+
+  const maxVal = Math.max(...rawEntries.map((e) => e.val), 1);
+  const minVal = Math.max(Math.min(...rawEntries.map((e) => e.val), 1), 1);
+  const logMin = Math.log10(minVal * 0.65);
+  const logMax = Math.log10(maxVal);
+  const logSpan = Math.max(logMax - logMin, 0.001);
+
+  const rows = rawEntries.map((entry, idx) => {
+    const linearPct = Math.max(3, Math.min(100, (entry.val / maxVal) * 100)).toFixed(1);
+    const logPct = Math.max(
+      10,
+      Math.min(100, ((Math.log10(Math.max(entry.val, 1)) - logMin) / logSpan) * 100),
+    ).toFixed(1);
+    return {
+      ...entry,
+      rank: idx + 1,
+      linearPct,
+      logPct,
+      vsProto: formatMultiplier(entry.protoVal, entry.val),
+      vsJson: formatMultiplier(entry.jsonVal, entry.val),
+    };
+  });
+
+  return {
+    ...def,
+    rows,
+  };
+});
+
+const wireSizeCategory = benchmarkCategories.find((cat) => cat.unit === 'B');
+
+const methodologyBenchmarks = [
+  {
+    title: 'Full Message Encode Speed',
+    slug: 'encode',
+    description:
+      'Serializes the 11-field PeerUpdate struct into a byte buffer. Every RPC response, event producer, and cache write hits full-message encoding on the hot path, and this workload directly tests whether single-pass 2-byte length slots and Prefix-Varint writes outperform Protobuf two-pass Size() walks and LEB128 loops.',
+  },
+  {
+    title: 'Full Message Decode Speed',
+    slug: 'decode',
+    description:
+      'Unpacks all 11 fields of PeerUpdate into a destination struct and feeds every field into a non-inlined checksum sink. Reading every field prevents lazy wrappers from skipping work and isolates trailing-zero Prefix-Varint loads and packed primitive arrays against LEB128 byte loops and JSON tokenizers under equal struct reuse.',
+  },
+  {
+    title: 'Read a Single Nested Field',
+    slug: 'nested-read',
+    description:
+      "Extracts one nested string (location.city) straight from raw wire bytes. Proxies, routers, and log filters often inspect a single routing key inside a larger payload, so this test highlights length-prefixed field skipping over Protobuf and JSON full decodes while showing honestly where FlatBuffers and Cap'n Proto offset tables stay faster.",
+  },
+  {
+    title: 'Selective Single-Field Mutation',
+    slug: 'splice',
+    description:
+      'Checks location.city, increments a 64-bit sequence counter, and returns updated packet bytes. Middleware and stream processors frequently validate one field, stamp a counter or flag, and forward the message, making this the direct test of Opaque in-place field splicing against a full decode, allocate, and re-encode cycle.',
+  },
+  {
+    title: 'Large Embedded Message Encode',
+    slug: 'large-embed',
+    description:
+      "Encodes a ~39 KiB message with embedded sub-messages exceeding OmniBuf's 16 KiB 2-byte length slot. Real batch responses and nested blobs routinely cross 16 KiB, so this benchmark exercises the 4-byte container length fallback path to confirm the 2-byte fast path is not masking a performance cliff on large payloads.",
+  },
+  {
+    title: 'Embedded Message Growth',
+    slug: 'growth',
+    description:
+      'Measures encode latency as embedded sub-message sizes scale up across multiple thresholds. Tracking growth catches quadratic buffer shifting or repeated re-sizing early and verifies linear O(N) scaling across container sizes.',
+  },
+];
+
+const validLangKeys: LanguageKey[] = languageBenchmarkList.map((s) => s.key);
+---
+
+<Layout
+  title="Benchmarks & Methodology | OmniBuf"
+  description="Cross-language OmniBuf benchmarks across Go, TypeScript, Rust, Python, C++20, Java, C#, Swift, Dart, PHP, and Elixir, plus full benchmark methodology."
+>
+  <Navbar currentPage="benchmarks" />
+
+  <main id="main-content">
+    <!-- Page Header -->
+    <section class="pt-10 sm:pt-14 pb-6 sm:pb-8 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+      <div class="flex flex-wrap items-end justify-between gap-4">
+        <div class="max-w-3xl">
+          <h1 class="text-4xl sm:text-6xl font-bold tracking-tight uppercase leading-[0.95] text-ink">
+            Runtime{' '}
+            <span class="font-serif italic font-normal normal-case text-[#FF4F18]">
+              benchmarks.
+            </span>
+          </h1>
+          <p class="mt-3 text-base sm:text-lg text-ink/85 font-medium leading-relaxed max-w-[64ch]">
+            Inspect OmniBuf against Protobuf, JSON, and native serializers in each of the 11
+            supported languages, or compare runtimes side by side on the same Apple M1 Pro workload.
+          </p>
+        </div>
+        <div class="flex flex-wrap gap-2 font-mono text-xs sm:text-sm">
+          <a href="#wire-size" class="os-btn px-3.5 py-2 bg-[#FAF8F2] text-ink font-bold rounded">
+            Wire Size &darr;
+          </a>
+          <a href="#methodology" class="os-btn px-3.5 py-2 bg-[#FAF8F2] text-ink font-bold rounded">
+            Methodology &darr;
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Interactive Benchmark Explorer -->
+    <section
+      id="results"
+      data-benchmark-explorer
+      class="pb-12 sm:pb-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto"
+    >
+      <!-- Workstation Control Bar -->
+      <div class="os-window overflow-hidden mb-6">
+        <div class="os-titlebar bg-[#E5E0D5]">
+          <span class="font-mono text-xs sm:text-sm font-bold uppercase text-ink">
+            Benchmark Explorer &middot; 11 Languages &middot; 6 Workloads
+          </span>
+          <div class="os-stripes"></div>
+          <span class="font-mono text-xs font-bold uppercase text-ink/80">
+            Shorter bars = Faster
+          </span>
+        </div>
+
+        <div class="p-3.5 sm:p-4 bg-[#FAF8F2] space-y-3.5">
+          <!-- Mode Switcher + Scale Toggle -->
+          <div class="flex flex-wrap items-center justify-between gap-3">
+            <div
+              role="tablist"
+              aria-label="Benchmark view mode"
+              class="inline-flex flex-wrap gap-1.5 font-mono text-xs sm:text-sm font-bold"
+            >
+              <button
+                type="button"
+                role="tab"
+                id="view-tab-language"
+                data-view-tab="language"
+                aria-selected="true"
+                aria-controls="view-panel-language"
+                tabindex="0"
+                class="px-3.5 py-1.5 rounded border-2 border-ink bg-acid text-ink shadow-[2px_2px_0px_#111111] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink transition cursor-pointer"
+              >
+                By Language
+              </button>
+              <button
+                type="button"
+                role="tab"
+                id="view-tab-compare"
+                data-view-tab="compare"
+                aria-selected="false"
+                aria-controls="view-panel-compare"
+                tabindex="-1"
+                class="px-3.5 py-1.5 rounded border-2 border-ink bg-[#FAF8F2] text-ink hover:bg-[#E5E0D5] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink transition cursor-pointer"
+              >
+                Compare Languages
+              </button>
+            </div>
+
+            <!-- Scale Switcher (visible in Compare Languages mode) -->
+            <div
+              data-scale-controls
+              class="hidden items-center gap-1.5 font-mono text-xs font-bold"
+            >
+              <span class="text-ink/75 uppercase mr-1">Bar scale:</span>
+              <button
+                type="button"
+                data-scale-btn="log"
+                aria-pressed="true"
+                class="px-2.5 py-1.5 rounded border-2 border-ink bg-acid text-ink shadow-[2px_2px_0px_#111111] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink transition cursor-pointer"
+              >
+                Log
+              </button>
+              <button
+                type="button"
+                data-scale-btn="linear"
+                aria-pressed="false"
+                class="px-2.5 py-1.5 rounded border-2 border-ink bg-[#FAF8F2] text-ink hover:bg-[#E5E0D5] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink transition cursor-pointer"
+              >
+                Linear
+              </button>
+            </div>
+          </div>
+
+          <!-- Sub-tabs: 11 Languages (By Language mode) -->
+          <div
+            data-language-subtabs
+            role="tablist"
+            aria-label="Select language runtime"
+            class="flex flex-wrap gap-1.5 pt-2.5 border-t border-ink/15 font-mono text-xs font-bold"
+          >
+            {languageBenchmarkList.map((suite, idx) => (
+              <button
+                type="button"
+                role="tab"
+                id={`lang-tab-${suite.key}`}
+                data-lang-tab={suite.key}
+                aria-selected={idx === 0 ? 'true' : 'false'}
+                aria-controls={`lang-panel-${suite.key}`}
+                tabindex={idx === 0 ? 0 : -1}
+                class:list={[
+                  'px-2.5 py-1.5 rounded border-2 border-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink transition cursor-pointer',
+                  idx === 0
+                    ? 'bg-acid text-ink shadow-[2px_2px_0px_#111111]'
+                    : 'bg-white text-ink hover:bg-[#E5E0D5]',
+                ]}
+              >
+                {suite.shortLabel}
+              </button>
+            ))}
+          </div>
+
+          <!-- Sub-tabs: 6 Workloads (Compare Languages mode) -->
+          <div
+            data-compare-subtabs
+            role="tablist"
+            aria-label="Select benchmark workload"
+            class="hidden flex-wrap gap-1.5 pt-2.5 border-t border-ink/15 font-mono text-xs font-bold"
+          >
+            {crossLangPanels.map((panel, idx) => (
+              <button
+                type="button"
+                role="tab"
+                id={`bench-tab-${panel.slug}`}
+                data-bench-tab={panel.slug}
+                aria-selected={idx === 0 ? 'true' : 'false'}
+                aria-controls={`bench-panel-${panel.slug}`}
+                tabindex={idx === 0 ? 0 : -1}
+                class:list={[
+                  'px-2.5 py-1.5 rounded border-2 border-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink transition cursor-pointer',
+                  idx === 0
+                    ? 'bg-acid text-ink shadow-[2px_2px_0px_#111111]'
+                    : 'bg-white text-ink hover:bg-[#E5E0D5]',
+                ]}
+              >
+                {panel.shortLabel}
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <!-- VIEW 1: CROSS-LANGUAGE COMPARISON -->
+      <div
+        id="view-panel-compare"
+        role="tabpanel"
+        aria-labelledby="view-tab-compare"
+        data-view-panel="compare"
+        class="hidden"
+      >
+        {crossLangPanels.map((panel, pIdx) => (
+          <div
+            id={`bench-panel-${panel.slug}`}
+            role="tabpanel"
+            aria-labelledby={`bench-tab-${panel.slug}`}
+            data-bench-panel={panel.slug}
+            class:list={[pIdx !== 0 && 'hidden']}
+          >
+            <div class="os-window overflow-hidden">
+              <div class="os-titlebar bg-[#E5E0D5]">
+                <h2 class="font-mono text-xs sm:text-sm font-bold uppercase text-ink">
+                  {panel.title} &middot; All 11 Runtimes
+                </h2>
+                <div class="os-stripes"></div>
+              </div>
+
+              <div class="p-4 sm:p-5 bg-[#FAF8F2] space-y-3">
+                <p class="text-sm sm:text-base text-ink/85 leading-relaxed max-w-[75ch]">
+                  {panel.summary}
+                </p>
+
+                <!-- Column Headers (Desktop) -->
+                <div class="hidden md:grid md:grid-cols-[minmax(190px,1.25fr)_minmax(180px,1.25fr)_minmax(165px,1fr)_minmax(165px,1fr)_auto] gap-4 px-3 pb-1.5 border-b-2 border-ink font-mono text-xs font-bold uppercase text-ink/80">
+                  <div>Language &amp; Runtime</div>
+                  <div>OmniBuf Latency</div>
+                  <div class="text-right">vs Protobuf</div>
+                  <div class="text-right">vs JSON</div>
+                  <div class="text-right">Charts</div>
+                </div>
+
+                <div class="space-y-1.5">
+                  {panel.rows.map((row) => (
+                    <div
+                      class:list={[
+                        'grid grid-cols-1 md:grid-cols-[minmax(190px,1.25fr)_minmax(180px,1.25fr)_minmax(165px,1fr)_minmax(165px,1fr)_auto] gap-x-4 gap-y-2 items-center px-3 py-2.5 rounded border transition',
+                        row.rank === 1
+                          ? 'bg-acid/30 border-2 border-ink shadow-[2px_2px_0px_#111111]'
+                          : 'bg-white border-ink/20 hover:border-ink',
+                      ]}
+                    >
+                      <!-- Language & Runtime (with mobile drill-down button) -->
+                      <div class="min-w-0 flex items-center justify-between md:block gap-2">
+                        <div class="min-w-0">
+                          <div class="flex items-center gap-2 min-w-0">
+                            <span class="font-mono text-xs font-bold text-ink/80 tabular-nums w-5 shrink-0">
+                              #{row.rank}
+                            </span>
+                            <a
+                              href={row.href}
+                              class="font-mono text-sm font-bold text-ink hover:underline decoration-2 decoration-[#FF4F18] underline-offset-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink rounded-sm truncate"
+                            >
+                              {row.label}
+                            </a>
+                          </div>
+                          <div class="font-mono text-xs text-ink/80 truncate pl-7">
+                            {row.runtimeLabel}
+                          </div>
+                        </div>
+                        <button
+                          type="button"
+                          data-inspect-lang={row.key}
+                          class="md:hidden px-2.5 py-1.5 rounded border border-ink bg-[#FAF8F2] hover:bg-acid text-ink font-mono text-xs font-bold focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink transition cursor-pointer whitespace-nowrap shrink-0"
+                          title={`View all ${row.label} benchmark charts`}
+                        >
+                          All 6 &rarr;
+                        </button>
+                      </div>
+
+                      <!-- Latency Bar + Metric -->
+                      <div class="flex items-center gap-2.5 min-w-0">
+                        <div class="flex-1 bg-[#E5E0D5] h-4 border border-ink rounded-sm overflow-hidden">
+                          <div
+                            data-scale-bar
+                            data-log-pct={row.logPct}
+                            data-linear-pct={row.linearPct}
+                            class="h-full bench-bar-omni border-r border-ink transition-[width] duration-200"
+                            style={`width: ${row.logPct}%;`}
+                          />
+                        </div>
+                        <span class="font-mono text-xs sm:text-sm font-bold text-ink tabular-nums whitespace-nowrap w-20 text-right shrink-0">
+                          {formatMetric(row.val, row.unit)}
+                        </span>
+                      </div>
+
+                      <!-- vs Protobuf -->
+                      <div class="flex items-baseline justify-between md:block font-mono text-xs tabular-nums md:text-right min-w-0 gap-2">
+                        <span class="md:hidden text-xs uppercase text-ink/80 shrink-0">
+                          vs Protobuf
+                        </span>
+                        <div class="text-right min-w-0">
+                          <div
+                            class="font-bold text-ink text-xs sm:text-sm"
+                            title={
+                              row.protoVal !== null && row.protoName
+                                ? `${row.protoName}: ${formatMetric(row.protoVal, row.unit)}`
+                                : undefined
+                            }
+                          >
+                            {row.vsProto}
+                          </div>
+                          {row.protoVal !== null && (
+                            <div class="text-xs text-ink/85 truncate">
+                              {formatMetric(row.protoVal, row.unit)} (
+                              {shortCompetitorName(row.protoName)})
+                            </div>
+                          )}
+                        </div>
+                      </div>
+
+                      <!-- vs JSON -->
+                      <div class="flex items-baseline justify-between md:block font-mono text-xs tabular-nums md:text-right min-w-0 gap-2">
+                        <span class="md:hidden text-xs uppercase text-ink/80 shrink-0">
+                          vs JSON
+                        </span>
+                        <div class="text-right min-w-0">
+                          <div
+                            class="font-bold text-ink text-xs sm:text-sm"
+                            title={
+                              row.jsonVal !== null && row.jsonName
+                                ? `${row.jsonName}: ${formatMetric(row.jsonVal, row.unit)}`
+                                : undefined
+                            }
+                          >
+                            {row.vsJson}
+                          </div>
+                          {row.jsonVal !== null && (
+                            <div class="text-xs text-ink/85 truncate">
+                              {formatMetric(row.jsonVal, row.unit)} (
+                              {shortCompetitorName(row.jsonName)})
+                            </div>
+                          )}
+                        </div>
+                      </div>
+
+                      <!-- Desktop drill-down button -->
+                      <div class="hidden md:flex justify-end">
+                        <button
+                          type="button"
+                          data-inspect-lang={row.key}
+                          class="px-2.5 py-1.5 rounded border border-ink bg-[#FAF8F2] hover:bg-acid text-ink font-mono text-xs font-bold focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink transition cursor-pointer whitespace-nowrap"
+                          title={`View all ${row.label} benchmark charts`}
+                        >
+                          All 6 &rarr;
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                <p class="pt-2 text-xs text-ink/75 font-mono leading-relaxed">
+                  Note: Cross-language latency reflects each runtime model (AOT native, JIT,
+                  interpreter + Rust FFI/NIF, or BEAM). Click any row&apos;s{' '}
+                  <strong>All 6 &rarr;</strong> button to inspect all competitors and pure-language
+                  variants for that ecosystem.
+                </p>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <!-- VIEW 2: BY-LANGUAGE DETAILED BREAKDOWN -->
+      <div
+        id="view-panel-language"
+        role="tabpanel"
+        aria-labelledby="view-tab-language"
+        data-view-panel="language"
+      >
+        {languageBenchmarkList.map((suite, sIdx) => {
+          const langMeta = langMetaByKey.get(suite.key);
+          return (
+            <div
+              id={`lang-panel-${suite.key}`}
+              role="tabpanel"
+              aria-labelledby={`lang-tab-${suite.key}`}
+              data-lang-panel={suite.key}
+              class:list={['space-y-6', sIdx !== 0 && 'hidden']}
+            >
+              <div class="flex flex-wrap items-end justify-between gap-4">
+                <div class="max-w-3xl">
+                  <h2
+                    tabindex="-1"
+                    data-lang-heading={suite.key}
+                    class="text-2xl sm:text-4xl font-bold tracking-tight uppercase leading-none text-ink focus:outline-none"
+                  >
+                    {suite.headingPrefix}{' '}
+                    <span class="font-serif italic font-normal normal-case text-[#FF4F18]">
+                      benchmarks.
+                    </span>
+                  </h2>
+                  <p
+                    class="mt-2 text-sm sm:text-base text-ink/80 font-medium"
+                    set:html={suite.subtitleHtml}
+                  />
+                </div>
+                <a
+                  href={langMeta?.href ?? `/${suite.key}`}
+                  class="os-btn px-3.5 py-2 bg-acid text-ink font-mono font-bold text-xs sm:text-sm rounded"
+                >
+                  {suite.label} Guide &rarr;
+                </a>
+              </div>
+
+              <div class="grid lg:grid-cols-2 gap-5 items-start">
+                {suite.categories.map((cat) => (
+                  <div class="os-window overflow-hidden">
+                    <div class="os-titlebar bg-[#E5E0D5]">
+                      <span class="font-mono text-xs sm:text-sm font-bold uppercase">
+                        {cat.title}
+                      </span>
+                      <div class="os-stripes" />
+                    </div>
+
+                    <div class="p-3.5 sm:p-4 bg-[#FAF8F2] space-y-1">
+                      <p class="text-xs sm:text-sm text-ink/85 leading-snug pb-1.5 max-w-[70ch]">
+                        {cat.methodology}
+                      </p>
+                      {(() => {
+                        const sortedRows = [...cat.rows].sort((a, b) => a.val - b.val);
+                        const omniVal =
+                          sortedRows.find((row) => row.baseline)?.val ??
+                          sortedRows.find((row) => row.highlight)?.val ??
+                          sortedRows[0].val;
+                        return sortedRows.map((r) => {
+                          const numPct = Math.max(2, Math.min(100, (r.val / cat.maxVal) * 100));
+                          const pct = numPct.toFixed(1);
+                          let ratioStr = r.ratio ?? '1.0x (base)';
+                          if (!r.ratio && r.val !== omniVal) {
+                            ratioStr =
+                              r.val < omniVal
+                                ? `${(omniVal / r.val).toFixed(1)}x faster`
+                                : `${(r.val / omniVal).toFixed(1)}x slower`;
+                          }
+                          const rowTitle = r.ops
+                            ? `${r.name}: ${r.val.toLocaleString('en-US')} ${cat.unit} (${r.ops})`
+                            : r.name;
+                          return (
+                            <div
+                              class:list={[
+                                'grid grid-cols-12 gap-x-2 gap-y-1 items-center px-2.5 py-1 rounded min-w-0',
+                                r.baseline
+                                  ? 'bg-acid/45 border-2 border-ink shadow-[2px_2px_0px_#111111] font-bold'
+                                  : r.highlight
+                                    ? 'bg-acid/25 border-2 border-dashed border-ink font-bold'
+                                    : 'border border-ink/15 bg-white',
+                              ]}
+                              title={rowTitle}
+                            >
+                              <div class="col-span-12 sm:col-span-5 font-mono text-xs text-ink truncate">
+                                {r.name}
+                              </div>
+                              <div class="col-span-6 sm:col-span-3 flex items-center min-w-0">
+                                <div class="w-full bg-[#E5E0D5] h-3.5 border border-ink rounded-sm overflow-hidden">
+                                  <div
+                                    class:list={[
+                                      'h-full',
+                                      numPct < 99.5 && 'border-r border-ink',
+                                      r.highlight ? 'bench-bar-omni' : 'bench-bar-competitor',
+                                    ]}
+                                    style={`width: ${pct}%;`}
+                                  />
+                                </div>
+                              </div>
+                              <div class="col-span-6 sm:col-span-4 flex flex-wrap items-baseline justify-end gap-x-1 text-right font-mono text-xs tabular-nums leading-tight min-w-0">
+                                <span class="font-bold text-ink whitespace-nowrap">{ratioStr}</span>
+                                <span class="text-ink/70 font-normal whitespace-nowrap">
+                                  ({formatMetric(r.val, cat.unit)})
+                                </span>
+                              </div>
+                            </div>
+                          );
+                        });
+                      })()}
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <!-- Per-Language Runtime & Reproducibility Notes -->
+              <div class="pt-6 border-t-2 border-ink/15 grid md:grid-cols-12 gap-6 items-start">
+                <div class="md:col-span-4">
+                  <div class="p-4 bg-ink text-paper rounded-md border-2 border-ink space-y-1.5 font-mono text-xs sm:text-sm">
+                    <div class="text-acid font-bold uppercase">{suite.label} Environment</div>
+                    {suite.hardwareLines.map((line) => (
+                      <div>{line}</div>
+                    ))}
+                  </div>
+                </div>
+                <div class="md:col-span-8 space-y-3 text-sm sm:text-base text-ink/85 leading-relaxed max-w-[68ch]">
+                  {suite.environmentParagraphs.map((para) => (
+                    <p set:html={para} />
+                  ))}
+                </div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </section>
+
+    <!-- Packet Wire Size (Language-Independent) -->
+    {wireSizeCategory && (
+      <section
+        id="wire-size"
+        class="scroll-mt-16 py-10 sm:py-14 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto border-t-2 border-ink/15"
+      >
+        <div class="grid lg:grid-cols-12 gap-6 lg:gap-8 items-start">
+          <div class="lg:col-span-4 space-y-3">
+            <h2 class="text-2xl sm:text-4xl font-bold tracking-tight uppercase leading-none text-ink">
+              Wire{' '}
+              <span class="font-serif italic font-normal normal-case text-[#FF4F18]">size.</span>
+            </h2>
+            <p class="text-sm sm:text-base text-ink/85 leading-relaxed">
+              Packet size is identical across all 11 OmniBuf runtimes. Protobuf saves ~7% on dense
+              messages by omitting type disambiguation, while OmniBuf stays 35% to 54% smaller than
+              Cap&apos;n Proto, FlatBuffers, MessagePack, and JSON.
+            </p>
+            <p class="text-xs sm:text-sm text-ink/75 leading-relaxed">
+              Even with optional <strong>Field #0</strong> metadata enabled (writing field names
+              once at the top of the packet), OmniBuf is still 4% smaller than MessagePack.
+            </p>
+          </div>
+
+          <div class="lg:col-span-8">
+            <div class="os-window overflow-hidden">
+              <div class="os-titlebar bg-[#E5E0D5]">
+                <span class="font-mono text-xs sm:text-sm font-bold uppercase">
+                  {wireSizeCategory.title} &middot; 11-Field PeerUpdate
+                </span>
+                <div class="os-stripes" />
+              </div>
+              <div class="p-3.5 sm:p-4 bg-[#FAF8F2] space-y-1">
+                {(() => {
+                  const sorted = [...wireSizeCategory.rows].sort((a, b) => a.val - b.val);
+                  const baseVal = sorted.find((r) => r.baseline)?.val ?? 366;
+                  return sorted.map((r) => {
+                    const numPct = Math.max(
+                      3,
+                      Math.min(100, (r.val / wireSizeCategory.maxVal) * 100),
+                    );
+                    const pct = numPct.toFixed(1);
+                    const deltaPct = Math.round(((r.val - baseVal) / baseVal) * 100);
+                    const deltaLabel =
+                      r.val === baseVal
+                        ? '1.0x (base)'
+                        : deltaPct < 0
+                          ? `${deltaPct}% smaller`
+                          : `+${deltaPct}% larger`;
+                    return (
+                      <div
+                        class:list={[
+                          'grid grid-cols-12 gap-x-2 gap-y-1 items-center px-2.5 py-1.5 rounded min-w-0',
+                          r.baseline
+                            ? 'bg-acid/45 border-2 border-ink shadow-[2px_2px_0px_#111111] font-bold'
+                            : r.highlight
+                              ? 'bg-acid/25 border-2 border-dashed border-ink font-bold'
+                              : 'border border-ink/15 bg-white',
+                        ]}
+                      >
+                        <div class="col-span-12 sm:col-span-5 font-mono text-xs text-ink truncate">
+                          {r.name}
+                        </div>
+                        <div class="col-span-6 sm:col-span-3 flex items-center min-w-0">
+                          <div class="w-full bg-[#E5E0D5] h-3.5 border border-ink rounded-sm overflow-hidden">
+                            <div
+                              class:list={[
+                                'h-full',
+                                numPct < 99.5 && 'border-r border-ink',
+                                r.highlight ? 'bench-bar-omni' : 'bench-bar-competitor',
+                              ]}
+                              style={`width: ${pct}%;`}
+                            />
+                          </div>
+                        </div>
+                        <div class="col-span-6 sm:col-span-4 flex flex-wrap items-baseline justify-end gap-x-1 text-right font-mono text-xs tabular-nums leading-tight min-w-0">
+                          <span class="font-bold text-ink whitespace-nowrap">{deltaLabel}</span>
+                          <span class="text-ink/70 font-normal whitespace-nowrap">
+                            ({r.val.toLocaleString('en-US')} B)
+                          </span>
+                        </div>
+                      </div>
+                    );
+                  });
+                })()}
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    )}
+
+    <!-- Benchmark Methodology (Placed AFTER Data) -->
+    <section
+      id="methodology"
+      class="scroll-mt-16 py-12 sm:py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto border-t-2 border-ink/15 space-y-12"
+    >
+      <div class="max-w-4xl">
+        <h2 class="text-3xl sm:text-5xl font-bold tracking-tight uppercase leading-none text-ink">
+          Benchmark{' '}
+          <span class="font-serif italic font-normal normal-case text-[#FF4F18]">methodology.</span>
+        </h2>
+        <p class="mt-3 text-base sm:text-lg text-ink/85 leading-relaxed">
+          Every runtime runs the same six workloads on the same Apple M1 Pro machine against
+          idiomatic Protobuf, JSON, and native serializers. Each test targets a specific wire-format
+          property so fast paths cannot hide regressions elsewhere.
+        </p>
+      </div>
+
+      <!-- Shared Test Setup & Equal-Footing Rules -->
+      <div class="space-y-4">
+        <h3 class="text-xl sm:text-2xl font-bold uppercase tracking-tight text-ink">
+          Test Payloads &amp; Equal-Footing Rules
+        </h3>
+        <div class="border-t-2 border-ink divide-y divide-ink/20">
+          <div class="py-4 grid md:grid-cols-12 gap-2 md:gap-8 items-baseline">
+            <div class="md:col-span-3 font-mono text-sm sm:text-base font-bold text-ink">
+              Shared Payloads
+            </div>
+            <p class="md:col-span-9 text-sm sm:text-base text-ink/85 leading-relaxed max-w-[75ch]">
+              The primary workload is an 11-field <code>PeerUpdate</code> struct with unsigned and
+              signed integers, booleans, UTF-8 strings, a nested <code>Location</code> sub-message,
+              packed integer arrays, and repeated nested peer entries (366 B in OmniBuf, 341 B in
+              Protobuf, 803 B in JSON). The large-embed and growth workloads use a ~39 KiB message
+              with embedded sub-messages exceeding OmniBuf&apos;s 16 KiB 2-byte length slot, forcing
+              the 4-byte container length path.
+            </p>
+          </div>
+          <div class="py-4 grid md:grid-cols-12 gap-2 md:gap-8 items-baseline">
+            <div class="md:col-span-3 font-mono text-sm sm:text-base font-bold text-ink">
+              No Dead-Code Elimination
+            </div>
+            <p class="md:col-span-9 text-sm sm:text-base text-ink/85 leading-relaxed max-w-[75ch]">
+              Every full-decode benchmark reads all 11 fields into a non-inlined checksum sink so
+              lazy wrappers (such as C <code>upb</code> arenas or FlatBuffers tables) perform the
+              same field materialization as eager structs.
+            </p>
+          </div>
+          <div class="py-4 grid md:grid-cols-12 gap-2 md:gap-8 items-baseline">
+            <div class="md:col-span-3 font-mono text-sm sm:text-base font-bold text-ink">
+              Equal Reuse &amp; Warmup
+            </div>
+            <p class="md:col-span-9 text-sm sm:text-base text-ink/85 leading-relaxed max-w-[75ch]">
+              Where a benchmark reuses output buffers or destination structs, every competitor in
+              that chart gets the same reuse. AOT languages compile with release optimizations (
+              <code>-O3</code>, <code>--release</code>, <code>-c release</code>), and JIT runtimes
+              (V8, JVM C2, .NET RyuJIT) warm up before timing. Every harness and recorded JSON
+              output lives in its language repository under <code>benchmarks/</code> and{' '}
+              <code>testdata/benchmarks.json</code>.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- The Six Benchmarks Explained -->
+      <div class="space-y-4">
+        <h3 class="text-xl sm:text-2xl font-bold uppercase tracking-tight text-ink">
+          Why These Six Benchmarks
+        </h3>
+        <div class="border-t-2 border-ink divide-y divide-ink/20">
+          {methodologyBenchmarks.map((item) => (
+            <div class="py-4 sm:py-5 grid md:grid-cols-12 gap-2 md:gap-8 items-baseline">
+              <h4 class="md:col-span-3 font-mono text-sm sm:text-base font-bold text-ink">
+                {item.title}
+              </h4>
+              <p class="md:col-span-9 text-sm sm:text-base text-ink/85 leading-relaxed max-w-[75ch]">
+                {item.description}
+              </p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <Footer />
+</Layout>
+
+<script define:vars={{ validLangKeys }}>
+  const root = document.querySelector('[data-benchmark-explorer]');
+  if (root) {
+    const viewTabs = Array.from(root.querySelectorAll('[data-view-tab]'));
+    const viewPanels = Array.from(root.querySelectorAll('[data-view-panel]'));
+    const compareSubtabs = root.querySelector('[data-compare-subtabs]');
+    const languageSubtabs = root.querySelector('[data-language-subtabs]');
+    const scaleControls = root.querySelector('[data-scale-controls]');
+    const scaleBtns = Array.from(root.querySelectorAll('[data-scale-btn]'));
+    const benchTabs = Array.from(root.querySelectorAll('[data-bench-tab]'));
+    const benchPanels = Array.from(root.querySelectorAll('[data-bench-panel]'));
+    const langTabs = Array.from(root.querySelectorAll('[data-lang-tab]'));
+    const langPanels = Array.from(root.querySelectorAll('[data-lang-panel]'));
+    const inspectButtons = Array.from(root.querySelectorAll('[data-inspect-lang]'));
+
+    const validBenchSlugs = benchTabs
+      .map((btn) => btn.getAttribute('data-bench-tab'))
+      .filter(Boolean);
+
+    let activeView = 'language';
+    let activeBench = validBenchSlugs[0] || 'decode';
+    let activeLang = validLangKeys[0] || 'go';
+    let activeScale = 'log';
+
+    function setTabStyle(btn, isActive, inactiveBg = 'bg-white') {
+      btn.setAttribute('aria-selected', isActive ? 'true' : 'false');
+      btn.setAttribute('tabindex', isActive ? '0' : '-1');
+      btn.classList.toggle('bg-acid', isActive);
+      btn.classList.toggle('shadow-[2px_2px_0px_#111111]', isActive);
+      btn.classList.toggle(inactiveBg, !isActive);
+      btn.classList.toggle('hover:bg-[#E5E0D5]', !isActive);
+    }
+
+    function syncUrl(push = false) {
+      const url = new URL(window.location.href);
+      url.hash = '';
+      if (activeView === 'compare') {
+        url.searchParams.delete('lang');
+        url.searchParams.set('view', 'compare');
+        if (activeBench !== 'decode') {
+          url.searchParams.set('bench', activeBench);
+        } else {
+          url.searchParams.delete('bench');
+        }
+      } else {
+        url.searchParams.delete('view');
+        url.searchParams.delete('bench');
+        if (activeLang !== 'go') {
+          url.searchParams.set('lang', activeLang);
+        } else {
+          url.searchParams.delete('lang');
+        }
+      }
+      const nextUrl = url.pathname + url.search;
+      if (push && nextUrl !== window.location.pathname + window.location.search) {
+        window.history.pushState(null, '', nextUrl);
+      } else {
+        window.history.replaceState(null, '', nextUrl);
+      }
+    }
+
+    function applyView(view, updateUrl = true, push = false) {
+      activeView = view === 'language' ? 'language' : 'compare';
+      viewTabs.forEach((tab) => {
+        const isActive = tab.getAttribute('data-view-tab') === activeView;
+        setTabStyle(tab, isActive, 'bg-[#FAF8F2]');
+      });
+      viewPanels.forEach((panel) => {
+        const isActive = panel.getAttribute('data-view-panel') === activeView;
+        panel.classList.toggle('hidden', !isActive);
+      });
+      if (compareSubtabs) {
+        compareSubtabs.classList.toggle('hidden', activeView !== 'compare');
+        compareSubtabs.classList.toggle('flex', activeView === 'compare');
+      }
+      if (languageSubtabs) {
+        languageSubtabs.classList.toggle('hidden', activeView !== 'language');
+        languageSubtabs.classList.toggle('flex', activeView === 'language');
+      }
+      if (scaleControls) {
+        scaleControls.classList.toggle('hidden', activeView !== 'compare');
+        scaleControls.classList.toggle('inline-flex', activeView === 'compare');
+      }
+      if (updateUrl) syncUrl(push);
+    }
+
+    function applyBench(slug, updateUrl = true) {
+      if (!validBenchSlugs.includes(slug)) return;
+      activeBench = slug;
+      benchTabs.forEach((tab) => {
+        setTabStyle(tab, tab.getAttribute('data-bench-tab') === activeBench, 'bg-white');
+      });
+      benchPanels.forEach((panel) => {
+        panel.classList.toggle('hidden', panel.getAttribute('data-bench-panel') !== activeBench);
+      });
+      if (updateUrl) syncUrl(false);
+    }
+
+    function applyLang(lang, updateUrl = true, push = false) {
+      if (!validLangKeys.includes(lang)) return;
+      activeLang = lang;
+      langTabs.forEach((tab) => {
+        setTabStyle(tab, tab.getAttribute('data-lang-tab') === activeLang, 'bg-white');
+      });
+      langPanels.forEach((panel) => {
+        panel.classList.toggle('hidden', panel.getAttribute('data-lang-panel') !== activeLang);
+      });
+      if (updateUrl) syncUrl(push);
+    }
+
+    function applyScale(scale) {
+      activeScale = scale === 'linear' ? 'linear' : 'log';
+      scaleBtns.forEach((btn) => {
+        const isActive = btn.getAttribute('data-scale-btn') === activeScale;
+        btn.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+        btn.classList.toggle('bg-acid', isActive);
+        btn.classList.toggle('shadow-[2px_2px_0px_#111111]', isActive);
+        btn.classList.toggle('bg-[#FAF8F2]', !isActive);
+        btn.classList.toggle('hover:bg-[#E5E0D5]', !isActive);
+      });
+      root.querySelectorAll('[data-scale-bar]').forEach((bar) => {
+        const pct =
+          activeScale === 'linear'
+            ? bar.getAttribute('data-linear-pct')
+            : bar.getAttribute('data-log-pct');
+        if (pct) {
+          bar.style.width = `${pct}%`;
+        }
+      });
+    }
+
+    function wireArrowNav(tabs, onSelect) {
+      tabs.forEach((tab, idx) => {
+        tab.addEventListener('keydown', (e) => {
+          let next = -1;
+          if (e.key === 'ArrowRight') next = (idx + 1) % tabs.length;
+          else if (e.key === 'ArrowLeft') next = (idx - 1 + tabs.length) % tabs.length;
+          else if (e.key === 'Home') next = 0;
+          else if (e.key === 'End') next = tabs.length - 1;
+          if (next === -1) return;
+          e.preventDefault();
+          tabs[next].focus();
+          onSelect(tabs[next]);
+        });
+      });
+    }
+
+    viewTabs.forEach((tab) => {
+      tab.addEventListener('click', () => {
+        applyView(tab.getAttribute('data-view-tab') || 'language', true, true);
+      });
+    });
+    wireArrowNav(viewTabs, (tab) =>
+      applyView(tab.getAttribute('data-view-tab') || 'language', true, true),
+    );
+
+    benchTabs.forEach((tab) => {
+      tab.addEventListener('click', () => {
+        applyBench(tab.getAttribute('data-bench-tab') || 'decode');
+      });
+    });
+    wireArrowNav(benchTabs, (tab) => applyBench(tab.getAttribute('data-bench-tab') || 'decode'));
+
+    langTabs.forEach((tab) => {
+      tab.addEventListener('click', () => {
+        applyLang(tab.getAttribute('data-lang-tab') || 'go', true, true);
+      });
+    });
+    wireArrowNav(langTabs, (tab) =>
+      applyLang(tab.getAttribute('data-lang-tab') || 'go', true, true),
+    );
+
+    scaleBtns.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        applyScale(btn.getAttribute('data-scale-btn') || 'log');
+      });
+    });
+
+    inspectButtons.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const lang = btn.getAttribute('data-inspect-lang');
+        if (lang) {
+          applyLang(lang, false);
+          applyView('language', true, true);
+          const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+          root.scrollIntoView({ behavior: prefersReduced ? 'auto' : 'smooth', block: 'start' });
+          const heading = root.querySelector(`[data-lang-heading="${lang}"]`);
+          if (heading) heading.focus({ preventScroll: true });
+        }
+      });
+    });
+
+    function hydrateFromLocation() {
+      const params = new URLSearchParams(window.location.search);
+      const hashLang = window.location.hash.replace(/^#/, '').toLowerCase();
+      const paramLang = (params.get('lang') || '').toLowerCase();
+      const paramView = (params.get('view') || '').toLowerCase();
+      const paramBench = (params.get('bench') || '').toLowerCase();
+
+      if (paramView === 'compare' || validBenchSlugs.includes(paramBench)) {
+        if (validBenchSlugs.includes(paramBench)) {
+          applyBench(paramBench, false);
+        }
+        applyView('compare', false);
+      } else {
+        if (validLangKeys.includes(paramLang)) {
+          applyLang(paramLang, false);
+        } else if (validLangKeys.includes(hashLang)) {
+          applyLang(hashLang, false);
+        } else {
+          applyLang('go', false);
+        }
+        applyView('language', false);
+      }
+    }
+
+    hydrateFromLocation();
+    window.addEventListener('popstate', hydrateFromLocation);
+    applyScale('log');
+  }
+</script>

@@ -1,5 +1,6 @@
 ---
 import {
+  benchmarksNavPage,
   cliNavPage,
   getGitHubUrlForPage,
   languages,
@@ -16,10 +17,31 @@ interface Props {
 const { currentPage = 'home' } = Astro.props;
 
 const activeLang = languages.find((l) => l.key === currentPage);
+const docsNavItems = [
+  {
+    href: '/',
+    key: 'home' as PageKey,
+    label: 'Overview',
+    desc: 'Wire format summary & quickstart',
+  },
+  {
+    href: '/how-it-works',
+    key: 'how-it-works' as PageKey,
+    label: 'How It Works',
+    desc: 'Prefix-Varints, 16 wire types & comparisons',
+  },
+  {
+    href: specNavPage.href,
+    key: specNavPage.key as PageKey,
+    label: specNavPage.label,
+    desc: 'Wire Specification v0.1',
+  },
+];
+const activeDoc = docsNavItems.find((d) => d.key === currentPage);
 const activePageLabel =
-  primaryNavPages.find((p) => p.key === currentPage)?.label ??
+  activeDoc?.label ??
+  (currentPage === benchmarksNavPage.key ? benchmarksNavPage.label : undefined) ??
   (currentPage === cliNavPage.key ? cliNavPage.label : undefined) ??
-  (currentPage === specNavPage.key ? specNavPage.label : undefined) ??
   (activeLang ? `Languages: ${activeLang.shortLabel}` : 'Menu');
 
 const githubUrl = getGitHubUrlForPage(currentPage);
@@ -37,21 +59,54 @@ const isMultiColDropdown = languages.length >= 5;
         <span>OmniBuf</span>
       </a>
 
-      <!-- Desktop Navigation -->
+      <!-- Desktop Navigation (4 top-level items: Docs, Languages, Benchmarks, CLI) -->
       <nav
         aria-label="Page navigation"
         class="hidden lg:flex items-center gap-2 font-medium min-w-0 py-1.5 px-0.5"
       >
-        {primaryNavPages.map((p) => (
-          <a
-            href={p.href}
-            class="nav-link"
-            data-active={currentPage === p.key ? 'true' : 'false'}
-            aria-current={currentPage === p.key ? 'page' : undefined}
+        <!-- Docs Dropdown -->
+        <details id="docs-nav-menu" class="relative group">
+          <summary
+            data-active={activeDoc ? 'true' : 'false'}
+            class="nav-link list-none cursor-pointer flex items-center gap-1.5 select-none"
           >
-            {p.label}
-          </a>
-        ))}
+            <span>Docs</span>
+            <span class="text-[10px] transition-transform group-open:rotate-180" aria-hidden="true">
+              &#9662;
+            </span>
+          </summary>
+
+          <div class="lang-dropdown-panel absolute left-0 top-full pt-2 z-50">
+            <div class="w-72 bg-[#FAF8F2] border-2 border-ink rounded-md shadow-[4px_4px_0px_#111111] overflow-hidden divide-y divide-ink/15">
+              {docsNavItems.map((item) => {
+                const isActive = currentPage === item.key;
+                return (
+                  <a
+                    href={item.href}
+                    aria-current={isActive ? 'page' : undefined}
+                    class={`flex items-center justify-between gap-3 px-3.5 py-2.5 text-sm font-bold transition-colors focus-visible:outline-none ${
+                      isActive
+                        ? 'bg-acid text-ink'
+                        : 'bg-[#FAF8F2] text-ink hover:bg-[#E5E0D5] focus-visible:bg-[#E5E0D5]'
+                    }`}
+                  >
+                    <div class="min-w-0">
+                      <div class="truncate">{item.label}</div>
+                      <div
+                        class={`text-[11px] font-normal truncate transition-colors ${
+                          isActive ? 'text-ink/80' : 'text-ink/70'
+                        }`}
+                      >
+                        {item.desc}
+                      </div>
+                    </div>
+                    {isActive && <span class="text-xs shrink-0">&bull;</span>}
+                  </a>
+                );
+              })}
+            </div>
+          </div>
+        </details>
 
         <!-- Languages Dropdown -->
         <details id="lang-nav-menu" class="relative group">
@@ -118,21 +173,21 @@ const isMultiColDropdown = languages.length >= 5;
         </details>
 
         <a
+          href={benchmarksNavPage.href}
+          class="nav-link"
+          data-active={currentPage === benchmarksNavPage.key ? 'true' : 'false'}
+          aria-current={currentPage === benchmarksNavPage.key ? 'page' : undefined}
+        >
+          {benchmarksNavPage.label}
+        </a>
+
+        <a
           href={cliNavPage.href}
           class="nav-link"
           data-active={currentPage === cliNavPage.key ? 'true' : 'false'}
           aria-current={currentPage === cliNavPage.key ? 'page' : undefined}
         >
           {cliNavPage.label}
-        </a>
-
-        <a
-          href={specNavPage.href}
-          class="nav-link"
-          data-active={currentPage === specNavPage.key ? 'true' : 'false'}
-          aria-current={currentPage === specNavPage.key ? 'page' : undefined}
-        >
-          {specNavPage.label}
         </a>
       </nav>
 
@@ -197,6 +252,18 @@ const isMultiColDropdown = languages.length >= 5;
               );
             })}
           </div>
+          <a
+            href={benchmarksNavPage.href}
+            aria-current={currentPage === benchmarksNavPage.key ? 'page' : undefined}
+            class={`flex items-center justify-between px-3.5 py-2.5 text-sm font-bold transition-colors ${
+              currentPage === benchmarksNavPage.key
+                ? 'bg-acid text-ink'
+                : 'text-ink hover:bg-[#E5E0D5]'
+            }`}
+          >
+            <span>{benchmarksNavPage.label}</span>
+            {currentPage === benchmarksNavPage.key && <span class="text-xs">&bull;</span>}
+          </a>
           <a
             href={cliNavPage.href}
             aria-current={currentPage === cliNavPage.key ? 'page' : undefined}
@@ -454,18 +521,22 @@ const isMultiColDropdown = languages.length >= 5;
 
 <script>
   const mobileNavMenu = document.getElementById('mobile-nav-menu') as HTMLDetailsElement | null;
+  const docsNavMenu = document.getElementById('docs-nav-menu') as HTMLDetailsElement | null;
   const langNavMenu = document.getElementById('lang-nav-menu') as HTMLDetailsElement | null;
-  const navMenus = [mobileNavMenu, langNavMenu].filter(
+  const hoverDropdowns = [docsNavMenu, langNavMenu].filter(
+    (el): el is HTMLDetailsElement => el !== null,
+  );
+  const navMenus = [mobileNavMenu, ...hoverDropdowns].filter(
     (el): el is HTMLDetailsElement => el !== null,
   );
 
-  if (langNavMenu) {
+  for (const dropdown of hoverDropdowns) {
     const HOVER_CLOSE_DELAY_MS = 260;
     const FADE_OUT_MS = 140;
     let hoverCloseTimer: number | null = null;
     let fadeCloseTimer: number | null = null;
 
-    const cancelLangClose = () => {
+    const cancelClose = () => {
       if (hoverCloseTimer !== null) {
         window.clearTimeout(hoverCloseTimer);
         hoverCloseTimer = null;
@@ -474,30 +545,35 @@ const isMultiColDropdown = languages.length >= 5;
         window.clearTimeout(fadeCloseTimer);
         fadeCloseTimer = null;
       }
-      delete langNavMenu.dataset.closing;
+      delete dropdown.dataset.closing;
     };
 
-    langNavMenu.addEventListener('pointerenter', (e) => {
+    dropdown.addEventListener('pointerenter', (e) => {
       if (e.pointerType !== 'mouse') return;
-      cancelLangClose();
-      langNavMenu.open = true;
+      for (const other of hoverDropdowns) {
+        if (other !== dropdown && other.open) {
+          other.open = false;
+        }
+      }
+      cancelClose();
+      dropdown.open = true;
     });
-    langNavMenu.addEventListener('pointerleave', (e) => {
-      if (e.pointerType !== 'mouse' || !langNavMenu.open) return;
-      cancelLangClose();
+    dropdown.addEventListener('pointerleave', (e) => {
+      if (e.pointerType !== 'mouse' || !dropdown.open) return;
+      cancelClose();
       hoverCloseTimer = window.setTimeout(() => {
         hoverCloseTimer = null;
-        langNavMenu.dataset.closing = 'true';
+        dropdown.dataset.closing = 'true';
         fadeCloseTimer = window.setTimeout(() => {
           fadeCloseTimer = null;
-          langNavMenu.open = false;
-          delete langNavMenu.dataset.closing;
+          dropdown.open = false;
+          delete dropdown.dataset.closing;
         }, FADE_OUT_MS);
       }, HOVER_CLOSE_DELAY_MS);
     });
-    langNavMenu.addEventListener('toggle', () => {
-      if (!langNavMenu.open) {
-        cancelLangClose();
+    dropdown.addEventListener('toggle', () => {
+      if (!dropdown.open) {
+        cancelClose();
       }
     });
   }

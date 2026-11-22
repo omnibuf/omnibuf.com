@@ -1,7 +1,8 @@
 export type LanguageKey =
   'go' | 'es' | 'rs' | 'py' | 'cpp' | 'java' | 'cs' | 'swift' | 'dart' | 'php' | 'elixir';
 
-export type PageKey = 'home' | 'how-it-works' | 'spec' | 'cli' | LanguageKey | 'none';
+export type PageKey =
+  'home' | 'how-it-works' | 'benchmarks' | 'spec' | 'cli' | LanguageKey | 'none';
 
 export interface LanguageEntry {
   key: LanguageKey;
@@ -132,6 +133,12 @@ export const primaryNavPages = [
   { href: '/how-it-works', key: 'how-it-works', label: 'How It Works' },
 ] as const;
 
+export const benchmarksNavPage = {
+  href: '/benchmarks',
+  key: 'benchmarks',
+  label: 'Benchmarks',
+} as const;
+
 export const cliNavPage = {
   href: '/cli',
   key: 'cli',
@@ -146,7 +153,7 @@ export const specNavPage = {
 } as const;
 
 export const totalSitePages =
-  primaryNavPages.length + languages.length + 2; /* CLI + Specification */
+  primaryNavPages.length + languages.length + 3; /* Benchmarks + CLI + Specification */
 
 export function getGitHubUrlForPage(currentPage: PageKey): string {
   const lang = languages.find((l) => l.key === currentPage);

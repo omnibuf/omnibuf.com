@@ -1259,7 +1259,7 @@ export const languageBenchmarks: Record<LanguageKey, LanguageBenchmarkSuite> = {
     headingPrefix: 'Go',
     subtitleHtml:
       '11-field <code>PeerUpdate</code> struct on Apple M1 Pro (Go 1.27.1). <strong>Shorter bars = Faster.</strong>',
-    href: '/go#benchmarks',
+    href: '/benchmarks?lang=go',
     ctaLabel: 'See full results',
     competitorsLabel: "Protobuf, FlatBuffers, Avro, Cap'n Proto, MsgPack, JSON",
     heroSummaryHtml:
@@ -1289,7 +1289,7 @@ export const languageBenchmarks: Record<LanguageKey, LanguageBenchmarkSuite> = {
     headingPrefix: 'TypeScript & JS',
     subtitleHtml:
       '11-field <code>PeerUpdate</code> numbers on Node.js v24 (Apple M1 Pro) across <code>@omnibuf/core</code>, <code>protobufjs</code>, <code>@bufbuild/protobuf</code>, <code>google-protobuf</code>, <code>@msgpack/msgpack</code>, and <code>JSON</code>. <strong>Shorter bars = Faster.</strong>',
-    href: '/es#benchmarks',
+    href: '/benchmarks?lang=es',
     ctaLabel: 'See full results',
     competitorsLabel: 'protobufjs, protobuf-es, google-protobuf, MsgPack, JSON',
     heroSummaryHtml:
@@ -1314,7 +1314,7 @@ export const languageBenchmarks: Record<LanguageKey, LanguageBenchmarkSuite> = {
     headingPrefix: 'Rust',
     subtitleHtml:
       '11-field <code>PeerUpdate</code> struct on Apple M1 Pro (<code>rustc 1.94.0</code>) across <code>omnibuf</code>, <code>buffa</code>, <code>prost</code>, <code>rmp-serde</code>, and <code>serde_json</code>. <strong>Shorter bars = Faster.</strong>',
-    href: '/rs#benchmarks',
+    href: '/benchmarks?lang=rs',
     ctaLabel: 'See full results',
     competitorsLabel: 'buffa, prost, rmp-serde, serde_json',
     heroSummaryHtml:
@@ -1339,7 +1339,7 @@ export const languageBenchmarks: Record<LanguageKey, LanguageBenchmarkSuite> = {
     headingPrefix: 'Python',
     subtitleHtml:
       '11-field <code>PeerUpdate</code> workload on Python 3.14.5 across <code>omnibuf</code> (compiled Rust extension), <code>protobuf-py</code>, <code>upb</code>, <code>msgspec</code>, <code>msgpack</code>, and stdlib <code>json</code>. <strong>Shorter bars = Faster.</strong>',
-    href: '/py#benchmarks',
+    href: '/benchmarks?lang=py',
     ctaLabel: 'See full results',
     competitorsLabel: 'protobuf-py (Rust), upb (C), msgspec (C), msgpack (C), json (C)',
     heroSummaryHtml:
@@ -1364,7 +1364,7 @@ export const languageBenchmarks: Record<LanguageKey, LanguageBenchmarkSuite> = {
     headingPrefix: 'C++20',
     subtitleHtml:
       '11-field <code>PeerUpdate</code> struct on Apple Clang 21 (<code>-O3 -DNDEBUG</code>, C++20). <strong>Shorter bars = Faster.</strong>',
-    href: '/cpp#benchmarks',
+    href: '/benchmarks?lang=cpp',
     ctaLabel: 'See full results',
     competitorsLabel: 'libprotobuf, Protobuf (LEB128 Wire), JSON',
     heroSummaryHtml:
@@ -1394,7 +1394,7 @@ export const languageBenchmarks: Record<LanguageKey, LanguageBenchmarkSuite> = {
     headingPrefix: 'Java 21',
     subtitleHtml:
       '11-field <code>PeerUpdate</code> workload on OpenJDK 21.0.13 (C2 JIT) across <code>com.omnibuf</code>, <code>protobuf-java</code>, <code>FlatBuffers</code>, Jackson JSON, and Jackson MessagePack. <strong>Shorter bars = Faster.</strong>',
-    href: '/java#benchmarks',
+    href: '/benchmarks?lang=java',
     ctaLabel: 'See full results',
     competitorsLabel: 'protobuf-java, FlatBuffers, Jackson JSON, Jackson MsgPack',
     heroSummaryHtml:
@@ -1419,7 +1419,7 @@ export const languageBenchmarks: Record<LanguageKey, LanguageBenchmarkSuite> = {
     headingPrefix: 'C# & .NET 8',
     subtitleHtml:
       '11-field <code>PeerUpdate</code> workload on .NET 8.0.29 (RyuJIT) across <code>OmniBuf</code>, <code>Google.Protobuf</code>, <code>MessagePack-CSharp</code>, and <code>System.Text.Json</code>. <strong>Shorter bars = Faster.</strong>',
-    href: '/cs#benchmarks',
+    href: '/benchmarks?lang=cs',
     ctaLabel: 'See full results',
     competitorsLabel: 'Google.Protobuf, MessagePack-CSharp, System.Text.Json',
     heroSummaryHtml:
@@ -1444,7 +1444,7 @@ export const languageBenchmarks: Record<LanguageKey, LanguageBenchmarkSuite> = {
     headingPrefix: 'Swift 6',
     subtitleHtml:
       '11-field <code>PeerUpdate</code> workload on Swift 6.3.2 (Apple M1 Pro) across <code>OmniBuf</code>, <code>SwiftProtobuf</code>, and Foundation <code>JSONEncoder</code> / <code>JSONDecoder</code>. <strong>Shorter bars = Faster.</strong>',
-    href: '/swift#benchmarks',
+    href: '/benchmarks?lang=swift',
     ctaLabel: 'See full results',
     competitorsLabel: 'SwiftProtobuf, Foundation JSON',
     heroSummaryHtml:
@@ -1469,7 +1469,7 @@ export const languageBenchmarks: Record<LanguageKey, LanguageBenchmarkSuite> = {
     headingPrefix: 'Dart 3',
     subtitleHtml:
       '11-field <code>PeerUpdate</code> workload on Dart 3.14.1 AOT (Apple M1 Pro) across <code>omnibuf</code>, <code>package:protobuf</code>, and <code>dart:convert</code> JSON. <strong>Shorter bars = Faster.</strong>',
-    href: '/dart#benchmarks',
+    href: '/benchmarks?lang=dart',
     ctaLabel: 'See full results',
     competitorsLabel: 'package:protobuf, dart:convert (JSON)',
     heroSummaryHtml:
@@ -1494,7 +1494,7 @@ export const languageBenchmarks: Record<LanguageKey, LanguageBenchmarkSuite> = {
     headingPrefix: 'PHP 8.3+',
     subtitleHtml:
       '11-field <code>PeerUpdate</code> workload on PHP 8.6 (Apple M1 Pro) across optional <code>ext-omnibuf</code> (Rust), pure-PHP <code>omnibuf/omnibuf</code>, PECL <code>ext-protobuf</code> (C <code>upb</code>), pure-PHP <code>google/protobuf</code>, and C-backed <code>json_encode</code> / <code>json_decode</code>. <strong>Shorter bars = Faster.</strong>',
-    href: '/php#benchmarks',
+    href: '/benchmarks?lang=php',
     ctaLabel: 'See full results',
     competitorsLabel: 'google/protobuf (C ext & pure PHP), JSON (C stdlib)',
     heroSummaryHtml:
@@ -1519,7 +1519,7 @@ export const languageBenchmarks: Record<LanguageKey, LanguageBenchmarkSuite> = {
     headingPrefix: 'Elixir / BEAM',
     subtitleHtml:
       '11-field <code>PeerUpdate</code> workload on Elixir 1.18.6 / OTP 27 (Apple M1 Pro) across optional Rustler NIF (<code>omnibuf-rs</code>), pure-Elixir <code>omnibuf</code>, <code>elixir-protobuf</code>, and <code>Jason</code> JSON. <strong>Shorter bars = Faster.</strong>',
-    href: '/elixir#benchmarks',
+    href: '/benchmarks?lang=elixir',
     ctaLabel: 'See full results',
     competitorsLabel: 'elixir-protobuf, Jason (JSON)',
     heroSummaryHtml:

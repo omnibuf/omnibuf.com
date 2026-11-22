@@ -250,6 +250,7 @@ test('CSS, 404 routes, FAQ deterministic wording, HowItWorks KiB units, and PROD
   for (const route of [
     '/',
     '/how-it-works',
+    '/benchmarks',
     '/spec',
     '/go',
     '/es',

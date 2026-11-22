@@ -2,7 +2,6 @@
 import { Code } from 'astro:components';
 import Layout from '../layouts/Layout.astro';
 import Navbar from '../components/Navbar.astro';
-import Benchmarks from '../components/Benchmarks.astro';
 import LanguageStrip from '../components/LanguageStrip.astro';
 import Footer from '../components/Footer.astro';
 
@@ -139,7 +138,7 @@ const cppFaqJsonLd = {
               GitHub Repository &rarr;
             </a>
             <a
-              href="#benchmarks"
+              href="/benchmarks?lang=cpp"
               class="os-btn px-4 py-2.5 bg-[#FAF8F2] text-ink font-bold rounded-md"
             >
               C++20 Benchmarks &rarr;
@@ -316,8 +315,6 @@ const cppFaqJsonLd = {
         </div>
       </div>
     </section>
-
-    <Benchmarks lang="cpp" />
 
     <section
       id="cpp-faq"
