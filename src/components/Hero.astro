@@ -26,6 +26,10 @@ const heroLanguageCharts = languageBenchmarkList.map((suite) => {
 });
 
 const stackedPeerFiles = [
+  { step: 10, file: 'peer.ex' },
+  { step: 9, file: 'Peer.php' },
+  { step: 8, file: 'peer.dart' },
+  { step: 7, file: 'Peer.swift' },
   { step: 6, file: 'Peer.java' },
   { step: 5, file: 'Peer.cs' },
   { step: 4, file: 'peer.hpp' },
@@ -310,10 +314,10 @@ const stackedPeerFiles = [
     <div class="p-4 sm:p-6 bg-[#FAF8F2]">
       <!-- DESKTOP SVG (Horizontal Tree) -->
       <svg
-        viewBox="0 0 860 502"
-        class="hidden md:block w-full max-h-[495px] mx-auto"
+        viewBox="0 0 860 542"
+        class="hidden md:block w-full max-h-[535px] mx-auto"
         role="img"
-        aria-label="Diagram showing peer.proto branching to Protobuf encoding, JSON encoding, and OmniBuf encoding, alongside peer.go with Peer.java, Peer.cs, peer.hpp, peer.py, peer.rs, and peer.ts stacked behind it pointing directly to OmniBuf encoding."
+        aria-label="Diagram showing peer.proto branching to Protobuf encoding, JSON encoding, and OmniBuf encoding, alongside peer.go with peer.ex, Peer.php, peer.dart, Peer.swift, Peer.java, Peer.cs, peer.hpp, peer.py, peer.rs, and peer.ts stacked behind it pointing directly to OmniBuf encoding."
       >
         <!-- TOP-LEFT NODE: .PROTO FILE -->
         <rect x="22" y="24" width="278" height="160" rx="8" fill="#111111" />
@@ -379,13 +383,13 @@ const stackedPeerFiles = [
 
         <!-- BOTTOM-LEFT STACK: OTHER SUPPORTED LANGUAGES BEHIND peer.go (SHIFTING UP AND LEFT) -->
         {stackedPeerFiles.map(({ step, file }) => {
-          const bx = 58 - step * 7;
-          const by = 318 - step * 19;
+          const bx = 58 - step * 4.2;
+          const by = 358 - step * 15.6;
           return (
             <g>
               <rect x={bx} y={by} width="236" height="158" rx="7" fill="#FAF8F2" />
-              <rect x={bx} y={by} width="236" height="24" rx="7" fill="#E5E0D5" />
-              <rect x={bx} y={by + 16} width="236" height="8" fill="#E5E0D5" />
+              <rect x={bx} y={by} width="236" height="20" rx="7" fill="#E5E0D5" />
+              <rect x={bx} y={by + 13} width="236" height="7" fill="#E5E0D5" />
               <rect
                 x={bx}
                 y={by}
@@ -396,13 +400,13 @@ const stackedPeerFiles = [
                 stroke="#111111"
                 stroke-width="2"
               />
-              <circle cx={bx + 14} cy={by + 9.5} r="3" fill="#FF4F18" opacity="0.8" />
-              <circle cx={bx + 24} cy={by + 9.5} r="3" fill="#111111" opacity="0.28" />
+              <circle cx={bx + 13} cy={by + 8} r="2.6" fill="#FF4F18" opacity="0.8" />
+              <circle cx={bx + 22} cy={by + 8} r="2.6" fill="#111111" opacity="0.28" />
               <text
-                x={bx + 36}
-                y={by + 13.3}
+                x={bx + 33}
+                y={by + 11.4}
                 font-family="IBM Plex Mono, monospace"
-                font-size="11"
+                font-size="10.2"
                 font-weight="700"
                 fill="#111111"
               >
@@ -413,10 +417,10 @@ const stackedPeerFiles = [
         })}
 
         <!-- FRONT CARD OF STACK: PLAIN GO STRUCT (peer.go) -->
-        <rect x="64" y="324" width="236" height="162" rx="8" fill="#111111" />
+        <rect x="64" y="364" width="236" height="162" rx="8" fill="#111111" />
         <rect
           x="58"
-          y="318"
+          y="358"
           width="236"
           height="162"
           rx="8"
@@ -425,14 +429,14 @@ const stackedPeerFiles = [
           stroke-width="2.5"
         />
         <path
-          d="M 58 326 Q 58 318 66 318 L 286 318 Q 294 318 294 326 L 294 352 L 58 352 Z"
+          d="M 58 366 Q 58 358 66 358 L 286 358 Q 294 358 294 366 L 294 392 L 58 392 Z"
           fill="#111111"
         />
-        <circle cx="76" cy="335" r="4.5" fill="#FF4F18" />
-        <circle cx="91" cy="335" r="4.5" fill="#D4FF33" />
+        <circle cx="76" cy="375" r="4.5" fill="#FF4F18" />
+        <circle cx="91" cy="375" r="4.5" fill="#D4FF33" />
         <text
           x="107"
-          y="340"
+          y="380"
           font-family="IBM Plex Mono, monospace"
           font-size="13.5"
           font-weight="700"
@@ -442,7 +446,7 @@ const stackedPeerFiles = [
         </text>
         <text
           x="282"
-          y="339"
+          y="379"
           text-anchor="end"
           font-family="IBM Plex Mono, monospace"
           font-size="10.5"
@@ -454,7 +458,7 @@ const stackedPeerFiles = [
 
         <text
           x="72"
-          y="382"
+          y="422"
           font-family="IBM Plex Mono, monospace"
           font-size="13.5"
           font-weight="700"
@@ -462,14 +466,14 @@ const stackedPeerFiles = [
         >
           type Peer struct &#123;
         </text>
-        <text y="409" font-family="IBM Plex Mono, monospace" font-size="13" fill="#111111">
+        <text y="449" font-family="IBM Plex Mono, monospace" font-size="13" fill="#111111">
           <tspan x="84">ID</tspan>
           <tspan x="124" fill="#FF4F18" font-weight="700">
             uint32
           </tspan>
           <tspan x="178">`omnibuf:"1"`</tspan>
         </text>
-        <text y="436" font-family="IBM Plex Mono, monospace" font-size="13" fill="#111111">
+        <text y="476" font-family="IBM Plex Mono, monospace" font-size="13" fill="#111111">
           <tspan x="84">Host</tspan>
           <tspan x="124" fill="#FF4F18" font-weight="700">
             string
@@ -478,7 +482,7 @@ const stackedPeerFiles = [
         </text>
         <text
           x="72"
-          y="463"
+          y="503"
           font-family="IBM Plex Mono, monospace"
           font-size="13.5"
           font-weight="700"
@@ -499,29 +503,29 @@ const stackedPeerFiles = [
           stroke-dasharray="5 4"
         />
         <polygon points="352,72 366,79 352,86" fill="#111111" />
-        <!-- peer.proto -> JSON (y = 239) -->
+        <!-- peer.proto -> JSON (y = 259) -->
         <path
-          d="M 330 98 L 330 225 Q 330 239 344 239 L 354 239"
+          d="M 330 98 L 330 245 Q 330 259 344 259 L 354 259"
           fill="none"
           stroke="#111111"
           stroke-width="2.5"
           stroke-dasharray="5 4"
         />
-        <polygon points="352,232 366,239 352,246" fill="#111111" />
-        <!-- peer.proto -> OmniBuf upper entry (y = 382) -->
+        <polygon points="352,252 366,259 352,266" fill="#111111" />
+        <!-- peer.proto -> OmniBuf upper entry (y = 422) -->
         <path
-          d="M 330 239 L 330 368 Q 330 382 344 382 L 352 382"
+          d="M 330 259 L 330 408 Q 330 422 344 422 L 352 422"
           fill="none"
           stroke="#FF4F18"
           stroke-width="3.5"
         />
-        <polygon points="350,374 366,382 350,390" fill="#FF4F18" />
+        <polygon points="350,414 366,422 350,430" fill="#FF4F18" />
         <circle cx="330" cy="98" r="4.5" fill="#111111" />
-        <circle cx="330" cy="239" r="4" fill="#111111" />
+        <circle cx="330" cy="259" r="4" fill="#111111" />
 
-        <!-- peer.go -> OmniBuf ONLY (straight horizontal at y = 432) -->
-        <path d="M 300 432 L 352 432" fill="none" stroke="#FF4F18" stroke-width="3.5" />
-        <polygon points="350,424 366,432 350,440" fill="#FF4F18" />
+        <!-- peer.go -> OmniBuf ONLY (straight horizontal at y = 472) -->
+        <path d="M 300 472 L 352 472" fill="none" stroke="#FF4F18" stroke-width="3.5" />
+        <polygon points="350,464 366,472 350,480" fill="#FF4F18" />
 
         <!-- OUTPUT 1: PROTOBUF -->
         <rect x="374" y="24" width="470" height="122" rx="8" fill="#111111" />
@@ -580,10 +584,10 @@ const stackedPeerFiles = [
         </text>
 
         <!-- OUTPUT 2: JSON -->
-        <rect x="374" y="184" width="470" height="122" rx="8" fill="#111111" />
+        <rect x="374" y="204" width="470" height="122" rx="8" fill="#111111" />
         <rect
           x="368"
-          y="178"
+          y="198"
           width="470"
           height="122"
           rx="8"
@@ -593,7 +597,7 @@ const stackedPeerFiles = [
         />
         <text
           x="390"
-          y="214"
+          y="234"
           font-family="Space Grotesk, sans-serif"
           font-size="20"
           font-weight="700"
@@ -603,7 +607,7 @@ const stackedPeerFiles = [
         </text>
         <rect
           x="658"
-          y="194"
+          y="214"
           width="160"
           height="26"
           rx="4"
@@ -613,7 +617,7 @@ const stackedPeerFiles = [
         />
         <text
           x="738"
-          y="211"
+          y="231"
           text-anchor="middle"
           font-family="IBM Plex Mono, monospace"
           font-size="12"
@@ -622,13 +626,13 @@ const stackedPeerFiles = [
         >
           EASIER DEBUGGING
         </text>
-        <text x="390" y="248" font-family="IBM Plex Mono, monospace" font-size="14" fill="#111111">
+        <text x="390" y="268" font-family="IBM Plex Mono, monospace" font-size="14" fill="#111111">
           <tspan fill="#00805A" font-weight="700">
             ✓
           </tspan>{' '}
           Easy to inspect without a schema
         </text>
-        <text x="390" y="276" font-family="IBM Plex Mono, monospace" font-size="14" fill="#111111">
+        <text x="390" y="296" font-family="IBM Plex Mono, monospace" font-size="14" fill="#111111">
           <tspan fill="#FF4F18" font-weight="700">
             ✗
           </tspan>{' '}
@@ -636,10 +640,10 @@ const stackedPeerFiles = [
         </text>
 
         <!-- OUTPUT 3: OMNIBUF -->
-        <rect x="374" y="344" width="470" height="142" rx="8" fill="#FF4F18" />
+        <rect x="374" y="384" width="470" height="142" rx="8" fill="#FF4F18" />
         <rect
           x="368"
-          y="338"
+          y="378"
           width="470"
           height="142"
           rx="8"
@@ -649,7 +653,7 @@ const stackedPeerFiles = [
         />
         <text
           x="390"
-          y="376"
+          y="416"
           font-family="Space Grotesk, sans-serif"
           font-size="20"
           font-weight="700"
@@ -657,10 +661,10 @@ const stackedPeerFiles = [
         >
           OmniBuf Encoding
         </text>
-        <rect x="628" y="356" width="190" height="26" rx="4" fill="#D4FF33" />
+        <rect x="628" y="396" width="190" height="26" rx="4" fill="#D4FF33" />
         <text
           x="723"
-          y="373"
+          y="413"
           text-anchor="middle"
           font-family="IBM Plex Mono, monospace"
           font-size="12"
@@ -671,7 +675,7 @@ const stackedPeerFiles = [
         </text>
         <text
           x="390"
-          y="416"
+          y="456"
           font-family="IBM Plex Mono, monospace"
           font-size="13.5"
           font-weight="600"
@@ -684,7 +688,7 @@ const stackedPeerFiles = [
         </text>
         <text
           x="390"
-          y="448"
+          y="488"
           font-family="IBM Plex Mono, monospace"
           font-size="13.5"
           font-weight="600"
@@ -699,10 +703,10 @@ const stackedPeerFiles = [
 
       <!-- MOBILE SVG (Vertical Layout) -->
       <svg
-        viewBox="0 0 360 834"
+        viewBox="0 0 360 882"
         class="block md:hidden w-full max-w-[380px] mx-auto h-auto"
         role="img"
-        aria-label="Vertical diagram showing peer.proto branching to Protobuf, JSON, and OmniBuf, and peer.go with Peer.java, Peer.cs, peer.hpp, peer.py, peer.rs, and peer.ts stacked behind it pointing directly into OmniBuf."
+        aria-label="Vertical diagram showing peer.proto branching to Protobuf, JSON, and OmniBuf, and peer.go with peer.ex, Peer.php, peer.dart, Peer.swift, Peer.java, Peer.cs, peer.hpp, peer.py, peer.rs, and peer.ts stacked behind it pointing directly into OmniBuf."
       >
         <!-- TOP NODE: .PROTO FILE -->
         <rect x="18" y="18" width="328" height="140" rx="8" fill="#111111" />
@@ -943,13 +947,13 @@ const stackedPeerFiles = [
 
         <!-- BOTTOM STACK: OTHER SUPPORTED LANGUAGES BEHIND peer.go (SHIFTING UP AND LEFT) -->
         {stackedPeerFiles.map(({ step, file }) => {
-          const mx = 76 - step * 6;
-          const my = 678 - step * 18;
+          const mx = 76 - step * 4.5;
+          const my = 725 - step * 15.5;
           return (
             <g>
               <rect x={mx} y={my} width="264" height="134" rx="7" fill="#FAF8F2" />
-              <rect x={mx} y={my} width="264" height="23" rx="7" fill="#E5E0D5" />
-              <rect x={mx} y={my + 15} width="264" height="8" fill="#E5E0D5" />
+              <rect x={mx} y={my} width="264" height="20" rx="7" fill="#E5E0D5" />
+              <rect x={mx} y={my + 13} width="264" height="7" fill="#E5E0D5" />
               <rect
                 x={mx}
                 y={my}
@@ -960,13 +964,13 @@ const stackedPeerFiles = [
                 stroke="#111111"
                 stroke-width="2"
               />
-              <circle cx={mx + 14} cy={my + 9} r="2.8" fill="#FF4F18" opacity="0.8" />
-              <circle cx={mx + 23} cy={my + 9} r="2.8" fill="#111111" opacity="0.28" />
+              <circle cx={mx + 13} cy={my + 8} r="2.5" fill="#FF4F18" opacity="0.8" />
+              <circle cx={mx + 22} cy={my + 8} r="2.5" fill="#111111" opacity="0.28" />
               <text
-                x={mx + 35}
-                y={my + 12.6}
+                x={mx + 33}
+                y={my + 11.4}
                 font-family="IBM Plex Mono, monospace"
-                font-size="10.5"
+                font-size="10"
                 font-weight="700"
                 fill="#111111"
               >
@@ -977,10 +981,10 @@ const stackedPeerFiles = [
         })}
 
         <!-- FRONT CARD OF BOTTOM STACK: PLAIN GO STRUCT (peer.go) -->
-        <rect x="80" y="682" width="264" height="138" rx="8" fill="#111111" />
+        <rect x="80" y="729" width="264" height="138" rx="8" fill="#111111" />
         <rect
           x="76"
-          y="678"
+          y="725"
           width="264"
           height="138"
           rx="8"
@@ -989,14 +993,14 @@ const stackedPeerFiles = [
           stroke-width="2.5"
         />
         <path
-          d="M 76 686 Q 76 678 84 678 L 332 678 Q 340 678 340 686 L 340 708 L 76 708 Z"
+          d="M 76 733 Q 76 725 84 725 L 332 725 Q 340 725 340 733 L 340 755 L 76 755 Z"
           fill="#111111"
         />
-        <circle cx="93" cy="693" r="4.5" fill="#FF4F18" />
-        <circle cx="107" cy="693" r="4.5" fill="#D4FF33" />
+        <circle cx="93" cy="740" r="4.5" fill="#FF4F18" />
+        <circle cx="107" cy="740" r="4.5" fill="#D4FF33" />
         <text
           x="122"
-          y="698"
+          y="745"
           font-family="IBM Plex Mono, monospace"
           font-size="13"
           font-weight="700"
@@ -1006,7 +1010,7 @@ const stackedPeerFiles = [
         </text>
         <text
           x="328"
-          y="697"
+          y="744"
           text-anchor="end"
           font-family="IBM Plex Mono, monospace"
           font-size="10.5"
@@ -1018,7 +1022,7 @@ const stackedPeerFiles = [
 
         <text
           x="90"
-          y="733"
+          y="780"
           font-family="IBM Plex Mono, monospace"
           font-size="13"
           font-weight="700"
@@ -1026,14 +1030,14 @@ const stackedPeerFiles = [
         >
           type Peer struct &#123;
         </text>
-        <text y="757" font-family="IBM Plex Mono, monospace" font-size="12" fill="#111111">
+        <text y="804" font-family="IBM Plex Mono, monospace" font-size="12" fill="#111111">
           <tspan x="102">ID</tspan>
           <tspan x="140" fill="#FF4F18" font-weight="700">
             uint32
           </tspan>
           <tspan x="192">`omnibuf:"1"`</tspan>
         </text>
-        <text y="780" font-family="IBM Plex Mono, monospace" font-size="12" fill="#111111">
+        <text y="827" font-family="IBM Plex Mono, monospace" font-size="12" fill="#111111">
           <tspan x="102">Host</tspan>
           <tspan x="140" fill="#FF4F18" font-weight="700">
             string
@@ -1042,7 +1046,7 @@ const stackedPeerFiles = [
         </text>
         <text
           x="90"
-          y="802"
+          y="849"
           font-family="IBM Plex Mono, monospace"
           font-size="13"
           font-weight="700"
