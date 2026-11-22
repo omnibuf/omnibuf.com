@@ -6,8 +6,35 @@ import Benchmarks from '../components/Benchmarks.astro';
 import LanguageStrip from '../components/LanguageStrip.astro';
 import Footer from '../components/Footer.astro';
 
+let swiftVersion = '0.1.0';
+const isNewerSemver = (candidate: string, current: string) => {
+  const pa = candidate.split(/[.-]/).map((n) => Number.parseInt(n, 10) || 0);
+  const pb = current.split(/[.-]/).map((n) => Number.parseInt(n, 10) || 0);
+  for (let i = 0; i < 3; i++) {
+    if ((pa[i] ?? 0) !== (pb[i] ?? 0)) return (pa[i] ?? 0) > (pb[i] ?? 0);
+  }
+  return false;
+};
+try {
+  const res = await fetch('https://api.github.com/repos/omnibuf/omnibuf-swift/releases/latest', {
+    signal: AbortSignal.timeout(4000),
+  });
+  if (res.ok) {
+    const data = (await res.json()) as { tag_name?: string };
+    const latest = (data.tag_name ?? '').replace(/^v/, '').trim();
+    if (
+      /^\d+\.\d+\.\d+(?:[-+][0-9A-Za-z.-]+)?$/.test(latest) &&
+      isNewerSemver(latest, swiftVersion)
+    ) {
+      swiftVersion = latest;
+    }
+  }
+} catch {
+  // Keep fallback version during offline builds
+}
+
 const swiftInstallSnippet = `dependencies: [
-    .package(url: "https://github.com/omnibuf/omnibuf-swift.git", from: "0.1.0"),
+    .package(url: "https://github.com/omnibuf/omnibuf-swift.git", from: "${swiftVersion}"),
 ]`;
 
 const structSwiftSnippet = `import OmniBuf
@@ -154,6 +181,7 @@ const swiftFaqJsonLd = {
             <div class="flex items-center justify-between gap-2 mb-2 pb-2 border-b border-paper/15">
               <div class="text-xs font-bold uppercase text-acid">Package.swift</div>
               <button
+                id="swift-spm-copy-btn"
                 type="button"
                 data-copy={swiftInstallSnippet}
                 class="copy-snippet-btn min-w-[4.75rem] text-center px-2.5 py-1 text-xs font-bold uppercase bg-paper/15 hover:bg-acid hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-acid text-paper border border-paper/30 rounded shrink-0 transition"
@@ -161,7 +189,9 @@ const swiftFaqJsonLd = {
                 Copy
               </button>
             </div>
-            <Code code={swiftInstallSnippet} lang="swift" theme="github-dark" />
+            <pre class="leading-relaxed whitespace-pre"><code>dependencies: [
+    .package(url: "https://github.com/omnibuf/omnibuf-swift.git", from: "<span id="swift-spm-version">{swiftVersion}</span>"),
+]</code></pre>
           </div>
         </div>
       </div>
@@ -372,4 +402,39 @@ const swiftFaqJsonLd = {
   </main>
 
   <Footer />
+
+  <script>
+    const verEl = document.getElementById('swift-spm-version');
+    const copyBtn = document.getElementById('swift-spm-copy-btn');
+    if (verEl && copyBtn) {
+      const isNewer = (candidate: string, current: string) => {
+        const pa = candidate.split(/[.-]/).map((n) => Number.parseInt(n, 10) || 0);
+        const pb = current.split(/[.-]/).map((n) => Number.parseInt(n, 10) || 0);
+        for (let i = 0; i < 3; i++) {
+          if ((pa[i] ?? 0) !== (pb[i] ?? 0)) return (pa[i] ?? 0) > (pb[i] ?? 0);
+        }
+        return false;
+      };
+      void (async () => {
+        try {
+          const res = await fetch(
+            'https://api.github.com/repos/omnibuf/omnibuf-swift/releases/latest',
+          );
+          if (!res.ok) return;
+          const data = (await res.json()) as { tag_name?: string };
+          const raw = (data.tag_name ?? '').replace(/^v/, '').trim();
+          if (!/^\d+\.\d+\.\d+(?:[-+][0-9A-Za-z.-]+)?$/.test(raw)) return;
+          const currentVer = (verEl.textContent ?? '').trim() || '0.0.0';
+          if (!isNewer(raw, currentVer)) return;
+          verEl.textContent = raw;
+          copyBtn.setAttribute(
+            'data-copy',
+            `dependencies: [\n    .package(url: "https://github.com/omnibuf/omnibuf-swift.git", from: "${raw}"),\n]`,
+          );
+        } catch {
+          // Keep build-time version on network failure
+        }
+      })();
+    }
+  </script>
 </Layout>

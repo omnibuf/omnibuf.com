@@ -6,9 +6,39 @@ import Benchmarks from '../components/Benchmarks.astro';
 import LanguageStrip from '../components/LanguageStrip.astro';
 import Footer from '../components/Footer.astro';
 
+let hexVersion = '0.1.0';
+const isNewerSemver = (candidate: string, current: string) => {
+  const pa = candidate.split(/[.-]/).map((n) => Number.parseInt(n, 10) || 0);
+  const pb = current.split(/[.-]/).map((n) => Number.parseInt(n, 10) || 0);
+  for (let i = 0; i < 3; i++) {
+    if ((pa[i] ?? 0) !== (pb[i] ?? 0)) return (pa[i] ?? 0) > (pb[i] ?? 0);
+  }
+  return false;
+};
+try {
+  const res = await fetch('https://hex.pm/api/packages/omnibuf', {
+    signal: AbortSignal.timeout(4000),
+  });
+  if (res.ok) {
+    const data = (await res.json()) as {
+      latest_stable_version?: string;
+      latest_version?: string;
+    };
+    const latest = (data.latest_stable_version ?? data.latest_version ?? '').trim();
+    if (
+      /^\d+\.\d+\.\d+(?:[-+][0-9A-Za-z.-]+)?$/.test(latest) &&
+      isNewerSemver(latest, hexVersion)
+    ) {
+      hexVersion = latest;
+    }
+  }
+} catch {
+  // Keep fallback version during offline builds
+}
+
 const mixInstallSnippet = `def deps do
   [
-    {:omnibuf, "~> 0.1.0"}
+    {:omnibuf, "~> ${hexVersion}"}
   ]
 end`;
 
@@ -157,6 +187,7 @@ const elixirFaqJsonLd = {
             <div class="flex items-center justify-between gap-2 mb-2 pb-2 border-b border-paper/15">
               <div class="text-xs font-bold uppercase text-acid">mix.exs</div>
               <button
+                id="elixir-mix-copy-btn"
                 type="button"
                 data-copy={mixInstallSnippet}
                 class="copy-snippet-btn min-w-[4.75rem] text-center px-2.5 py-1 text-xs font-bold uppercase bg-paper/15 hover:bg-acid hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-acid text-paper border border-paper/30 rounded shrink-0 transition"
@@ -164,7 +195,11 @@ const elixirFaqJsonLd = {
                 Copy
               </button>
             </div>
-            <Code code={mixInstallSnippet} lang="elixir" theme="github-dark" />
+            <pre class="leading-relaxed whitespace-pre"><code>def deps do
+  [
+    &#123;:omnibuf, "~&gt; <span id="elixir-mix-version">{hexVersion}</span>"&#125;
+  ]
+end</code></pre>
           </div>
         </div>
       </div>
@@ -372,4 +407,40 @@ const elixirFaqJsonLd = {
   </main>
 
   <Footer />
+
+  <script>
+    const verEl = document.getElementById('elixir-mix-version');
+    const copyBtn = document.getElementById('elixir-mix-copy-btn');
+    if (verEl && copyBtn) {
+      const isNewer = (candidate: string, current: string) => {
+        const pa = candidate.split(/[.-]/).map((n) => Number.parseInt(n, 10) || 0);
+        const pb = current.split(/[.-]/).map((n) => Number.parseInt(n, 10) || 0);
+        for (let i = 0; i < 3; i++) {
+          if ((pa[i] ?? 0) !== (pb[i] ?? 0)) return (pa[i] ?? 0) > (pb[i] ?? 0);
+        }
+        return false;
+      };
+      void (async () => {
+        try {
+          const res = await fetch('https://hex.pm/api/packages/omnibuf');
+          if (!res.ok) return;
+          const data = (await res.json()) as {
+            latest_stable_version?: string;
+            latest_version?: string;
+          };
+          const raw = (data.latest_stable_version ?? data.latest_version ?? '').trim();
+          if (!/^\d+\.\d+\.\d+(?:[-+][0-9A-Za-z.-]+)?$/.test(raw)) return;
+          const currentVer = (verEl.textContent ?? '').trim() || '0.0.0';
+          if (!isNewer(raw, currentVer)) return;
+          verEl.textContent = raw;
+          copyBtn.setAttribute(
+            'data-copy',
+            `def deps do\n  [\n    {:omnibuf, "~> ${raw}"}\n  ]\nend`,
+          );
+        } catch {
+          // Keep build-time version on network failure
+        }
+      })();
+    }
+  </script>
 </Layout>
