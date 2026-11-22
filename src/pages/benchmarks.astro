@@ -147,7 +147,7 @@ const crossLangPanels = crossLangDefs.map((def) => {
     .sort((a, b) => a.val - b.val);
 
   const maxVal = Math.max(...rawEntries.map((e) => e.val), 1);
-  const minVal = Math.max(Math.min(...rawEntries.map((e) => e.val), 1), 1);
+  const minVal = rawEntries.length > 0 ? Math.max(Math.min(...rawEntries.map((e) => e.val)), 1) : 1;
   const logMin = Math.log10(minVal * 0.65);
   const logMax = Math.log10(maxVal);
   const logSpan = Math.max(logMax - logMin, 0.001);
@@ -311,19 +311,19 @@ const validLangKeys: LanguageKey[] = languageBenchmarkList.map((s) => s.key);
               <span class="text-ink/75 uppercase mr-1">Bar scale:</span>
               <button
                 type="button"
-                data-scale-btn="log"
+                data-scale-btn="linear"
                 aria-pressed="true"
                 class="px-2.5 py-1.5 rounded border-2 border-ink bg-acid text-ink shadow-[2px_2px_0px_#111111] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink transition cursor-pointer"
               >
-                Log
+                Linear
               </button>
               <button
                 type="button"
-                data-scale-btn="linear"
+                data-scale-btn="log"
                 aria-pressed="false"
                 class="px-2.5 py-1.5 rounded border-2 border-ink bg-[#FAF8F2] text-ink hover:bg-[#E5E0D5] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink transition cursor-pointer"
               >
-                Linear
+                Log
               </button>
             </div>
           </div>
@@ -470,7 +470,7 @@ const validLangKeys: LanguageKey[] = languageBenchmarkList.map((s) => s.key);
                             data-log-pct={row.logPct}
                             data-linear-pct={row.linearPct}
                             class="h-full bench-bar-omni border-r border-ink transition-[width] duration-200"
-                            style={`width: ${row.logPct}%;`}
+                            style={`width: ${row.linearPct}%;`}
                           />
                         </div>
                         <span class="font-mono text-xs sm:text-sm font-bold text-ink tabular-nums whitespace-nowrap w-20 text-right shrink-0">
@@ -893,7 +893,7 @@ const validLangKeys: LanguageKey[] = languageBenchmarkList.map((s) => s.key);
     let activeView = 'language';
     let activeBench = validBenchSlugs[0] || 'decode';
     let activeLang = validLangKeys[0] || 'go';
-    let activeScale = 'log';
+    let activeScale = 'linear';
 
     function setTabStyle(btn, isActive, inactiveBg = 'bg-white') {
       btn.setAttribute('aria-selected', isActive ? 'true' : 'false');
