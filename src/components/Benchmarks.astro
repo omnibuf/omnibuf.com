@@ -8,6 +8,18 @@ interface Props {
 
 const { lang = 'go' } = Astro.props;
 const suite = languageBenchmarks[lang];
+
+function formatMetric(val: number, unit: string): string {
+  if (unit === 'ns') {
+    if (val >= 1_000_000) {
+      return `${(val / 1_000_000).toFixed(2)} ms`;
+    }
+    if (val >= 10_000) {
+      return `${(val / 1_000).toFixed(1)} µs`;
+    }
+  }
+  return `${val.toLocaleString('en-US')} ${unit}`;
+}
 ---
 
 <section
@@ -22,7 +34,7 @@ const suite = languageBenchmarks[lang];
     <p class="mt-2.5 text-base sm:text-lg text-ink/80 font-medium" set:html={suite.subtitleHtml} />
   </div>
 
-  <div class="grid lg:grid-cols-2 gap-5 items-start select-none">
+  <div class="grid lg:grid-cols-2 gap-5 items-start">
     {suite.categories.map((cat) => (
       <div class="os-window overflow-hidden">
         <div class="os-titlebar bg-[#E5E0D5]">
@@ -80,10 +92,10 @@ const suite = languageBenchmarks[lang];
                       />
                     </div>
                   </div>
-                  <div class="col-span-6 sm:col-span-4 text-right font-mono text-xs tabular-nums whitespace-nowrap leading-none">
-                    <span class="font-bold text-ink">{ratioStr}</span>{' '}
-                    <span class="text-ink/70 font-normal">
-                      ({r.val.toLocaleString('en-US')} {cat.unit})
+                  <div class="col-span-6 sm:col-span-4 flex flex-wrap items-baseline justify-end gap-x-1 text-right font-mono text-xs tabular-nums leading-tight min-w-0">
+                    <span class="font-bold text-ink whitespace-nowrap">{ratioStr}</span>
+                    <span class="text-ink/70 font-normal whitespace-nowrap">
+                      ({formatMetric(r.val, cat.unit)})
                     </span>
                   </div>
                 </div>
@@ -97,7 +109,7 @@ const suite = languageBenchmarks[lang];
 
   <!-- Benchmark Environment & Reproducibility -->
   <div class="mt-8 pt-8 border-t-2 border-ink/15 grid md:grid-cols-12 gap-6 lg:gap-8 items-start">
-    <div class="md:col-span-4 space-y-2 select-none">
+    <div class="md:col-span-4 space-y-2">
       <h3 class="text-xl sm:text-2xl font-bold uppercase tracking-tight leading-snug">
         Benchmark Environment
       </h3>
