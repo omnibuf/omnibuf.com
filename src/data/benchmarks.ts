@@ -424,12 +424,12 @@ export const rsBenchmarkCategories: BenchmarkCategory[] = [
     maxVal: 1100,
     methodology: 'Serializing PeerUpdate into a freshly allocated Vec<u8> across every library.',
     rows: [
-      { name: 'OmniBuf (Generated)', val: 139, sizeBytes: 366, highlight: true, baseline: true },
-      { name: 'OmniBuf (#[derive(OmniBuf)])', val: 139, sizeBytes: 366, highlight: true },
-      { name: 'buffa (Protobuf)', val: 200, sizeBytes: 341 },
-      { name: 'prost (Protobuf)', val: 227, sizeBytes: 341 },
-      { name: 'rmp-serde (MessagePack)', val: 628, sizeBytes: 626 },
-      { name: 'serde_json', val: 783, sizeBytes: 803 },
+      { name: 'OmniBuf (Generated)', val: 134, sizeBytes: 366, highlight: true, baseline: true },
+      { name: 'OmniBuf (#[derive(OmniBuf)])', val: 134, sizeBytes: 366, highlight: true },
+      { name: 'buffa (Protobuf)', val: 199, sizeBytes: 341 },
+      { name: 'prost (Protobuf)', val: 233, sizeBytes: 341 },
+      { name: 'rmp-serde (MessagePack)', val: 634, sizeBytes: 626 },
+      { name: 'serde_json', val: 797, sizeBytes: 803 },
     ],
   },
   {
@@ -438,12 +438,12 @@ export const rsBenchmarkCategories: BenchmarkCategory[] = [
     maxVal: 1750,
     methodology: 'Decoding &[u8] into a fresh owned PeerUpdate struct and reading all 11 fields.',
     rows: [
-      { name: 'OmniBuf (Generated)', val: 425, highlight: true, baseline: true },
-      { name: 'OmniBuf (#[derive(OmniBuf)])', val: 433, highlight: true },
-      { name: 'buffa (Protobuf)', val: 525 },
-      { name: 'prost (Protobuf)', val: 666 },
-      { name: 'rmp-serde (MessagePack)', val: 862 },
-      { name: 'serde_json', val: 1311 },
+      { name: 'OmniBuf (Generated)', val: 428, highlight: true, baseline: true },
+      { name: 'OmniBuf (#[derive(OmniBuf)])', val: 436, highlight: true },
+      { name: 'buffa (Protobuf)', val: 512 },
+      { name: 'prost (Protobuf)', val: 673 },
+      { name: 'rmp-serde (MessagePack)', val: 860 },
+      { name: 'serde_json', val: 1342 },
     ],
   },
   {
@@ -453,11 +453,11 @@ export const rsBenchmarkCategories: BenchmarkCategory[] = [
     methodology:
       'Borrowing a nested &str directly from &[u8] via OpaquePeerUpdate vs buffa PeerUpdateView vs full decode.',
     rows: [
-      { name: 'OmniBuf (Generated)', val: 77, highlight: true, baseline: true },
-      { name: 'buffa (Protobuf)', val: 366 },
-      { name: 'prost (Protobuf)', val: 653 },
-      { name: 'rmp-serde (MessagePack)', val: 853 },
-      { name: 'serde_json', val: 1270 },
+      { name: 'OmniBuf (Generated)', val: 73, highlight: true, baseline: true },
+      { name: 'buffa (Protobuf)', val: 368 },
+      { name: 'prost (Protobuf)', val: 659 },
+      { name: 'rmp-serde (MessagePack)', val: 852 },
+      { name: 'serde_json', val: 1273 },
     ],
   },
   {
@@ -467,11 +467,11 @@ export const rsBenchmarkCategories: BenchmarkCategory[] = [
     methodology:
       'Checking a nested city string and splicing an incremented 64-bit sequence counter into &[u8] vs decode and re-encode.',
     rows: [
-      { name: 'OmniBuf (Generated)', val: 232, highlight: true, baseline: true },
-      { name: 'buffa (Protobuf)', val: 725 },
-      { name: 'prost (Protobuf)', val: 937 },
-      { name: 'rmp-serde (MessagePack)', val: 1588 },
-      { name: 'serde_json', val: 2151 },
+      { name: 'OmniBuf (Generated)', val: 221, highlight: true, baseline: true },
+      { name: 'buffa (Protobuf)', val: 716 },
+      { name: 'prost (Protobuf)', val: 920 },
+      { name: 'rmp-serde (MessagePack)', val: 1506 },
+      { name: 'serde_json', val: 2096 },
     ],
   },
   {
@@ -481,12 +481,12 @@ export const rsBenchmarkCategories: BenchmarkCategory[] = [
     methodology:
       'Serializing a 39 KiB packet whose >16 KiB nested sub-messages trigger 4-byte container length pre-sizing vs two-pass encoded_len() in buffa and prost.',
     rows: [
-      { name: 'OmniBuf (Generated)', val: 849, sizeBytes: 39256, highlight: true, baseline: true },
-      { name: 'buffa (Protobuf)', val: 924, sizeBytes: 39227 },
-      { name: 'prost (Protobuf)', val: 975, sizeBytes: 39227 },
-      { name: 'OmniBuf (#[derive(OmniBuf)])', val: 1049, sizeBytes: 39256, highlight: true },
-      { name: 'rmp-serde (MessagePack)', val: 1763, sizeBytes: 39508 },
-      { name: 'serde_json', val: 14324, sizeBytes: 39681 },
+      { name: 'OmniBuf (Generated)', val: 902, sizeBytes: 39256, highlight: true, baseline: true },
+      { name: 'OmniBuf (#[derive(OmniBuf)])', val: 929, sizeBytes: 39256, highlight: true },
+      { name: 'buffa (Protobuf)', val: 929, sizeBytes: 39227 },
+      { name: 'prost (Protobuf)', val: 1010, sizeBytes: 39227 },
+      { name: 'rmp-serde (MessagePack)', val: 1669, sizeBytes: 39508 },
+      { name: 'serde_json', val: 14105, sizeBytes: 39681 },
     ],
   },
   {
@@ -496,11 +496,11 @@ export const rsBenchmarkCategories: BenchmarkCategory[] = [
     methodology:
       'Growing a nested string field past 16 KiB ahead of 32 trailing Neighbor entries via Opaque splicing vs full decode and re-encode.',
     rows: [
-      { name: 'OmniBuf (Generated)', val: 1574, highlight: true, baseline: true },
-      { name: 'buffa (Protobuf)', val: 3679 },
-      { name: 'prost (Protobuf)', val: 4134 },
-      { name: 'rmp-serde (MessagePack)', val: 6487 },
-      { name: 'serde_json', val: 15498 },
+      { name: 'OmniBuf (Generated)', val: 1846, highlight: true, baseline: true },
+      { name: 'buffa (Protobuf)', val: 3480 },
+      { name: 'prost (Protobuf)', val: 4001 },
+      { name: 'rmp-serde (MessagePack)', val: 6340 },
+      { name: 'serde_json', val: 15355 },
     ],
   },
 ];
@@ -1041,16 +1041,16 @@ export const phpBenchmarkCategories: BenchmarkCategory[] = [
     rows: [
       {
         name: 'OmniBuf (ext-omnibuf)',
-        val: 284,
+        val: 317,
         sizeBytes: 365,
         highlight: true,
         baseline: true,
       },
-      { name: 'google/protobuf (C ext)', val: 440, sizeBytes: 341 },
+      { name: 'google/protobuf (C ext)', val: 420, sizeBytes: 341 },
       { name: 'JSON (stdlib)', val: 1412, sizeBytes: 803 },
-      { name: 'OmniBuf (Generated)', val: 4609, sizeBytes: 365, highlight: true },
-      { name: 'OmniBuf (Attributes)', val: 11204, sizeBytes: 365, highlight: true },
-      { name: 'google/protobuf (pure PHP)', val: 87169, sizeBytes: 341 },
+      { name: 'OmniBuf (Generated)', val: 4584, sizeBytes: 365, highlight: true },
+      { name: 'OmniBuf (Attributes)', val: 11416, sizeBytes: 365, highlight: true },
+      { name: 'google/protobuf (pure PHP)', val: 86075, sizeBytes: 341 },
     ],
   },
   {
@@ -1060,12 +1060,12 @@ export const phpBenchmarkCategories: BenchmarkCategory[] = [
     methodology:
       'Decoding a binary string into a fresh PeerUpdate object and reading all 11 fields.',
     rows: [
-      { name: 'OmniBuf (ext-omnibuf)', val: 966, highlight: true, baseline: true },
-      { name: 'google/protobuf (C ext)', val: 4022 },
-      { name: 'JSON (stdlib)', val: 4560 },
-      { name: 'OmniBuf (Generated)', val: 16124, highlight: true },
-      { name: 'OmniBuf (Attributes)', val: 27852, highlight: true },
-      { name: 'google/protobuf (pure PHP)', val: 50069 },
+      { name: 'OmniBuf (ext-omnibuf)', val: 955, highlight: true, baseline: true },
+      { name: 'google/protobuf (C ext)', val: 3678 },
+      { name: 'JSON (stdlib)', val: 4214 },
+      { name: 'OmniBuf (Generated)', val: 15899, highlight: true },
+      { name: 'OmniBuf (Attributes)', val: 25670, highlight: true },
+      { name: 'google/protobuf (pure PHP)', val: 49895 },
     ],
   },
   {
@@ -1074,11 +1074,11 @@ export const phpBenchmarkCategories: BenchmarkCategory[] = [
     maxVal: 52000,
     methodology: 'Reading a nested city string via OpaquePeerUpdate vs full message decode.',
     rows: [
-      { name: 'OmniBuf (ext-omnibuf)', val: 171, highlight: true, baseline: true },
-      { name: 'google/protobuf (C ext)', val: 1003 },
-      { name: 'JSON (stdlib)', val: 3698 },
-      { name: 'OmniBuf (Generated)', val: 5744, highlight: true },
-      { name: 'google/protobuf (pure PHP)', val: 47125 },
+      { name: 'OmniBuf (ext-omnibuf)', val: 174, highlight: true, baseline: true },
+      { name: 'google/protobuf (C ext)', val: 959 },
+      { name: 'JSON (stdlib)', val: 3700 },
+      { name: 'OmniBuf (Generated)', val: 5706, highlight: true },
+      { name: 'google/protobuf (pure PHP)', val: 48442 },
     ],
   },
   {
@@ -1088,11 +1088,11 @@ export const phpBenchmarkCategories: BenchmarkCategory[] = [
     methodology:
       'Checking a nested city string and splicing an updated sequence counter via OpaquePeerUpdate vs full decode and re-encode.',
     rows: [
-      { name: 'OmniBuf (ext-omnibuf)', val: 507, highlight: true, baseline: true },
-      { name: 'google/protobuf (C ext)', val: 1661 },
-      { name: 'JSON (stdlib)', val: 5137 },
-      { name: 'OmniBuf (Generated)', val: 10014, highlight: true },
-      { name: 'google/protobuf (pure PHP)', val: 139481 },
+      { name: 'OmniBuf (ext-omnibuf)', val: 505, highlight: true, baseline: true },
+      { name: 'google/protobuf (C ext)', val: 1471 },
+      { name: 'JSON (stdlib)', val: 5075 },
+      { name: 'OmniBuf (Generated)', val: 9980, highlight: true },
+      { name: 'google/protobuf (pure PHP)', val: 137135 },
     ],
   },
   {
@@ -1100,20 +1100,20 @@ export const phpBenchmarkCategories: BenchmarkCategory[] = [
     unit: 'ns',
     maxVal: 1280000,
     methodology:
-      'Serializing a 39 KiB packet whose >16 KiB nested sub-messages trigger 2B-to-4B header expansion.',
+      'Serializing a 39 KiB packet whose >16 KiB nested sub-messages trigger 4-byte container length pre-sizing directly into a pre-allocated zend_string.',
     rows: [
-      { name: 'google/protobuf (C ext)', val: 2161, sizeBytes: 39227 },
       {
         name: 'OmniBuf (ext-omnibuf)',
-        val: 2927,
+        val: 949,
         sizeBytes: 39255,
         highlight: true,
         baseline: true,
       },
-      { name: 'OmniBuf (Generated)', val: 8713, sizeBytes: 39255, highlight: true },
-      { name: 'OmniBuf (Attributes)', val: 18309, sizeBytes: 39255, highlight: true },
-      { name: 'JSON (stdlib)', val: 23523, sizeBytes: 39681 },
-      { name: 'google/protobuf (pure PHP)', val: 1162229, sizeBytes: 39227 },
+      { name: 'google/protobuf (C ext)', val: 2195, sizeBytes: 39227 },
+      { name: 'OmniBuf (Generated)', val: 8738, sizeBytes: 39255, highlight: true },
+      { name: 'OmniBuf (Attributes)', val: 18372, sizeBytes: 39255, highlight: true },
+      { name: 'JSON (stdlib)', val: 23540, sizeBytes: 39681 },
+      { name: 'google/protobuf (pure PHP)', val: 1160962, sizeBytes: 39227 },
     ],
   },
   {
@@ -1123,11 +1123,11 @@ export const phpBenchmarkCategories: BenchmarkCategory[] = [
     methodology:
       'Growing a nested string field past 16 KiB ahead of 32 trailing Neighbor entries via Opaque splicing vs full decode and re-encode.',
     rows: [
-      { name: 'OmniBuf (ext-omnibuf)', val: 2425, highlight: true, baseline: true },
-      { name: 'google/protobuf (C ext)', val: 6370 },
-      { name: 'OmniBuf (Generated)', val: 10960, highlight: true },
-      { name: 'JSON (stdlib)', val: 30960 },
-      { name: 'google/protobuf (pure PHP)', val: 1141449 },
+      { name: 'OmniBuf (ext-omnibuf)', val: 2182, highlight: true, baseline: true },
+      { name: 'google/protobuf (C ext)', val: 6358 },
+      { name: 'OmniBuf (Generated)', val: 10390, highlight: true },
+      { name: 'JSON (stdlib)', val: 30674 },
+      { name: 'google/protobuf (pure PHP)', val: 1137293 },
     ],
   },
 ];
@@ -1498,7 +1498,7 @@ export const languageBenchmarks: Record<LanguageKey, LanguageBenchmarkSuite> = {
     ctaLabel: 'See full results',
     competitorsLabel: 'google/protobuf (C ext & pure PHP), JSON (C stdlib)',
     heroSummaryHtml:
-      'With the optional Rust-backed <code>ext-omnibuf</code> extension, PHP encodes faster than Google&apos;s C <code>ext-protobuf</code>, decodes <strong>over 4x faster</strong>, and reads nested fields <strong>nearly 6x faster</strong>. Without any extension installed, pure-PHP OmniBuf runs <strong>about 19x faster</strong> than pure-PHP Protobuf. Explore the <a href="/php" class="doc-link">PHP runtime</a>.',
+      'With the optional Rust-backed <code>ext-omnibuf</code> extension, PHP beats Google&apos;s C <code>ext-protobuf</code> across all six benchmarks, encoding large 39 KiB messages <strong>over 2x faster</strong>, decoding <strong>nearly 4x faster</strong>, and reading nested fields <strong>over 5x faster</strong>. Without any extension installed, pure-PHP OmniBuf runs <strong>about 19x faster</strong> than pure-PHP Protobuf. Explore the <a href="/php" class="doc-link">PHP runtime</a>.',
     categories: phpBenchmarkCategories,
     butterflyEncodeRows: primaryAndCompetitors(phpEncodeCat.rows),
     butterflyDecodeRows: primaryAndCompetitors(phpDecodeCat.rows),
