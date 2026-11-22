@@ -1,0 +1,382 @@
+---
+import { Code } from 'astro:components';
+import Layout from '../layouts/Layout.astro';
+import Navbar from '../components/Navbar.astro';
+import Benchmarks from '../components/Benchmarks.astro';
+import LanguageStrip from '../components/LanguageStrip.astro';
+import Footer from '../components/Footer.astro';
+
+const attributePhpSnippet = `<?php
+use OmniBuf\\Attributes\\OmniBufField;
+use OmniBuf\\Attributes\\OmniBufMessage;
+use OmniBuf\\OmniBuf;
+
+#[OmniBufMessage('Location')]
+final class Location
+{
+    #[OmniBufField(3, 'string')]
+    public string $city = '';
+
+    #[OmniBufField(4, 'uint32')]
+    public int $rack = 0;
+}
+
+$loc = new Location();
+$loc->city = 'FRA';
+$loc->rack = 42;
+
+$bytes = OmniBuf::marshal($loc, deterministic: true);
+$decoded = OmniBuf::unmarshal($bytes, Location::class);`;
+
+const googleProtoPhpSnippet = `<?php
+use OmniBuf\\OmniBuf;
+use Omnibuf\\Bench\\PeerUpdate;
+
+$bytes = OmniBuf::marshal($protoPeerUpdate, deterministic: true);
+$decoded = OmniBuf::unmarshal($bytes, PeerUpdate::class);`;
+
+const bufGenPhpSnippet = `version: v2
+clean: true
+plugins:
+  - local: vendor/bin/protoc-gen-omnibuf-php
+    out: gen`;
+
+const generatedPhpSnippet = `<?php
+use OmniBuf\\Generated\\Omnibuf\\Bench\\OpaquePeerUpdate;
+
+$view = new OpaquePeerUpdate($packetBytes);
+if ($view->opaqueLocation()?->getCity() === 'Frankfurt') {
+    $view->setSequence($view->getSequence() + 1);
+}
+$updatedPacket = $view->marshal();`;
+
+const blindPhpCode = `<?php
+use OmniBuf\\OmniBuf;
+
+$bytes = OmniBuf::marshal($loc, selfDescribing: true);
+$json = OmniBuf::decodeBlindJson($bytes);`;
+
+const phpFaqItems = [
+  {
+    id: 'php-faq-ext',
+    question: 'Does omnibuf/omnibuf require a PECL or C extension?',
+    paragraphs: [
+      'No. The package is 100% pure PHP 8.3+ (64-bit) with no native build step. It installs anywhere Composer runs and encodes around 18x faster than pure-PHP <code>google/protobuf</code>.',
+    ],
+  },
+  {
+    id: 'php-faq-plugin',
+    question: 'How is protoc-gen-omnibuf-php installed?',
+    paragraphs: [
+      'Composer links <code>vendor/bin/protoc-gen-omnibuf-php</code> automatically on <code>composer require omnibuf/omnibuf</code>. Point <code>buf.gen.yaml</code> at that binary to generate typed classes and lazy <code>Opaque*</code> views.',
+    ],
+  },
+  {
+    id: 'php-faq-blind',
+    question: 'How does OmniBuf::decodeBlind inspect schema-less packets?',
+    paragraphs: [
+      '<code>OmniBuf::decodeBlind($bytes)</code> and <code>OmniBuf::decodeBlindJson($bytes)</code> decode any OmniBuf packet straight from its wire types. Keys default to <code>field_1</code>, <code>field_2</code>, ... or resolve to Field #0 names when <code>selfDescribing: true</code> was passed on marshal.',
+    ],
+    codeBlock: blindPhpCode,
+    codeLabel: 'Example',
+  },
+];
+
+const stripHtml = (s: string) => s.replace(/<[^>]+>/g, '');
+
+const phpFaqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: phpFaqItems.map((item) => ({
+    '@type': 'Question',
+    name: item.question,
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: item.paragraphs.map(stripHtml).join('\n\n'),
+    },
+  })),
+};
+---
+
+<Layout
+  title="OmniBuf for PHP 8.3+ | #[OmniBufField] Attributes, google/protobuf & protoc-gen-omnibuf-php"
+  description="Use OmniBuf in PHP 8.3+ via Packagist: annotate plain PHP classes with PHP 8 attributes, marshal google/protobuf messages, or generate typed classes and Opaque views."
+>
+  <Navbar currentPage="php" />
+
+  <main id="main-content">
+    <section class="relative pt-10 pb-8 sm:pt-16 sm:pb-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+      <h1 class="text-[2.6rem] sm:text-7xl lg:text-[5.5rem] font-bold tracking-tight leading-[0.94] text-ink uppercase">
+        OmniBuf
+        <br />
+        <span class="font-serif italic font-normal normal-case text-[#FF4F18] text-[3.1rem] sm:text-8xl lg:text-[6.2rem]">
+          for PHP 8.3+.
+        </span>
+      </h1>
+
+      <div class="mt-6 grid lg:grid-cols-12 gap-6 lg:gap-8 items-end">
+        <div class="lg:col-span-7 space-y-4">
+          <p class="text-lg sm:text-2xl text-ink/85 font-medium leading-snug">
+            Pure PHP 8.3+ library on Packagist with a bundled Composer plugin binary. Annotate{' '}
+            <a href="#attributes" class="doc-link">
+              plain PHP classes with attributes
+            </a>
+            , marshal existing{' '}
+            <a href="#google-protobuf" class="doc-link">
+              <code>google/protobuf</code> messages
+            </a>
+            , or{' '}
+            <a href="#plugin-codegen" class="doc-link">
+              generate typed classes and lazy Opaque views
+            </a>{' '}
+            with zero PECL extensions.
+          </p>
+          <div class="flex flex-wrap gap-3 font-mono text-sm sm:text-base pt-1 no-print">
+            <a
+              href="https://github.com/omnibuf/omnibuf-php"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="os-btn px-4 py-2.5 bg-acid text-ink font-bold rounded-md"
+            >
+              GitHub Repository &rarr;
+            </a>
+            <a
+              href="https://packagist.org/packages/omnibuf/omnibuf"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="os-btn px-4 py-2.5 bg-[#FAF8F2] text-ink font-bold rounded-md"
+            >
+              Packagist Package &rarr;
+            </a>
+            <a
+              href="#benchmarks"
+              class="os-btn px-4 py-2.5 bg-[#FAF8F2] text-ink font-bold rounded-md"
+            >
+              PHP Benchmarks &rarr;
+            </a>
+          </div>
+        </div>
+
+        <div class="lg:col-span-5 min-w-0">
+          <div class="p-4 sm:p-5 bg-ink text-paper rounded-md font-mono text-xs sm:text-sm overflow-x-auto leading-relaxed border-2 border-ink shadow-[4px_4px_0px_#111111]">
+            <div class="flex items-center justify-between gap-2 mb-2 pb-2 border-b border-paper/15">
+              <div class="text-xs font-bold uppercase text-acid">Install via Composer</div>
+              <button
+                type="button"
+                data-copy="composer require omnibuf/omnibuf"
+                class="copy-snippet-btn min-w-[4.75rem] text-center px-2.5 py-1 text-xs font-bold uppercase bg-paper/15 hover:bg-acid hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-acid text-paper border border-paper/30 rounded shrink-0 transition"
+              >
+                Copy
+              </button>
+            </div>
+            <pre class="leading-relaxed whitespace-pre"><code><span class="text-paper/75 select-none">$ </span>composer require omnibuf/omnibuf</code></pre>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section
+      id="quickstart"
+      class="scroll-mt-16 py-12 sm:py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto border-t-2 border-ink/15"
+    >
+      <div class="max-w-3xl mb-8">
+        <h2 class="text-3xl sm:text-5xl font-bold tracking-tight uppercase leading-none">
+          Three ways to use{' '}
+          <span class="font-serif italic font-normal normal-case text-[#FF4F18]">
+            OmniBuf in PHP.
+          </span>
+        </h2>
+        <p class="mt-3 text-lg sm:text-xl text-ink/80 font-medium">
+          All three emit identical v0.1 wire bytes on 64-bit PHP 8.3 and newer.
+        </p>
+      </div>
+
+      <div class="border-t-2 border-ink divide-y-2 divide-ink/20">
+        <div
+          id="attributes"
+          class="scroll-mt-16 py-8 sm:py-12 grid lg:grid-cols-12 gap-6 lg:gap-8 items-start"
+        >
+          <div class="lg:col-span-5 space-y-3.5 min-w-0">
+            <h3 class="text-2xl sm:text-3xl font-bold uppercase tracking-tight leading-snug">
+              PHP 8 attribute-annotated classes
+            </h3>
+            <p class="text-base sm:text-lg text-ink/85 leading-relaxed">
+              Tag class properties with <code>#[OmniBufMessage]</code> and{' '}
+              <code>#[OmniBufField]</code>. Metadata is cached per class on first use so repeated
+              marshals skip reflection overhead.
+            </p>
+          </div>
+
+          <div class="lg:col-span-7 min-w-0">
+            <div class="p-4 sm:p-5 bg-ink text-paper rounded-md font-mono text-xs sm:text-sm overflow-x-auto leading-relaxed border-2 border-ink [&>pre]:!bg-transparent [&>pre]:!p-0 [&>pre]:!m-0 [&>pre]:!border-0">
+              <div class="flex items-center justify-between gap-2 mb-2.5 pb-2 border-b border-paper/15">
+                <div class="text-xs font-bold uppercase text-acid">#[OmniBufField] Class</div>
+                <button
+                  type="button"
+                  data-copy={attributePhpSnippet}
+                  class="copy-snippet-btn min-w-[4.75rem] text-center px-2.5 py-1 text-xs font-bold uppercase bg-paper/15 hover:bg-acid hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-acid text-paper border border-paper/30 rounded shrink-0 transition"
+                >
+                  Copy
+                </button>
+              </div>
+              <Code code={attributePhpSnippet} lang="php" theme="github-dark" />
+            </div>
+          </div>
+        </div>
+
+        <div
+          id="google-protobuf"
+          class="scroll-mt-16 py-8 sm:py-12 grid lg:grid-cols-12 gap-6 lg:gap-8 items-start"
+        >
+          <div class="lg:col-span-5 space-y-3.5 min-w-0">
+            <h3 class="text-2xl sm:text-3xl font-bold uppercase tracking-tight leading-snug">
+              Existing google/protobuf messages
+            </h3>
+            <p class="text-base sm:text-lg text-ink/85 leading-relaxed">
+              <code>OmniBuf::marshal</code> and <code>OmniBuf::unmarshal</code> accept standard{' '}
+              <code>Google\Protobuf\Internal\Message</code> objects directly via{' '}
+              <code>DescriptorPool</code> with no extra code generator required.
+            </p>
+          </div>
+
+          <div class="lg:col-span-7 min-w-0">
+            <div class="p-4 sm:p-5 bg-ink text-paper rounded-md font-mono text-xs sm:text-sm overflow-x-auto leading-relaxed border-2 border-ink [&>pre]:!bg-transparent [&>pre]:!p-0 [&>pre]:!m-0 [&>pre]:!border-0">
+              <div class="flex items-center justify-between gap-2 mb-2.5 pb-2 border-b border-paper/15">
+                <div class="text-xs font-bold uppercase text-acid">google/protobuf Bridge</div>
+                <button
+                  type="button"
+                  data-copy={googleProtoPhpSnippet}
+                  class="copy-snippet-btn min-w-[4.75rem] text-center px-2.5 py-1 text-xs font-bold uppercase bg-paper/15 hover:bg-acid hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-acid text-paper border border-paper/30 rounded shrink-0 transition"
+                >
+                  Copy
+                </button>
+              </div>
+              <Code code={googleProtoPhpSnippet} lang="php" theme="github-dark" />
+            </div>
+          </div>
+        </div>
+
+        <div
+          id="plugin-codegen"
+          class="scroll-mt-16 py-8 sm:py-12 grid lg:grid-cols-12 gap-6 lg:gap-8 items-start"
+        >
+          <div class="lg:col-span-5 space-y-3.5 min-w-0">
+            <h3 class="text-2xl sm:text-3xl font-bold uppercase tracking-tight leading-snug">
+              Generated classes with protoc-gen-omnibuf-php
+            </h3>
+            <p class="text-base sm:text-lg text-ink/85 leading-relaxed">
+              <code>vendor/bin/protoc-gen-omnibuf-php</code> emits typed PHP 8.3+ message classes
+              and lazy <code>Opaque*</code> views that skip untouched fields in{' '}
+              <code>O(fields)</code> time and splice modified bytes directly.
+            </p>
+          </div>
+
+          <div class="lg:col-span-7 space-y-3.5 min-w-0">
+            <div class="p-4 sm:p-5 bg-ink text-paper rounded-md font-mono text-xs sm:text-sm overflow-x-auto leading-relaxed border-2 border-ink [&>pre]:!bg-transparent [&>pre]:!p-0 [&>pre]:!m-0 [&>pre]:!border-0">
+              <div class="flex items-center justify-between gap-2 mb-2.5 pb-2 border-b border-paper/15">
+                <div class="text-xs font-bold uppercase text-acid">buf.gen.yaml</div>
+                <button
+                  type="button"
+                  data-copy={bufGenPhpSnippet}
+                  class="copy-snippet-btn min-w-[4.75rem] text-center px-2.5 py-1 text-xs font-bold uppercase bg-paper/15 hover:bg-acid hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-acid text-paper border border-paper/30 rounded shrink-0 transition"
+                >
+                  Copy
+                </button>
+              </div>
+              <Code code={bufGenPhpSnippet} lang="yaml" theme="github-dark" />
+            </div>
+
+            <div class="p-4 sm:p-5 bg-ink text-paper rounded-md font-mono text-xs sm:text-sm overflow-x-auto leading-relaxed border-2 border-ink">
+              <div class="flex items-center justify-between gap-2 mb-2.5 pb-2 border-b border-paper/15">
+                <div class="text-xs font-bold uppercase text-acid">
+                  Lint &amp; Generate with Buf
+                </div>
+                <button
+                  type="button"
+                  data-copy="buf lint && buf generate"
+                  class="copy-snippet-btn min-w-[4.75rem] text-center px-2.5 py-1 text-xs font-bold uppercase bg-paper/15 hover:bg-acid hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-acid text-paper border border-paper/30 rounded shrink-0 transition"
+                >
+                  Copy
+                </button>
+              </div>
+              <pre class="leading-relaxed whitespace-pre"><code><span class="text-paper/75 select-none">$ </span>buf lint
+<span class="text-paper/75 select-none">$ </span><span class="text-acid font-bold">buf generate</span></code></pre>
+            </div>
+
+            <div class="p-4 sm:p-5 bg-ink text-paper rounded-md font-mono text-xs sm:text-sm overflow-x-auto leading-relaxed border-2 border-ink [&>pre]:!bg-transparent [&>pre]:!p-0 [&>pre]:!m-0 [&>pre]:!border-0">
+              <div class="flex items-center justify-between gap-2 mb-2.5 pb-2 border-b border-paper/15">
+                <div class="text-xs font-bold uppercase text-acid">
+                  Lazy Opaque View &amp; Wire Splice
+                </div>
+                <button
+                  type="button"
+                  data-copy={generatedPhpSnippet}
+                  class="copy-snippet-btn min-w-[4.75rem] text-center px-2.5 py-1 text-xs font-bold uppercase bg-paper/15 hover:bg-acid hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-acid text-paper border border-paper/30 rounded shrink-0 transition"
+                >
+                  Copy
+                </button>
+              </div>
+              <Code code={generatedPhpSnippet} lang="php" theme="github-dark" />
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <Benchmarks lang="php" />
+
+    <section
+      id="php-faq"
+      class="scroll-mt-16 py-16 sm:py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto border-t-2 border-ink/15"
+    >
+      <div class="max-w-3xl mb-10">
+        <h2 class="text-3xl sm:text-5xl font-bold tracking-tight uppercase leading-none">
+          PHP{' '}
+          <span class="font-serif italic font-normal normal-case text-[#FF4F18]">questions.</span>
+        </h2>
+      </div>
+
+      <div class="border-t-2 border-ink divide-y-2 divide-ink/20">
+        {phpFaqItems.map((item) => (
+          <div
+            id={item.id}
+            class="scroll-mt-16 py-8 sm:py-10 grid lg:grid-cols-12 gap-6 lg:gap-8 items-start"
+          >
+            <h3 class="lg:col-span-5 text-xl sm:text-2xl font-bold uppercase tracking-tight text-ink leading-snug">
+              {item.question}
+            </h3>
+
+            <div class="lg:col-span-7 space-y-3.5 text-base sm:text-lg text-ink/85 leading-relaxed max-w-[65ch] min-w-0">
+              {item.paragraphs.map((paragraph) => (
+                <p set:html={paragraph} />
+              ))}
+              {item.codeBlock && (
+                <div class="bg-ink text-paper p-4 sm:p-5 rounded-md border-2 border-ink font-mono text-xs sm:text-sm leading-relaxed overflow-x-auto [&>pre]:!bg-transparent [&>pre]:!p-0 [&>pre]:!m-0 [&>pre]:!border-0">
+                  <div class="flex items-center justify-between gap-2 mb-2.5 pb-2 border-b border-paper/15">
+                    <div class="text-xs font-bold uppercase text-acid">
+                      {item.codeLabel ?? 'Example'}
+                    </div>
+                    <button
+                      type="button"
+                      data-copy={item.codeBlock}
+                      class="copy-snippet-btn min-w-[4.75rem] text-center px-2.5 py-1 text-xs font-bold uppercase bg-paper/15 hover:bg-acid hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-acid text-paper border border-paper/30 rounded shrink-0 transition"
+                    >
+                      Copy
+                    </button>
+                  </div>
+                  <Code code={item.codeBlock} lang="php" theme="github-dark" />
+                </div>
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <script is:inline type="application/ld+json" set:html={JSON.stringify(phpFaqJsonLd)} />
+    </section>
+
+    <LanguageStrip currentPage="php" />
+  </main>
+
+  <Footer />
+</Layout>

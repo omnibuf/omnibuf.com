@@ -1,0 +1,381 @@
+---
+import { Code } from 'astro:components';
+import Layout from '../layouts/Layout.astro';
+import Navbar from '../components/Navbar.astro';
+import Benchmarks from '../components/Benchmarks.astro';
+import LanguageStrip from '../components/LanguageStrip.astro';
+import Footer from '../components/Footer.astro';
+
+const schemaDartSnippet = `import 'package:omnibuf/omnibuf.dart';
+
+class SensorSample {
+  String sensorId;
+  double celsius;
+  int seq;
+  SensorSample({this.sensorId = '', this.celsius = 0.0, this.seq = 0});
+}
+
+final sensorSchema = OmniBufSchema<SensorSample>(
+  typeName: 'SensorSample',
+  create: SensorSample.new,
+  fields: [
+    OmniBufSchemaField.string(1, 'sensor_id', (m) => m.sensorId, (m, v) => m.sensorId = v),
+    OmniBufSchemaField.float64(2, 'celsius', (m) => m.celsius, (m, v) => m.celsius = v),
+    OmniBufSchemaField.uint64(3, 'seq', (m) => m.seq, (m, v) => m.seq = v),
+  ],
+);
+
+final pkt = sensorSchema.encode(SensorSample(sensorId: 'rack-42', celsius: 21.75, seq: 1042));
+final decoded = sensorSchema.decode(pkt);`;
+
+const protobufDartSnippet = `import 'package:omnibuf/omnibuf.dart';
+
+final pkt = ProtobufOmniBufCodec.encode(protoPeer);
+final copy = ProtobufOmniBufCodec.decode(pkt, PeerUpdate.create);`;
+
+const bufGenDartSnippet = `version: v2
+clean: true
+plugins:
+  - local: protoc-gen-omnibuf-dart
+    out: lib/src/generated`;
+
+const generatedDartSnippet = `import 'package:omnibuf/omnibuf.dart';
+import 'package:my_app/src/generated/omnibuf/bench/peer.omnibuf.dart';
+
+final pkt = peer.encode();
+
+final view = OpaquePeerUpdate(pkt);
+final city = view.locationOpaque?.city;
+
+view.sequence = view.sequence + 1;
+final updated = view.marshalAppend();`;
+
+const blindDartCode = `import 'package:omnibuf/omnibuf.dart';
+
+final pkt = sensorSchema.encode(sample, selfDescribing: true);
+final json = decodeBlindJson(pkt);`;
+
+const dartFaqItems = [
+  {
+    id: 'dart-faq-flutter',
+    question: 'Does omnibuf work in Flutter apps as well as server-side Dart?',
+    paragraphs: [
+      'Yes. The runtime uses pure Dart 3 <code>Uint8List</code> and <code>ByteData</code> buffers with no <code>dart:mirrors</code> or native FFI requirements, so it compiles cleanly under Flutter AOT (iOS, Android, desktop), Dart VM, and Dart web targets.',
+    ],
+  },
+  {
+    id: 'dart-faq-protobuf',
+    question: 'How does ProtobufOmniBufCodec bridge package:protobuf messages?',
+    paragraphs: [
+      '<code>ProtobufOmniBufCodec</code> walks each generated message&apos;s <code>BuilderInfo</code> metadata directly, encoding and decoding standard <code>GeneratedMessage</code> subclasses onto OmniBuf wire bytes with no extra plugin step.',
+    ],
+  },
+  {
+    id: 'dart-faq-blind',
+    question: 'How does decodeBlind inspect packets without a schema?',
+    paragraphs: [
+      '<code>decodeBlind(pkt)</code> and <code>decodeBlindJson(pkt)</code> decode arbitrary OmniBuf packets directly from their 4-bit wire types. Keys default to <code>field_1</code>, <code>field_2</code>, ... or resolve to Field #0 names when encoded with <code>selfDescribing: true</code>.',
+    ],
+    codeBlock: blindDartCode,
+    codeLabel: 'Example',
+  },
+];
+
+const stripHtml = (s: string) => s.replace(/<[^>]+>/g, '');
+
+const dartFaqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: dartFaqItems.map((item) => ({
+    '@type': 'Question',
+    name: item.question,
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: item.paragraphs.map(stripHtml).join('\n\n'),
+    },
+  })),
+};
+---
+
+<Layout
+  title="OmniBuf for Dart 3 & Flutter | OmniBufSchema, package:protobuf & protoc-gen-omnibuf-dart"
+  description="Use OmniBuf in Dart 3 and Flutter via pub.dev: define OmniBufSchema codecs, serialize package:protobuf messages, or generate Uint8List codecs and Opaque views."
+>
+  <Navbar currentPage="dart" />
+
+  <main id="main-content">
+    <section class="relative pt-10 pb-8 sm:pt-16 sm:pb-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+      <h1 class="text-[2.6rem] sm:text-7xl lg:text-[5.5rem] font-bold tracking-tight leading-[0.94] text-ink uppercase">
+        OmniBuf
+        <br />
+        <span class="font-serif italic font-normal normal-case text-[#FF4F18] text-[3.1rem] sm:text-8xl lg:text-[6.2rem]">
+          for Dart 3.
+        </span>
+      </h1>
+
+      <div class="mt-6 grid lg:grid-cols-12 gap-6 lg:gap-8 items-end">
+        <div class="lg:col-span-7 space-y-4">
+          <p class="text-lg sm:text-2xl text-ink/85 font-medium leading-snug">
+            Pure Dart 3 library on pub.dev built on <code>Uint8List</code> and <code>ByteData</code>
+            . Define{' '}
+            <a href="#schema-codec" class="doc-link">
+              declarative class schemas
+            </a>
+            , bridge{' '}
+            <a href="#package-protobuf" class="doc-link">
+              <code>package:protobuf</code> messages
+            </a>
+            , or{' '}
+            <a href="#plugin-codegen" class="doc-link">
+              generate typed classes and lazy Opaque views
+            </a>{' '}
+            for AOT Flutter and server runtimes.
+          </p>
+          <div class="flex flex-wrap gap-3 font-mono text-sm sm:text-base pt-1 no-print">
+            <a
+              href="https://github.com/omnibuf/omnibuf-dart"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="os-btn px-4 py-2.5 bg-acid text-ink font-bold rounded-md"
+            >
+              GitHub Repository &rarr;
+            </a>
+            <a
+              href="https://pub.dev/packages/omnibuf"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="os-btn px-4 py-2.5 bg-[#FAF8F2] text-ink font-bold rounded-md"
+            >
+              pub.dev Package &rarr;
+            </a>
+            <a
+              href="#benchmarks"
+              class="os-btn px-4 py-2.5 bg-[#FAF8F2] text-ink font-bold rounded-md"
+            >
+              Dart Benchmarks &rarr;
+            </a>
+          </div>
+        </div>
+
+        <div class="lg:col-span-5 min-w-0">
+          <div class="p-4 sm:p-5 bg-ink text-paper rounded-md font-mono text-xs sm:text-sm overflow-x-auto leading-relaxed border-2 border-ink shadow-[4px_4px_0px_#111111]">
+            <div class="flex items-center justify-between gap-2 mb-2 pb-2 border-b border-paper/15">
+              <div class="text-xs font-bold uppercase text-acid">Add pub.dev Package</div>
+              <button
+                type="button"
+                data-copy="dart pub add omnibuf"
+                class="copy-snippet-btn min-w-[4.75rem] text-center px-2.5 py-1 text-xs font-bold uppercase bg-paper/15 hover:bg-acid hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-acid text-paper border border-paper/30 rounded shrink-0 transition"
+              >
+                Copy
+              </button>
+            </div>
+            <pre class="leading-relaxed whitespace-pre"><code><span class="text-paper/75 select-none">$ </span>dart pub add omnibuf</code></pre>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section
+      id="quickstart"
+      class="scroll-mt-16 py-12 sm:py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto border-t-2 border-ink/15"
+    >
+      <div class="max-w-3xl mb-8">
+        <h2 class="text-3xl sm:text-5xl font-bold tracking-tight uppercase leading-none">
+          Three ways to use{' '}
+          <span class="font-serif italic font-normal normal-case text-[#FF4F18]">
+            OmniBuf in Dart.
+          </span>
+        </h2>
+        <p class="mt-3 text-lg sm:text-xl text-ink/80 font-medium">
+          All three share the exact same v0.1 binary layout across Flutter, Dart VM, and web.
+        </p>
+      </div>
+
+      <div class="border-t-2 border-ink divide-y-2 divide-ink/20">
+        <div
+          id="schema-codec"
+          class="scroll-mt-16 py-8 sm:py-12 grid lg:grid-cols-12 gap-6 lg:gap-8 items-start"
+        >
+          <div class="lg:col-span-5 space-y-3.5 min-w-0">
+            <h3 class="text-2xl sm:text-3xl font-bold uppercase tracking-tight leading-snug">
+              Declarative OmniBufSchema codecs
+            </h3>
+            <p class="text-base sm:text-lg text-ink/85 leading-relaxed">
+              Bind plain Dart classes directly with <code>OmniBufSchema</code> field getters and
+              setters. Zero reflection, zero codegen, and full replace or merge decoding semantics.
+            </p>
+          </div>
+
+          <div class="lg:col-span-7 min-w-0">
+            <div class="p-4 sm:p-5 bg-ink text-paper rounded-md font-mono text-xs sm:text-sm overflow-x-auto leading-relaxed border-2 border-ink [&>pre]:!bg-transparent [&>pre]:!p-0 [&>pre]:!m-0 [&>pre]:!border-0">
+              <div class="flex items-center justify-between gap-2 mb-2.5 pb-2 border-b border-paper/15">
+                <div class="text-xs font-bold uppercase text-acid">OmniBufSchema Class</div>
+                <button
+                  type="button"
+                  data-copy={schemaDartSnippet}
+                  class="copy-snippet-btn min-w-[4.75rem] text-center px-2.5 py-1 text-xs font-bold uppercase bg-paper/15 hover:bg-acid hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-acid text-paper border border-paper/30 rounded shrink-0 transition"
+                >
+                  Copy
+                </button>
+              </div>
+              <Code code={schemaDartSnippet} lang="dart" theme="github-dark" />
+            </div>
+          </div>
+        </div>
+
+        <div
+          id="package-protobuf"
+          class="scroll-mt-16 py-8 sm:py-12 grid lg:grid-cols-12 gap-6 lg:gap-8 items-start"
+        >
+          <div class="lg:col-span-5 space-y-3.5 min-w-0">
+            <h3 class="text-2xl sm:text-3xl font-bold uppercase tracking-tight leading-snug">
+              Standard package:protobuf messages
+            </h3>
+            <p class="text-base sm:text-lg text-ink/85 leading-relaxed">
+              Apps already using <code>package:protobuf</code> pass any{' '}
+              <code>GeneratedMessage</code> into <code>ProtobufOmniBufCodec.encode</code> and{' '}
+              <code>decode</code> via <code>BuilderInfo</code>.
+            </p>
+          </div>
+
+          <div class="lg:col-span-7 min-w-0">
+            <div class="p-4 sm:p-5 bg-ink text-paper rounded-md font-mono text-xs sm:text-sm overflow-x-auto leading-relaxed border-2 border-ink [&>pre]:!bg-transparent [&>pre]:!p-0 [&>pre]:!m-0 [&>pre]:!border-0">
+              <div class="flex items-center justify-between gap-2 mb-2.5 pb-2 border-b border-paper/15">
+                <div class="text-xs font-bold uppercase text-acid">package:protobuf Bridge</div>
+                <button
+                  type="button"
+                  data-copy={protobufDartSnippet}
+                  class="copy-snippet-btn min-w-[4.75rem] text-center px-2.5 py-1 text-xs font-bold uppercase bg-paper/15 hover:bg-acid hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-acid text-paper border border-paper/30 rounded shrink-0 transition"
+                >
+                  Copy
+                </button>
+              </div>
+              <Code code={protobufDartSnippet} lang="dart" theme="github-dark" />
+            </div>
+          </div>
+        </div>
+
+        <div
+          id="plugin-codegen"
+          class="scroll-mt-16 py-8 sm:py-12 grid lg:grid-cols-12 gap-6 lg:gap-8 items-start"
+        >
+          <div class="lg:col-span-5 space-y-3.5 min-w-0">
+            <h3 class="text-2xl sm:text-3xl font-bold uppercase tracking-tight leading-snug">
+              Generated classes with protoc-gen-omnibuf-dart
+            </h3>
+            <p class="text-base sm:text-lg text-ink/85 leading-relaxed">
+              <code>protoc-gen-omnibuf-dart</code> emits idiomatic Dart 3 message classes,
+              single-pass <code>Uint8List</code> encoders, and lazy <code>Opaque*</code> views.
+              Nested field reads finish in ~393 ns and single-field splices in ~759 ns.
+            </p>
+          </div>
+
+          <div class="lg:col-span-7 space-y-3.5 min-w-0">
+            <div class="p-4 sm:p-5 bg-ink text-paper rounded-md font-mono text-xs sm:text-sm overflow-x-auto leading-relaxed border-2 border-ink [&>pre]:!bg-transparent [&>pre]:!p-0 [&>pre]:!m-0 [&>pre]:!border-0">
+              <div class="flex items-center justify-between gap-2 mb-2.5 pb-2 border-b border-paper/15">
+                <div class="text-xs font-bold uppercase text-acid">buf.gen.yaml</div>
+                <button
+                  type="button"
+                  data-copy={bufGenDartSnippet}
+                  class="copy-snippet-btn min-w-[4.75rem] text-center px-2.5 py-1 text-xs font-bold uppercase bg-paper/15 hover:bg-acid hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-acid text-paper border border-paper/30 rounded shrink-0 transition"
+                >
+                  Copy
+                </button>
+              </div>
+              <Code code={bufGenDartSnippet} lang="yaml" theme="github-dark" />
+            </div>
+
+            <div class="p-4 sm:p-5 bg-ink text-paper rounded-md font-mono text-xs sm:text-sm overflow-x-auto leading-relaxed border-2 border-ink">
+              <div class="flex items-center justify-between gap-2 mb-2.5 pb-2 border-b border-paper/15">
+                <div class="text-xs font-bold uppercase text-acid">
+                  Lint &amp; Generate with Buf
+                </div>
+                <button
+                  type="button"
+                  data-copy="buf lint && buf generate"
+                  class="copy-snippet-btn min-w-[4.75rem] text-center px-2.5 py-1 text-xs font-bold uppercase bg-paper/15 hover:bg-acid hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-acid text-paper border border-paper/30 rounded shrink-0 transition"
+                >
+                  Copy
+                </button>
+              </div>
+              <pre class="leading-relaxed whitespace-pre"><code><span class="text-paper/75 select-none">$ </span>buf lint
+<span class="text-paper/75 select-none">$ </span><span class="text-acid font-bold">buf generate</span></code></pre>
+            </div>
+
+            <div class="p-4 sm:p-5 bg-ink text-paper rounded-md font-mono text-xs sm:text-sm overflow-x-auto leading-relaxed border-2 border-ink [&>pre]:!bg-transparent [&>pre]:!p-0 [&>pre]:!m-0 [&>pre]:!border-0">
+              <div class="flex items-center justify-between gap-2 mb-2.5 pb-2 border-b border-paper/15">
+                <div class="text-xs font-bold uppercase text-acid">
+                  Generated Message &amp; Opaque Splice
+                </div>
+                <button
+                  type="button"
+                  data-copy={generatedDartSnippet}
+                  class="copy-snippet-btn min-w-[4.75rem] text-center px-2.5 py-1 text-xs font-bold uppercase bg-paper/15 hover:bg-acid hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-acid text-paper border border-paper/30 rounded shrink-0 transition"
+                >
+                  Copy
+                </button>
+              </div>
+              <Code code={generatedDartSnippet} lang="dart" theme="github-dark" />
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <Benchmarks lang="dart" />
+
+    <section
+      id="dart-faq"
+      class="scroll-mt-16 py-16 sm:py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto border-t-2 border-ink/15"
+    >
+      <div class="max-w-3xl mb-10">
+        <h2 class="text-3xl sm:text-5xl font-bold tracking-tight uppercase leading-none">
+          Dart{' '}
+          <span class="font-serif italic font-normal normal-case text-[#FF4F18]">questions.</span>
+        </h2>
+      </div>
+
+      <div class="border-t-2 border-ink divide-y-2 divide-ink/20">
+        {dartFaqItems.map((item) => (
+          <div
+            id={item.id}
+            class="scroll-mt-16 py-8 sm:py-10 grid lg:grid-cols-12 gap-6 lg:gap-8 items-start"
+          >
+            <h3 class="lg:col-span-5 text-xl sm:text-2xl font-bold uppercase tracking-tight text-ink leading-snug">
+              {item.question}
+            </h3>
+
+            <div class="lg:col-span-7 space-y-3.5 text-base sm:text-lg text-ink/85 leading-relaxed max-w-[65ch] min-w-0">
+              {item.paragraphs.map((paragraph) => (
+                <p set:html={paragraph} />
+              ))}
+              {item.codeBlock && (
+                <div class="bg-ink text-paper p-4 sm:p-5 rounded-md border-2 border-ink font-mono text-xs sm:text-sm leading-relaxed overflow-x-auto [&>pre]:!bg-transparent [&>pre]:!p-0 [&>pre]:!m-0 [&>pre]:!border-0">
+                  <div class="flex items-center justify-between gap-2 mb-2.5 pb-2 border-b border-paper/15">
+                    <div class="text-xs font-bold uppercase text-acid">
+                      {item.codeLabel ?? 'Example'}
+                    </div>
+                    <button
+                      type="button"
+                      data-copy={item.codeBlock}
+                      class="copy-snippet-btn min-w-[4.75rem] text-center px-2.5 py-1 text-xs font-bold uppercase bg-paper/15 hover:bg-acid hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-acid text-paper border border-paper/30 rounded shrink-0 transition"
+                    >
+                      Copy
+                    </button>
+                  </div>
+                  <Code code={item.codeBlock} lang="dart" theme="github-dark" />
+                </div>
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <script is:inline type="application/ld+json" set:html={JSON.stringify(dartFaqJsonLd)} />
+    </section>
+
+    <LanguageStrip currentPage="dart" />
+  </main>
+
+  <Footer />
+</Layout>
