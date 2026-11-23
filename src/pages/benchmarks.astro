@@ -147,22 +147,13 @@ const crossLangPanels = crossLangDefs.map((def) => {
     .sort((a, b) => a.val - b.val);
 
   const maxVal = Math.max(...rawEntries.map((e) => e.val), 1);
-  const minVal = rawEntries.length > 0 ? Math.max(Math.min(...rawEntries.map((e) => e.val)), 1) : 1;
-  const logMin = Math.log10(minVal * 0.65);
-  const logMax = Math.log10(maxVal);
-  const logSpan = Math.max(logMax - logMin, 0.001);
 
   const rows = rawEntries.map((entry, idx) => {
     const linearPct = Math.max(3, Math.min(100, (entry.val / maxVal) * 100)).toFixed(1);
-    const logPct = Math.max(
-      10,
-      Math.min(100, ((Math.log10(Math.max(entry.val, 1)) - logMin) / logSpan) * 100),
-    ).toFixed(1);
     return {
       ...entry,
       rank: idx + 1,
       linearPct,
-      logPct,
       vsProto: formatMultiplier(entry.protoVal, entry.val),
       vsJson: formatMultiplier(entry.jsonVal, entry.val),
     };
@@ -300,30 +291,6 @@ const validLangKeys: LanguageKey[] = languageBenchmarkList.map((s) => s.key);
                 class="px-3.5 py-1.5 rounded border-2 border-ink bg-[#FAF8F2] text-ink hover:bg-[#E5E0D5] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink transition cursor-pointer"
               >
                 Compare Languages
-              </button>
-            </div>
-
-            <!-- Scale Switcher (visible in Compare Languages mode) -->
-            <div
-              data-scale-controls
-              class="hidden items-center gap-1.5 font-mono text-xs font-bold"
-            >
-              <span class="text-ink/75 uppercase mr-1">Bar scale:</span>
-              <button
-                type="button"
-                data-scale-btn="linear"
-                aria-pressed="true"
-                class="px-2.5 py-1.5 rounded border-2 border-ink bg-acid text-ink shadow-[2px_2px_0px_#111111] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink transition cursor-pointer"
-              >
-                Linear
-              </button>
-              <button
-                type="button"
-                data-scale-btn="log"
-                aria-pressed="false"
-                class="px-2.5 py-1.5 rounded border-2 border-ink bg-[#FAF8F2] text-ink hover:bg-[#E5E0D5] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink transition cursor-pointer"
-              >
-                Log
               </button>
             </div>
           </div>
@@ -466,10 +433,7 @@ const validLangKeys: LanguageKey[] = languageBenchmarkList.map((s) => s.key);
                       <div class="flex items-center gap-2.5 min-w-0">
                         <div class="flex-1 bg-[#E5E0D5] h-4 border border-ink rounded-sm overflow-hidden">
                           <div
-                            data-scale-bar
-                            data-log-pct={row.logPct}
-                            data-linear-pct={row.linearPct}
-                            class="h-full bench-bar-omni border-r border-ink transition-[width] duration-200"
+                            class="h-full bench-bar-omni border-r border-ink"
                             style={`width: ${row.linearPct}%;`}
                           />
                         </div>
@@ -878,8 +842,6 @@ const validLangKeys: LanguageKey[] = languageBenchmarkList.map((s) => s.key);
     const viewPanels = Array.from(root.querySelectorAll('[data-view-panel]'));
     const compareSubtabs = root.querySelector('[data-compare-subtabs]');
     const languageSubtabs = root.querySelector('[data-language-subtabs]');
-    const scaleControls = root.querySelector('[data-scale-controls]');
-    const scaleBtns = Array.from(root.querySelectorAll('[data-scale-btn]'));
     const benchTabs = Array.from(root.querySelectorAll('[data-bench-tab]'));
     const benchPanels = Array.from(root.querySelectorAll('[data-bench-panel]'));
     const langTabs = Array.from(root.querySelectorAll('[data-lang-tab]'));
@@ -893,7 +855,6 @@ const validLangKeys: LanguageKey[] = languageBenchmarkList.map((s) => s.key);
     let activeView = 'language';
     let activeBench = validBenchSlugs[0] || 'decode';
     let activeLang = validLangKeys[0] || 'go';
-    let activeScale = 'linear';
 
     function setTabStyle(btn, isActive, inactiveBg = 'bg-white') {
       btn.setAttribute('aria-selected', isActive ? 'true' : 'false');
@@ -950,10 +911,6 @@ const validLangKeys: LanguageKey[] = languageBenchmarkList.map((s) => s.key);
         languageSubtabs.classList.toggle('hidden', activeView !== 'language');
         languageSubtabs.classList.toggle('flex', activeView === 'language');
       }
-      if (scaleControls) {
-        scaleControls.classList.toggle('hidden', activeView !== 'compare');
-        scaleControls.classList.toggle('inline-flex', activeView === 'compare');
-      }
       if (updateUrl) syncUrl(push);
     }
 
@@ -979,27 +936,6 @@ const validLangKeys: LanguageKey[] = languageBenchmarkList.map((s) => s.key);
         panel.classList.toggle('hidden', panel.getAttribute('data-lang-panel') !== activeLang);
       });
       if (updateUrl) syncUrl(push);
-    }
-
-    function applyScale(scale) {
-      activeScale = scale === 'linear' ? 'linear' : 'log';
-      scaleBtns.forEach((btn) => {
-        const isActive = btn.getAttribute('data-scale-btn') === activeScale;
-        btn.setAttribute('aria-pressed', isActive ? 'true' : 'false');
-        btn.classList.toggle('bg-acid', isActive);
-        btn.classList.toggle('shadow-[2px_2px_0px_#111111]', isActive);
-        btn.classList.toggle('bg-[#FAF8F2]', !isActive);
-        btn.classList.toggle('hover:bg-[#E5E0D5]', !isActive);
-      });
-      root.querySelectorAll('[data-scale-bar]').forEach((bar) => {
-        const pct =
-          activeScale === 'linear'
-            ? bar.getAttribute('data-linear-pct')
-            : bar.getAttribute('data-log-pct');
-        if (pct) {
-          bar.style.width = `${pct}%`;
-        }
-      });
     }
 
     function wireArrowNav(tabs, onSelect) {
@@ -1043,12 +979,6 @@ const validLangKeys: LanguageKey[] = languageBenchmarkList.map((s) => s.key);
       applyLang(tab.getAttribute('data-lang-tab') || 'go', true, true),
     );
 
-    scaleBtns.forEach((btn) => {
-      btn.addEventListener('click', () => {
-        applyScale(btn.getAttribute('data-scale-btn') || 'log');
-      });
-    });
-
     inspectButtons.forEach((btn) => {
       btn.addEventListener('click', () => {
         const lang = btn.getAttribute('data-inspect-lang');
@@ -1089,6 +1019,5 @@ const validLangKeys: LanguageKey[] = languageBenchmarkList.map((s) => s.key);
 
     hydrateFromLocation();
     window.addEventListener('popstate', hydrateFromLocation);
-    applyScale('log');
   }
 </script>
