@@ -7,6 +7,15 @@ import TypeMappingTable from '../components/TypeMappingTable.astro';
 import Footer from '../components/Footer.astro';
 import { defaultTypeMappings } from '../data/typeMappings';
 
+const installCommands = `# Homebrew (macOS & Linux)
+brew install omnibuf/tap/protoc-gen-omnibuf-nano
+
+# mise
+mise use -g github:omnibuf/omnibuf-nano
+
+# Go
+go install github.com/omnibuf/omnibuf-nano/cmd/protoc-gen-omnibuf-nano@latest`;
+
 const optionsProtoSnippet = `syntax = "proto3";
 package telemetry;
 
@@ -120,8 +129,8 @@ const nanoFaqJsonLd = {
         </span>
       </h1>
 
-      <div class="mt-6 grid lg:grid-cols-12 gap-6 lg:gap-8 items-end">
-        <div class="lg:col-span-7 space-y-4">
+      <div class="mt-6 grid lg:grid-cols-12 gap-6 lg:gap-8 items-start">
+        <div class="lg:col-span-6 space-y-4">
           <p class="text-lg sm:text-2xl text-ink/85 font-medium leading-snug">
             Freestanding C99 runtime for microcontrollers and embedded targets. Zero heap
             allocation,{' '}
@@ -153,7 +162,7 @@ const nanoFaqJsonLd = {
               rel="noopener noreferrer"
               class="os-btn px-4 py-2.5 bg-[#FAF8F2] text-ink font-bold rounded-md"
             >
-              Prebuilt Binaries &rarr;
+              Release Binaries &rarr;
             </a>
             <a
               href="https://buf.build/omnibuf/nano"
@@ -172,21 +181,21 @@ const nanoFaqJsonLd = {
           </div>
         </div>
 
-        <div class="lg:col-span-5 min-w-0">
-          <div class="p-4 sm:p-5 bg-ink text-paper rounded-md font-mono text-xs sm:text-sm overflow-x-auto leading-relaxed border-2 border-ink shadow-[4px_4px_0px_#111111]">
-            <div class="flex items-center justify-between gap-2 mb-2 pb-2 border-b border-paper/15">
+        <div class="lg:col-span-6 min-w-0">
+          <div class="p-4 sm:p-5 bg-ink text-paper rounded-md font-mono text-xs sm:text-sm overflow-x-auto leading-relaxed border-2 border-ink shadow-[4px_4px_0px_#111111] [&>pre]:bg-transparent! [&>pre]:p-0! [&>pre]:m-0! [&>pre]:border-0!">
+            <div class="flex items-center justify-between gap-2 mb-2.5 pb-2 border-b border-paper/15">
               <div class="text-xs font-bold uppercase text-acid">
-                Install Prebuilt Plugin (No Go Required)
+                Install protoc-gen-omnibuf-nano
               </div>
               <button
                 type="button"
                 data-copy="brew install omnibuf/tap/protoc-gen-omnibuf-nano"
                 class="copy-snippet-btn min-w-[4.75rem] text-center px-2.5 py-1 text-xs font-bold uppercase bg-paper/15 hover:bg-acid hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-acid text-paper border border-paper/30 rounded shrink-0 transition"
               >
-                Copy
+                Copy brew
               </button>
             </div>
-            <pre class="leading-relaxed whitespace-pre"><code><span class="text-paper/75 select-none">$ </span>brew install omnibuf/tap/protoc-gen-omnibuf-nano</code></pre>
+            <Code code={installCommands} lang="sh" theme="github-dark" />
           </div>
         </div>
       </div>
