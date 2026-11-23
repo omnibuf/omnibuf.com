@@ -1235,12 +1235,12 @@ export const nanoBenchmarkCategories: BenchmarkCategory[] = [
     rows: [
       {
         name: 'OmniBuf Nano (C99)',
-        val: 1198,
+        val: 1345,
         sizeBytes: 358,
         highlight: true,
         baseline: true,
       },
-      { name: 'nanopb (C99)', val: 1349, sizeBytes: 341 },
+      { name: 'nanopb (C99)', val: 1481, sizeBytes: 341 },
     ],
   },
   {
@@ -1252,11 +1252,11 @@ export const nanoBenchmarkCategories: BenchmarkCategory[] = [
     rows: [
       {
         name: 'OmniBuf Nano (C99)',
-        val: 855,
+        val: 1004,
         highlight: true,
         baseline: true,
       },
-      { name: 'nanopb (C99)', val: 1316 },
+      { name: 'nanopb (C99)', val: 1227 },
     ],
   },
 ];
@@ -1587,7 +1587,7 @@ export const languageBenchmarks: Record<LanguageKey, LanguageBenchmarkSuite> = {
     ctaLabel: 'See full results',
     competitorsLabel: 'nanopb 0.4.9.1 (C99)',
     heroSummaryHtml:
-      'Built for microcontrollers with zero dynamic allocation, OmniBuf Nano encodes <strong>1.13x faster</strong> and decodes <strong>1.54x faster</strong> than <code>nanopb</code> while keeping the runtime <strong>20% smaller</strong> at <code>-Os</code> (8.9 KB vs 11.2 KB). Explore <a href="/nano" class="doc-link">C (Nano)</a>.',
+      'Built for microcontrollers with zero dynamic allocation, OmniBuf Nano encodes <strong>1.10x faster</strong> and decodes <strong>1.22x faster</strong> than <code>nanopb</code> while keeping the runtime <strong>13% smaller</strong> at <code>-Os</code> (9.7 KB vs 11.2 KB). Explore <a href="/nano" class="doc-link">C (Nano)</a>.',
     categories: nanoBenchmarkCategories,
     butterflyEncodeRows: primaryAndCompetitors(nanoEncodeCat.rows),
     butterflyDecodeRows: primaryAndCompetitors(nanoDecodeCat.rows),
@@ -1598,7 +1598,7 @@ export const languageBenchmarks: Record<LanguageKey, LanguageBenchmarkSuite> = {
     ],
     environmentParagraphs: [
       'Compiled with Apple Clang at <code>-O3 -DNDEBUG -std=c99</code> on an Apple M1 Pro Mac. Both <code>omnibuf-nano</code> and <code>nanopb 0.4.9.1</code> use identical static <code>PeerUpdate</code> struct bounds (976 bytes) generated from the same <code>.proto</code> and <code>.options</code> files.',
-      'At <code>-Os</code>, the <code>omnibuf-nano</code> C99 runtime compiles to 8,937 bytes of <code>__TEXT</code> (0 bytes <code>.data</code>/<code>.bss</code>), compared to 11,165 bytes for <code>nanopb</code>. Benchmark source lives in <a href="https://github.com/omnibuf/omnibuf-nano/blob/main/benchmarks/peer_bench.c" target="_blank" rel="noopener noreferrer" class="doc-link font-mono">benchmarks/peer_bench.c</a>, with recorded output in <a href="https://github.com/omnibuf/omnibuf-nano/blob/main/testdata/benchmarks.json" target="_blank" rel="noopener noreferrer" class="doc-link font-mono">testdata/benchmarks.json</a>.',
+      'At <code>-Os</code>, the <code>omnibuf-nano</code> C99 runtime compiles to 9,700 bytes of <code>__TEXT</code> (0 bytes <code>.data</code>/<code>.bss</code>), compared to 11,165 bytes for <code>nanopb</code>. Benchmark source lives in <a href="https://github.com/omnibuf/omnibuf-nano/blob/main/benchmarks/peer_bench.c" target="_blank" rel="noopener noreferrer" class="doc-link font-mono">benchmarks/peer_bench.c</a>, with recorded output in <a href="https://github.com/omnibuf/omnibuf-nano/blob/main/testdata/benchmarks.json" target="_blank" rel="noopener noreferrer" class="doc-link font-mono">testdata/benchmarks.json</a>.',
     ],
   },
 };
