@@ -4,7 +4,11 @@ import Navbar from '../components/Navbar.astro';
 import Footer from '../components/Footer.astro';
 ---
 
-<Layout title="404 Not Found | OmniBuf" description="The requested page could not be found.">
+<Layout
+  title="404 Not Found | OmniBuf"
+  description="The requested page could not be found."
+  noindex={true}
+>
   <Navbar currentPage="none" />
   <main id="main-content" class="py-20 sm:py-28 px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto">
     <div class="os-window overflow-hidden">
