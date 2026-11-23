@@ -1,0 +1,386 @@
+---
+import { Code } from 'astro:components';
+import Layout from '../layouts/Layout.astro';
+import Navbar from '../components/Navbar.astro';
+import LanguageStrip from '../components/LanguageStrip.astro';
+import TypeMappingTable from '../components/TypeMappingTable.astro';
+import Footer from '../components/Footer.astro';
+import { defaultTypeMappings } from '../data/typeMappings';
+
+const optionsProtoSnippet = `syntax = "proto3";
+package telemetry;
+
+import "omnibuf/nano/v1/options.proto";
+
+message SensorFrame {
+  uint32 device_id = 1;
+  string location = 2 [(omnibuf.nano.v1.field).max_size = 32];
+  bytes mac_addr = 3 [(omnibuf.nano.v1.field) = {
+    max_size: 6
+    fixed_length: true
+  }];
+  repeated float samples = 4 [(omnibuf.nano.v1.field).max_count = 16];
+}`;
+
+const sidecarOptionsSnippet = `# Sidecar .options overrides (same wildcard syntax as nanopb)
+*.* max_size:32 max_count:8
+SensorFrame.location max_size:64
+SensorFrame.mac_addr max_size:6 fixed_length:true`;
+
+const bufGenNanoSnippet = `version: v2
+plugins:
+  - local: protoc-gen-omnibuf-nano
+    out: gen/c
+    opt:
+      - options_path=proto`;
+
+const c99StreamSnippet = `#include "ob_encode.h"
+#include "ob_decode.h"
+#include "sensor.ob.h"
+
+uint8_t buf[256];
+telemetry_SensorFrame tx = telemetry_SensorFrame_init_zero;
+tx.device_id = 42;
+strcpy(tx.location, "rack-04");
+tx.samples_count = 2;
+tx.samples[0] = 21.5f;
+tx.samples[1] = 22.0f;
+
+/* 2-pass streaming encode (zero malloc) */
+ob_ostream_t os = ob_ostream_from_buffer(buf, sizeof(buf));
+bool ok = ob_encode(&os, &telemetry_SensorFrame_msg, &tx);
+
+/* Single-pass streaming decode */
+telemetry_SensorFrame rx;
+ob_istream_t is = ob_istream_from_buffer(buf, os.bytes_written);
+ok = ob_decode(&is, &telemetry_SensorFrame_msg, &rx);`;
+
+const uartCallbackSnippet = `static bool uart_write_cb(ob_ostream_t *stream, const uint8_t *buf, size_t count) {
+    uart_t *uart = (uart_t *)stream->state;
+    return uart_tx_blocking(uart, buf, count);
+}
+
+/* Stream directly to UART with no packet buffer in RAM */
+ob_ostream_t uart_stream = { uart_write_cb, &uart0, 0, 0, NULL };
+ob_encode(&uart_stream, &telemetry_SensorFrame_msg, &tx);`;
+
+const nanoFaqItems = [
+  {
+    id: 'nano-faq-alloc',
+    question: 'Does the runtime call malloc or depend on a hosted libc?',
+    paragraphs: [
+      'No. <code>runtime/</code> compiles cleanly under <code>-ffreestanding -std=c99 -pedantic</code> and references only <code>memcpy</code> and <code>memset</code>. Every struct size is fixed at compile time from <code>max_size</code> and <code>max_count</code>.',
+    ],
+  },
+  {
+    id: 'nano-faq-footprint',
+    question: 'How does flash and speed compare to nanopb?',
+    paragraphs: [
+      'On the 11-field <code>PeerUpdate</code> struct (976 B RAM for both libraries), <code>omnibuf-nano</code> encodes 1.13x faster and decodes 1.54x faster than <code>nanopb 0.4.9.1</code> at <code>-O3</code>. At <code>-Os</code>, the three runtime objects total 8,937 bytes of code with 0 bytes of <code>.data</code>/<code>.bss</code>, roughly 20% smaller than <code>nanopb</code>.',
+    ],
+  },
+  {
+    id: 'nano-faq-field0',
+    question: 'What happens when a microcontroller receives Field #0 or unknown fields?',
+    paragraphs: [
+      'Every OmniBuf tag carries its 4-bit wire type. The decoder skips Field #0 (<code>SchemaMeta</code>) and any unrecognized tag using a 32-byte stack scratch buffer in a loop, so firmware stays forward-compatible with backend schema additions.',
+    ],
+  },
+];
+
+const stripHtml = (s: string) => s.replace(/<[^>]+>/g, '');
+
+const nanoFaqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: nanoFaqItems.map((item) => ({
+    '@type': 'Question',
+    name: item.question,
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: item.paragraphs.map(stripHtml).join('\n\n'),
+    },
+  })),
+};
+---
+
+<Layout
+  title="OmniBuf Nano for C99 | Zero-Allocation Embedded Runtime & protoc-gen-omnibuf-nano"
+  description="Use OmniBuf on microcontrollers in C99: zero dynamic allocation, RODATA descriptor tables, 2-pass streaming I/O, and native omnibuf.nano.v1 Buf Schema Registry options."
+>
+  <Navbar currentPage="nano" />
+
+  <main id="main-content">
+    <section class="relative pt-10 pb-8 sm:pt-16 sm:pb-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+      <h1 class="text-[2.6rem] sm:text-7xl lg:text-[5.5rem] font-bold tracking-tight leading-[0.94] text-ink uppercase">
+        OmniBuf
+        <br />
+        <span class="font-serif italic font-normal normal-case text-[#FF4F18] text-[3.1rem] sm:text-8xl lg:text-[6.2rem]">
+          for C99 Nano.
+        </span>
+      </h1>
+
+      <div class="mt-6 grid lg:grid-cols-12 gap-6 lg:gap-8 items-end">
+        <div class="lg:col-span-7 space-y-4">
+          <p class="text-lg sm:text-2xl text-ink/85 font-medium leading-snug">
+            Freestanding C99 runtime for microcontrollers and embedded targets. Zero heap
+            allocation,{' '}
+            <a href="#static-bounds" class="doc-link">
+              statically bounded structs
+            </a>
+            ,{' '}
+            <a href="#plugin-codegen" class="doc-link">
+              RODATA descriptor tables
+            </a>
+            , and{' '}
+            <a href="#streaming-io" class="doc-link">
+              2-pass streaming callbacks
+            </a>{' '}
+            that talk directly to UART, SPI, or flash.
+          </p>
+          <div class="flex flex-wrap gap-3 font-mono text-sm sm:text-base pt-1 no-print">
+            <a
+              href="https://github.com/omnibuf/omnibuf-nano"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="os-btn px-4 py-2.5 bg-acid text-ink font-bold rounded-md"
+            >
+              GitHub Repository &rarr;
+            </a>
+            <a
+              href="https://buf.build/omnibuf/nano"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="os-btn px-4 py-2.5 bg-[#FAF8F2] text-ink font-bold rounded-md"
+            >
+              BSR Options Module &rarr;
+            </a>
+            <a
+              href="/benchmarks?lang=nano"
+              class="os-btn px-4 py-2.5 bg-[#FAF8F2] text-ink font-bold rounded-md"
+            >
+              vs. nanopb Benchmarks &rarr;
+            </a>
+          </div>
+        </div>
+
+        <div class="lg:col-span-5 min-w-0">
+          <div class="p-4 sm:p-5 bg-ink text-paper rounded-md font-mono text-xs sm:text-sm overflow-x-auto leading-relaxed border-2 border-ink shadow-[4px_4px_0px_#111111]">
+            <div class="flex items-center justify-between gap-2 mb-2 pb-2 border-b border-paper/15">
+              <div class="text-xs font-bold uppercase text-acid">Install Codegen Plugin</div>
+              <button
+                type="button"
+                data-copy="go install github.com/omnibuf/omnibuf-nano/cmd/protoc-gen-omnibuf-nano@latest"
+                class="copy-snippet-btn min-w-[4.75rem] text-center px-2.5 py-1 text-xs font-bold uppercase bg-paper/15 hover:bg-acid hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-acid text-paper border border-paper/30 rounded shrink-0 transition"
+              >
+                Copy
+              </button>
+            </div>
+            <pre class="leading-relaxed whitespace-pre"><code><span class="text-paper/75 select-none">$ </span>go install github.com/omnibuf/omnibuf-nano/cmd/protoc-gen-omnibuf-nano@latest</code></pre>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section
+      id="quickstart"
+      class="scroll-mt-16 py-12 sm:py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto border-t-2 border-ink/15"
+    >
+      <div class="max-w-3xl mb-8">
+        <h2 class="text-3xl sm:text-5xl font-bold tracking-tight uppercase leading-none">
+          Predictable RAM,{' '}
+          <span class="font-serif italic font-normal normal-case text-[#FF4F18]">
+            flat flash growth.
+          </span>
+        </h2>
+        <p class="mt-3 text-lg sm:text-xl text-ink/80 font-medium">
+          One shared C99 encode/decode engine interprets generated <code>const ob_msgdesc_t</code>{' '}
+          tables in ROM, wire-compatible with every other OmniBuf runtime.
+        </p>
+      </div>
+
+      <div class="border-t-2 border-ink divide-y-2 divide-ink/20">
+        <div
+          id="static-bounds"
+          class="scroll-mt-16 py-8 sm:py-12 grid lg:grid-cols-12 gap-6 lg:gap-8 items-start"
+        >
+          <div class="lg:col-span-5 space-y-3.5 min-w-0">
+            <h3 class="text-2xl sm:text-3xl font-bold uppercase tracking-tight leading-snug">
+              Static bounds via BSR options or sidecar files
+            </h3>
+            <p class="text-base sm:text-lg text-ink/85 leading-relaxed">
+              Annotate fields inline with <code>buf.build/omnibuf/nano</code> options or keep
+              shared <code>.proto</code> files untouched by placing bounds in a sidecar{' '}
+              <code>.options</code> file. Sidecar rules take precedence over inline annotations, and
+              unbounded fields fail at codegen time.
+            </p>
+          </div>
+
+          <div class="lg:col-span-7 space-y-3.5 min-w-0">
+            <div class="p-4 sm:p-5 bg-ink text-paper rounded-md font-mono text-xs sm:text-sm overflow-x-auto leading-relaxed border-2 border-ink [&>pre]:bg-transparent! [&>pre]:p-0! [&>pre]:m-0! [&>pre]:border-0!">
+              <div class="flex items-center justify-between gap-2 mb-2.5 pb-2 border-b border-paper/15">
+                <div class="text-xs font-bold uppercase text-acid">sensor.proto (omnibuf.nano.v1)</div>
+                <button
+                  type="button"
+                  data-copy={optionsProtoSnippet}
+                  class="copy-snippet-btn min-w-[4.75rem] text-center px-2.5 py-1 text-xs font-bold uppercase bg-paper/15 hover:bg-acid hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-acid text-paper border border-paper/30 rounded shrink-0 transition"
+                >
+                  Copy
+                </button>
+              </div>
+              <Code code={optionsProtoSnippet} lang="proto" theme="github-dark" />
+            </div>
+
+            <div class="p-4 sm:p-5 bg-ink text-paper rounded-md font-mono text-xs sm:text-sm overflow-x-auto leading-relaxed border-2 border-ink [&>pre]:bg-transparent! [&>pre]:p-0! [&>pre]:m-0! [&>pre]:border-0!">
+              <div class="flex items-center justify-between gap-2 mb-2.5 pb-2 border-b border-paper/15">
+                <div class="text-xs font-bold uppercase text-acid">sensor.options (sidecar)</div>
+                <button
+                  type="button"
+                  data-copy={sidecarOptionsSnippet}
+                  class="copy-snippet-btn min-w-[4.75rem] text-center px-2.5 py-1 text-xs font-bold uppercase bg-paper/15 hover:bg-acid hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-acid text-paper border border-paper/30 rounded shrink-0 transition"
+                >
+                  Copy
+                </button>
+              </div>
+              <Code code={sidecarOptionsSnippet} lang="ini" theme="github-dark" />
+            </div>
+          </div>
+
+          <TypeMappingTable {...defaultTypeMappings.nano} />
+        </div>
+
+        <div
+          id="plugin-codegen"
+          class="scroll-mt-16 py-8 sm:py-12 grid lg:grid-cols-12 gap-6 lg:gap-8 items-start"
+        >
+          <div class="lg:col-span-5 space-y-3.5 min-w-0">
+            <h3 class="text-2xl sm:text-3xl font-bold uppercase tracking-tight leading-snug">
+              Generate .ob.h and .ob.c descriptors
+            </h3>
+            <p class="text-base sm:text-lg text-ink/85 leading-relaxed">
+              <code>protoc-gen-omnibuf-nano</code> emits plain C99 structs, tag constants,{' '}
+              <code>_init_zero</code> macros, and tag-sorted <code>const ob_field_t</code> arrays
+              placed in <code>RODATA</code>. Link the generated <code>.ob.c</code> alongside the
+              three runtime files (<code>ob_varint.c</code>, <code>ob_encode.c</code>,{' '}
+              <code>ob_decode.c</code>).
+            </p>
+          </div>
+
+          <div class="lg:col-span-7 space-y-3.5 min-w-0">
+            <div class="p-4 sm:p-5 bg-ink text-paper rounded-md font-mono text-xs sm:text-sm overflow-x-auto leading-relaxed border-2 border-ink [&>pre]:bg-transparent! [&>pre]:p-0! [&>pre]:m-0! [&>pre]:border-0!">
+              <div class="flex items-center justify-between gap-2 mb-2.5 pb-2 border-b border-paper/15">
+                <div class="text-xs font-bold uppercase text-acid">buf.gen.yaml</div>
+                <button
+                  type="button"
+                  data-copy={bufGenNanoSnippet}
+                  class="copy-snippet-btn min-w-[4.75rem] text-center px-2.5 py-1 text-xs font-bold uppercase bg-paper/15 hover:bg-acid hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-acid text-paper border border-paper/30 rounded shrink-0 transition"
+                >
+                  Copy
+                </button>
+              </div>
+              <Code code={bufGenNanoSnippet} lang="yaml" theme="github-dark" />
+            </div>
+
+            <div class="p-4 sm:p-5 bg-ink text-paper rounded-md font-mono text-xs sm:text-sm overflow-x-auto leading-relaxed border-2 border-ink">
+              <div class="flex items-center justify-between gap-2 mb-2.5 pb-2 border-b border-paper/15">
+                <div class="text-xs font-bold uppercase text-acid">Cross-Compile (Cortex-M0 / M4 / AVR)</div>
+                <button
+                  type="button"
+                  data-copy="arm-none-eabi-gcc -mcpu=cortex-m4 -mthumb -Os -ffreestanding -std=c99 -Iruntime runtime/ob_*.c gen/c/sensor.ob.c -c"
+                  class="copy-snippet-btn min-w-[4.75rem] text-center px-2.5 py-1 text-xs font-bold uppercase bg-paper/15 hover:bg-acid hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-acid text-paper border border-paper/30 rounded shrink-0 transition"
+                >
+                  Copy
+                </button>
+              </div>
+              <pre class="leading-relaxed whitespace-pre"><code><span class="text-paper/75 select-none">$ </span>arm-none-eabi-gcc -mcpu=cortex-m4 -mthumb -Os -ffreestanding -std=c99 \
+    -Iruntime runtime/ob_*.c gen/c/sensor.ob.c -c</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div
+          id="streaming-io"
+          class="scroll-mt-16 py-8 sm:py-12 grid lg:grid-cols-12 gap-6 lg:gap-8 items-start"
+        >
+          <div class="lg:col-span-5 space-y-3.5 min-w-0">
+            <h3 class="text-2xl sm:text-3xl font-bold uppercase tracking-tight leading-snug">
+              2-pass streaming encode &amp; single-pass decode
+            </h3>
+            <p class="text-base sm:text-lg text-ink/85 leading-relaxed">
+              Nested messages, arrays, and maps size themselves with a null-callback pass first,
+              then stream bytes directly to the output callback. That avoids <code>memmove</code>,
+              removes sub-message size caps, and lets firmware stream straight over UART or SPI.
+            </p>
+          </div>
+
+          <div class="lg:col-span-7 space-y-3.5 min-w-0">
+            <div class="p-4 sm:p-5 bg-ink text-paper rounded-md font-mono text-xs sm:text-sm overflow-x-auto leading-relaxed border-2 border-ink [&>pre]:bg-transparent! [&>pre]:p-0! [&>pre]:m-0! [&>pre]:border-0!">
+              <div class="flex items-center justify-between gap-2 mb-2.5 pb-2 border-b border-paper/15">
+                <div class="text-xs font-bold uppercase text-acid">Buffer Stream Roundtrip</div>
+                <button
+                  type="button"
+                  data-copy={c99StreamSnippet}
+                  class="copy-snippet-btn min-w-[4.75rem] text-center px-2.5 py-1 text-xs font-bold uppercase bg-paper/15 hover:bg-acid hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-acid text-paper border border-paper/30 rounded shrink-0 transition"
+                >
+                  Copy
+                </button>
+              </div>
+              <Code code={c99StreamSnippet} lang="c" theme="github-dark" />
+            </div>
+
+            <div class="p-4 sm:p-5 bg-ink text-paper rounded-md font-mono text-xs sm:text-sm overflow-x-auto leading-relaxed border-2 border-ink [&>pre]:bg-transparent! [&>pre]:p-0! [&>pre]:m-0! [&>pre]:border-0!">
+              <div class="flex items-center justify-between gap-2 mb-2.5 pb-2 border-b border-paper/15">
+                <div class="text-xs font-bold uppercase text-acid">Custom UART / SPI Callback</div>
+                <button
+                  type="button"
+                  data-copy={uartCallbackSnippet}
+                  class="copy-snippet-btn min-w-[4.75rem] text-center px-2.5 py-1 text-xs font-bold uppercase bg-paper/15 hover:bg-acid hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-acid text-paper border border-paper/30 rounded shrink-0 transition"
+                >
+                  Copy
+                </button>
+              </div>
+              <Code code={uartCallbackSnippet} lang="c" theme="github-dark" />
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section
+      id="nano-faq"
+      class="scroll-mt-16 py-16 sm:py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto border-t-2 border-ink/15"
+    >
+      <div class="max-w-3xl mb-10">
+        <h2 class="text-3xl sm:text-5xl font-bold tracking-tight uppercase leading-none">
+          C99 Nano{' '}
+          <span class="font-serif italic font-normal normal-case text-[#FF4F18]">questions.</span>
+        </h2>
+      </div>
+
+      <div class="border-t-2 border-ink divide-y-2 divide-ink/20">
+        {nanoFaqItems.map((item) => (
+          <div
+            id={item.id}
+            class="scroll-mt-16 py-8 sm:py-10 grid lg:grid-cols-12 gap-6 lg:gap-8 items-start"
+          >
+            <h3 class="lg:col-span-5 text-xl sm:text-2xl font-bold uppercase tracking-tight text-ink leading-snug">
+              {item.question}
+            </h3>
+
+            <div class="lg:col-span-7 space-y-3.5 text-base sm:text-lg text-ink/85 leading-relaxed max-w-[65ch] min-w-0">
+              {item.paragraphs.map((paragraph) => (
+                <p set:html={paragraph} />
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <script is:inline type="application/ld+json" set:html={JSON.stringify(nanoFaqJsonLd)} />
+    </section>
+
+    <LanguageStrip currentPage="nano" />
+  </main>
+
+  <Footer currentPage="nano" />
+</Layout>

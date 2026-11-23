@@ -1,5 +1,5 @@
 export type LanguageKey =
-  'go' | 'es' | 'rs' | 'py' | 'cpp' | 'java' | 'cs' | 'swift' | 'dart' | 'php' | 'elixir';
+  'go' | 'es' | 'rs' | 'py' | 'cpp' | 'nano' | 'java' | 'cs' | 'swift' | 'dart' | 'php' | 'elixir';
 
 export type PageKey =
   'home' | 'how-it-works' | 'benchmarks' | 'spec' | 'cli' | LanguageKey | 'none';
@@ -64,6 +64,16 @@ export const languages: LanguageEntry[] = [
     repoUrl: 'https://github.com/omnibuf/omnibuf-cpp',
     packageLabel: 'omnibuf/omnibuf.hpp',
     shortPackage: 'C++20 headers',
+    status: 'experimental',
+  },
+  {
+    key: 'nano',
+    label: 'C (Nano)',
+    shortLabel: 'C99',
+    href: '/nano',
+    repoUrl: 'https://github.com/omnibuf/omnibuf-nano',
+    packageLabel: 'omnibuf-nano',
+    shortPackage: 'C99 embedded',
     status: 'experimental',
   },
   {

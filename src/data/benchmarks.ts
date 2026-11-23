@@ -1224,6 +1224,43 @@ export const elixirBenchmarkCategories: BenchmarkCategory[] = [
   },
 ];
 
+// C99 Nano results from omnibuf-nano/testdata/benchmarks.json (Apple Clang -O3, Apple M1 Pro)
+export const nanoBenchmarkCategories: BenchmarkCategory[] = [
+  {
+    title: 'Full Message Encode Speed',
+    unit: 'ns',
+    maxVal: 1500,
+    methodology:
+      'Serializing a static 976-byte PeerUpdate C99 struct into a fixed stack buffer (zero malloc) using descriptor tables in RODATA, comparing omnibuf-nano against nanopb 0.4.9.1.',
+    rows: [
+      {
+        name: 'OmniBuf Nano (C99)',
+        val: 1198,
+        sizeBytes: 358,
+        highlight: true,
+        baseline: true,
+      },
+      { name: 'nanopb (C99)', val: 1349, sizeBytes: 341 },
+    ],
+  },
+  {
+    title: 'Full Message Decode Speed',
+    unit: 'ns',
+    maxVal: 1500,
+    methodology:
+      'Zero-initializing and decoding a full 11-field PeerUpdate packet into a static 976-byte C99 struct using streaming input callbacks.',
+    rows: [
+      {
+        name: 'OmniBuf Nano (C99)',
+        val: 855,
+        highlight: true,
+        baseline: true,
+      },
+      { name: 'nanopb (C99)', val: 1316 },
+    ],
+  },
+];
+
 const goSpeedCategories = benchmarkCategories.filter((cat) => cat.unit !== 'B');
 const goEncodeCat = benchmarkCategories.find((cat) => cat.title === 'Full Message Encode Speed');
 const goDecodeCat = benchmarkCategories.find((cat) => cat.title === 'Full Message Decode Speed');
@@ -1247,6 +1284,8 @@ const phpEncodeCat = phpBenchmarkCategories[0];
 const phpDecodeCat = phpBenchmarkCategories[1];
 const elixirEncodeCat = elixirBenchmarkCategories[0];
 const elixirDecodeCat = elixirBenchmarkCategories[1];
+const nanoEncodeCat = nanoBenchmarkCategories[0];
+const nanoDecodeCat = nanoBenchmarkCategories[1];
 
 const primaryAndCompetitors = (rows: BenchmarkRow[]) =>
   rows.filter((r) => Boolean(r.baseline) || !r.highlight);
@@ -1537,6 +1576,31 @@ export const languageBenchmarks: Record<LanguageKey, LanguageBenchmarkSuite> = {
       'Benchmark source lives in <a href="https://github.com/omnibuf/omnibuf-elixir/blob/main/bench/peer_bench.exs" target="_blank" rel="noopener noreferrer" class="doc-link font-mono">bench/peer_bench.exs</a>, with recorded output in <a href="https://github.com/omnibuf/omnibuf-elixir/blob/main/testdata/benchmarks.json" target="_blank" rel="noopener noreferrer" class="doc-link font-mono">testdata/benchmarks.json</a>.',
     ],
   },
+  nano: {
+    key: 'nano',
+    label: 'C (Nano)',
+    shortLabel: 'C99',
+    headingPrefix: 'C99 Nano',
+    subtitleHtml:
+      '11-field <code>PeerUpdate</code> static C99 struct (976 B, zero heap allocation) compiled with <code>-O3 -std=c99</code> against <code>nanopb 0.4.9.1</code>. <strong>Shorter bars = Faster.</strong>',
+    href: '/benchmarks?lang=nano',
+    ctaLabel: 'See full results',
+    competitorsLabel: 'nanopb 0.4.9.1 (C99)',
+    heroSummaryHtml:
+      'Built for microcontrollers with zero dynamic allocation, OmniBuf Nano encodes <strong>1.13x faster</strong> and decodes <strong>1.54x faster</strong> than <code>nanopb</code> while keeping the runtime <strong>20% smaller</strong> at <code>-Os</code> (8.9 KB vs 11.2 KB). Explore <a href="/nano" class="doc-link">C (Nano)</a>.',
+    categories: nanoBenchmarkCategories,
+    butterflyEncodeRows: primaryAndCompetitors(nanoEncodeCat.rows),
+    butterflyDecodeRows: primaryAndCompetitors(nanoDecodeCat.rows),
+    hardwareLines: [
+      'CPU: Apple M1 Pro (darwin/arm64)',
+      'Compiler: Apple Clang (-O3 -DNDEBUG -std=c99)',
+      'Command: just bench',
+    ],
+    environmentParagraphs: [
+      'Compiled with Apple Clang at <code>-O3 -DNDEBUG -std=c99</code> on an Apple M1 Pro Mac. Both <code>omnibuf-nano</code> and <code>nanopb 0.4.9.1</code> use identical static <code>PeerUpdate</code> struct bounds (976 bytes) generated from the same <code>.proto</code> and <code>.options</code> files.',
+      'At <code>-Os</code>, the <code>omnibuf-nano</code> C99 runtime compiles to 8,937 bytes of <code>__TEXT</code> (0 bytes <code>.data</code>/<code>.bss</code>), compared to 11,165 bytes for <code>nanopb</code>. Benchmark source lives in <a href="https://github.com/omnibuf/omnibuf-nano/blob/main/benchmarks/peer_bench.c" target="_blank" rel="noopener noreferrer" class="doc-link font-mono">benchmarks/peer_bench.c</a>, with recorded output in <a href="https://github.com/omnibuf/omnibuf-nano/blob/main/testdata/benchmarks.json" target="_blank" rel="noopener noreferrer" class="doc-link font-mono">testdata/benchmarks.json</a>.',
+    ],
+  },
 };
 
 export const languageBenchmarkList: LanguageBenchmarkSuite[] = [
@@ -1545,6 +1609,7 @@ export const languageBenchmarkList: LanguageBenchmarkSuite[] = [
   languageBenchmarks.rs,
   languageBenchmarks.py,
   languageBenchmarks.cpp,
+  languageBenchmarks.nano,
   languageBenchmarks.cs,
   languageBenchmarks.java,
   languageBenchmarks.swift,

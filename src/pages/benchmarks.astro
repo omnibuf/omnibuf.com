@@ -32,7 +32,7 @@ function findPrimaryProtobuf(rows: BenchmarkRow[]): BenchmarkRow | undefined {
   const candidates = rows.filter(
     (r) =>
       !r.highlight &&
-      /protobuf|prost|buffa|libprotobuf|upb|swiftprotobuf|package:protobuf|elixir-protobuf/i.test(
+      /protobuf|prost|buffa|libprotobuf|upb|swiftprotobuf|package:protobuf|elixir-protobuf|nanopb/i.test(
         r.name,
       ) &&
       !/pure php|leb128 wire/i.test(r.name),
@@ -40,7 +40,7 @@ function findPrimaryProtobuf(rows: BenchmarkRow[]): BenchmarkRow | undefined {
   if (candidates.length === 0) return undefined;
   return (
     candidates.find((r) =>
-      /^(Protobuf|@bufbuild\/protobuf|prost|google\/protobuf \(upb|libprotobuf|protobuf-java|Google\.Protobuf|SwiftProtobuf|package:protobuf|google\/protobuf \(C ext|elixir-protobuf)/i.test(
+      /^(Protobuf|@bufbuild\/protobuf|prost|google\/protobuf \(upb|libprotobuf|protobuf-java|Google\.Protobuf|SwiftProtobuf|package:protobuf|google\/protobuf \(C ext|elixir-protobuf|nanopb)/i.test(
         r.name,
       ),
     ) ?? candidates[0]

@@ -8,7 +8,7 @@ export interface LanguageTypeMapping {
 }
 
 export const defaultTypeMappings: Record<
-  'go' | 'rs' | 'py' | 'cpp' | 'java' | 'cs' | 'php',
+  'go' | 'rs' | 'py' | 'cpp' | 'nano' | 'java' | 'cs' | 'php',
   LanguageTypeMapping
 > = {
   go: {
@@ -84,6 +84,25 @@ export const defaultTypeMappings: Record<
     ],
     noteHtml:
       'Pass a <code>WireOverride</code> as the third template argument to <code>omnibuf::field</code> (<code>Uint</code>, <code>Sint</code>, <code>Fixed32</code>, <code>Fixed64</code>, <code>Sfixed32</code>, or <code>Sfixed64</code>), plus a fourth argument for map keys. On signed integers, <code>Fixed32</code> and <code>Fixed64</code> write <code>sfixed32</code> and <code>sfixed64</code>. <code>std::optional&lt;T&gt;</code>, <code>std::unique_ptr&lt;T&gt;</code>, and <code>omnibuf::Box&lt;T&gt;</code> encode as <code>T</code> when set and are omitted when empty.',
+  },
+  nano: {
+    title: 'C99 Nano generated struct mapping',
+    nativeLabel: 'Generated C99 type',
+    rows: [
+      { nativeType: 'uint32_t / uint64_t', protoType: 'uint32, fixed32 / uint64, fixed64' },
+      { nativeType: 'int32_t / int64_t', protoType: 'int32, sint32, sfixed32 / int64, sint64, sfixed64' },
+      { nativeType: 'bool', protoType: 'bool' },
+      { nativeType: 'float / double', protoType: 'float / double' },
+      { nativeType: 'typedef enum { ... }', protoType: 'enum' },
+      { nativeType: 'char field[MAX_SIZE]', protoType: 'string (null-terminated)' },
+      { nativeType: 'OB_BYTES_ARRAY_T(MAX_SIZE)', protoType: 'bytes (or uint8_t[MAX_SIZE] with fixed_length)' },
+      { nativeType: 'bool has_x; SubMsg x;', protoType: 'message (embedded value)' },
+      { nativeType: 'uint16_t x_count; T x[MAX_COUNT];', protoType: 'repeated T' },
+      { nativeType: 'uint16_t which_x; union { ... } x;', protoType: 'oneof' },
+      { nativeType: 'uint16_t x_count; Entry x[MAX_COUNT];', protoType: 'map<K, V>' },
+    ],
+    noteHtml:
+      'Every <code>string</code>, <code>bytes</code>, <code>repeated</code>, and <code>map</code> field requires static bounds via <code>omnibuf.nano.v1</code> proto options or a sidecar <code>.options</code> file. Unbounded fields fail at codegen time so RAM usage stays fixed at compile time.',
   },
   java: {
     title: 'Java type defaults',
