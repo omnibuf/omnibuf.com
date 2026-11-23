@@ -148,6 +148,14 @@ const nanoFaqJsonLd = {
               GitHub Repository &rarr;
             </a>
             <a
+              href="https://github.com/omnibuf/omnibuf-nano/releases"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="os-btn px-4 py-2.5 bg-[#FAF8F2] text-ink font-bold rounded-md"
+            >
+              Prebuilt Binaries &rarr;
+            </a>
+            <a
               href="https://buf.build/omnibuf/nano"
               target="_blank"
               rel="noopener noreferrer"
@@ -167,16 +175,18 @@ const nanoFaqJsonLd = {
         <div class="lg:col-span-5 min-w-0">
           <div class="p-4 sm:p-5 bg-ink text-paper rounded-md font-mono text-xs sm:text-sm overflow-x-auto leading-relaxed border-2 border-ink shadow-[4px_4px_0px_#111111]">
             <div class="flex items-center justify-between gap-2 mb-2 pb-2 border-b border-paper/15">
-              <div class="text-xs font-bold uppercase text-acid">Install Codegen Plugin</div>
+              <div class="text-xs font-bold uppercase text-acid">
+                Install Prebuilt Plugin (No Go Required)
+              </div>
               <button
                 type="button"
-                data-copy="go install github.com/omnibuf/omnibuf-nano/cmd/protoc-gen-omnibuf-nano@latest"
+                data-copy="brew install omnibuf/tap/protoc-gen-omnibuf-nano"
                 class="copy-snippet-btn min-w-[4.75rem] text-center px-2.5 py-1 text-xs font-bold uppercase bg-paper/15 hover:bg-acid hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-acid text-paper border border-paper/30 rounded shrink-0 transition"
               >
                 Copy
               </button>
             </div>
-            <pre class="leading-relaxed whitespace-pre"><code><span class="text-paper/75 select-none">$ </span>go install github.com/omnibuf/omnibuf-nano/cmd/protoc-gen-omnibuf-nano@latest</code></pre>
+            <pre class="leading-relaxed whitespace-pre"><code><span class="text-paper/75 select-none">$ </span>brew install omnibuf/tap/protoc-gen-omnibuf-nano</code></pre>
           </div>
         </div>
       </div>
