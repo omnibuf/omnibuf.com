@@ -90,12 +90,18 @@ export const defaultTypeMappings: Record<
     nativeLabel: 'Generated C99 type',
     rows: [
       { nativeType: 'uint32_t / uint64_t', protoType: 'uint32, fixed32 / uint64, fixed64' },
-      { nativeType: 'int32_t / int64_t', protoType: 'int32, sint32, sfixed32 / int64, sint64, sfixed64' },
+      {
+        nativeType: 'int32_t / int64_t',
+        protoType: 'int32, sint32, sfixed32 / int64, sint64, sfixed64',
+      },
       { nativeType: 'bool', protoType: 'bool' },
       { nativeType: 'float / double', protoType: 'float / double' },
       { nativeType: 'typedef enum { ... }', protoType: 'enum' },
       { nativeType: 'char field[MAX_SIZE]', protoType: 'string (null-terminated)' },
-      { nativeType: 'OB_BYTES_ARRAY_T(MAX_SIZE)', protoType: 'bytes (or uint8_t[MAX_SIZE] with fixed_length)' },
+      {
+        nativeType: 'OB_BYTES_ARRAY_T(MAX_SIZE)',
+        protoType: 'bytes (or uint8_t[MAX_SIZE] with fixed_length)',
+      },
       { nativeType: 'bool has_x; SubMsg x;', protoType: 'message (embedded value)' },
       { nativeType: 'uint16_t x_count; T x[MAX_COUNT];', protoType: 'repeated T' },
       { nativeType: 'uint16_t which_x; union { ... } x;', protoType: 'oneof' },

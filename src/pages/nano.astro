@@ -209,8 +209,8 @@ const nanoFaqJsonLd = {
               Static bounds via BSR options or sidecar files
             </h3>
             <p class="text-base sm:text-lg text-ink/85 leading-relaxed">
-              Annotate fields inline with <code>buf.build/omnibuf/nano</code> options or keep
-              shared <code>.proto</code> files untouched by placing bounds in a sidecar{' '}
+              Annotate fields inline with <code>buf.build/omnibuf/nano</code> options or keep shared{' '}
+              <code>.proto</code> files untouched by placing bounds in a sidecar{' '}
               <code>.options</code> file. Sidecar rules take precedence over inline annotations, and
               unbounded fields fail at codegen time.
             </p>
@@ -219,7 +219,9 @@ const nanoFaqJsonLd = {
           <div class="lg:col-span-7 space-y-3.5 min-w-0">
             <div class="p-4 sm:p-5 bg-ink text-paper rounded-md font-mono text-xs sm:text-sm overflow-x-auto leading-relaxed border-2 border-ink [&>pre]:bg-transparent! [&>pre]:p-0! [&>pre]:m-0! [&>pre]:border-0!">
               <div class="flex items-center justify-between gap-2 mb-2.5 pb-2 border-b border-paper/15">
-                <div class="text-xs font-bold uppercase text-acid">sensor.proto (omnibuf.nano.v1)</div>
+                <div class="text-xs font-bold uppercase text-acid">
+                  sensor.proto (omnibuf.nano.v1)
+                </div>
                 <button
                   type="button"
                   data-copy={optionsProtoSnippet}
@@ -283,7 +285,9 @@ const nanoFaqJsonLd = {
 
             <div class="p-4 sm:p-5 bg-ink text-paper rounded-md font-mono text-xs sm:text-sm overflow-x-auto leading-relaxed border-2 border-ink">
               <div class="flex items-center justify-between gap-2 mb-2.5 pb-2 border-b border-paper/15">
-                <div class="text-xs font-bold uppercase text-acid">Cross-Compile (Cortex-M0 / M4 / AVR)</div>
+                <div class="text-xs font-bold uppercase text-acid">
+                  Cross-Compile (Cortex-M0 / M4 / AVR)
+                </div>
                 <button
                   type="button"
                   data-copy="arm-none-eabi-gcc -mcpu=cortex-m4 -mthumb -Os -ffreestanding -std=c99 -Iruntime runtime/ob_*.c gen/c/sensor.ob.c -c"
