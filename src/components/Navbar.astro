@@ -77,7 +77,7 @@ const isMultiColDropdown = languages.length >= 5;
           </summary>
 
           <div class="lang-dropdown-panel absolute left-0 top-full pt-2 z-50">
-            <div class="w-72 bg-[#FAF8F2] border-2 border-ink rounded-md shadow-[4px_4px_0px_#111111] overflow-hidden divide-y divide-ink/15">
+            <div class="w-72 bg-[#FAF8F2] border-2 border-ink rounded-md overflow-hidden divide-y divide-ink/15">
               {docsNavItems.map((item) => {
                 const isActive = currentPage === item.key;
                 return (
@@ -123,7 +123,7 @@ const isMultiColDropdown = languages.length >= 5;
           <div class="lang-dropdown-panel absolute left-0 top-full pt-2 z-50">
             <div
               class:list={[
-                'bg-[#FAF8F2] border-2 border-ink rounded-md shadow-[4px_4px_0px_#111111] overflow-hidden',
+                'bg-[#FAF8F2] border-2 border-ink rounded-md overflow-hidden',
                 isMultiColDropdown
                   ? 'w-[26rem] grid grid-cols-2'
                   : 'w-64 divide-y divide-ink/15 py-1.5',
@@ -215,7 +215,7 @@ const isMultiColDropdown = languages.length >= 5;
 
         <nav
           aria-label="Mobile page navigation"
-          class="absolute left-0 mt-2 w-64 bg-[#FAF8F2] border-2 border-ink rounded-md shadow-[4px_4px_0px_#111111] py-1.5 z-50 divide-y divide-ink/15"
+          class="absolute left-0 mt-2 w-64 bg-[#FAF8F2] border-2 border-ink rounded-md py-1.5 z-50 divide-y divide-ink/15"
         >
           {primaryNavPages.map((p) => {
             const isActive = currentPage === p.key;
@@ -378,13 +378,12 @@ const isMultiColDropdown = languages.length >= 5;
 <dialog
   id="search-dialog"
   aria-label="Search documentation and wire specification"
-  class="fixed inset-0 z-[70] m-auto mt-8 sm:mt-16 w-[calc(100%-1.5rem)] max-w-2xl max-h-[82vh] p-0 bg-[#FAF8F2] text-ink border-2 border-ink rounded-md shadow-[6px_6px_0px_#111111] font-mono overflow-hidden open:flex open:flex-col no-print select-none"
+  class="fixed inset-0 z-[70] m-auto mt-8 sm:mt-16 w-[calc(100%-1.5rem)] max-w-2xl max-h-[82vh] p-0 bg-[#FAF8F2] text-ink border-2 border-ink rounded-md font-mono overflow-hidden open:flex open:flex-col no-print select-none"
 >
   <div class="os-titlebar bg-[#E5E0D5] shrink-0">
     <span class="font-bold uppercase text-ink text-xs sm:text-sm">
       Search Documentation &amp; Spec
     </span>
-    <div class="os-stripes"></div>
     <button
       type="button"
       id="search-close"

@@ -47,8 +47,8 @@
     background-color: var(--bg-paper);
     color: var(--ink);
     background-image:
-      linear-gradient(to right, rgba(17, 17, 17, 0.05) 1px, transparent 1px),
-      linear-gradient(to bottom, rgba(17, 17, 17, 0.05) 1px, transparent 1px);
+      linear-gradient(to right, rgba(17, 17, 17, 0.028) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(17, 17, 17, 0.028) 1px, transparent 1px);
     background-size: 32px 32px;
     overflow-x: hidden;
   }
@@ -86,23 +86,22 @@
 }
 
 @layer components {
-  /* Classic OS Window Chrome & Hard Shadows */
+  /* Framed Code & Panel Containers */
   .os-window {
     background-color: #faf8f2;
-    border: 2px solid #111111;
-    box-shadow: 6px 6px 0px #111111;
+    border: 1.5px solid #111111;
     border-radius: 6px;
   }
 
   .os-window-lg {
     background-color: #faf8f2;
-    border: 2px solid #111111;
-    box-shadow: 10px 10px 0px #111111;
+    border: 1.5px solid #111111;
+    box-shadow: 0 12px 32px rgba(17, 17, 17, 0.14);
     border-radius: 8px;
   }
 
   .os-titlebar {
-    border-bottom: 2px solid #111111;
+    border-bottom: 1.5px solid #111111;
     padding: 8px 14px;
     display: flex;
     align-items: center;
@@ -111,41 +110,28 @@
     user-select: none;
   }
 
-  .os-stripes {
-    flex: 1;
-    height: 12px;
-    background: repeating-linear-gradient(
-      to bottom,
-      #111111,
-      #111111 2px,
-      transparent 2px,
-      transparent 4px
-    );
-    opacity: 0.25;
-  }
-
   .os-btn {
-    border: 2px solid #111111;
-    box-shadow: 4px 4px 0px #111111;
+    border: 1.5px solid #111111;
+    box-shadow: 2px 2px 0px #111111;
     transition: all 0.12s ease;
     cursor: pointer;
   }
 
   .os-btn:hover {
-    transform: translate(-2px, -2px);
-    box-shadow: 6px 6px 0px #111111;
+    transform: translate(-1px, -1px);
+    box-shadow: 3px 3px 0px #111111;
   }
 
   .os-btn:active {
-    transform: translate(2px, 2px);
+    transform: translate(1px, 1px);
     box-shadow: 1px 1px 0px #111111;
   }
 
   .os-btn:focus-visible {
     outline: 2px solid #111111;
     outline-offset: 3px;
-    transform: translate(-2px, -2px);
-    box-shadow: 6px 6px 0px #111111;
+    transform: translate(-1px, -1px);
+    box-shadow: 3px 3px 0px #111111;
   }
 
   /* Authoritative External Doc Links */
@@ -459,46 +445,35 @@ html.dark body {
   background-color: var(--bg-paper);
   color: var(--ink);
   background-image:
-    linear-gradient(to right, rgba(244, 240, 230, 0.045) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(244, 240, 230, 0.045) 1px, transparent 1px);
+    linear-gradient(to right, rgba(244, 240, 230, 0.025) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(244, 240, 230, 0.025) 1px, transparent 1px);
 }
 
 /* Surfaces in Dark Mode */
 html.dark .os-window {
   background-color: #161920;
-  border-color: #454d5e;
-  box-shadow: 6px 6px 0px #050608;
+  border-color: #363d4c;
+  box-shadow: none;
 }
 
 html.dark .os-window-lg {
   background-color: #161920;
-  border-color: #454d5e;
-  box-shadow: 10px 10px 0px #050608;
+  border-color: #363d4c;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
 }
 
 html.dark .os-titlebar {
-  border-bottom-color: #454d5e;
-}
-
-html.dark .os-stripes {
-  background: repeating-linear-gradient(
-    to bottom,
-    #f4f0e6,
-    #f4f0e6 2px,
-    transparent 2px,
-    transparent 4px
-  );
-  opacity: 0.2;
+  border-bottom-color: #363d4c;
 }
 
 html.dark .os-btn {
   border-color: #454d5e;
-  box-shadow: 4px 4px 0px #050608;
+  box-shadow: 2px 2px 0px #050608;
 }
 
 html.dark .os-btn:hover,
 html.dark .os-btn:focus-visible {
-  box-shadow: 6px 6px 0px #050608;
+  box-shadow: 3px 3px 0px #050608;
   outline-color: #d4ff33;
 }
 

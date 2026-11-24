@@ -1534,7 +1534,7 @@ export const languageBenchmarks: Record<LanguageKey, LanguageBenchmarkSuite> = {
     ctaLabel: 'See full results',
     competitorsLabel: 'google/protobuf (pure PHP), JSON (C stdlib)',
     heroSummaryHtml:
-      'With the optional pure-Rust <code>ext-omnibuf</code> extension loaded, PHP beats C stdlib JSON across all six benchmarks: encoding <strong>1.8x faster</strong>, decoding <strong>2.6x faster</strong>, and reading nested fields <strong>7.2x faster</strong>. Without any extension installed, pure-PHP OmniBuf encodes <strong>nearly 19x faster</strong> than pure-PHP Protobuf. Explore the <a href="/php" class="doc-link">PHP runtime</a>.',
+      'With the optional pure-Rust <code>ext-omnibuf</code> extension loaded, PHP beats C stdlib JSON across all six benchmarks: encoding <strong>nearly 2x faster</strong>, decoding <strong>over 2x faster</strong>, and reading nested fields <strong>over 7x faster</strong>. Without any extension installed, pure-PHP OmniBuf encodes <strong>nearly 19x faster</strong> than pure-PHP Protobuf. Explore the <a href="/php" class="doc-link">PHP runtime</a>.',
     categories: phpBenchmarkCategories,
     butterflyEncodeRows: primaryAndCompetitors(phpEncodeCat.rows),
     butterflyDecodeRows: primaryAndCompetitors(phpDecodeCat.rows),
@@ -1584,7 +1584,7 @@ export const languageBenchmarks: Record<LanguageKey, LanguageBenchmarkSuite> = {
     ctaLabel: 'See full results',
     competitorsLabel: 'nanopb 0.4.9.1 (C99)',
     heroSummaryHtml:
-      'Built for microcontrollers with zero dynamic allocation, OmniBuf Nano encodes <strong>1.10x faster</strong> and decodes <strong>1.22x faster</strong> than <code>nanopb</code> while keeping the runtime <strong>13% smaller</strong> at <code>-Os</code> (9.7 KB vs 11.2 KB). Explore <a href="/nano" class="doc-link">C (Nano)</a>.',
+      'Built for microcontrollers with zero dynamic allocation, OmniBuf Nano encodes <strong>10% faster</strong> and decodes <strong>22% faster</strong> than <code>nanopb</code> while keeping the runtime <strong>13% smaller</strong> at <code>-Os</code> (9.7 KB vs 11.2 KB). Explore <a href="/nano" class="doc-link">C (Nano)</a>.',
     categories: nanoBenchmarkCategories,
     butterflyEncodeRows: primaryAndCompetitors(nanoEncodeCat.rows),
     butterflyDecodeRows: primaryAndCompetitors(nanoDecodeCat.rows),

@@ -60,8 +60,8 @@ const stackedPeerFiles = [
 
   <div class="mt-8 space-y-5">
     <!-- prettier-ignore -->
-    <p class="max-w-4xl text-lg sm:text-2xl font-medium leading-snug text-ink/90">
-      I built OmniBuf as an evolution of <a href="https://protobuf.dev/programming-guides/encoding/" target="_blank" rel="noopener noreferrer" class="doc-link">Protobuf</a> with a smoother on-ramp to schemas. It is faster and completely parsable without a schema. Start by tagging plain structs and classes in <a href="/go" class="doc-link">Go</a>, <a href="/es" class="doc-link">TypeScript</a>, <a href="/rs" class="doc-link">Rust</a>, <a href="/py" class="doc-link">Python</a>, <a href="/cpp" class="doc-link">C++</a>, <a href="/nano" class="doc-link">C (Nano)</a>, <a href="/java" class="doc-link">Java</a>, <a href="/cs" class="doc-link">C#</a>, <a href="/swift" class="doc-link">Swift</a>, <a href="/dart" class="doc-link">Dart</a>, <a href="/php" class="doc-link">PHP</a>, or <a href="/elixir" class="doc-link">Elixir</a>, then move to <code>.proto</code> files for <a href="https://connectrpc.com/" target="_blank" rel="noopener noreferrer" class="doc-link">Connect</a> and <a href="https://grpc.io/" target="_blank" rel="noopener noreferrer" class="doc-link">gRPC</a> on the exact same wire format.
+    <p class="max-w-3xl text-lg sm:text-2xl font-medium leading-snug text-ink/90">
+      I built OmniBuf as an evolution of <a href="https://protobuf.dev/programming-guides/encoding/" target="_blank" rel="noopener noreferrer" class="doc-link">Protobuf</a> with a smoother on-ramp to schemas. It is faster, parsable without a schema, and works with plain structs or <code>.proto</code> files for <a href="https://connectrpc.com/" target="_blank" rel="noopener noreferrer" class="doc-link">Connect</a> and <a href="https://grpc.io/" target="_blank" rel="noopener noreferrer" class="doc-link">gRPC</a> across <a href="#status" class="doc-link">12 languages</a> on the exact same wire format.
     </p>
 
     <div
@@ -70,7 +70,7 @@ const stackedPeerFiles = [
       data-autorotate="idle"
       style="--hero-cycle-ms: 14000ms;"
     >
-      <div class="lg:col-span-7 flex flex-col justify-between bg-[#FAF8F2] border-2 border-ink shadow-[6px_6px_0px_#111111] rounded-md overflow-hidden">
+      <div class="lg:col-span-7 flex flex-col justify-between bg-[#FAF8F2] border-2 border-ink rounded-md overflow-hidden">
         <div class="p-5 sm:p-6 flex-1 grid items-center text-base sm:text-xl font-medium text-ink/90 leading-relaxed">
           {heroLanguageCharts.map((chart, idx) => (
             <p
@@ -131,7 +131,7 @@ const stackedPeerFiles = [
         <div>
           <div class="flex flex-wrap items-center justify-between gap-2 mb-2.5">
             <h2 class="text-2xl sm:text-3xl lg:text-4xl font-bold uppercase tracking-tight leading-none text-ink">
-              Ludicrous <span class="text-[#FF4F18]">speed.</span>
+              Ludicrous speed.
             </h2>
             <div class="grid justify-items-end font-mono text-xs font-bold uppercase">
               {heroLanguageCharts.map((chart, idx) => (
@@ -306,7 +306,6 @@ const stackedPeerFiles = [
       <span class="font-mono text-sm sm:text-base font-bold uppercase">
         .proto Schemas or Plain Structs &rarr; Wire Encodings
       </span>
-      <div class="os-stripes"></div>
     </div>
     <div class="p-4 sm:p-6 bg-[#FAF8F2]">
       <!-- DESKTOP SVG (Horizontal Tree) -->

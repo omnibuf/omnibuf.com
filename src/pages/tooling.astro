@@ -89,7 +89,7 @@ Plug 'omnibuf/omnibuf-vim'`;
       <!-- VS Code -->
       <div
         id="vscode"
-        class="scroll-mt-16 bg-[#FAF8F2] border-2 border-ink rounded-md shadow-[4px_4px_0px_#111111] p-5 sm:p-6 space-y-4"
+        class="scroll-mt-16 bg-[#FAF8F2] border-2 border-ink rounded-md p-5 sm:p-6 space-y-4"
       >
         <div class="flex flex-wrap items-center justify-between gap-2">
           <div class="flex items-center gap-3.5">
@@ -167,7 +167,7 @@ Plug 'omnibuf/omnibuf-vim'`;
       <!-- Neovim / Vim -->
       <div
         id="neovim"
-        class="scroll-mt-16 bg-[#FAF8F2] border-2 border-ink rounded-md shadow-[4px_4px_0px_#111111] p-5 sm:p-6 space-y-4"
+        class="scroll-mt-16 bg-[#FAF8F2] border-2 border-ink rounded-md p-5 sm:p-6 space-y-4"
       >
         <div class="flex flex-wrap items-center justify-between gap-2">
           <div class="flex items-center gap-3.5">
@@ -216,7 +216,7 @@ Plug 'omnibuf/omnibuf-vim'`;
       id="cli"
       class="scroll-mt-16 py-10 sm:py-12 px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto border-t-2 border-ink space-y-10"
     >
-      <div class="bg-[#FAF8F2] border-2 border-ink rounded-md shadow-[4px_4px_0px_#111111] p-5 sm:p-6 space-y-4">
+      <div class="bg-[#FAF8F2] border-2 border-ink rounded-md p-5 sm:p-6 space-y-4">
         <div class="flex flex-wrap items-center justify-between gap-2">
           <div class="flex items-center gap-3.5">
             <svg
@@ -289,7 +289,7 @@ Plug 'omnibuf/omnibuf-vim'`;
         <p class="text-base text-ink/90 leading-relaxed">
           Protobuf collapses strings, byte slices, sub-messages, maps, and packed arrays into one wire type, and shares a single varint wire type across booleans, signed integers, and unsigned integers. Inspecting a raw Protobuf packet with <a href="https://github.com/protocolbuffers/protoscope" target="_blank" rel="noopener noreferrer" class="doc-link"><code>protoscope</code></a> leaves you guessing what each field means. OmniBuf carries an explicit 4-bit wire type on every field, plus element types on arrays and maps. Running <code>omnibuf</code> prints the exact booleans, signed numbers, UTF-8 strings, arrays, and maps on the wire. Packets encoded with <strong>Field #0</strong> also decode with their original field names.
         </p>
-        <div class="border-2 border-ink rounded-md shadow-[4px_4px_0px_#111111] overflow-hidden font-mono text-xs sm:text-sm bg-ink text-paper p-4 space-y-3">
+        <div class="border-2 border-ink rounded-md overflow-hidden font-mono text-xs sm:text-sm bg-ink text-paper p-4 space-y-3">
           <div class="bg-[#1F1F1F] p-3 rounded border border-paper/15">
             <div class="flex flex-wrap items-center justify-between gap-2 mb-1.5">
               <span class="text-xs font-bold text-[#FF4F18]">$ protoscope packet.pb</span>
@@ -331,7 +331,7 @@ Plug 'omnibuf/omnibuf-vim'`;
           (<code>-i</code> / <code>--input</code> and <code>-o</code> / <code>--output</code>) are
           supported directly.
         </p>
-        <div class="border-2 border-ink rounded-md shadow-[4px_4px_0px_#111111] overflow-hidden font-mono text-xs sm:text-sm bg-ink text-paper p-4 [&>pre]:bg-transparent! [&>pre]:p-0! [&>pre]:m-0! [&>pre]:border-0! [&>pre]:leading-relaxed [&>pre]:overflow-x-auto">
+        <div class="border-2 border-ink rounded-md overflow-hidden font-mono text-xs sm:text-sm bg-ink text-paper p-4 [&>pre]:bg-transparent! [&>pre]:p-0! [&>pre]:m-0! [&>pre]:border-0! [&>pre]:leading-relaxed [&>pre]:overflow-x-auto">
           <Code code={jqFilterSnippet} lang="sh" theme="github-dark" />
         </div>
       </div>
@@ -353,7 +353,7 @@ Plug 'omnibuf/omnibuf-vim'`;
           <code>--max-schema-bytes</code> (default 64 MiB) to cap descriptor file and decompressed
           size.
         </p>
-        <div class="border-2 border-ink rounded-md shadow-[4px_4px_0px_#111111] overflow-hidden font-mono text-xs sm:text-sm bg-ink text-paper p-4 [&>pre]:bg-transparent! [&>pre]:p-0! [&>pre]:m-0! [&>pre]:border-0! [&>pre]:leading-relaxed [&>pre]:overflow-x-auto">
+        <div class="border-2 border-ink rounded-md overflow-hidden font-mono text-xs sm:text-sm bg-ink text-paper p-4 [&>pre]:bg-transparent! [&>pre]:p-0! [&>pre]:m-0! [&>pre]:border-0! [&>pre]:leading-relaxed [&>pre]:overflow-x-auto">
           <Code code={encodeSnippet} lang="sh" theme="github-dark" />
         </div>
       </div>
@@ -372,7 +372,7 @@ Plug 'omnibuf/omnibuf-vim'`;
           names. Pass <code>--schema descriptors.pb --type pkg.Msg</code> for exact{' '}
           <code>.proto</code> field numbers, 32-bit floats, fixed-width integers, enums, and maps.
         </p>
-        <div class="border-2 border-ink rounded-md shadow-[4px_4px_0px_#111111] overflow-hidden">
+        <div class="border-2 border-ink rounded-md overflow-hidden">
           <div class="overflow-x-auto bg-[#FAF8F2]">
             <table class="w-full text-left border-collapse font-mono text-xs sm:text-sm">
               <thead>
