@@ -7,13 +7,14 @@ import LanguageStrip from '../components/LanguageStrip.astro';
 import Footer from '../components/Footer.astro';
 import RpcIntegration from '../components/RpcIntegration.astro';
 
-const goRpcCode = `// gRPC (separate submodule: github.com/omnibuf/omnibuf-go/omnibufgrpc)
+const goRpcCode = `// gRPC (github.com/omnibuf/omnibuf-go/omnibufgrpc)
 omnibufgrpc.Register()
 conn, _ := grpc.NewClient(addr, grpc.WithDefaultCallOptions(omnibufgrpc.CallOption()))
 
-// ConnectRPC (separate submodule: github.com/omnibuf/omnibuf-go/omnibufconnect)
-mux.Handle(greetv1connect.NewGreetServiceHandler(svc, omnibufconnect.HandlerOptions()...))
-client := greetv1connect.NewGreetServiceClient(http.DefaultClient, url, omnibufconnect.ClientOption())`;
+// ConnectRPC v2 (github.com/omnibuf/omnibuf-go/omnibufconnect)
+connecthttp.Mount(mux, server, omnibufconnect.ServerOptions()...)
+transport := connecthttp.NewTransport(http.DefaultClient, url, omnibufconnect.ClientOptions()...)
+client := connect.NewClient(transport)`;
 
 const opaqueSpliceCode = `var view pb.OpaquePeerUpdate
 _ = view.Unmarshal(pkt)
@@ -159,7 +160,7 @@ const goFaqJsonLd = {
     <RpcIntegration
       heading="gRPC & Connect"
       accent="in Go."
-      summary="Separate Go modules (<code>omnibufgrpc</code> and <code>omnibufconnect</code>) register OmniBuf with <code>google.golang.org/grpc</code> and <code>connectrpc.com/connect</code> (v1) without adding RPC dependencies to core <code>omnibuf-go</code>."
+      summary="Separate Go modules (<code>omnibufgrpc</code> and <code>omnibufconnect</code>) register OmniBuf with <code>google.golang.org/grpc</code> and <code>connectrpc.com/connect/v2</code> without adding RPC dependencies to core <code>omnibuf-go</code>."
       code={goRpcCode}
       lang="go"
       codeLabel="omnibufgrpc & omnibufconnect"
