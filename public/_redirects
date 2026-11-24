@@ -1,2 +1,32 @@
 /cli /tooling 301
 /cli/ /tooling 301
+
+# Redirect naive Markdown link-scraper paths that capture trailing ")." or ")"
+/go). /go 301
+/go) /go 301
+/es). /es 301
+/es) /es 301
+/rs). /rs 301
+/rs) /rs 301
+/py). /py 301
+/py) /py 301
+/cpp). /cpp 301
+/cpp) /cpp 301
+/nano). /nano 301
+/nano) /nano 301
+/java). /java 301
+/java) /java 301
+/cs). /cs 301
+/cs) /cs 301
+/swift). /swift 301
+/swift) /swift 301
+/dart). /dart 301
+/dart) /dart 301
+/php). /php 301
+/php) /php 301
+/elixir). /elixir 301
+/elixir) /elixir 301
+/spec). /spec 301
+/spec) /spec 301
+/tooling). /tooling 301
+/tooling) /tooling 301
