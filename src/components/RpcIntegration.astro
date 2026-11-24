@@ -24,10 +24,20 @@ const { heading, accent, summary, code, lang, codeLabel = 'gRPC & Connect Codec'
         {heading} <span class="text-[#FF4F18]">{accent}</span>
       </h2>
       <p class="text-base sm:text-lg text-ink/85 leading-relaxed" set:html={summary} />
-      <p class="text-sm font-mono text-ink/70">
-        Codec names: <code>"omnibuf"</code> (compact) &middot; <code>"x-omnibuf"</code> (with Field
-        #0)
-      </p>
+      <dl class="pt-1 space-y-2 text-sm text-ink/80">
+        <div class="flex flex-wrap items-baseline gap-x-2 gap-y-1">
+          <dt class="font-mono font-bold text-xs px-2 py-0.5 bg-ink/8 border border-ink/20 rounded text-ink">
+            omnibuf
+          </dt>
+          <dd>Compact wire payload (schema known by both peers)</dd>
+        </div>
+        <div class="flex flex-wrap items-baseline gap-x-2 gap-y-1">
+          <dt class="font-mono font-bold text-xs px-2 py-0.5 bg-ink/8 border border-ink/20 rounded text-ink">
+            x-omnibuf
+          </dt>
+          <dd>Self-describing payload with Field #0 schema metadata inline</dd>
+        </div>
+      </dl>
     </div>
 
     <div class="lg:col-span-7 min-w-0">
