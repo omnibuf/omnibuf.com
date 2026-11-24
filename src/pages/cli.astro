@@ -171,11 +171,13 @@ omnibuf decode --schema descriptors.pb --type demo.v1.PeerUpdate packet.obuf`;
               Query packets with jq filters.
             </h2>
             <p class="text-base sm:text-lg text-ink/90 leading-relaxed max-w-[60ch]">
-              Pass a <code>jq</code> filter expression as the first argument to slice, select, or
-              reshape decoded fields in a single command. Flags such as <code>-r</code> (raw string
-              output) and <code>-c</code> (compact single-line JSON) work the same way as{' '}
-              <code>jq</code>. Hex (<code>-x</code>) and base64 (<code>-b</code>) inputs are
-              supported directly.
+              Pass a <code>jq</code> filter expression as the first argument (or via{' '}
+              <code>-q</code> / <code>--query</code> or <code>-f</code> / <code>--filter</code>) to
+              slice, select, or reshape decoded fields in a single command. Flags such as{' '}
+              <code>-r</code> (raw string output) and <code>-c</code> (compact single-line JSON)
+              work the same way as <code>jq</code>. Hex (<code>-x</code>), base64 (<code>-b</code>),
+              and explicit file paths (<code>-i</code> / <code>--input</code> and <code>-o</code> /{' '}
+              <code>--output</code>) are supported directly.
             </p>
           </div>
 
@@ -202,12 +204,16 @@ omnibuf decode --schema descriptors.pb --type demo.v1.PeerUpdate packet.obuf`;
               Convert JSON to OmniBuf and back.
             </h2>
             <p class="text-base sm:text-lg text-ink/90 leading-relaxed max-w-[60ch]">
-              <code>omnibuf</code> auto-detects whether its input is JSON or OmniBuf wire bytes.
-              Piping a JSON object into <code>omnibuf</code> encodes it into a self-describing
-              OmniBuf packet with <code>Field #0</code> field names and deterministic field tags.
-              Supplying <code>--schema</code> (<code>-s</code>) with a compiled{' '}
+              <code>omnibuf</code> auto-detects whether its input is JSON or OmniBuf wire bytes
+              (pass <code>-e</code> / <code>--encode</code> or <code>-d</code> /{' '}
+              <code>--decode</code> to force a direction). Piping a JSON object into{' '}
+              <code>omnibuf</code> encodes it into a self-describing OmniBuf packet with{' '}
+              <code>Field #0</code> field names, preserving the JSON object's key order for
+              sequential tags. Supplying <code>--schema</code> (<code>-s</code>) with a compiled{' '}
               <code>FileDescriptorSet</code> encodes or decodes against your <code>.proto</code>{' '}
-              definitions.
+              definitions, with <code>--field0</code> (alias <code>--self-describing</code>) to
+              embed inline field names and <code>--max-schema-bytes</code> (default 64 MiB) to cap
+              descriptor file and decompressed size.
             </p>
           </div>
 

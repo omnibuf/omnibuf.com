@@ -3,7 +3,9 @@ import { Code } from 'astro:components';
 import Layout from '../layouts/Layout.astro';
 import Navbar from '../components/Navbar.astro';
 import LanguageStrip from '../components/LanguageStrip.astro';
+import TypeMappingTable from '../components/TypeMappingTable.astro';
 import Footer from '../components/Footer.astro';
+import { defaultTypeMappings } from '../data/typeMappings';
 
 let swiftVersion = '0.1.0';
 const isNewerSemver = (candidate: string, current: string) => {
@@ -245,6 +247,8 @@ const swiftFaqJsonLd = {
               <Code code={structSwiftSnippet} lang="swift" theme="github-dark" />
             </div>
           </div>
+
+          <TypeMappingTable {...defaultTypeMappings.swift} />
         </div>
 
         <div

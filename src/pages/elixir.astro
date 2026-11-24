@@ -3,7 +3,9 @@ import { Code } from 'astro:components';
 import Layout from '../layouts/Layout.astro';
 import Navbar from '../components/Navbar.astro';
 import LanguageStrip from '../components/LanguageStrip.astro';
+import TypeMappingTable from '../components/TypeMappingTable.astro';
 import Footer from '../components/Footer.astro';
+import { defaultTypeMappings } from '../data/typeMappings';
 
 let hexVersion = '0.1.0';
 const isNewerSemver = (candidate: string, current: string) => {
@@ -269,6 +271,8 @@ end</code></pre>
               <Code code={schemaElixirSnippet} lang="elixir" theme="github-dark" />
             </div>
           </div>
+
+          <TypeMappingTable {...defaultTypeMappings.elixir} />
         </div>
 
         <div

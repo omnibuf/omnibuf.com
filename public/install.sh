@@ -37,11 +37,14 @@ resolve_version() {
     echo "$VERSION"
     return
   fi
-  latest="$(curl -fsSL "https://api.github.com/repos/${REPO}/releases/latest" | sed -n 's/.*"tag_name": *"\([^"]*\)".*/\1/p' | head -n 1)"
-  if [ -z "$latest" ]; then
-    echo "error: failed to resolve latest release tag from GitHub" >&2
-    exit 1
-  fi
+  latest_url="$(curl -fsSL -o /dev/null -w '%{url_effective}' "https://github.com/${REPO}/releases/latest")"
+  latest="${latest_url##*/}"
+  case "$latest" in
+    ""|"latest"|"releases")
+      echo "error: failed to resolve latest release tag from GitHub" >&2
+      exit 1
+      ;;
+  esac
   echo "$latest"
 }
 

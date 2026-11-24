@@ -8,7 +8,7 @@ export interface LanguageTypeMapping {
 }
 
 export const defaultTypeMappings: Record<
-  'go' | 'rs' | 'py' | 'cpp' | 'nano' | 'java' | 'cs' | 'php',
+  'go' | 'es' | 'rs' | 'py' | 'cpp' | 'nano' | 'java' | 'cs' | 'swift' | 'dart' | 'php' | 'elixir',
   LanguageTypeMapping
 > = {
   go: {
@@ -160,5 +160,79 @@ export const defaultTypeMappings: Record<
     ],
     noteHtml:
       'Untyped properties default to <code>string</code>, <code>int</code> defaults to signed <code>sint64</code>, and <code>float</code> defaults to <code>double</code>. Pass a type string to <code>#[OmniBufField]</code> (such as <code>&apos;uint32&apos;</code>, <code>&apos;uint64&apos;</code>, <code>&apos;fixed32&apos;</code>, <code>&apos;fixed64&apos;</code>, <code>&apos;float32&apos;</code>, or <code>&apos;bytes&apos;</code>) to override it. PHP arrays carry no element types at runtime, so repeated fields need <code>elementWire:</code> and maps need <code>wire: &apos;map&apos;</code> with <code>keyWire:</code> and <code>valueWire:</code>.',
+  },
+  es: {
+    title: 'TypeScript / JS type mapping',
+    nativeLabel: 'TypeScript type',
+    rows: [
+      { nativeType: 'number (uint32 / fixed32)', protoType: 'uint32 / fixed32' },
+      { nativeType: 'number (sint32 / sfixed32)', protoType: 'sint32 / sfixed32' },
+      { nativeType: 'bigint (uint64 / fixed64)', protoType: 'uint64 / fixed64' },
+      { nativeType: 'bigint (sint64 / sfixed64)', protoType: 'sint64 / sfixed64' },
+      { nativeType: 'boolean', protoType: 'bool' },
+      { nativeType: 'number (float / double)', protoType: 'float / double' },
+      { nativeType: 'string', protoType: 'string' },
+      { nativeType: 'Uint8Array', protoType: 'bytes' },
+      { nativeType: 'number (enum)', protoType: 'enum' },
+      { nativeType: 'interface / Message<T>', protoType: 'message' },
+      { nativeType: 'T[]', protoType: 'repeated T' },
+      { nativeType: 'Record<K, V>', protoType: 'map<K, V>' },
+    ],
+    noteHtml:
+      'Each field in <code>defineMessage</code> selects its wire type explicitly (<code>uint32</code>, <code>sint64</code>, <code>fixed32</code>, <code>float</code>, <code>double</code>, <code>string</code>, <code>bytes</code>, <code>uint32[]</code>, <code>submsg</code>, or <code>map</code>). 64-bit integer fields use <code>bigint</code> to preserve full 64-bit precision.',
+  },
+  swift: {
+    title: 'Swift 6 type mapping',
+    nativeLabel: 'Swift type',
+    rows: [
+      { nativeType: 'UInt32 / UInt64', protoType: 'uint32 / uint64' },
+      { nativeType: 'Int32 / Int64', protoType: 'sint32 / sint64' },
+      { nativeType: 'Bool', protoType: 'bool' },
+      { nativeType: 'Float / Double', protoType: 'float / double' },
+      { nativeType: 'String', protoType: 'string' },
+      { nativeType: 'Data, [UInt8]', protoType: 'bytes' },
+      { nativeType: 'RawRepresentable (Int32)', protoType: 'enum' },
+      { nativeType: 'OmniBufStruct, Indirect<T>', protoType: 'message' },
+      { nativeType: '[T]', protoType: 'repeated T' },
+      { nativeType: '[K: V]', protoType: 'map<K, V>' },
+    ],
+    noteHtml:
+      '<code>Field.*</code> constructors in <code>OmniBufStructSchema</code> bind Swift key paths directly to wire types (including <code>Field.fixed32</code>, <code>Field.sfixed32</code>, <code>Field.fixed64</code>, and <code>Field.sfixed64</code>). Optional fields (<code>T?</code>) omit <code>nil</code> on encode.',
+  },
+  dart: {
+    title: 'Dart 3 type mapping',
+    nativeLabel: 'Dart type',
+    rows: [
+      { nativeType: 'int (uint32 / uint64)', protoType: 'uint32 / uint64' },
+      { nativeType: 'int (sint32 / sint64)', protoType: 'sint32 / sint64' },
+      { nativeType: 'bool', protoType: 'bool' },
+      { nativeType: 'double (float32 / float64)', protoType: 'float / double' },
+      { nativeType: 'String', protoType: 'string' },
+      { nativeType: 'Uint8List', protoType: 'bytes' },
+      { nativeType: 'Enum', protoType: 'enum' },
+      { nativeType: 'Class (OmniBufSchema<T>)', protoType: 'message' },
+      { nativeType: 'List<T>', protoType: 'repeated T' },
+      { nativeType: 'Map<K, V>', protoType: 'map<K, V>' },
+    ],
+    noteHtml:
+      'Dart has a single 64-bit <code>int</code> and 64-bit <code>double</code> type, so <code>OmniBufSchemaField</code> factories (<code>uint32</code>, <code>uint64</code>, <code>sint32</code>, <code>sint64</code>, <code>fixed32</code>, <code>sfixed32</code>, <code>fixed64</code>, <code>sfixed64</code>, <code>float32</code>, <code>float64</code>) pick the exact wire encoding for each field.',
+  },
+  elixir: {
+    title: 'Elixir type mapping',
+    nativeLabel: 'Elixir type',
+    rows: [
+      { nativeType: 'non_neg_integer() (:uint32 / :uint64)', protoType: 'uint32 / uint64' },
+      { nativeType: 'integer() (:sint32 / :sint64)', protoType: 'sint32 / sint64' },
+      { nativeType: 'boolean() (:bool)', protoType: 'bool' },
+      { nativeType: 'float() (:float / :double)', protoType: 'float / double' },
+      { nativeType: 'String.t() (:string)', protoType: 'string' },
+      { nativeType: 'binary() (:bytes)', protoType: 'bytes' },
+      { nativeType: 'atom() | integer() (:enum)', protoType: 'enum' },
+      { nativeType: 'struct() (Module)', protoType: 'message' },
+      { nativeType: '[T] ({:repeated, T})', protoType: 'repeated T' },
+      { nativeType: '%{K => V} ({:map, K, V})', protoType: 'map<K, V>' },
+    ],
+    noteHtml:
+      'Each <code>field</code> declaration in <code>use OmniBuf.Schema</code> picks its wire type explicitly (<code>:uint32</code>, <code>:uint64</code>, <code>:sint32</code>, <code>:sint64</code>, <code>:fixed32</code>, <code>:sfixed32</code>, <code>:fixed64</code>, <code>:sfixed64</code>, <code>:float</code>, <code>:double</code>, <code>:string</code>, <code>:bytes</code>). Fields set to <code>nil</code> are omitted on encode.',
   },
 };
