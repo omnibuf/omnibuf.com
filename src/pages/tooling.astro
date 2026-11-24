@@ -57,19 +57,162 @@ Plug 'omnibuf/omnibuf-vim'`;
         Tooling
       </h1>
       <p class="text-base sm:text-xl text-ink/85 leading-relaxed max-w-[62ch]">
-        Command-line tool and editor extensions for inspecting, querying, and editing{' '}
+        Editor extensions and command-line tool for inspecting, querying, and editing{' '}
         <code>.obuf</code> files.
       </p>
       <div class="flex flex-wrap gap-3 font-mono text-xs sm:text-sm pt-1 no-print">
-        <a href="#cli" class="os-btn px-4 py-2 bg-acid text-ink font-bold rounded-md">
-          CLI &darr;
-        </a>
-        <a
-          href="#editor-extensions"
-          class="os-btn px-4 py-2 bg-[#FAF8F2] text-ink font-bold rounded-md"
-        >
+        <a href="#editor-extensions" class="os-btn px-4 py-2 bg-acid text-ink font-bold rounded-md">
           Editor extensions &darr;
         </a>
+        <a href="#cli" class="os-btn px-4 py-2 bg-[#FAF8F2] text-ink font-bold rounded-md">
+          CLI &darr;
+        </a>
+      </div>
+    </section>
+
+    <!-- Editor extensions -->
+    <section
+      id="editor-extensions"
+      class="scroll-mt-16 py-10 sm:py-12 px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto border-t-2 border-ink space-y-6"
+    >
+      <div class="space-y-2">
+        <h2 class="text-2xl sm:text-3xl font-bold uppercase tracking-tight text-ink">
+          Editor extensions
+        </h2>
+        <p class="text-base text-ink/85 leading-relaxed">
+          Both extensions require the <code>omnibuf</code> CLI on your <code>PATH</code>. Opening a{' '}
+          <code>.obuf</code> file decodes it to JSON and saving re-encodes valid JSON back to wire
+          bytes.
+        </p>
+      </div>
+
+      <!-- VS Code -->
+      <div id="vscode" class="scroll-mt-16 os-window overflow-hidden">
+        <div class="os-titlebar bg-[#E5E0D5]">
+          <span class="font-bold uppercase text-ink text-xs font-mono">
+            Visual Studio Code &middot; omnibuf.omnibuf-vscode
+          </span>
+          <div class="os-stripes"></div>
+        </div>
+        <div class="p-5 sm:p-6 bg-[#FAF8F2] space-y-4">
+          <div class="flex items-center gap-3.5">
+            <svg
+              aria-hidden="true"
+              viewBox="0 0 100 100"
+              class="w-9 h-9 shrink-0"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M95.5 20.4L74.8 10.4C72.5 9.3 69.8 9.8 68 11.6L32.1 44.3L16.3 32.3C14.7 31.1 12.5 31.2 11 32.5L4.5 38.4C2.5 40.2 2.5 43.3 4.5 45.1L16.2 50L4.5 54.9C2.5 56.7 2.5 59.8 4.5 61.6L11 67.5C12.5 68.8 14.7 68.9 16.3 67.7L32.1 55.7L68 88.4C69.8 90.2 72.5 90.7 74.8 89.6L95.5 79.6C97.6 78.6 99 76.5 99 74.1V25.9C99 23.5 97.6 21.4 95.5 20.4Z"
+                fill="#0065A9"
+              />
+              <path
+                d="M95.5 20.4L74.8 10.4C72.5 9.3 69.8 9.8 68 11.6L11 67.5C12.5 68.8 14.7 68.9 16.3 67.7L95.5 20.4Z"
+                fill="#007ACC"
+              />
+              <path
+                d="M95.5 79.6L74.8 89.6C72.5 90.7 69.8 90.2 68 88.4L11 32.5C12.5 31.2 14.7 31.1 16.3 32.3L95.5 79.6Z"
+                fill="#1F9CF0"
+              />
+              <path
+                d="M74.8 89.6C72.5 90.7 69.8 90.2 68 88.4V11.6C69.8 9.8 72.5 9.3 74.8 10.4L95.5 20.4C97.6 21.4 99 23.5 99 25.9V74.1C99 76.5 97.6 78.6 95.5 79.6L74.8 89.6Z"
+                fill="#1F9CF0"
+              />
+              <path d="M74 30.8L48.5 50L74 69.2V30.8Z" fill="#FAF8F2" />
+            </svg>
+            <h3 class="text-xl sm:text-2xl font-bold tracking-tight text-ink">
+              Visual Studio Code
+            </h3>
+          </div>
+
+          <p class="text-sm sm:text-base text-ink/85 leading-relaxed">
+            Custom editor for <code>*.obuf</code> files with syntax-highlighted JSON editing, Split
+            and 16-byte Hex views, live reload on disk changes, and optional{' '}
+            <code>FileDescriptorSet</code> schema settings. Invalid JSON blocks save so the
+            underlying binary file stays intact.
+          </p>
+
+          <div class="p-3.5 bg-ink text-paper rounded font-mono text-xs sm:text-sm overflow-x-auto border-2 border-ink [&>pre]:bg-transparent! [&>pre]:p-0! [&>pre]:m-0! [&>pre]:border-0!">
+            <Code code={vscodeInstallSnippet} lang="sh" theme="github-dark" />
+          </div>
+
+          <div class="flex flex-wrap gap-3 font-mono text-xs sm:text-sm pt-1 no-print">
+            <a
+              href="https://marketplace.visualstudio.com/items?itemName=omnibuf.omnibuf-vscode"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="os-btn px-4 py-2 bg-acid text-ink font-bold rounded-md"
+            >
+              VS Code Marketplace &rarr;
+            </a>
+            <a
+              href="https://open-vsx.org/extension/omnibuf/omnibuf-vscode"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="os-btn px-4 py-2 bg-[#FAF8F2] text-ink font-bold rounded-md"
+            >
+              Open VSX &rarr;
+            </a>
+            <a
+              href="https://github.com/omnibuf/omnibuf-vscode"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="os-btn px-4 py-2 bg-[#FAF8F2] text-ink font-bold rounded-md"
+            >
+              GitHub &rarr;
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Neovim / Vim -->
+      <div id="neovim" class="scroll-mt-16 os-window overflow-hidden">
+        <div class="os-titlebar bg-[#E5E0D5]">
+          <span class="font-bold uppercase text-ink text-xs font-mono">
+            Neovim &amp; Vim &middot; omnibuf/omnibuf-vim
+          </span>
+          <div class="os-stripes"></div>
+        </div>
+        <div class="p-5 sm:p-6 bg-[#FAF8F2] space-y-4">
+          <div class="flex items-center gap-3.5">
+            <svg
+              aria-hidden="true"
+              viewBox="0 0 100 100"
+              class="w-9 h-9 shrink-0"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path d="M16 20.5L34.5 4V96L16 77.5V20.5Z" fill="#54A2E0" />
+              <path d="M84 22.5L65.5 4V96L84 79.5V22.5Z" fill="#57A143" />
+              <path d="M34.5 4L84 79.5L65.5 96L16 20.5L34.5 4Z" fill="#46993A" />
+              <path d="M34.5 42.5L16 20.5L34.5 4V42.5Z" fill="#2E7D32" fill-opacity="0.35" />
+            </svg>
+            <h3 class="text-xl sm:text-2xl font-bold tracking-tight text-ink">Neovim / Vim</h3>
+          </div>
+
+          <p class="text-sm sm:text-base text-ink/85 leading-relaxed">
+            <code>BufReadCmd</code> / <code>BufWriteCmd</code> plugin for <code>*.obuf</code>{' '}
+            buffers with atomic write-back, companion hex split view (<code>:OmnibufSplit</code>),
+            hex toggle (<code>:OmnibufHex</code>), and per-buffer schema switching (
+            <code>:OmnibufSchema</code>).
+          </p>
+
+          <div class="p-3.5 bg-ink text-paper rounded font-mono text-xs sm:text-sm overflow-x-auto border-2 border-ink [&>pre]:bg-transparent! [&>pre]:p-0! [&>pre]:m-0! [&>pre]:border-0!">
+            <Code code={neovimInstallSnippet} lang="lua" theme="github-dark" />
+          </div>
+
+          <div class="flex flex-wrap gap-3 font-mono text-xs sm:text-sm pt-1 no-print">
+            <a
+              href="https://github.com/omnibuf/omnibuf-vim"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="os-btn px-4 py-2 bg-acid text-ink font-bold rounded-md"
+            >
+              GitHub Repository &rarr;
+            </a>
+          </div>
+        </div>
       </div>
     </section>
 
@@ -80,7 +223,35 @@ Plug 'omnibuf/omnibuf-vim'`;
     >
       <div class="space-y-4">
         <div class="flex flex-wrap items-center justify-between gap-3">
-          <h2 class="text-2xl sm:text-3xl font-bold uppercase tracking-tight text-ink">CLI</h2>
+          <div class="flex items-center gap-3.5">
+            <svg
+              aria-hidden="true"
+              viewBox="0 0 100 100"
+              class="w-9 h-9 shrink-0"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <rect
+                x="6"
+                y="12"
+                width="88"
+                height="76"
+                rx="10"
+                fill="#111111"
+                stroke="#111111"
+                stroke-width="4"
+              />
+              <path
+                d="M24 38L44 52L24 66"
+                stroke="#D4FF33"
+                stroke-width="8"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+              <path d="M52 66H76" stroke="#FAF8F2" stroke-width="8" stroke-linecap="round" />
+            </svg>
+            <h2 class="text-2xl sm:text-3xl font-bold uppercase tracking-tight text-ink">CLI</h2>
+          </div>
           <div class="flex flex-wrap gap-2.5 font-mono text-xs sm:text-sm no-print">
             <a
               href="https://github.com/omnibuf/omnibuf-cli"
@@ -347,152 +518,6 @@ Plug 'omnibuf/omnibuf-vim'`;
                 </tr>
               </tbody>
             </table>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- Editor extensions -->
-    <section
-      id="editor-extensions"
-      class="scroll-mt-16 py-10 sm:py-12 px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto border-t-2 border-ink space-y-6"
-    >
-      <div class="space-y-2">
-        <h2 class="text-2xl sm:text-3xl font-bold uppercase tracking-tight text-ink">
-          Editor extensions
-        </h2>
-        <p class="text-base text-ink/85 leading-relaxed">
-          Both extensions require the <code>omnibuf</code> CLI on your <code>PATH</code>. Opening a{' '}
-          <code>.obuf</code> file decodes it to JSON and saving re-encodes valid JSON back to wire
-          bytes.
-        </p>
-      </div>
-
-      <!-- VS Code -->
-      <div id="vscode" class="scroll-mt-16 os-window overflow-hidden">
-        <div class="os-titlebar bg-[#E5E0D5]">
-          <span class="font-bold uppercase text-ink text-xs font-mono">
-            Visual Studio Code &middot; omnibuf.omnibuf-vscode
-          </span>
-          <div class="os-stripes"></div>
-        </div>
-        <div class="p-5 sm:p-6 bg-[#FAF8F2] space-y-4">
-          <div class="flex items-center gap-3.5">
-            <svg
-              aria-hidden="true"
-              viewBox="0 0 100 100"
-              class="w-9 h-9 shrink-0"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M95.5 20.4L74.8 10.4C72.5 9.3 69.8 9.8 68 11.6L32.1 44.3L16.3 32.3C14.7 31.1 12.5 31.2 11 32.5L4.5 38.4C2.5 40.2 2.5 43.3 4.5 45.1L16.2 50L4.5 54.9C2.5 56.7 2.5 59.8 4.5 61.6L11 67.5C12.5 68.8 14.7 68.9 16.3 67.7L32.1 55.7L68 88.4C69.8 90.2 72.5 90.7 74.8 89.6L95.5 79.6C97.6 78.6 99 76.5 99 74.1V25.9C99 23.5 97.6 21.4 95.5 20.4Z"
-                fill="#0065A9"
-              />
-              <path
-                d="M95.5 20.4L74.8 10.4C72.5 9.3 69.8 9.8 68 11.6L11 67.5C12.5 68.8 14.7 68.9 16.3 67.7L95.5 20.4Z"
-                fill="#007ACC"
-              />
-              <path
-                d="M95.5 79.6L74.8 89.6C72.5 90.7 69.8 90.2 68 88.4L11 32.5C12.5 31.2 14.7 31.1 16.3 32.3L95.5 79.6Z"
-                fill="#1F9CF0"
-              />
-              <path
-                d="M74.8 89.6C72.5 90.7 69.8 90.2 68 88.4V11.6C69.8 9.8 72.5 9.3 74.8 10.4L95.5 20.4C97.6 21.4 99 23.5 99 25.9V74.1C99 76.5 97.6 78.6 95.5 79.6L74.8 89.6Z"
-                fill="#1F9CF0"
-              />
-              <path d="M74 30.8L48.5 50L74 69.2V30.8Z" fill="#FAF8F2" />
-            </svg>
-            <h3 class="text-xl sm:text-2xl font-bold tracking-tight text-ink">
-              Visual Studio Code
-            </h3>
-          </div>
-
-          <p class="text-sm sm:text-base text-ink/85 leading-relaxed">
-            Custom editor for <code>*.obuf</code> files with syntax-highlighted JSON editing, Split
-            and 16-byte Hex views, live reload on disk changes, and optional{' '}
-            <code>FileDescriptorSet</code> schema settings. Invalid JSON blocks save so the
-            underlying binary file stays intact.
-          </p>
-
-          <div class="p-3.5 bg-ink text-paper rounded font-mono text-xs sm:text-sm overflow-x-auto border-2 border-ink [&>pre]:bg-transparent! [&>pre]:p-0! [&>pre]:m-0! [&>pre]:border-0!">
-            <Code code={vscodeInstallSnippet} lang="sh" theme="github-dark" />
-          </div>
-
-          <div class="flex flex-wrap gap-3 font-mono text-xs sm:text-sm pt-1 no-print">
-            <a
-              href="https://marketplace.visualstudio.com/items?itemName=omnibuf.omnibuf-vscode"
-              target="_blank"
-              rel="noopener noreferrer"
-              class="os-btn px-4 py-2 bg-acid text-ink font-bold rounded-md"
-            >
-              VS Code Marketplace &rarr;
-            </a>
-            <a
-              href="https://open-vsx.org/extension/omnibuf/omnibuf-vscode"
-              target="_blank"
-              rel="noopener noreferrer"
-              class="os-btn px-4 py-2 bg-[#FAF8F2] text-ink font-bold rounded-md"
-            >
-              Open VSX &rarr;
-            </a>
-            <a
-              href="https://github.com/omnibuf/omnibuf-vscode"
-              target="_blank"
-              rel="noopener noreferrer"
-              class="os-btn px-4 py-2 bg-[#FAF8F2] text-ink font-bold rounded-md"
-            >
-              GitHub &rarr;
-            </a>
-          </div>
-        </div>
-      </div>
-
-      <!-- Neovim / Vim -->
-      <div id="neovim" class="scroll-mt-16 os-window overflow-hidden">
-        <div class="os-titlebar bg-[#E5E0D5]">
-          <span class="font-bold uppercase text-ink text-xs font-mono">
-            Neovim &amp; Vim &middot; omnibuf/omnibuf-vim
-          </span>
-          <div class="os-stripes"></div>
-        </div>
-        <div class="p-5 sm:p-6 bg-[#FAF8F2] space-y-4">
-          <div class="flex items-center gap-3.5">
-            <svg
-              aria-hidden="true"
-              viewBox="0 0 100 100"
-              class="w-9 h-9 shrink-0"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path d="M16 20.5L34.5 4V96L16 77.5V20.5Z" fill="#54A2E0" />
-              <path d="M84 22.5L65.5 4V96L84 79.5V22.5Z" fill="#57A143" />
-              <path d="M34.5 4L84 79.5L65.5 96L16 20.5L34.5 4Z" fill="#46993A" />
-              <path d="M34.5 42.5L16 20.5L34.5 4V42.5Z" fill="#2E7D32" fill-opacity="0.35" />
-            </svg>
-            <h3 class="text-xl sm:text-2xl font-bold tracking-tight text-ink">Neovim / Vim</h3>
-          </div>
-
-          <p class="text-sm sm:text-base text-ink/85 leading-relaxed">
-            <code>BufReadCmd</code> / <code>BufWriteCmd</code> plugin for <code>*.obuf</code>{' '}
-            buffers with atomic write-back, companion hex split view (<code>:OmnibufSplit</code>),
-            hex toggle (<code>:OmnibufHex</code>), and per-buffer schema switching (
-            <code>:OmnibufSchema</code>).
-          </p>
-
-          <div class="p-3.5 bg-ink text-paper rounded font-mono text-xs sm:text-sm overflow-x-auto border-2 border-ink [&>pre]:bg-transparent! [&>pre]:p-0! [&>pre]:m-0! [&>pre]:border-0!">
-            <Code code={neovimInstallSnippet} lang="lua" theme="github-dark" />
-          </div>
-
-          <div class="flex flex-wrap gap-3 font-mono text-xs sm:text-sm pt-1 no-print">
-            <a
-              href="https://github.com/omnibuf/omnibuf-vim"
-              target="_blank"
-              rel="noopener noreferrer"
-              class="os-btn px-4 py-2 bg-acid text-ink font-bold rounded-md"
-            >
-              GitHub Repository &rarr;
-            </a>
           </div>
         </div>
       </div>
