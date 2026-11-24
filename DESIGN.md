@@ -102,7 +102,7 @@ components:
 
 OmniBuf's visual identity combines the clarity of a printed Swiss technical manual with classic 1980s Macintosh workstation window chrome and byte-level engineering blueprints. Surfaces rest on a warm drafting-paper canvas overlaid with a faint 32px technical grid, giving every diagram, benchmark chart, and wire-format breakdown the feel of an interactive hardware reference sheet.
 
-The interface treats data structures as physical objects you can inspect and measure, not an abstract cloud service. Containers use crisp 2px ink borders, striped classic OS title bars, and hard zero-blur offset shadows. Geometric grotesque headlines pair with italic editorial serif counterpoints and dense monospace byte tables so engineers can scan high-level claims and immediately drill down into exact bit layouts.
+The interface treats data structures as physical objects you can inspect and measure, not an abstract cloud service. Containers use crisp 2px ink borders, striped classic OS title bars, and hard zero-blur offset shadows. Bold geometric grotesque headlines pair with dense monospace byte tables so engineers can scan high-level claims and immediately drill down into exact bit layouts.
 
 The system explicitly rejects neon SaaS gradients, frosted glassmorphism, diffuse drop shadows, and sterile corporate documentation templates. Every visual element is tactile, high-contrast, and mechanical, with an optional "Night Workstation Manual" dark theme (`html.dark`) that maps the paper canvas to deep slate (`#0F1115`) while preserving crisp borders, offset shadows, and Signal Orange / Acid Lime accents.
 
@@ -110,7 +110,7 @@ The system explicitly rejects neon SaaS gradients, frosted glassmorphism, diffus
 
 - Warm drafting-paper background with a 32px technical coordinate grid (`rgba(17, 17, 17, 0.05)` lines).
 - Classic OS window chrome featuring 2px solid ink borders, horizontal title-bar stripes, and hard offset shadows.
-- Tri-font editorial hierarchy pairing uppercase geometric sans (`Space Grotesk`), italic display serif (`Instrument Serif`), and technical monospace (`IBM Plex Mono`).
+- Two-font technical hierarchy pairing uppercase geometric sans (`Space Grotesk`) and technical monospace (`IBM Plex Mono`).
 - High-visibility industrial signal accents (`Signal Orange` and `Acid Lime`) reserved for primary actions, active states, and OmniBuf benchmark bars.
 
 ## Colors
@@ -119,7 +119,7 @@ The palette contrasts warm, archival paper neutrals against pitch-black printer'
 
 ### Primary
 
-- **Signal Orange** (`#FF4F18`): Used for italic serif headline counterpoints, OmniBuf's primary data series in benchmark charts, length-prefix byte tokens, and key architectural callout labels.
+- **Signal Orange** (`#FF4F18`): Used for display headline accent phrases, OmniBuf's primary data series in benchmark charts, length-prefix byte tokens, and key architectural callout labels.
 
 ### Secondary
 
@@ -146,23 +146,21 @@ The palette contrasts warm, archival paper neutrals against pitch-black printer'
 ## Typography
 
 **Display Font:** Space Grotesk (with system sans-serif fallback)
-**Accent Display Font:** Instrument Serif Italic (with Georgia, serif fallback)
 **Body Font:** Space Grotesk (with system sans-serif fallback)
 **Label/Mono Font:** IBM Plex Mono (with monospace fallback)
 
-**Character:** Bold, tightly tracked uppercase `Space Grotesk` establishes an assertive engineering voice, while `Instrument Serif Italic` in Signal Orange injects human editorial warmth into section hooks, and `IBM Plex Mono` grounds every claim in byte-level precision.
+**Character:** Bold, tightly tracked uppercase `Space Grotesk` establishes a clean engineering voice with Signal Orange color accents, and `IBM Plex Mono` grounds every claim in byte-level precision.
 
 ### Hierarchy
 
-- **Display** (`700` weight, `clamp(2.6rem, 6vw, 5.5rem)`, `0.94` line-height, uppercase): Hero and page-level statements, paired with `Instrument Serif Italic` (`400` weight, `clamp(3.1rem, 7vw, 6.2rem)`, normal case) for the second line counterpoint.
-- **Headline** (`700` weight, `clamp(1.85rem, 4vw, 3rem)`, `1.1` line-height, uppercase): Major section headers (`h2`), often ending with an italic serif accent word.
+- **Display** (`700` weight, `clamp(2.6rem, 6vw, 5.5rem)`, `0.94` line-height, uppercase): Hero and page-level statements, using Signal Orange (`#FF4F18`) for the second line accent.
+- **Headline** (`700` weight, `clamp(1.85rem, 4vw, 3rem)`, `1.1` line-height, uppercase): Major section headers (`h2`), with optional Signal Orange accent phrases in the same upright display weight.
 - **Title** (`700` weight, `1.05rem` to `1.4rem`, `1.35` line-height): Card titles, `.os-titlebar` window labels (uppercase `IBM Plex Mono`), and specification subheadings (`h3`, `h4`).
 - **Body** (`500` weight, `1.0625rem` / `17px`, `1.75` line-height, max width `65ch` to `75ch` in prose): Technical explanations, specification prose, and architectural summaries.
 - **Label** (`700` weight, `0.875rem` / `14px`, `1.4` line-height, `IBM Plex Mono`): Buttons, navigation links, benchmark axis labels, byte offsets, and wire-type tags.
 
 ### Named Rules
 
-**The Serif Counterpoint Rule.** `Instrument Serif` is used exclusively in italic style as a contrasting phrase inside display or section headlines, never for body copy or UI controls.
 **The Monospace Data Rule.** All buttons, navigation bars, window title bars, benchmark rows, byte offsets, and wire-type identifiers must use `IBM Plex Mono`.
 
 ## Layout

@@ -1,5 +1,7 @@
 # omnibuf.com
 
+[![OmniBuf Spec: v1 DRAFT-1](https://img.shields.io/badge/OmniBuf%20Spec-v1%20DRAFT--1-FF4F18)](https://omnibuf.com/spec)
+
 Website, wire format specification, and documentation for [OmniBuf](https://omnibuf.com).
 
 ## Run
