@@ -31,7 +31,7 @@ test('/es defineMessage snippet and prose match @omnibuf/core FieldSpec', () => 
 });
 
 test('schema-less omnibuf -c and DecodeBlind examples use field_<N> keys', () => {
-  for (const file of ['src/pages/cli.astro', 'src/components/Motivation.astro']) {
+  for (const file of ['src/pages/tooling.astro', 'src/components/Motivation.astro']) {
     const src = readRepoFile(file);
     assert.match(src, /"field_1"/);
     assert.match(src, /"field_2"/);
@@ -96,7 +96,7 @@ test('Hero and Comparisons scope butterfly widget scripts and ARIA tab linkage',
 
   assert.doesNotMatch(benchmarksData, /canonical 11-field/);
   const summaryMatches = [...benchmarksData.matchAll(/heroSummaryHtml:\s*'([^']+)'/g)];
-  assert.equal(summaryMatches.length, 11);
+  assert.equal(summaryMatches.length, 12);
   for (const [, html] of summaryMatches) {
     assert.doesNotMatch(html, /[0-9]+\.[0-9]+x/);
     assert.doesNotMatch(html, /encoded_len/);
@@ -263,7 +263,7 @@ test('CSS, 404 routes, FAQ deterministic wording, HowItWorks KiB units, and PROD
     '/dart',
     '/php',
     '/elixir',
-    '/cli',
+    '/tooling',
   ]) {
     assert.match(notFoundPage, new RegExp(`href="${route}"`));
   }

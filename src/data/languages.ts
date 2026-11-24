@@ -2,7 +2,7 @@ export type LanguageKey =
   'go' | 'es' | 'rs' | 'py' | 'cpp' | 'nano' | 'java' | 'cs' | 'swift' | 'dart' | 'php' | 'elixir';
 
 export type PageKey =
-  'home' | 'how-it-works' | 'benchmarks' | 'spec' | 'cli' | LanguageKey | 'none';
+  'home' | 'how-it-works' | 'benchmarks' | 'spec' | 'tooling' | LanguageKey | 'none';
 
 export interface LanguageEntry {
   key: LanguageKey;
@@ -150,10 +150,10 @@ export const benchmarksNavPage = {
 } as const;
 
 export const cliNavPage = {
-  href: '/cli',
-  key: 'cli',
-  label: 'CLI',
-  repoUrl: 'https://github.com/omnibuf/omnibuf-cli',
+  href: '/tooling',
+  key: 'tooling',
+  label: 'Tooling',
+  repoUrl: 'https://github.com/omnibuf',
 } as const;
 
 export const specNavPage = {
@@ -163,11 +163,11 @@ export const specNavPage = {
 } as const;
 
 export const totalSitePages =
-  primaryNavPages.length + languages.length + 3; /* Benchmarks + CLI + Specification */
+  primaryNavPages.length + languages.length + 3; /* Benchmarks + Tooling + Specification */
 
 export function getGitHubUrlForPage(currentPage: PageKey): string {
   const lang = languages.find((l) => l.key === currentPage);
   if (lang) return lang.repoUrl;
-  if (currentPage === 'cli') return cliNavPage.repoUrl;
+  if (currentPage === 'tooling') return cliNavPage.repoUrl;
   return 'https://github.com/omnibuf';
 }

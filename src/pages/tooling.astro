@@ -1,0 +1,532 @@
+---
+import { Code } from 'astro:components';
+import Layout from '../layouts/Layout.astro';
+import Navbar from '../components/Navbar.astro';
+import Footer from '../components/Footer.astro';
+
+const installCommands = `# Homebrew (macOS & Linux)
+brew install omnibuf/tap/omnibuf
+
+# mise
+mise use -g github:omnibuf/omnibuf-cli
+
+# Shell script
+curl -fsSL https://omnibuf.com/install.sh | sh
+
+# Go
+go install github.com/omnibuf/omnibuf-cli/cmd/omnibuf@latest`;
+
+const jqFilterSnippet = `# Pretty-print any OmniBuf packet as JSON
+omnibuf packet.obuf
+
+# Extract a nested field as a raw string (-r)
+omnibuf -r '.location.city' packet.obuf
+
+# Filter array elements and emit compact JSON (-c)
+omnibuf -c '.neighbors[] | select(.established) | .router' packet.obuf`;
+
+const encodeSnippet = `# Pipe JSON directly into omnibuf to produce self-describing wire bytes (Field #0)
+echo '{"event": {"int": 10, "city": "FRA"}}' | omnibuf > event.obuf
+
+# Round-trip back to JSON or query a field in one pipeline
+echo '{"event": {"int": 10, "city": "FRA"}}' | omnibuf | omnibuf '.event.city'
+
+# Encode or decode against a compiled Protobuf FileDescriptorSet (.pb, .pb.gz, .json)
+omnibuf encode --schema descriptors.pb --type demo.v1.PeerUpdate input.json > packet.obuf
+omnibuf decode --schema descriptors.pb --type demo.v1.PeerUpdate packet.obuf`;
+
+const vscodeInstallSnippet = `# Install from the Visual Studio Marketplace
+code --install-extension omnibuf.omnibuf-vscode`;
+
+const neovimInstallSnippet = `-- lazy.nvim
+{ "omnibuf/omnibuf-vim" }
+
+-- vim-plug
+Plug 'omnibuf/omnibuf-vim'`;
+---
+
+<Layout
+  title="OmniBuf Tooling | CLI & Editor Extensions"
+  description="Inspect, query, and edit OmniBuf (.obuf) packets from the command line, Visual Studio Code, and Neovim / Vim."
+>
+  <Navbar currentPage="tooling" />
+
+  <main id="main-content">
+    <!-- Page Header + Up-Front Install Bar -->
+    <section
+      id="cli"
+      class="relative pt-10 pb-8 sm:pt-16 sm:pb-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto"
+    >
+      <h1 class="text-[2.6rem] sm:text-7xl lg:text-[5.5rem] font-bold tracking-tight leading-[0.94] text-ink uppercase">
+        OmniBuf
+        <br />
+        <span class="font-serif italic font-normal normal-case text-[#FF4F18] text-[3.1rem] sm:text-8xl lg:text-[6.2rem]">
+          tooling &amp; editors.
+        </span>
+      </h1>
+
+      <div class="mt-6 grid lg:grid-cols-12 gap-6 lg:gap-8 items-start">
+        <div class="lg:col-span-6 space-y-4">
+          <p class="text-lg sm:text-2xl text-ink/85 font-medium leading-snug">
+            Command-line inspector, converter, and editor extensions for <code>.obuf</code> files.
+            Decode raw wire bytes to JSON, filter nested fields with{' '}
+            <a href="#jq-queries" class="doc-link">
+              jq expressions
+            </a>
+            , or inspect and edit binary packets directly in{' '}
+            <a href="#editor-extensions" class="doc-link">
+              VS Code and Neovim
+            </a>
+            .
+          </p>
+          <div class="flex flex-wrap gap-3 font-mono text-sm sm:text-base pt-1 no-print">
+            <a
+              href="https://github.com/omnibuf/omnibuf-cli"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="os-btn px-4 py-2.5 bg-acid text-ink font-bold rounded-md"
+            >
+              CLI Repository &rarr;
+            </a>
+            <a
+              href="https://github.com/omnibuf/omnibuf-cli/releases"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="os-btn px-4 py-2.5 bg-[#FAF8F2] text-ink font-bold rounded-md"
+            >
+              Release Binaries &rarr;
+            </a>
+            <a
+              href="#editor-extensions"
+              class="os-btn px-4 py-2.5 bg-[#FAF8F2] text-ink font-bold rounded-md"
+            >
+              Editor Extensions &darr;
+            </a>
+          </div>
+        </div>
+
+        <div class="lg:col-span-6 min-w-0">
+          <div class="p-4 sm:p-5 bg-ink text-paper rounded-md font-mono text-xs sm:text-sm overflow-x-auto leading-relaxed border-2 border-ink shadow-[4px_4px_0px_#111111] [&>pre]:bg-transparent! [&>pre]:p-0! [&>pre]:m-0! [&>pre]:border-0!">
+            <div class="flex items-center justify-between gap-2 mb-2.5 pb-2 border-b border-paper/15">
+              <div class="text-xs font-bold uppercase text-acid">Install omnibuf CLI</div>
+              <button
+                type="button"
+                data-copy="brew install omnibuf/tap/omnibuf"
+                class="copy-snippet-btn min-w-[4.75rem] text-center px-2.5 py-1 text-xs font-bold uppercase bg-paper/15 hover:bg-acid hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-acid text-paper border border-paper/30 rounded shrink-0 transition"
+              >
+                Copy brew
+              </button>
+            </div>
+            <Code code={installCommands} lang="sh" theme="github-dark" />
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Editor Extensions -->
+    <section
+      id="editor-extensions"
+      class="scroll-mt-16 py-12 sm:py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto border-t-2 border-ink"
+    >
+      <div class="mb-8 space-y-2">
+        <div class="font-mono text-xs font-bold uppercase tracking-wider text-ink/60">
+          Editor Extensions
+        </div>
+        <h2 class="text-3xl sm:text-4xl font-bold uppercase tracking-tight leading-none text-ink">
+          Open and edit <code>.obuf</code> files in your editor.
+        </h2>
+        <p class="text-base sm:text-lg text-ink/85 max-w-[65ch]">
+          Both extensions shell out to the <code>omnibuf</code> CLI so opening a binary packet shows
+          decoded JSON and saving re-encodes valid JSON back to wire bytes.
+        </p>
+      </div>
+
+      <div class="grid lg:grid-cols-2 gap-6 lg:gap-8">
+        <!-- VS Code -->
+        <div id="vscode" class="scroll-mt-16 os-window overflow-hidden flex flex-col">
+          <div class="os-titlebar bg-[#E5E0D5]">
+            <span class="font-bold uppercase text-ink text-xs font-mono">
+              Visual Studio Code &middot; omnibuf.omnibuf-vscode
+            </span>
+            <div class="os-stripes"></div>
+          </div>
+          <div class="p-5 sm:p-6 bg-[#FAF8F2] flex-1 flex flex-col justify-between space-y-5">
+            <div class="space-y-3">
+              <h3 class="text-xl sm:text-2xl font-bold tracking-tight text-ink">
+                OmniBuf for VS Code
+              </h3>
+              <p class="text-sm sm:text-base text-ink/85 leading-relaxed">
+                Custom editor for <code>*.obuf</code> files with syntax-highlighted JSON editing,
+                side-by-side Split and 16-byte Hex views, live reload on disk changes, and optional{' '}
+                <code>FileDescriptorSet</code> schema settings. Invalid JSON blocks save before
+                touching the underlying binary file.
+              </p>
+              <div class="p-3.5 bg-ink text-paper rounded font-mono text-xs overflow-x-auto border-2 border-ink [&>pre]:bg-transparent! [&>pre]:p-0! [&>pre]:m-0! [&>pre]:border-0!">
+                <Code code={vscodeInstallSnippet} lang="sh" theme="github-dark" />
+              </div>
+            </div>
+            <div class="flex flex-wrap gap-3 font-mono text-xs sm:text-sm pt-1 no-print">
+              <a
+                href="https://marketplace.visualstudio.com/items?itemName=omnibuf.omnibuf-vscode"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="os-btn px-4 py-2 bg-acid text-ink font-bold rounded-md"
+              >
+                VS Code Marketplace &rarr;
+              </a>
+              <a
+                href="https://github.com/omnibuf/omnibuf-vscode"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="os-btn px-4 py-2 bg-[#FAF8F2] text-ink font-bold rounded-md"
+              >
+                GitHub &rarr;
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Neovim / Vim -->
+        <div id="neovim" class="scroll-mt-16 os-window overflow-hidden flex flex-col">
+          <div class="os-titlebar bg-[#E5E0D5]">
+            <span class="font-bold uppercase text-ink text-xs font-mono">
+              Neovim &amp; Vim &middot; omnibuf/omnibuf-vim
+            </span>
+            <div class="os-stripes"></div>
+          </div>
+          <div class="p-5 sm:p-6 bg-[#FAF8F2] flex-1 flex flex-col justify-between space-y-5">
+            <div class="space-y-3">
+              <h3 class="text-xl sm:text-2xl font-bold tracking-tight text-ink">
+                OmniBuf for Neovim / Vim
+              </h3>
+              <p class="text-sm sm:text-base text-ink/85 leading-relaxed">
+                Transparent <code>BufReadCmd</code> / <code>BufWriteCmd</code> integration for{' '}
+                <code>*.obuf</code> buffers with atomic write-back, companion hex split view (
+                <code>:OmnibufSplit</code>), hex toggle (<code>:OmnibufHex</code>), and per-buffer
+                schema switching (<code>:OmnibufSchema</code>).
+              </p>
+              <div class="p-3.5 bg-ink text-paper rounded font-mono text-xs overflow-x-auto border-2 border-ink [&>pre]:bg-transparent! [&>pre]:p-0! [&>pre]:m-0! [&>pre]:border-0!">
+                <Code code={neovimInstallSnippet} lang="lua" theme="github-dark" />
+              </div>
+            </div>
+            <div class="flex flex-wrap gap-3 font-mono text-xs sm:text-sm pt-1 no-print">
+              <a
+                href="https://github.com/omnibuf/omnibuf-vim"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="os-btn px-4 py-2 bg-acid text-ink font-bold rounded-md"
+              >
+                GitHub Repository &rarr;
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CLI Capabilities -->
+    <section class="py-12 sm:py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto border-t-2 border-ink">
+      <div class="divide-y-2 divide-ink/20">
+        <!-- 1. Schema-Less Packet Inspection: protoscope vs omnibuf vs Field #0 -->
+        <div
+          id="inspect-without-schema"
+          class="scroll-mt-16 pb-10 sm:pb-12 grid lg:grid-cols-12 gap-6 lg:gap-8 items-center"
+        >
+          <div class="lg:col-span-5 space-y-3">
+            <h2 class="text-2xl sm:text-3xl font-bold uppercase tracking-tight leading-snug">
+              See actual values, not guesses.
+            </h2>
+            <!-- prettier-ignore -->
+            <p class="text-base sm:text-lg text-ink/90 leading-relaxed max-w-[60ch]">
+              Protobuf collapses strings, byte slices, sub-messages, maps, and packed arrays into one wire type, and shares a single varint wire type across booleans, signed integers, and unsigned integers. Inspecting a raw Protobuf packet with <a href="https://github.com/protocolbuffers/protoscope" target="_blank" rel="noopener noreferrer" class="doc-link"><code>protoscope</code></a> leaves you guessing what each field means. OmniBuf carries an explicit 4-bit wire type on every field, plus element types on arrays and maps. Running <code>omnibuf</code> prints the exact booleans, signed numbers, UTF-8 strings, arrays, and maps on the wire. Packets encoded with <strong>Field #0</strong> also decode with their original field names.
+            </p>
+          </div>
+
+          <div class="lg:col-span-7 min-w-0">
+            <div class="os-window overflow-hidden font-mono text-xs sm:text-sm">
+              <div class="os-titlebar bg-[#E5E0D5]">
+                <span class="font-bold uppercase text-ink text-xs">protoscope vs. omnibuf cli</span>
+                <div class="os-stripes"></div>
+              </div>
+              <div class="bg-ink text-paper p-4 space-y-3">
+                <div class="bg-[#1F1F1F] p-3 rounded border border-paper/15">
+                  <div class="flex flex-wrap items-center justify-between gap-2 mb-1.5">
+                    <span class="text-xs font-bold text-[#FF4F18]">$ protoscope packet.pb</span>
+                    <span class="text-[11px] text-paper/55">Protobuf &middot; guesses types</span>
+                  </div>
+                  <pre class="leading-relaxed overflow-x-auto"><code><span class="text-[#FF4F18] font-bold">1:</span> 1          <span class="text-paper/55"># bool / uint / sint / enum?</span>
+<span class="text-[#FF4F18] font-bold">2:</span> 3          <span class="text-paper/55"># +3 uint or -2 sint?</span>
+<span class="text-[#FF4F18] font-bold">3:</span> &#123;<span class="text-acid">"FRA"</span>&#125;    <span class="text-paper/55"># string / bytes / sub-msg?</span>
+<span class="text-[#FF4F18] font-bold">4:</span> <span class="text-acid">"\x0a\x14"</span> <span class="text-paper/55"># bytes / string / packed array?</span></code></pre>
+                </div>
+                <div class="bg-[#1F1F1F] p-3 rounded border border-paper/25">
+                  <div class="flex flex-wrap items-center justify-between gap-2 mb-1.5">
+                    <span class="text-xs font-bold text-acid">$ omnibuf -c packet.obuf</span>
+                    <span class="text-[11px] text-paper/65">OmniBuf &middot; actual values</span>
+                  </div>
+                  <pre class="leading-relaxed overflow-x-auto"><code>&#123;<span class="text-acid font-bold">"field_1"</span>: <span class="text-[#FF4F18] font-bold">true</span>, <span class="text-acid font-bold">"field_2"</span>: -2, <span class="text-acid font-bold">"field_3"</span>: <span class="text-acid">"FRA"</span>, <span class="text-acid font-bold">"field_4"</span>: [10, 20]&#125;</code></pre>
+                </div>
+                <div class="bg-[#1F1F1F] p-3 rounded border border-acid/45">
+                  <div class="flex flex-wrap items-center justify-between gap-2 mb-1.5">
+                    <span class="text-xs font-bold text-acid">$ omnibuf -c packet-field0.obuf</span>
+                    <span class="text-[11px] text-acid/85">
+                      OmniBuf + Field #0 &middot; actual values &amp; names
+                    </span>
+                  </div>
+                  <pre class="leading-relaxed overflow-x-auto"><code>&#123;<span class="text-acid font-bold">"active"</span>: <span class="text-[#FF4F18] font-bold">true</span>, <span class="text-acid font-bold">"delta"</span>: -2, <span class="text-acid font-bold">"city"</span>: <span class="text-acid">"FRA"</span>, <span class="text-acid font-bold">"peers"</span>: [10, 20]&#125;</code></pre>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2. Built-in jq Queries -->
+        <div
+          id="jq-queries"
+          class="scroll-mt-16 py-10 sm:py-12 grid lg:grid-cols-12 gap-6 lg:gap-8 items-center"
+        >
+          <div class="lg:col-span-5 space-y-3">
+            <h2 class="text-2xl sm:text-3xl font-bold uppercase tracking-tight leading-snug">
+              Query packets with jq filters.
+            </h2>
+            <p class="text-base sm:text-lg text-ink/90 leading-relaxed max-w-[60ch]">
+              Pass a <code>jq</code> filter expression as the first argument (or via <code>-q</code>{' '}
+              / <code>--query</code> or <code>-f</code> / <code>--filter</code>) to slice, select,
+              or reshape decoded fields in a single command. Flags such as <code>-r</code> (raw
+              string output) and <code>-c</code> (compact single-line JSON) work the same way as{' '}
+              <code>jq</code>. Hex (<code>-x</code>), base64 (<code>-b</code>), and explicit file
+              paths (<code>-i</code> / <code>--input</code> and <code>-o</code> /{' '}
+              <code>--output</code>) are supported directly.
+            </p>
+          </div>
+
+          <div class="lg:col-span-7 min-w-0">
+            <div class="os-window overflow-hidden font-mono text-xs sm:text-sm">
+              <div class="os-titlebar bg-[#E5E0D5]">
+                <span class="font-bold uppercase text-ink text-xs">jq filter expressions</span>
+                <div class="os-stripes"></div>
+              </div>
+              <div class="bg-ink text-paper p-4 [&>pre]:bg-transparent! [&>pre]:p-0! [&>pre]:m-0! [&>pre]:border-0! [&>pre]:leading-relaxed [&>pre]:overflow-x-auto">
+                <Code code={jqFilterSnippet} lang="sh" theme="github-dark" />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3. Auto-Detect JSON Encode & Schema Mode -->
+        <div
+          id="encode-json"
+          class="scroll-mt-16 py-10 sm:py-12 grid lg:grid-cols-12 gap-6 lg:gap-8 items-center"
+        >
+          <div class="lg:col-span-5 space-y-3">
+            <h2 class="text-2xl sm:text-3xl font-bold uppercase tracking-tight leading-snug">
+              Convert JSON to OmniBuf and back.
+            </h2>
+            <p class="text-base sm:text-lg text-ink/90 leading-relaxed max-w-[60ch]">
+              <code>omnibuf</code> auto-detects whether its input is JSON or OmniBuf wire bytes
+              (pass <code>-e</code> / <code>--encode</code> or <code>-d</code> /{' '}
+              <code>--decode</code> to force a direction). Piping a JSON object into{' '}
+              <code>omnibuf</code> encodes it into a self-describing OmniBuf packet with{' '}
+              <code>Field #0</code> field names, preserving the JSON object's key order for
+              sequential tags. Supplying <code>--schema</code> (<code>-s</code>) with a compiled{' '}
+              <code>FileDescriptorSet</code> encodes or decodes against your <code>.proto</code>{' '}
+              definitions, with <code>--field0</code> (alias <code>--self-describing</code>) to
+              embed inline field names and <code>--max-schema-bytes</code> (default 64 MiB) to cap
+              descriptor file and decompressed size.
+            </p>
+          </div>
+
+          <div class="lg:col-span-7 min-w-0">
+            <div class="os-window overflow-hidden font-mono text-xs sm:text-sm">
+              <div class="os-titlebar bg-[#E5E0D5]">
+                <span class="font-bold uppercase text-ink text-xs">json &harr; omnibuf</span>
+                <div class="os-stripes"></div>
+              </div>
+              <div class="bg-ink text-paper p-4 [&>pre]:bg-transparent! [&>pre]:p-0! [&>pre]:m-0! [&>pre]:border-0! [&>pre]:leading-relaxed [&>pre]:overflow-x-auto">
+                <Code code={encodeSnippet} lang="sh" theme="github-dark" />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 4. Schemaless JSON Type Mapping -->
+        <div id="json-type-mapping" class="scroll-mt-16 pt-10 sm:pt-12 space-y-6">
+          <div class="grid lg:grid-cols-12 gap-6 lg:gap-8 items-start">
+            <div class="lg:col-span-5 space-y-3">
+              <h2 class="text-2xl sm:text-3xl font-bold uppercase tracking-tight leading-snug">
+                Schemaless JSON type mapping.
+              </h2>
+              <p class="text-base sm:text-lg text-ink/90 leading-relaxed max-w-[60ch]">
+                Converting JSON without <code>--schema</code> requires a top-level JSON object.
+                <code>omnibuf</code> infers each OmniBuf wire type directly from the JSON literal
+                and assigns sequential field numbers starting at <code>1</code> (keys named{' '}
+                <code>field_&lt;N&gt;</code> reserve field number <code>N</code> directly). Pass{' '}
+                <code>--deterministic</code> to sort keys lexicographically before numbering, or{' '}
+                <code>--no-field0</code> to omit inline field names.
+              </p>
+              <p class="text-sm sm:text-base text-ink/80 leading-relaxed max-w-[60ch]">
+                JSON has no syntax for 32-bit floats, fixed-width integers, enums, or Protobuf{' '}
+                <code>map&lt;K, V&gt;</code> entries. Pass{' '}
+                <code>--schema descriptors.pb --type pkg.Msg</code> for exact <code>.proto</code>{' '}
+                field numbers and wire types.
+              </p>
+            </div>
+
+            <div class="lg:col-span-7 min-w-0">
+              <div class="os-window overflow-hidden">
+                <div class="os-titlebar bg-[#E5E0D5]">
+                  <span class="font-bold uppercase text-ink text-xs font-mono">
+                    json literal &rarr; omnibuf wire type (no --schema)
+                  </span>
+                  <div class="os-stripes"></div>
+                </div>
+                <div class="overflow-x-auto bg-[#FAF8F2]">
+                  <table class="w-full text-left border-collapse font-mono text-xs sm:text-sm">
+                    <thead>
+                      <tr class="border-b-2 border-ink bg-[#E5E0D5]/70 text-ink uppercase text-[11px]">
+                        <th class="py-2.5 px-3 font-bold">JSON Value</th>
+                        <th class="py-2.5 px-3 font-bold">OmniBuf Wire Type</th>
+                        <th class="py-2.5 px-3 font-bold">Protobuf Equiv.</th>
+                      </tr>
+                    </thead>
+                    <tbody class="divide-y divide-ink/15 text-ink">
+                      <tr>
+                        <td class="py-2.5 px-3">
+                          <code>true</code> / <code>false</code>
+                        </td>
+                        <td class="py-2.5 px-3">
+                          <code>WireBoolTrue</code> (3) / <code>WireBoolFalse</code> (2)
+                        </td>
+                        <td class="py-2.5 px-3">
+                          <code>bool</code>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td class="py-2.5 px-3">
+                          Non-negative integer (<code>0..2^64-1</code>)
+                        </td>
+                        <td class="py-2.5 px-3">
+                          <code>WireUint</code> (0)
+                        </td>
+                        <td class="py-2.5 px-3">
+                          <code>uint32</code> / <code>uint64</code>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td class="py-2.5 px-3">
+                          Negative integer (<code>-2^63..-1</code>)
+                        </td>
+                        <td class="py-2.5 px-3">
+                          <code>WireSint</code> (1, ZigZag)
+                        </td>
+                        <td class="py-2.5 px-3">
+                          <code>sint32</code> / <code>sint64</code>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td class="py-2.5 px-3">
+                          Decimal, exponent (<code>.</code>/<code>e</code>), or &gt;64-bit
+                        </td>
+                        <td class="py-2.5 px-3">
+                          <code>WireFloat64</code> (9, 8B LE)
+                        </td>
+                        <td class="py-2.5 px-3">
+                          <code>double</code>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td class="py-2.5 px-3">
+                          String (<code>"FRA"</code>)
+                        </td>
+                        <td class="py-2.5 px-3">
+                          <code>WireString</code> (10, UTF-8)
+                        </td>
+                        <td class="py-2.5 px-3">
+                          <code>string</code>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td class="py-2.5 px-3">
+                          <code>"base64:..."</code> (valid std base64)
+                        </td>
+                        <td class="py-2.5 px-3">
+                          <code>WireBytes</code> (11, raw bytes)
+                        </td>
+                        <td class="py-2.5 px-3">
+                          <code>bytes</code>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td class="py-2.5 px-3">
+                          Nested object (<code>&#123;...&#125;</code>)
+                        </td>
+                        <td class="py-2.5 px-3">
+                          <code>WireSubMsg</code> (12)
+                        </td>
+                        <td class="py-2.5 px-3">
+                          <code>message</code>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td class="py-2.5 px-3">
+                          Homogeneous array (<code>[...]</code>)
+                        </td>
+                        <td class="py-2.5 px-3">
+                          <code>WireArray</code> (13)
+                          <div class="text-[11px] font-sans text-ink/70 mt-0.5">
+                            Numbers widen across elements: <code>WireUint</code> &rarr;{' '}
+                            <code>WireSint</code> &rarr; <code>WireFloat64</code>. All-base64 string
+                            arrays encode as <code>WireBytes</code>. Objects share one field table.
+                            Nested arrays and empty arrays are supported; mixed incompatible types
+                            fail and <code>null</code> elements are omitted.
+                          </div>
+                        </td>
+                        <td class="py-2.5 px-3">
+                          <code>repeated T</code>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td class="py-2.5 px-3">
+                          <code>null</code>
+                        </td>
+                        <td class="py-2.5 px-3">Omitted (absent field)</td>
+                        <td class="py-2.5 px-3">unset field</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="py-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto border-t-2 border-ink no-print">
+      <div class="flex flex-wrap items-center justify-between gap-4">
+        <div class="font-mono text-sm sm:text-base font-bold uppercase text-ink/80">
+          Language Libraries &amp; Specification
+        </div>
+        <div class="flex flex-wrap gap-3 font-mono text-sm sm:text-base">
+          <a href="/go" class="os-btn px-5 py-2.5 bg-acid text-ink font-bold rounded-md">
+            OmniBuf for Go &rarr;
+          </a>
+          <a href="/es" class="os-btn px-5 py-2.5 bg-[#FAF8F2] text-ink font-bold rounded-md">
+            TypeScript / JS &rarr;
+          </a>
+          <a
+            href="/how-it-works"
+            class="os-btn px-5 py-2.5 bg-[#FAF8F2] text-ink font-bold rounded-md"
+          >
+            How It Works &rarr;
+          </a>
+          <a href="/spec" class="os-btn px-5 py-2.5 bg-[#FAF8F2] text-ink font-bold rounded-md">
+            Wire Specification &rarr;
+          </a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <Footer />
+</Layout>
