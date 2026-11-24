@@ -5,6 +5,13 @@ import Navbar from '../components/Navbar.astro';
 import LanguageStrip from '../components/LanguageStrip.astro';
 import TypeMappingTable from '../components/TypeMappingTable.astro';
 import Footer from '../components/Footer.astro';
+import RpcIntegration from '../components/RpcIntegration.astro';
+
+const rsRpcCode = `// Separate crate: omnibuf-tonic (keeps core omnibuf free of tonic)
+use omnibuf_tonic::OmniBufCodec;
+
+let codec = OmniBufCodec::<PingRequest, PingResponse>::default();
+let self_describing = OmniBufCodec::<PingRequest, PingResponse>::self_describing();`;
 import { defaultTypeMappings } from '../data/typeMappings';
 
 const cargoFeaturesSnippet = `# Default: derive + buffa + prost
@@ -496,6 +503,15 @@ const rsFaqJsonLd = {
         </div>
       </div>
     </section>
+
+    <RpcIntegration
+      heading="gRPC with Tonic"
+      accent="in Rust."
+      summary="The detached <code>omnibuf-tonic</code> crate implements <code>tonic::codec::Codec</code>, <code>Encoder</code>, and <code>Decoder</code> for any <code>omnibuf::Message</code> type while keeping core <code>omnibuf</code> free of Tonic dependencies."
+      code={rsRpcCode}
+      lang="rust"
+      codeLabel="omnibuf-tonic"
+    />
 
     <section
       id="rs-faq"

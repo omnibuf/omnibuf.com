@@ -5,6 +5,21 @@ import Navbar from '../components/Navbar.astro';
 import LanguageStrip from '../components/LanguageStrip.astro';
 import TypeMappingTable from '../components/TypeMappingTable.astro';
 import Footer from '../components/Footer.astro';
+import RpcIntegration from '../components/RpcIntegration.astro';
+
+const pyRpcCode = `# grpcio (detached module: omnibuf.grpc)
+import grpc
+from omnibuf.grpc import grpc_deserializer, grpc_serializer
+
+handler = grpc.unary_unary_rpc_method_handler(
+    serve_ping,
+    request_deserializer=grpc_deserializer(PingRequest),
+    response_serializer=grpc_serializer(),
+)
+
+# connect-python (detached module: omnibuf.connect)
+from omnibuf.connect import OmniBufConnectCodec
+codec = OmniBufConnectCodec()`;
 import { defaultTypeMappings } from '../data/typeMappings';
 
 const protobufPySnippet = `import omnibuf
@@ -323,6 +338,15 @@ const pyFaqJsonLd = {
         </div>
       </div>
     </section>
+
+    <RpcIntegration
+      heading="gRPC &amp; Connect"
+      accent="in Python."
+      summary="Separate detached modules <code>omnibuf.grpc</code> and <code>omnibuf.connect</code> integrate with <code>grpcio</code> and <code>connect-python</code> without pulling either framework into core <code>omnibuf</code>."
+      code={pyRpcCode}
+      lang="python"
+      codeLabel="omnibuf.grpc & omnibuf.connect"
+    />
 
     <section
       id="py-faq"

@@ -5,6 +5,23 @@ import Navbar from '../components/Navbar.astro';
 import LanguageStrip from '../components/LanguageStrip.astro';
 import TypeMappingTable from '../components/TypeMappingTable.astro';
 import Footer from '../components/Footer.astro';
+import RpcIntegration from '../components/RpcIntegration.astro';
+
+const dartRpcCode = `// package:grpc (separate entrypoint: package:omnibuf/grpc.dart)
+import 'package:grpc/grpc.dart';
+import 'package:omnibuf/grpc.dart';
+
+final reqCodec = OmniBufGrpcCodec<PingReq>(decode: PingReq.fromOmniBufBytes);
+final respCodec = OmniBufGrpcCodec<PingResp>(decode: PingResp.fromOmniBufBytes);
+final method = ClientMethod<PingReq, PingResp>(
+  '/acme.v1.Svc/Ping',
+  reqCodec.serialize,
+  respCodec.deserialize,
+);
+
+// Connect-Dart (separate entrypoint: package:omnibuf/connect.dart)
+import 'package:omnibuf/connect.dart';
+final connectCodec = OmniBufConnectCodec<PingReq>(decode: PingReq.fromOmniBufBytes);`;
 import { defaultTypeMappings } from '../data/typeMappings';
 
 const schemaDartSnippet = `import 'package:omnibuf/omnibuf.dart';
@@ -313,6 +330,15 @@ const dartFaqJsonLd = {
         </div>
       </div>
     </section>
+
+    <RpcIntegration
+      heading="gRPC &amp; Connect"
+      accent="in Dart."
+      summary="Detached library entrypoints <code>package:omnibuf/grpc.dart</code> and <code>package:omnibuf/connect.dart</code> plug into <code>package:grpc</code> and Connect-Dart without adding RPC dependencies to core <code>package:omnibuf/omnibuf.dart</code>."
+      code={dartRpcCode}
+      lang="dart"
+      codeLabel="omnibuf/grpc.dart & omnibuf/connect.dart"
+    />
 
     <section
       id="dart-faq"

@@ -5,6 +5,16 @@ import Navbar from '../components/Navbar.astro';
 import LanguageStrip from '../components/LanguageStrip.astro';
 import TypeMappingTable from '../components/TypeMappingTable.astro';
 import Footer from '../components/Footer.astro';
+import RpcIntegration from '../components/RpcIntegration.astro';
+
+const esRpcCode = `// @grpc/grpc-js (separate package: @omnibuf/grpc)
+import { createGrpcMethodDefinition } from '@omnibuf/grpc';
+const method = createGrpcMethodDefinition('/acme.v1.Svc/Ping', PingReqSchema, PingRespSchema);
+
+// @connectrpc/connect (separate package: @omnibuf/connect)
+import { createConnectCodec, createConnectUnaryClient } from '@omnibuf/connect';
+const codec = createConnectCodec(PingReqSchema);
+const call = createConnectUnaryClient('/acme.v1.Svc/Ping', PingReqSchema, PingRespSchema);`;
 import { defaultTypeMappings } from '../data/typeMappings';
 
 const defineMessageSnippet = `import {
@@ -416,6 +426,15 @@ const esFaqJsonLd = {
     </section>
 
     <!-- TypeScript & JS FAQ -->
+    <RpcIntegration
+      heading="gRPC &amp; Connect"
+      accent="in TypeScript."
+      summary="Two separate workspace packages (<code>@omnibuf/grpc</code> and <code>@omnibuf/connect</code>) plug OmniBuf into <code>@grpc/grpc-js</code> and <code>@connectrpc/connect</code> without adding RPC dependencies to <code>@omnibuf/core</code>."
+      code={esRpcCode}
+      lang="ts"
+      codeLabel="@omnibuf/grpc & @omnibuf/connect"
+    />
+
     <section
       id="es-faq"
       class="scroll-mt-16 py-16 sm:py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto border-t-2 border-ink/15"

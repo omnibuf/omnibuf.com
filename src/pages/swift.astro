@@ -5,6 +5,16 @@ import Navbar from '../components/Navbar.astro';
 import LanguageStrip from '../components/LanguageStrip.astro';
 import TypeMappingTable from '../components/TypeMappingTable.astro';
 import Footer from '../components/Footer.astro';
+import RpcIntegration from '../components/RpcIntegration.astro';
+
+const swiftRpcCode = `// gRPC-Swift (separate SPM product: OmniBufGRPC)
+import OmniBufGRPC
+let serializer = OmniBufGRPCSerializer<PingRequest>()
+let deserializer = OmniBufGRPCDeserializer<PingResponse>()
+
+// Connect-Swift (separate SPM product: OmniBufConnect)
+import OmniBufConnect
+let codec = OmniBufConnectCodec.compact`;
 import { defaultTypeMappings } from '../data/typeMappings';
 
 let swiftVersion = '0.1.0';
@@ -345,6 +355,15 @@ const swiftFaqJsonLd = {
         </div>
       </div>
     </section>
+
+    <RpcIntegration
+      heading="gRPC &amp; Connect"
+      accent="in Swift."
+      summary="Two separate SwiftPM products (<code>OmniBufGRPC</code> and <code>OmniBufConnect</code>) keep core <code>OmniBuf</code> zero-dependency while providing <code>Sendable</code> serializers, deserializers, and Connect codecs."
+      code={swiftRpcCode}
+      lang="swift"
+      codeLabel="OmniBufGRPC & OmniBufConnect"
+    />
 
     <section
       id="swift-faq"

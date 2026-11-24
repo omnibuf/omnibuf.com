@@ -5,6 +5,18 @@ import Navbar from '../components/Navbar.astro';
 import LanguageStrip from '../components/LanguageStrip.astro';
 import TypeMappingTable from '../components/TypeMappingTable.astro';
 import Footer from '../components/Footer.astro';
+import RpcIntegration from '../components/RpcIntegration.astro';
+
+const csRpcCode = `// Separate project: OmniBuf.Grpc (keeps core OmniBuf free of Grpc.Core.Api)
+using Grpc.Core;
+using OmniBuf.Grpc;
+
+var method = new Method<PingRequest, PingResponse>(
+    MethodType.Unary,
+    "acme.v1.Svc",
+    "Ping",
+    OmniBufGrpcMarshaller.Create<PingRequest>(),
+    OmniBufGrpcMarshaller.Create<PingResponse>());`;
 import { defaultTypeMappings } from '../data/typeMappings';
 
 const attributeCsSnippet = `using OmniBuf;
@@ -307,6 +319,15 @@ const csFaqJsonLd = {
         </div>
       </div>
     </section>
+
+    <RpcIntegration
+      heading="gRPC in C#"
+      accent="with OmniBuf.Grpc."
+      summary="The detached <code>OmniBuf.Grpc</code> library builds contextual <code>Grpc.Core.Marshaller&lt;T&gt;</code> instances for <code>Grpc.Net.Client</code> and ASP.NET Core gRPC while keeping core <code>OmniBuf</code> free of gRPC dependencies."
+      code={csRpcCode}
+      lang="csharp"
+      codeLabel="OmniBuf.Grpc"
+    />
 
     <section
       id="cs-faq"

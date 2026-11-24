@@ -5,6 +5,18 @@ import Navbar from '../components/Navbar.astro';
 import LanguageStrip from '../components/LanguageStrip.astro';
 import TypeMappingTable from '../components/TypeMappingTable.astro';
 import Footer from '../components/Footer.astro';
+import RpcIntegration from '../components/RpcIntegration.astro';
+
+const phpRpcCode = `use OmniBuf\\Grpc\\GrpcCodec;
+
+// Inside a Grpc\\BaseStub subclass (zero runtime dependency on grpc/grpc)
+$call = $this->_simpleRequest(
+    '/acme.v1.Svc/Ping',
+    $request,
+    GrpcCodec::deserialize(PingResponse::class),
+    GrpcCodec::callMetadata(),
+    ['serializer' => static fn(object $m): string => GrpcCodec::serialize($m)],
+);`;
 import { defaultTypeMappings } from '../data/typeMappings';
 
 const attributePhpSnippet = `<?php
@@ -331,6 +343,15 @@ const phpFaqJsonLd = {
         </div>
       </div>
     </section>
+
+    <RpcIntegration
+      heading="gRPC in PHP"
+      accent="with Grpc\\BaseStub."
+      summary="<code>OmniBuf\\Grpc\\GrpcCodec</code> provides serializer, deserializer, and <code>content-type</code> metadata helpers for <code>grpc/grpc</code> stubs with zero runtime dependency on <code>grpc/grpc</code>."
+      code={phpRpcCode}
+      lang="php"
+      codeLabel="OmniBuf\\Grpc\\GrpcCodec"
+    />
 
     <section
       id="php-faq"

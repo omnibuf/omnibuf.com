@@ -5,6 +5,15 @@ import Navbar from '../components/Navbar.astro';
 import Quickstart from '../components/Quickstart.astro';
 import LanguageStrip from '../components/LanguageStrip.astro';
 import Footer from '../components/Footer.astro';
+import RpcIntegration from '../components/RpcIntegration.astro';
+
+const goRpcCode = `// gRPC (separate submodule: github.com/omnibuf/omnibuf-go/omnibufgrpc)
+omnibufgrpc.Register()
+conn, _ := grpc.NewClient(addr, grpc.WithDefaultCallOptions(omnibufgrpc.CallOption()))
+
+// ConnectRPC (separate submodule: github.com/omnibuf/omnibuf-go/omnibufconnect)
+mux.Handle(greetv1connect.NewGreetServiceHandler(svc, omnibufconnect.HandlerOptions()...))
+client := greetv1connect.NewGreetServiceClient(http.DefaultClient, url, omnibufconnect.ClientOption())`;
 
 const opaqueSpliceCode = `var view pb.OpaquePeerUpdate
 _ = view.Unmarshal(pkt)
@@ -147,6 +156,15 @@ const goFaqJsonLd = {
     <Quickstart />
 
     <!-- Go FAQ -->
+    <RpcIntegration
+      heading="gRPC &amp; Connect"
+      accent="in Go."
+      summary="Two detached Go submodules (<code>omnibufgrpc</code> and <code>omnibufconnect</code>) register OmniBuf with <code>google.golang.org/grpc</code> and <code>connectrpc.com/connect</code> while keeping core <code>omnibuf-go</code> dependency-free."
+      code={goRpcCode}
+      lang="go"
+      codeLabel="omnibufgrpc & omnibufconnect"
+    />
+
     <section
       id="go-faq"
       class="scroll-mt-16 py-16 sm:py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto border-t-2 border-ink/15"

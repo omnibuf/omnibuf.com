@@ -5,6 +5,16 @@ import Navbar from '../components/Navbar.astro';
 import LanguageStrip from '../components/LanguageStrip.astro';
 import TypeMappingTable from '../components/TypeMappingTable.astro';
 import Footer from '../components/Footer.astro';
+import RpcIntegration from '../components/RpcIntegration.astro';
+
+const elixirRpcCode = `# Server endpoint (zero runtime dependency on :grpc)
+defmodule MyApp.Endpoint do
+  use GRPC.Endpoint
+  run MyApp.PingServer, codecs: [OmniBuf.GRPC.Codec, OmniBuf.GRPC.SelfDescribingCodec]
+end
+
+# Client call
+{:ok, reply} = MyApp.PingStub.ping(channel, req, codec: OmniBuf.GRPC.Codec)`;
 import { defaultTypeMappings } from '../data/typeMappings';
 
 let hexVersion = '0.1.0';
@@ -366,6 +376,15 @@ end</code></pre>
         </div>
       </div>
     </section>
+
+    <RpcIntegration
+      heading="gRPC in Elixir"
+      accent="with grpc-elixir."
+      summary="<code>OmniBuf.GRPC.Codec</code> and <code>OmniBuf.GRPC.SelfDescribingCodec</code> implement the <code>GRPC.Codec</code> callbacks for <code>grpc-elixir</code> servers and stubs without adding <code>:grpc</code> as a runtime dependency."
+      code={elixirRpcCode}
+      lang="elixir"
+      codeLabel="OmniBuf.GRPC.Codec"
+    />
 
     <section
       id="elixir-faq"
