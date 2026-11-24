@@ -1041,31 +1041,31 @@ export const phpBenchmarkCategories: BenchmarkCategory[] = [
     rows: [
       {
         name: 'OmniBuf (ext-omnibuf)',
-        val: 2731,
+        val: 802,
         sizeBytes: 365,
         highlight: true,
         baseline: true,
       },
-      { name: 'OmniBuf Attributes (ext-omnibuf)', val: 2753, sizeBytes: 366, highlight: true },
-      { name: 'JSON (stdlib)', val: 1418, sizeBytes: 803 },
+      { name: 'OmniBuf Attributes (ext-omnibuf)', val: 811, sizeBytes: 366, highlight: true },
+      { name: 'JSON (stdlib)', val: 1420, sizeBytes: 803 },
       { name: 'OmniBuf (Pure PHP Generated)', val: 4624, sizeBytes: 365, highlight: true },
       { name: 'OmniBuf (Pure PHP Attributes)', val: 12096, sizeBytes: 366, highlight: true },
-      { name: 'google/protobuf (pure PHP)', val: 87250, sizeBytes: 341 },
+      { name: 'google/protobuf (pure PHP)', val: 87188, sizeBytes: 341 },
     ],
   },
   {
     title: 'Full Message Decode Speed',
     unit: 'ns',
-    maxVal: 55000,
+    maxVal: 58000,
     methodology:
       'Decoding a binary string into a fresh PeerUpdate object and reading all 11 fields.',
     rows: [
-      { name: 'OmniBuf (ext-omnibuf)', val: 2890, highlight: true, baseline: true },
-      { name: 'OmniBuf Attributes (ext-omnibuf)', val: 2902, highlight: true },
-      { name: 'JSON (stdlib)', val: 4931 },
+      { name: 'OmniBuf (ext-omnibuf)', val: 1653, highlight: true, baseline: true },
+      { name: 'OmniBuf Attributes (ext-omnibuf)', val: 1782, highlight: true },
+      { name: 'JSON (stdlib)', val: 4287 },
       { name: 'OmniBuf (Pure PHP Generated)', val: 16441, highlight: true },
       { name: 'OmniBuf (Pure PHP Attributes)', val: 25577, highlight: true },
-      { name: 'google/protobuf (pure PHP)', val: 51102 },
+      { name: 'google/protobuf (pure PHP)', val: 54760 },
     ],
   },
   {
@@ -1074,10 +1074,10 @@ export const phpBenchmarkCategories: BenchmarkCategory[] = [
     maxVal: 52000,
     methodology: 'Reading a nested city string via OpaquePeerUpdate vs full message decode.',
     rows: [
-      { name: 'OmniBuf (ext-omnibuf)', val: 516, highlight: true, baseline: true },
-      { name: 'JSON (stdlib)', val: 3700 },
+      { name: 'OmniBuf (ext-omnibuf)', val: 513, highlight: true, baseline: true },
+      { name: 'JSON (stdlib)', val: 3692 },
       { name: 'OmniBuf (Pure PHP Generated)', val: 6033, highlight: true },
-      { name: 'google/protobuf (pure PHP)', val: 47483 },
+      { name: 'google/protobuf (pure PHP)', val: 47888 },
     ],
   },
   {
@@ -1087,10 +1087,10 @@ export const phpBenchmarkCategories: BenchmarkCategory[] = [
     methodology:
       'Checking a nested city string and splicing an updated sequence counter via OpaquePeerUpdate vs full decode and re-encode.',
     rows: [
-      { name: 'OmniBuf (ext-omnibuf)', val: 1500, highlight: true, baseline: true },
-      { name: 'JSON (stdlib)', val: 5131 },
+      { name: 'OmniBuf (ext-omnibuf)', val: 1514, highlight: true, baseline: true },
+      { name: 'JSON (stdlib)', val: 5181 },
       { name: 'OmniBuf (Pure PHP Generated)', val: 10457, highlight: true },
-      { name: 'google/protobuf (pure PHP)', val: 138241 },
+      { name: 'google/protobuf (pure PHP)', val: 137479 },
     ],
   },
   {
@@ -1102,16 +1102,16 @@ export const phpBenchmarkCategories: BenchmarkCategory[] = [
     rows: [
       {
         name: 'OmniBuf (ext-omnibuf)',
-        val: 6995,
+        val: 5359,
         sizeBytes: 39255,
         highlight: true,
         baseline: true,
       },
-      { name: 'OmniBuf Attributes (ext-omnibuf)', val: 6994, sizeBytes: 39256, highlight: true },
+      { name: 'OmniBuf Attributes (ext-omnibuf)', val: 5505, sizeBytes: 39256, highlight: true },
       { name: 'OmniBuf (Pure PHP Generated)', val: 8249, sizeBytes: 39255, highlight: true },
       { name: 'OmniBuf (Pure PHP Attributes)', val: 17603, sizeBytes: 39256, highlight: true },
-      { name: 'JSON (stdlib)', val: 23175, sizeBytes: 39681 },
-      { name: 'google/protobuf (pure PHP)', val: 1169536, sizeBytes: 39227 },
+      { name: 'JSON (stdlib)', val: 23293, sizeBytes: 39681 },
+      { name: 'google/protobuf (pure PHP)', val: 1168719, sizeBytes: 39227 },
     ],
   },
   {
@@ -1121,10 +1121,10 @@ export const phpBenchmarkCategories: BenchmarkCategory[] = [
     methodology:
       'Growing a nested string field past 16 KiB ahead of 32 trailing Neighbor entries via Opaque splicing vs full decode and re-encode.',
     rows: [
-      { name: 'OmniBuf (ext-omnibuf)', val: 4495, highlight: true, baseline: true },
+      { name: 'OmniBuf (ext-omnibuf)', val: 4432, highlight: true, baseline: true },
       { name: 'OmniBuf (Pure PHP Generated)', val: 11263, highlight: true },
-      { name: 'JSON (stdlib)', val: 31253 },
-      { name: 'google/protobuf (pure PHP)', val: 1161962 },
+      { name: 'JSON (stdlib)', val: 31683 },
+      { name: 'google/protobuf (pure PHP)', val: 1152036 },
     ],
   },
 ];
@@ -1534,7 +1534,7 @@ export const languageBenchmarks: Record<LanguageKey, LanguageBenchmarkSuite> = {
     ctaLabel: 'See full results',
     competitorsLabel: 'google/protobuf (pure PHP), JSON (C stdlib)',
     heroSummaryHtml:
-      'With the optional pure-Rust <code>ext-omnibuf</code> extension loaded, PHP decodes <strong>1.7x faster</strong> than C <code>json_decode</code>, reads nested fields <strong>7.2x faster</strong>, and encodes large 39 KiB payloads <strong>3.3x faster</strong> than <code>json_encode</code>. Without any extension installed, pure-PHP OmniBuf encodes <strong>nearly 19x faster</strong> than pure-PHP Protobuf. Explore the <a href="/php" class="doc-link">PHP runtime</a>.',
+      'With the optional pure-Rust <code>ext-omnibuf</code> extension loaded, PHP beats C stdlib JSON across all six benchmarks: encoding <strong>1.8x faster</strong>, decoding <strong>2.6x faster</strong>, and reading nested fields <strong>7.2x faster</strong>. Without any extension installed, pure-PHP OmniBuf encodes <strong>nearly 19x faster</strong> than pure-PHP Protobuf. Explore the <a href="/php" class="doc-link">PHP runtime</a>.',
     categories: phpBenchmarkCategories,
     butterflyEncodeRows: primaryAndCompetitors(phpEncodeCat.rows),
     butterflyDecodeRows: primaryAndCompetitors(phpDecodeCat.rows),
