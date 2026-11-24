@@ -216,8 +216,8 @@ Plug 'omnibuf/omnibuf-vim'`;
       id="cli"
       class="scroll-mt-16 py-10 sm:py-12 px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto border-t-2 border-ink space-y-10"
     >
-      <div class="space-y-4">
-        <div class="flex flex-wrap items-center justify-between gap-3">
+      <div class="bg-[#FAF8F2] border-2 border-ink rounded-md shadow-[4px_4px_0px_#111111] p-5 sm:p-6 space-y-4">
+        <div class="flex flex-wrap items-center justify-between gap-2">
           <div class="flex items-center gap-3.5">
             <svg
               aria-hidden="true"
@@ -245,40 +245,38 @@ Plug 'omnibuf/omnibuf-vim'`;
               />
               <path d="M52 66H76" stroke="#FAF8F2" stroke-width="8" stroke-linecap="round" />
             </svg>
-            <h2 class="text-2xl sm:text-3xl font-bold uppercase tracking-tight text-ink">CLI</h2>
+            <h2 class="text-xl sm:text-2xl font-bold tracking-tight text-ink">OmniBuf CLI</h2>
           </div>
-          <div class="flex flex-wrap gap-2.5 font-mono text-xs sm:text-sm no-print">
-            <a
-              href="https://github.com/omnibuf/omnibuf-cli"
-              target="_blank"
-              rel="noopener noreferrer"
-              class="os-btn px-3.5 py-1.5 bg-acid text-ink font-bold rounded-md"
-            >
-              GitHub &rarr;
-            </a>
-            <a
-              href="https://github.com/omnibuf/omnibuf-cli/releases"
-              target="_blank"
-              rel="noopener noreferrer"
-              class="os-btn px-3.5 py-1.5 bg-[#FAF8F2] text-ink font-bold rounded-md"
-            >
-              Releases &rarr;
-            </a>
-          </div>
+          <code class="text-xs font-mono text-ink/65">omnibuf/omnibuf-cli</code>
         </div>
 
-        <div class="p-4 sm:p-5 bg-ink text-paper rounded-md font-mono text-xs sm:text-sm overflow-x-auto leading-relaxed border-2 border-ink shadow-[4px_4px_0px_#111111] [&>pre]:bg-transparent! [&>pre]:p-0! [&>pre]:m-0! [&>pre]:border-0!">
-          <div class="flex items-center justify-between gap-2 mb-2.5 pb-2 border-b border-paper/15">
-            <div class="text-xs font-bold uppercase text-acid">Install omnibuf</div>
-            <button
-              type="button"
-              data-copy="brew install omnibuf/tap/omnibuf"
-              class="copy-snippet-btn min-w-[4.75rem] text-center px-2.5 py-1 text-xs font-bold uppercase bg-paper/15 hover:bg-acid hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-acid text-paper border border-paper/30 rounded shrink-0 transition"
-            >
-              Copy brew
-            </button>
-          </div>
+        <p class="text-sm sm:text-base text-ink/85 leading-relaxed">
+          Standalone command-line binary for decoding raw <code>.obuf</code> packets to JSON,
+          querying fields with built-in <code>jq</code> filters, and encoding JSON back to wire
+          bytes with or without a <code>FileDescriptorSet</code> schema.
+        </p>
+
+        <div class="p-3.5 bg-ink text-paper rounded font-mono text-xs sm:text-sm overflow-x-auto leading-relaxed border-2 border-ink [&>pre]:bg-transparent! [&>pre]:p-0! [&>pre]:m-0! [&>pre]:border-0!">
           <Code code={installCommands} lang="sh" theme="github-dark" />
+        </div>
+
+        <div class="flex flex-wrap gap-3 font-mono text-xs sm:text-sm pt-1 no-print">
+          <a
+            href="https://github.com/omnibuf/omnibuf-cli"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="os-btn px-4 py-2 bg-acid text-ink font-bold rounded-md"
+          >
+            GitHub Repository &rarr;
+          </a>
+          <a
+            href="https://github.com/omnibuf/omnibuf-cli/releases"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="os-btn px-4 py-2 bg-[#FAF8F2] text-ink font-bold rounded-md"
+          >
+            Release Binaries &rarr;
+          </a>
         </div>
       </div>
 
