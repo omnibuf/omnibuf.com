@@ -171,12 +171,12 @@ omnibuf decode --schema descriptors.pb --type demo.v1.PeerUpdate packet.obuf`;
               Query packets with jq filters.
             </h2>
             <p class="text-base sm:text-lg text-ink/90 leading-relaxed max-w-[60ch]">
-              Pass a <code>jq</code> filter expression as the first argument (or via{' '}
-              <code>-q</code> / <code>--query</code> or <code>-f</code> / <code>--filter</code>) to
-              slice, select, or reshape decoded fields in a single command. Flags such as{' '}
-              <code>-r</code> (raw string output) and <code>-c</code> (compact single-line JSON)
-              work the same way as <code>jq</code>. Hex (<code>-x</code>), base64 (<code>-b</code>),
-              and explicit file paths (<code>-i</code> / <code>--input</code> and <code>-o</code> /{' '}
+              Pass a <code>jq</code> filter expression as the first argument (or via <code>-q</code>{' '}
+              / <code>--query</code> or <code>-f</code> / <code>--filter</code>) to slice, select,
+              or reshape decoded fields in a single command. Flags such as <code>-r</code> (raw
+              string output) and <code>-c</code> (compact single-line JSON) work the same way as{' '}
+              <code>jq</code>. Hex (<code>-x</code>), base64 (<code>-b</code>), and explicit file
+              paths (<code>-i</code> / <code>--input</code> and <code>-o</code> /{' '}
               <code>--output</code>) are supported directly.
             </p>
           </div>
