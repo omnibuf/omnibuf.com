@@ -87,14 +87,11 @@ Plug 'omnibuf/omnibuf-vim'`;
       </div>
 
       <!-- VS Code -->
-      <div id="vscode" class="scroll-mt-16 os-window overflow-hidden">
-        <div class="os-titlebar bg-[#E5E0D5]">
-          <span class="font-bold uppercase text-ink text-xs font-mono">
-            Visual Studio Code &middot; omnibuf.omnibuf-vscode
-          </span>
-          <div class="os-stripes"></div>
-        </div>
-        <div class="p-5 sm:p-6 bg-[#FAF8F2] space-y-4">
+      <div
+        id="vscode"
+        class="scroll-mt-16 bg-[#FAF8F2] border-2 border-ink rounded-md shadow-[4px_4px_0px_#111111] p-5 sm:p-6 space-y-4"
+      >
+        <div class="flex flex-wrap items-center justify-between gap-2">
           <div class="flex items-center gap-3.5">
             <svg
               aria-hidden="true"
@@ -125,56 +122,54 @@ Plug 'omnibuf/omnibuf-vim'`;
               Visual Studio Code
             </h3>
           </div>
+          <code class="text-xs font-mono text-ink/65">omnibuf.omnibuf-vscode</code>
+        </div>
 
-          <p class="text-sm sm:text-base text-ink/85 leading-relaxed">
-            Custom editor for <code>*.obuf</code> files with syntax-highlighted JSON editing, Split
-            and 16-byte Hex views, live reload on disk changes, and optional{' '}
-            <code>FileDescriptorSet</code> schema settings. Invalid JSON blocks save so the
-            underlying binary file stays intact.
-          </p>
+        <p class="text-sm sm:text-base text-ink/85 leading-relaxed">
+          Custom editor for <code>*.obuf</code> files with syntax-highlighted JSON editing, Split
+          and 16-byte Hex views, live reload on disk changes, and optional{' '}
+          <code>FileDescriptorSet</code> schema settings. Invalid JSON blocks save so the underlying
+          binary file stays intact.
+        </p>
 
-          <div class="p-3.5 bg-ink text-paper rounded font-mono text-xs sm:text-sm overflow-x-auto border-2 border-ink [&>pre]:bg-transparent! [&>pre]:p-0! [&>pre]:m-0! [&>pre]:border-0!">
-            <Code code={vscodeInstallSnippet} lang="sh" theme="github-dark" />
-          </div>
+        <div class="p-3.5 bg-ink text-paper rounded font-mono text-xs sm:text-sm overflow-x-auto border-2 border-ink [&>pre]:bg-transparent! [&>pre]:p-0! [&>pre]:m-0! [&>pre]:border-0!">
+          <Code code={vscodeInstallSnippet} lang="sh" theme="github-dark" />
+        </div>
 
-          <div class="flex flex-wrap gap-3 font-mono text-xs sm:text-sm pt-1 no-print">
-            <a
-              href="https://marketplace.visualstudio.com/items?itemName=omnibuf.omnibuf-vscode"
-              target="_blank"
-              rel="noopener noreferrer"
-              class="os-btn px-4 py-2 bg-acid text-ink font-bold rounded-md"
-            >
-              VS Code Marketplace &rarr;
-            </a>
-            <a
-              href="https://open-vsx.org/extension/omnibuf/omnibuf-vscode"
-              target="_blank"
-              rel="noopener noreferrer"
-              class="os-btn px-4 py-2 bg-[#FAF8F2] text-ink font-bold rounded-md"
-            >
-              Open VSX &rarr;
-            </a>
-            <a
-              href="https://github.com/omnibuf/omnibuf-vscode"
-              target="_blank"
-              rel="noopener noreferrer"
-              class="os-btn px-4 py-2 bg-[#FAF8F2] text-ink font-bold rounded-md"
-            >
-              GitHub &rarr;
-            </a>
-          </div>
+        <div class="flex flex-wrap gap-3 font-mono text-xs sm:text-sm pt-1 no-print">
+          <a
+            href="https://marketplace.visualstudio.com/items?itemName=omnibuf.omnibuf-vscode"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="os-btn px-4 py-2 bg-acid text-ink font-bold rounded-md"
+          >
+            VS Code Marketplace &rarr;
+          </a>
+          <a
+            href="https://open-vsx.org/extension/omnibuf/omnibuf-vscode"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="os-btn px-4 py-2 bg-[#FAF8F2] text-ink font-bold rounded-md"
+          >
+            Open VSX &rarr;
+          </a>
+          <a
+            href="https://github.com/omnibuf/omnibuf-vscode"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="os-btn px-4 py-2 bg-[#FAF8F2] text-ink font-bold rounded-md"
+          >
+            GitHub &rarr;
+          </a>
         </div>
       </div>
 
       <!-- Neovim / Vim -->
-      <div id="neovim" class="scroll-mt-16 os-window overflow-hidden">
-        <div class="os-titlebar bg-[#E5E0D5]">
-          <span class="font-bold uppercase text-ink text-xs font-mono">
-            Neovim &amp; Vim &middot; omnibuf/omnibuf-vim
-          </span>
-          <div class="os-stripes"></div>
-        </div>
-        <div class="p-5 sm:p-6 bg-[#FAF8F2] space-y-4">
+      <div
+        id="neovim"
+        class="scroll-mt-16 bg-[#FAF8F2] border-2 border-ink rounded-md shadow-[4px_4px_0px_#111111] p-5 sm:p-6 space-y-4"
+      >
+        <div class="flex flex-wrap items-center justify-between gap-2">
           <div class="flex items-center gap-3.5">
             <svg
               aria-hidden="true"
@@ -190,28 +185,28 @@ Plug 'omnibuf/omnibuf-vim'`;
             </svg>
             <h3 class="text-xl sm:text-2xl font-bold tracking-tight text-ink">Neovim / Vim</h3>
           </div>
+          <code class="text-xs font-mono text-ink/65">omnibuf/omnibuf-vim</code>
+        </div>
 
-          <p class="text-sm sm:text-base text-ink/85 leading-relaxed">
-            <code>BufReadCmd</code> / <code>BufWriteCmd</code> plugin for <code>*.obuf</code>{' '}
-            buffers with atomic write-back, companion hex split view (<code>:OmnibufSplit</code>),
-            hex toggle (<code>:OmnibufHex</code>), and per-buffer schema switching (
-            <code>:OmnibufSchema</code>).
-          </p>
+        <p class="text-sm sm:text-base text-ink/85 leading-relaxed">
+          <code>BufReadCmd</code> / <code>BufWriteCmd</code> plugin for <code>*.obuf</code> buffers
+          with atomic write-back, companion hex split view (<code>:OmnibufSplit</code>), hex toggle
+          (<code>:OmnibufHex</code>), and per-buffer schema switching (<code>:OmnibufSchema</code>).
+        </p>
 
-          <div class="p-3.5 bg-ink text-paper rounded font-mono text-xs sm:text-sm overflow-x-auto border-2 border-ink [&>pre]:bg-transparent! [&>pre]:p-0! [&>pre]:m-0! [&>pre]:border-0!">
-            <Code code={neovimInstallSnippet} lang="lua" theme="github-dark" />
-          </div>
+        <div class="p-3.5 bg-ink text-paper rounded font-mono text-xs sm:text-sm overflow-x-auto border-2 border-ink [&>pre]:bg-transparent! [&>pre]:p-0! [&>pre]:m-0! [&>pre]:border-0!">
+          <Code code={neovimInstallSnippet} lang="lua" theme="github-dark" />
+        </div>
 
-          <div class="flex flex-wrap gap-3 font-mono text-xs sm:text-sm pt-1 no-print">
-            <a
-              href="https://github.com/omnibuf/omnibuf-vim"
-              target="_blank"
-              rel="noopener noreferrer"
-              class="os-btn px-4 py-2 bg-acid text-ink font-bold rounded-md"
-            >
-              GitHub Repository &rarr;
-            </a>
-          </div>
+        <div class="flex flex-wrap gap-3 font-mono text-xs sm:text-sm pt-1 no-print">
+          <a
+            href="https://github.com/omnibuf/omnibuf-vim"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="os-btn px-4 py-2 bg-acid text-ink font-bold rounded-md"
+          >
+            GitHub Repository &rarr;
+          </a>
         </div>
       </div>
     </section>
@@ -296,38 +291,32 @@ Plug 'omnibuf/omnibuf-vim'`;
         <p class="text-base text-ink/90 leading-relaxed">
           Protobuf collapses strings, byte slices, sub-messages, maps, and packed arrays into one wire type, and shares a single varint wire type across booleans, signed integers, and unsigned integers. Inspecting a raw Protobuf packet with <a href="https://github.com/protocolbuffers/protoscope" target="_blank" rel="noopener noreferrer" class="doc-link"><code>protoscope</code></a> leaves you guessing what each field means. OmniBuf carries an explicit 4-bit wire type on every field, plus element types on arrays and maps. Running <code>omnibuf</code> prints the exact booleans, signed numbers, UTF-8 strings, arrays, and maps on the wire. Packets encoded with <strong>Field #0</strong> also decode with their original field names.
         </p>
-        <div class="os-window overflow-hidden font-mono text-xs sm:text-sm">
-          <div class="os-titlebar bg-[#E5E0D5]">
-            <span class="font-bold uppercase text-ink text-xs">protoscope vs. omnibuf cli</span>
-            <div class="os-stripes"></div>
-          </div>
-          <div class="bg-ink text-paper p-4 space-y-3">
-            <div class="bg-[#1F1F1F] p-3 rounded border border-paper/15">
-              <div class="flex flex-wrap items-center justify-between gap-2 mb-1.5">
-                <span class="text-xs font-bold text-[#FF4F18]">$ protoscope packet.pb</span>
-                <span class="text-[11px] text-paper/55">Protobuf &middot; guesses types</span>
-              </div>
-              <pre class="leading-relaxed overflow-x-auto"><code><span class="text-[#FF4F18] font-bold">1:</span> 1          <span class="text-paper/55"># bool / uint / sint / enum?</span>
+        <div class="border-2 border-ink rounded-md shadow-[4px_4px_0px_#111111] overflow-hidden font-mono text-xs sm:text-sm bg-ink text-paper p-4 space-y-3">
+          <div class="bg-[#1F1F1F] p-3 rounded border border-paper/15">
+            <div class="flex flex-wrap items-center justify-between gap-2 mb-1.5">
+              <span class="text-xs font-bold text-[#FF4F18]">$ protoscope packet.pb</span>
+              <span class="text-[11px] text-paper/55">Protobuf &middot; guesses types</span>
+            </div>
+            <pre class="leading-relaxed overflow-x-auto"><code><span class="text-[#FF4F18] font-bold">1:</span> 1          <span class="text-paper/55"># bool / uint / sint / enum?</span>
 <span class="text-[#FF4F18] font-bold">2:</span> 3          <span class="text-paper/55"># +3 uint or -2 sint?</span>
 <span class="text-[#FF4F18] font-bold">3:</span> &#123;<span class="text-acid">"FRA"</span>&#125;    <span class="text-paper/55"># string / bytes / sub-msg?</span>
 <span class="text-[#FF4F18] font-bold">4:</span> <span class="text-acid">"\x0a\x14"</span> <span class="text-paper/55"># bytes / string / packed array?</span></code></pre>
+          </div>
+          <div class="bg-[#1F1F1F] p-3 rounded border border-paper/25">
+            <div class="flex flex-wrap items-center justify-between gap-2 mb-1.5">
+              <span class="text-xs font-bold text-acid">$ omnibuf -c packet.obuf</span>
+              <span class="text-[11px] text-paper/65">OmniBuf &middot; actual values</span>
             </div>
-            <div class="bg-[#1F1F1F] p-3 rounded border border-paper/25">
-              <div class="flex flex-wrap items-center justify-between gap-2 mb-1.5">
-                <span class="text-xs font-bold text-acid">$ omnibuf -c packet.obuf</span>
-                <span class="text-[11px] text-paper/65">OmniBuf &middot; actual values</span>
-              </div>
-              <pre class="leading-relaxed overflow-x-auto"><code>&#123;<span class="text-acid font-bold">"field_1"</span>: <span class="text-[#FF4F18] font-bold">true</span>, <span class="text-acid font-bold">"field_2"</span>: -2, <span class="text-acid font-bold">"field_3"</span>: <span class="text-acid">"FRA"</span>, <span class="text-acid font-bold">"field_4"</span>: [10, 20]&#125;</code></pre>
+            <pre class="leading-relaxed overflow-x-auto"><code>&#123;<span class="text-acid font-bold">"field_1"</span>: <span class="text-[#FF4F18] font-bold">true</span>, <span class="text-acid font-bold">"field_2"</span>: -2, <span class="text-acid font-bold">"field_3"</span>: <span class="text-acid">"FRA"</span>, <span class="text-acid font-bold">"field_4"</span>: [10, 20]&#125;</code></pre>
+          </div>
+          <div class="bg-[#1F1F1F] p-3 rounded border border-acid/45">
+            <div class="flex flex-wrap items-center justify-between gap-2 mb-1.5">
+              <span class="text-xs font-bold text-acid">$ omnibuf -c packet-field0.obuf</span>
+              <span class="text-[11px] text-acid/85">
+                OmniBuf + Field #0 &middot; actual values &amp; names
+              </span>
             </div>
-            <div class="bg-[#1F1F1F] p-3 rounded border border-acid/45">
-              <div class="flex flex-wrap items-center justify-between gap-2 mb-1.5">
-                <span class="text-xs font-bold text-acid">$ omnibuf -c packet-field0.obuf</span>
-                <span class="text-[11px] text-acid/85">
-                  OmniBuf + Field #0 &middot; actual values &amp; names
-                </span>
-              </div>
-              <pre class="leading-relaxed overflow-x-auto"><code>&#123;<span class="text-acid font-bold">"active"</span>: <span class="text-[#FF4F18] font-bold">true</span>, <span class="text-acid font-bold">"delta"</span>: -2, <span class="text-acid font-bold">"city"</span>: <span class="text-acid">"FRA"</span>, <span class="text-acid font-bold">"peers"</span>: [10, 20]&#125;</code></pre>
-            </div>
+            <pre class="leading-relaxed overflow-x-auto"><code>&#123;<span class="text-acid font-bold">"active"</span>: <span class="text-[#FF4F18] font-bold">true</span>, <span class="text-acid font-bold">"delta"</span>: -2, <span class="text-acid font-bold">"city"</span>: <span class="text-acid">"FRA"</span>, <span class="text-acid font-bold">"peers"</span>: [10, 20]&#125;</code></pre>
           </div>
         </div>
       </div>
@@ -344,14 +333,8 @@ Plug 'omnibuf/omnibuf-vim'`;
           (<code>-i</code> / <code>--input</code> and <code>-o</code> / <code>--output</code>) are
           supported directly.
         </p>
-        <div class="os-window overflow-hidden font-mono text-xs sm:text-sm">
-          <div class="os-titlebar bg-[#E5E0D5]">
-            <span class="font-bold uppercase text-ink text-xs">jq filter expressions</span>
-            <div class="os-stripes"></div>
-          </div>
-          <div class="bg-ink text-paper p-4 [&>pre]:bg-transparent! [&>pre]:p-0! [&>pre]:m-0! [&>pre]:border-0! [&>pre]:leading-relaxed [&>pre]:overflow-x-auto">
-            <Code code={jqFilterSnippet} lang="sh" theme="github-dark" />
-          </div>
+        <div class="border-2 border-ink rounded-md shadow-[4px_4px_0px_#111111] overflow-hidden font-mono text-xs sm:text-sm bg-ink text-paper p-4 [&>pre]:bg-transparent! [&>pre]:p-0! [&>pre]:m-0! [&>pre]:border-0! [&>pre]:leading-relaxed [&>pre]:overflow-x-auto">
+          <Code code={jqFilterSnippet} lang="sh" theme="github-dark" />
         </div>
       </div>
 
@@ -372,14 +355,8 @@ Plug 'omnibuf/omnibuf-vim'`;
           <code>--max-schema-bytes</code> (default 64 MiB) to cap descriptor file and decompressed
           size.
         </p>
-        <div class="os-window overflow-hidden font-mono text-xs sm:text-sm">
-          <div class="os-titlebar bg-[#E5E0D5]">
-            <span class="font-bold uppercase text-ink text-xs">json &harr; omnibuf</span>
-            <div class="os-stripes"></div>
-          </div>
-          <div class="bg-ink text-paper p-4 [&>pre]:bg-transparent! [&>pre]:p-0! [&>pre]:m-0! [&>pre]:border-0! [&>pre]:leading-relaxed [&>pre]:overflow-x-auto">
-            <Code code={encodeSnippet} lang="sh" theme="github-dark" />
-          </div>
+        <div class="border-2 border-ink rounded-md shadow-[4px_4px_0px_#111111] overflow-hidden font-mono text-xs sm:text-sm bg-ink text-paper p-4 [&>pre]:bg-transparent! [&>pre]:p-0! [&>pre]:m-0! [&>pre]:border-0! [&>pre]:leading-relaxed [&>pre]:overflow-x-auto">
+          <Code code={encodeSnippet} lang="sh" theme="github-dark" />
         </div>
       </div>
 
@@ -397,13 +374,7 @@ Plug 'omnibuf/omnibuf-vim'`;
           names. Pass <code>--schema descriptors.pb --type pkg.Msg</code> for exact{' '}
           <code>.proto</code> field numbers, 32-bit floats, fixed-width integers, enums, and maps.
         </p>
-        <div class="os-window overflow-hidden">
-          <div class="os-titlebar bg-[#E5E0D5]">
-            <span class="font-bold uppercase text-ink text-xs font-mono">
-              json literal &rarr; omnibuf wire type (no --schema)
-            </span>
-            <div class="os-stripes"></div>
-          </div>
+        <div class="border-2 border-ink rounded-md shadow-[4px_4px_0px_#111111] overflow-hidden">
           <div class="overflow-x-auto bg-[#FAF8F2]">
             <table class="w-full text-left border-collapse font-mono text-xs sm:text-sm">
               <thead>
