@@ -62,7 +62,7 @@ const phpFaqItems = [
     id: 'php-faq-ext',
     question: 'Does omnibuf/omnibuf require a PECL or C extension?',
     paragraphs: [
-      'No. Pure PHP 8.3+ (64-bit) works out of the box anywhere Composer runs, encoding around 18x faster than pure-PHP <code>google/protobuf</code>. An optional Rust-backed <code>ext-omnibuf</code> PHP extension is included in <code>ext/</code> and detected automatically when loaded, beating Google&apos;s C <code>ext-protobuf</code> across all six benchmarks.',
+      'No. Pure PHP 8.3+ (64-bit) works out of the box anywhere Composer runs, encoding around 19x faster than pure-PHP <code>google/protobuf</code>. An optional pure-Rust <code>ext-omnibuf</code> extension (<code>ext-php-rs</code>) is included in <code>ext/rust</code> and detected automatically when loaded, accelerating encode, decode, opaque views, splicing, and blind decode.',
     ],
   },
   {

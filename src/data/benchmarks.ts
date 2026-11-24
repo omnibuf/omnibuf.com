@@ -1037,20 +1037,20 @@ export const phpBenchmarkCategories: BenchmarkCategory[] = [
     unit: 'ns',
     maxVal: 95000,
     methodology:
-      'Serializing PeerUpdate into a PHP binary string on PHP 8.6 across ext-omnibuf (Rust), pure-PHP OmniBuf, PECL ext-protobuf (C upb), pure-PHP google/protobuf, and stdlib JSON.',
+      'Serializing PeerUpdate into a PHP binary string on PHP 8.6 via the public PHP APIs (marshalOmnibuf / OmniBuf::marshal) with the optional 100% Rust ext-omnibuf extension, pure-PHP OmniBuf, pure-PHP google/protobuf, and stdlib JSON.',
     rows: [
       {
         name: 'OmniBuf (ext-omnibuf)',
-        val: 313,
+        val: 2731,
         sizeBytes: 365,
         highlight: true,
         baseline: true,
       },
-      { name: 'google/protobuf (C ext)', val: 433, sizeBytes: 341 },
-      { name: 'JSON (stdlib)', val: 1427, sizeBytes: 803 },
-      { name: 'OmniBuf (Generated)', val: 4638, sizeBytes: 365, highlight: true },
-      { name: 'OmniBuf (Attributes)', val: 11166, sizeBytes: 365, highlight: true },
-      { name: 'google/protobuf (pure PHP)', val: 88290, sizeBytes: 341 },
+      { name: 'OmniBuf Attributes (ext-omnibuf)', val: 2753, sizeBytes: 366, highlight: true },
+      { name: 'JSON (stdlib)', val: 1418, sizeBytes: 803 },
+      { name: 'OmniBuf (Pure PHP Generated)', val: 4624, sizeBytes: 365, highlight: true },
+      { name: 'OmniBuf (Pure PHP Attributes)', val: 12096, sizeBytes: 366, highlight: true },
+      { name: 'google/protobuf (pure PHP)', val: 87250, sizeBytes: 341 },
     ],
   },
   {
@@ -1060,12 +1060,12 @@ export const phpBenchmarkCategories: BenchmarkCategory[] = [
     methodology:
       'Decoding a binary string into a fresh PeerUpdate object and reading all 11 fields.',
     rows: [
-      { name: 'OmniBuf (ext-omnibuf)', val: 1002, highlight: true, baseline: true },
-      { name: 'google/protobuf (C ext)', val: 3720 },
-      { name: 'JSON (stdlib)', val: 4383 },
-      { name: 'OmniBuf (Generated)', val: 16274, highlight: true },
-      { name: 'OmniBuf (Attributes)', val: 26207, highlight: true },
-      { name: 'google/protobuf (pure PHP)', val: 55913 },
+      { name: 'OmniBuf (ext-omnibuf)', val: 2890, highlight: true, baseline: true },
+      { name: 'OmniBuf Attributes (ext-omnibuf)', val: 2902, highlight: true },
+      { name: 'JSON (stdlib)', val: 4931 },
+      { name: 'OmniBuf (Pure PHP Generated)', val: 16441, highlight: true },
+      { name: 'OmniBuf (Pure PHP Attributes)', val: 25577, highlight: true },
+      { name: 'google/protobuf (pure PHP)', val: 51102 },
     ],
   },
   {
@@ -1074,11 +1074,10 @@ export const phpBenchmarkCategories: BenchmarkCategory[] = [
     maxVal: 52000,
     methodology: 'Reading a nested city string via OpaquePeerUpdate vs full message decode.',
     rows: [
-      { name: 'OmniBuf (ext-omnibuf)', val: 175, highlight: true, baseline: true },
-      { name: 'google/protobuf (C ext)', val: 999 },
-      { name: 'JSON (stdlib)', val: 3723 },
-      { name: 'OmniBuf (Generated)', val: 5788, highlight: true },
-      { name: 'google/protobuf (pure PHP)', val: 47764 },
+      { name: 'OmniBuf (ext-omnibuf)', val: 516, highlight: true, baseline: true },
+      { name: 'JSON (stdlib)', val: 3700 },
+      { name: 'OmniBuf (Pure PHP Generated)', val: 6033, highlight: true },
+      { name: 'google/protobuf (pure PHP)', val: 47483 },
     ],
   },
   {
@@ -1088,11 +1087,10 @@ export const phpBenchmarkCategories: BenchmarkCategory[] = [
     methodology:
       'Checking a nested city string and splicing an updated sequence counter via OpaquePeerUpdate vs full decode and re-encode.',
     rows: [
-      { name: 'OmniBuf (ext-omnibuf)', val: 505, highlight: true, baseline: true },
-      { name: 'google/protobuf (C ext)', val: 1515 },
-      { name: 'JSON (stdlib)', val: 5229 },
-      { name: 'OmniBuf (Generated)', val: 10075, highlight: true },
-      { name: 'google/protobuf (pure PHP)', val: 138642 },
+      { name: 'OmniBuf (ext-omnibuf)', val: 1500, highlight: true, baseline: true },
+      { name: 'JSON (stdlib)', val: 5131 },
+      { name: 'OmniBuf (Pure PHP Generated)', val: 10457, highlight: true },
+      { name: 'google/protobuf (pure PHP)', val: 138241 },
     ],
   },
   {
@@ -1100,20 +1098,20 @@ export const phpBenchmarkCategories: BenchmarkCategory[] = [
     unit: 'ns',
     maxVal: 1280000,
     methodology:
-      'Serializing a 39 KiB packet whose >16 KiB nested sub-messages trigger 4-byte container length pre-sizing directly into a pre-allocated zend_string.',
+      'Serializing a 39 KiB packet whose >16 KiB nested sub-messages trigger 4-byte container length backpatching.',
     rows: [
       {
         name: 'OmniBuf (ext-omnibuf)',
-        val: 853,
+        val: 6995,
         sizeBytes: 39255,
         highlight: true,
         baseline: true,
       },
-      { name: 'google/protobuf (C ext)', val: 2195, sizeBytes: 39227 },
-      { name: 'OmniBuf (Generated)', val: 8968, sizeBytes: 39255, highlight: true },
-      { name: 'OmniBuf (Attributes)', val: 17380, sizeBytes: 39255, highlight: true },
-      { name: 'JSON (stdlib)', val: 24784, sizeBytes: 39681 },
-      { name: 'google/protobuf (pure PHP)', val: 1177080, sizeBytes: 39227 },
+      { name: 'OmniBuf Attributes (ext-omnibuf)', val: 6994, sizeBytes: 39256, highlight: true },
+      { name: 'OmniBuf (Pure PHP Generated)', val: 8249, sizeBytes: 39255, highlight: true },
+      { name: 'OmniBuf (Pure PHP Attributes)', val: 17603, sizeBytes: 39256, highlight: true },
+      { name: 'JSON (stdlib)', val: 23175, sizeBytes: 39681 },
+      { name: 'google/protobuf (pure PHP)', val: 1169536, sizeBytes: 39227 },
     ],
   },
   {
@@ -1123,11 +1121,10 @@ export const phpBenchmarkCategories: BenchmarkCategory[] = [
     methodology:
       'Growing a nested string field past 16 KiB ahead of 32 trailing Neighbor entries via Opaque splicing vs full decode and re-encode.',
     rows: [
-      { name: 'OmniBuf (ext-omnibuf)', val: 2033, highlight: true, baseline: true },
-      { name: 'google/protobuf (C ext)', val: 6270 },
-      { name: 'OmniBuf (Generated)', val: 10354, highlight: true },
-      { name: 'JSON (stdlib)', val: 31112 },
-      { name: 'google/protobuf (pure PHP)', val: 1157604 },
+      { name: 'OmniBuf (ext-omnibuf)', val: 4495, highlight: true, baseline: true },
+      { name: 'OmniBuf (Pure PHP Generated)', val: 11263, highlight: true },
+      { name: 'JSON (stdlib)', val: 31253 },
+      { name: 'google/protobuf (pure PHP)', val: 1161962 },
     ],
   },
 ];
@@ -1532,22 +1529,22 @@ export const languageBenchmarks: Record<LanguageKey, LanguageBenchmarkSuite> = {
     shortLabel: 'PHP',
     headingPrefix: 'PHP',
     subtitleHtml:
-      '11-field <code>PeerUpdate</code> workload on PHP 8.6 (Apple M1 Pro) across optional <code>ext-omnibuf</code> (Rust), pure-PHP <code>omnibuf/omnibuf</code>, PECL <code>ext-protobuf</code> (C <code>upb</code>), pure-PHP <code>google/protobuf</code>, and C-backed <code>json_encode</code> / <code>json_decode</code>. <strong>Shorter bars = Faster.</strong>',
+      '11-field <code>PeerUpdate</code> workload on PHP 8.6 (Apple M1 Pro) across the optional pure-Rust <code>ext-omnibuf</code> extension (<code>ext-php-rs</code>), pure-PHP <code>omnibuf/omnibuf</code>, pure-PHP <code>google/protobuf</code>, and C-backed <code>json_encode</code> / <code>json_decode</code>. <strong>Shorter bars = Faster.</strong>',
     href: '/benchmarks?lang=php',
     ctaLabel: 'See full results',
-    competitorsLabel: 'google/protobuf (C ext & pure PHP), JSON (C stdlib)',
+    competitorsLabel: 'google/protobuf (pure PHP), JSON (C stdlib)',
     heroSummaryHtml:
-      'With the optional Rust-backed <code>ext-omnibuf</code> extension, PHP beats Google&apos;s C <code>ext-protobuf</code> across all six benchmarks, encoding large 39 KiB messages <strong>over 2x faster</strong>, decoding <strong>nearly 4x faster</strong>, and reading nested fields <strong>over 5x faster</strong>. Without any extension installed, pure-PHP OmniBuf runs <strong>about 19x faster</strong> than pure-PHP Protobuf. Explore the <a href="/php" class="doc-link">PHP runtime</a>.',
+      'With the optional pure-Rust <code>ext-omnibuf</code> extension loaded, PHP decodes <strong>1.7x faster</strong> than C <code>json_decode</code>, reads nested fields <strong>7.2x faster</strong>, and encodes large 39 KiB payloads <strong>3.3x faster</strong> than <code>json_encode</code>. Without any extension installed, pure-PHP OmniBuf encodes <strong>nearly 19x faster</strong> than pure-PHP Protobuf. Explore the <a href="/php" class="doc-link">PHP runtime</a>.',
     categories: phpBenchmarkCategories,
     butterflyEncodeRows: primaryAndCompetitors(phpEncodeCat.rows),
     butterflyDecodeRows: primaryAndCompetitors(phpDecodeCat.rows),
     hardwareLines: [
       'CPU: Apple M1 Pro (darwin/arm64)',
-      'Runtime: PHP 8.6.0 (ext-omnibuf + pure PHP + ext-protobuf)',
-      'Command: PROTOBUF_EXT=.../protobuf.so php -d extension=ext/modules/omnibuf.so benchmarks/bench.php',
+      'Runtime: PHP 8.6.0 (ext-omnibuf Rust + pure PHP)',
+      'Command: php -d extension=ext/modules/omnibuf.so benchmarks/bench.php',
     ],
     environmentParagraphs: [
-      'Measured on PHP 8.6.0 on an Apple M1 Pro Mac. Both native extensions (<code>ext-omnibuf</code> backed by <code>omnibuf-rs</code> and PECL <code>ext-protobuf</code> backed by C <code>upb</code>) are shown alongside pure-PHP <code>omnibuf/omnibuf</code>, pure-PHP <code>google/protobuf</code>, and C stdlib <code>json_encode</code> / <code>json_decode</code>.',
+      'Measured on PHP 8.6.0 on an Apple M1 Pro Mac through the public PHP APIs (<code>marshalOmnibuf</code>, <code>OmniBuf::marshal</code>, and <code>OpaquePeerUpdate</code>) with the optional 100% Rust <code>ext-omnibuf</code> extension (<code>ext-php-rs</code>) alongside pure-PHP <code>omnibuf/omnibuf</code>, pure-PHP <code>google/protobuf</code>, and C stdlib <code>json_encode</code> / <code>json_decode</code>.',
       'Benchmark source lives in <a href="https://github.com/omnibuf/omnibuf-php/blob/main/benchmarks/bench.php" target="_blank" rel="noopener noreferrer" class="doc-link font-mono">benchmarks/bench.php</a>, with recorded output in <a href="https://github.com/omnibuf/omnibuf-php/blob/main/testdata/benchmarks.json" target="_blank" rel="noopener noreferrer" class="doc-link font-mono">testdata/benchmarks.json</a>.',
     ],
   },
