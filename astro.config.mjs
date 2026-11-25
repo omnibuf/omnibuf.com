@@ -1,4 +1,4 @@
-import { copyFile, readdir, readFile, writeFile } from 'node:fs/promises';
+import { access, copyFile, readdir, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import sitemap from '@astrojs/sitemap';
@@ -268,6 +268,14 @@ function checkInternalLinksAndAnchors() {
 
             const targetIds = pageIds.get(targetRoute);
             if (!targetIds) {
+              const staticFilePath = path.join(distDir, targetRoute.replace(/^\/+/, ''));
+              const staticExists = await access(staticFilePath).then(
+                () => true,
+                () => false,
+              );
+              if (staticExists && !hash) {
+                continue;
+              }
               broken.push(
                 `${sourceRoute}: broken page link href="${href}" (missing route ${targetRoute})`,
               );
