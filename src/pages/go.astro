@@ -59,9 +59,9 @@ const goFaqItems = [
   },
   {
     id: 'go-faq-plugin',
-    question: 'Do I need protoc-gen-omnibuf?',
+    question: 'Do I need protoc-gen-omnibuf-go?',
     paragraphs: [
-      'Code generation is optional. Core <code>omnibuf.Marshal</code> and <code>omnibuf.Unmarshal</code> serialize tagged Go structs with zero external dependencies, while the separate <code>omnibufproto</code> submodule handles standard <code>.pb.go</code> messages via <code>protoreflect</code>. Adding <code>protoc-gen-omnibuf</code> compiles single-pass struct methods and lazy <code>Opaque</code> packet views.',
+      'Code generation is optional. Core <code>omnibuf.Marshal</code> and <code>omnibuf.Unmarshal</code> serialize tagged Go structs with zero external dependencies, while the separate <code>omnibufproto</code> submodule handles standard <code>.pb.go</code> messages via <code>protoreflect</code>. Adding <code>protoc-gen-omnibuf-go</code> compiles single-pass struct methods and lazy <code>Opaque</code> packet views.',
     ],
   },
 ];
@@ -83,7 +83,7 @@ const goFaqJsonLd = {
 ---
 
 <Layout
-  title="OmniBuf for Go | Struct Tags, Protobuf Structs & protoc-gen-omnibuf"
+  title="OmniBuf for Go | Struct Tags, Protobuf Structs & protoc-gen-omnibuf-go"
   description="Use OmniBuf in Go: tag plain Go structs, encode standard .pb.go Protobuf messages, or generate single-pass codecs and Opaque views."
 >
   <Navbar currentPage="go" />

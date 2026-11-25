@@ -32,7 +32,7 @@ plugins:
   - local: protoc-gen-go
     out: gen
     opt: paths=source_relative
-  - local: protoc-gen-omnibuf
+  - local: protoc-gen-omnibuf-go
     out: gen
     opt: paths=source_relative`;
 
@@ -163,10 +163,10 @@ if view.GetActive() && view.GetAsn() == 64512 {
     >
       <div class="lg:col-span-5 space-y-3.5 min-w-0">
         <h3 class="text-2xl sm:text-3xl font-bold uppercase tracking-tight leading-snug">
-          Generated code with protoc-gen-omnibuf
+          Generated code with protoc-gen-omnibuf-go
         </h3>
         <p class="text-base sm:text-lg text-ink/85 leading-relaxed">
-          For the lowest overhead, add <code>protoc-gen-omnibuf</code> to <code>buf.gen.yaml</code>.
+          For the lowest overhead, add <code>protoc-gen-omnibuf-go</code> to <code>buf.gen.yaml</code>.
           It generates <code>MarshalOmniBufAppend</code> and <code>UnmarshalOmniBuf</code> methods
           on your <code>.pb.go</code> structs, plus an <code>Opaque</code> wrapper type for reading
           or splicing raw packets.
@@ -202,13 +202,13 @@ if view.GetActive() && view.GetAsn() == 64512 {
             <div class="text-xs font-bold uppercase text-acid">Install Plugin &amp; Generate</div>
             <button
               type="button"
-              data-copy="go install github.com/omnibuf/omnibuf-go/cmd/protoc-gen-omnibuf@latest && buf generate"
+              data-copy="go install github.com/omnibuf/omnibuf-go/cmd/protoc-gen-omnibuf-go@latest && buf generate"
               class="copy-snippet-btn min-w-[4.75rem] text-center px-2.5 py-1 text-xs font-bold uppercase bg-paper/15 hover:bg-acid hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-acid text-paper border border-paper/30 rounded shrink-0 transition"
             >
               Copy
             </button>
           </div>
-          <pre class="leading-relaxed whitespace-pre"><code><span class="text-paper/75 select-none">$ </span>go install github.com/omnibuf/omnibuf-go/cmd/protoc-gen-omnibuf@latest
+          <pre class="leading-relaxed whitespace-pre"><code><span class="text-paper/75 select-none">$ </span>go install github.com/omnibuf/omnibuf-go/cmd/protoc-gen-omnibuf-go@latest
 <span class="text-paper/75 select-none">$ </span><span class="text-acid font-bold">buf generate</span></code></pre>
         </div>
 
