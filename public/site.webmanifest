@@ -1,0 +1,21 @@
+{
+  "name": "OmniBuf",
+  "short_name": "OmniBuf",
+  "description": "Fast, self-describing binary wire format for Protocol Buffers and native types.",
+  "start_url": "/",
+  "display": "browser",
+  "background_color": "#f4f0e6",
+  "theme_color": "#ff4f18",
+  "icons": [
+    {
+      "src": "/favicon-32x32.png",
+      "sizes": "32x32",
+      "type": "image/png"
+    },
+    {
+      "src": "/logo.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

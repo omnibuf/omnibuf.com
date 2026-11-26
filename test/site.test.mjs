@@ -342,3 +342,96 @@ test('Breadcrumbs and BreadcrumbList JSON-LD render everywhere except the root p
     );
   }
 });
+
+test('SEO metadata, canonical URLs, JSON-LD, and sitemap stay valid across all pages', () => {
+  const indexableRoutes = [
+    ['/', 'dist/index.html'],
+    ['/how-it-works', 'dist/how-it-works/index.html'],
+    ['/benchmarks', 'dist/benchmarks/index.html'],
+    ['/spec', 'dist/spec/index.html'],
+    ['/languages', 'dist/languages/index.html'],
+    ['/go', 'dist/go/index.html'],
+    ['/es', 'dist/es/index.html'],
+    ['/rs', 'dist/rs/index.html'],
+    ['/py', 'dist/py/index.html'],
+    ['/cpp', 'dist/cpp/index.html'],
+    ['/nano', 'dist/nano/index.html'],
+    ['/java', 'dist/java/index.html'],
+    ['/cs', 'dist/cs/index.html'],
+    ['/swift', 'dist/swift/index.html'],
+    ['/dart', 'dist/dart/index.html'],
+    ['/php', 'dist/php/index.html'],
+    ['/elixir', 'dist/elixir/index.html'],
+    ['/tooling', 'dist/tooling/index.html'],
+    ['/tooling/cli', 'dist/tooling/cli/index.html'],
+    ['/tooling/editors', 'dist/tooling/editors/index.html'],
+    ['/tooling/devtools', 'dist/tooling/devtools/index.html'],
+    ['/tooling/traffic', 'dist/tooling/traffic/index.html'],
+  ];
+
+  const seenTitles = new Set();
+  const seenDescriptions = new Set();
+
+  for (const [route, relPath] of indexableRoutes) {
+    const html = readFileSync(resolve(rootDir, relPath), 'utf8');
+    const expectedCanonical = `https://omnibuf.com${route}`;
+
+    const titleMatch = html.match(/<title>([^<]+)<\/title>/);
+    assert.ok(titleMatch, `${relPath} must have a <title>`);
+    const title = titleMatch[1].replace(/&amp;/g, '&');
+    assert.ok(
+      title.length >= 25 && title.length <= 65,
+      `${relPath} title length (${title.length}) out of 25-65 range: "${title}"`,
+    );
+    assert.equal(seenTitles.has(title), false, `duplicate title on ${relPath}: "${title}"`);
+    seenTitles.add(title);
+
+    const descMatch = html.match(/<meta name="description" content="([^"]+)"/);
+    assert.ok(descMatch, `${relPath} must have a meta description`);
+    const desc = descMatch[1].replace(/&amp;/g, '&');
+    assert.ok(
+      desc.length >= 110 && desc.length <= 160,
+      `${relPath} description length (${desc.length}) out of 110-160 range: "${desc}"`,
+    );
+    assert.equal(seenDescriptions.has(desc), false, `duplicate description on ${relPath}`);
+    seenDescriptions.add(desc);
+
+    assert.match(html, /<meta name="keywords" content="[^"]+"/);
+    assert.match(html, /<meta name="robots" content="index, follow/);
+    assert.match(html, new RegExp(`<link rel="canonical" href="${expectedCanonical}"`));
+    assert.match(html, new RegExp(`<meta property="og:url" content="${expectedCanonical}"`));
+    assert.match(html, /<meta property="og:locale" content="en_US"/);
+    assert.match(html, /<meta property="og:image:type" content="image\/jpeg"/);
+    assert.match(html, /<meta name="twitter:card" content="summary_large_image"/);
+    assert.match(html, /<link rel="manifest" href="\/site\.webmanifest"/);
+
+    const ldMatches = [...html.matchAll(/<script type="application\/ld\+json">([^<]+)<\/script>/g)];
+    assert.ok(ldMatches.length > 0, `${relPath} must embed JSON-LD structured data`);
+    for (const [, raw] of ldMatches) {
+      assert.doesNotThrow(() => JSON.parse(raw), `${relPath} contains invalid JSON-LD`);
+    }
+  }
+
+  // Redirect and 404 pages must not be indexed
+  const cliRedirectHtml = readFileSync(resolve(rootDir, 'dist/cli/index.html'), 'utf8');
+  assert.match(cliRedirectHtml, /<meta name="robots" content="noindex, follow"/);
+  const notFoundHtml = readFileSync(resolve(rootDir, 'dist/404.html'), 'utf8');
+  assert.match(notFoundHtml, /<meta name="robots" content="noindex, nofollow"/);
+  assert.doesNotMatch(notFoundHtml, /<link rel="canonical"/);
+
+  // Sitemap must exclude /cli redirect and match trailing-slash-free canonical URLs
+  for (const sitemapFile of ['dist/sitemap-0.xml', 'dist/sitemap.xml']) {
+    const xml = readFileSync(resolve(rootDir, sitemapFile), 'utf8');
+    const locs = [...xml.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => m[1]);
+    assert.equal(
+      locs.includes('https://omnibuf.com/cli') || locs.includes('https://omnibuf.com/cli/'),
+      false,
+      `${sitemapFile} must exclude /cli redirect`,
+    );
+    assert.deepEqual(
+      locs.sort(),
+      indexableRoutes.map(([route]) => `https://omnibuf.com${route}`).sort(),
+      `${sitemapFile} must list exact indexable canonical URLs`,
+    );
+  }
+});

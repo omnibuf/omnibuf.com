@@ -1,6 +1,6 @@
 import { access, copyFile, readdir, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, URL } from 'node:url';
 import sitemap from '@astrojs/sitemap';
 import tailwindcss from '@tailwindcss/vite';
 import { defineConfig } from 'astro/config';
@@ -205,12 +205,13 @@ function checkInternalLinksAndAnchors() {
                 } else if (
                   entry.isFile() &&
                   entry.name.endsWith('.astro') &&
-                  entry.name !== '404.astro'
+                  entry.name !== '404.astro' &&
+                  !(prefix === '' && entry.name === 'cli.astro')
                 ) {
                   if (entry.name === 'index.astro') {
-                    routes.push(prefix ? `${prefix}/` : '/');
+                    routes.push(prefix || '/');
                   } else {
-                    routes.push(`${prefix}/${entry.name.replace(/\.astro$/, '')}/`);
+                    routes.push(`${prefix}/${entry.name.replace(/\.astro$/, '')}`);
                   }
                 }
               }
@@ -359,7 +360,13 @@ function checkInternalLinksAndAnchors() {
 
 export default defineConfig({
   site: 'https://omnibuf.com',
-  integrations: [sitemap(), checkInternalLinksAndAnchors()],
+  trailingSlash: 'never',
+  integrations: [
+    sitemap({
+      filter: (page) => new URL(page).pathname.replace(/\/+$/, '') !== '/cli',
+    }),
+    checkInternalLinksAndAnchors(),
+  ],
   vite: {
     plugins: [tailwindcss()],
   },

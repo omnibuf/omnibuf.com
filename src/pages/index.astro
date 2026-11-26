@@ -5,29 +5,6 @@ import Hero from '../components/Hero.astro';
 import Motivation from '../components/Motivation.astro';
 import LanguageStrip from '../components/LanguageStrip.astro';
 import Footer from '../components/Footer.astro';
-import { languages } from '../data/languages';
-
-const siteJsonLd = {
-  '@context': 'https://schema.org',
-  '@graph': [
-    {
-      '@type': 'WebSite',
-      name: 'OmniBuf',
-      url: 'https://omnibuf.com/',
-      description:
-        'Fast, self-describing binary wire format for .proto schemas and native structs with single-pass encoding, branchless Prefix-Varints, raw message concatenation, and schema-less inspection.',
-    },
-    {
-      '@type': 'SoftwareSourceCode',
-      name: 'OmniBuf',
-      url: 'https://omnibuf.com/',
-      codeRepository: 'https://github.com/omnibuf',
-      license: 'https://www.apache.org/licenses/LICENSE-2.0',
-      programmingLanguage: languages.map((l) => l.label),
-      sameAs: ['https://github.com/omnibuf', 'https://buf.build/omnibuf'],
-    },
-  ],
-};
 ---
 
 <Layout>
@@ -36,7 +13,6 @@ const siteJsonLd = {
     <Hero />
     <Motivation />
     <LanguageStrip id="status" currentPage="home" narrow={true} />
-    <script is:inline type="application/ld+json" set:html={JSON.stringify(siteJsonLd)} />
   </main>
   <Footer />
 </Layout>

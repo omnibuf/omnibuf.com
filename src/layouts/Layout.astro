@@ -1,25 +1,44 @@
 ---
 import '../styles/global.css';
+import { getRouteSeoData } from '../data/seo';
 
 interface Props {
   title?: string;
   description?: string;
+  keywords?: string[];
   noindex?: boolean;
   ogImage?: string;
   ogImageAlt?: string;
+  ogType?: 'website' | 'article';
+  jsonLd?: Record<string, unknown> | Record<string, unknown>[];
 }
 
 const {
   title = 'OmniBuf: Fast, Self-Describing Binary Wire Format',
-  description = 'Fast, self-describing binary wire format for .proto and native structs with single-pass encoding and schema-less inspection.',
+  description = 'Fast, self-describing binary wire format for Protocol Buffers and native structs. Single-pass encoding, schema-less inspection, and 12 language runtimes.',
+  keywords,
   noindex = false,
   ogImage = '/og-image.jpg',
-  ogImageAlt = 'OmniBuf: Fast, self-describing binary wire format',
+  ogImageAlt,
+  ogType = 'website',
+  jsonLd,
 } = Astro.props;
 
 const siteBase = Astro.site ?? 'https://omnibuf.com';
-const canonicalURL = new URL(Astro.url.pathname, siteBase);
+const normalizedPath = Astro.url.pathname === '/' ? '/' : Astro.url.pathname.replace(/\/+$/, '');
+const canonicalURL = new URL(normalizedPath, siteBase);
 const ogImageURL = new URL(ogImage, siteBase);
+const resolvedOgImageAlt = ogImageAlt ?? title;
+const ogImageType = ogImage.endsWith('.png')
+  ? 'image/png'
+  : ogImage.endsWith('.webp')
+    ? 'image/webp'
+    : 'image/jpeg';
+const routeSeo = noindex
+  ? { keywords: [], jsonLd: [] }
+  : getRouteSeoData(normalizedPath, title, description);
+const resolvedKeywords = keywords ?? routeSeo.keywords;
+const jsonLdItems = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : routeSeo.jsonLd;
 ---
 
 <!doctype html>
@@ -28,28 +47,40 @@ const ogImageURL = new URL(ogImage, siteBase);
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content={description} />
+    {resolvedKeywords.length > 0 && <meta name="keywords" content={resolvedKeywords.join(', ')} />}
+    <meta name="author" content="OmniBuf" />
     <meta name="theme-color" content="#f4f0e6" media="(prefers-color-scheme: light)" />
     <meta name="theme-color" content="#111111" media="(prefers-color-scheme: dark)" />
     {noindex ? (
       <meta name="robots" content="noindex, nofollow" />
     ) : (
-      <link rel="canonical" href={canonicalURL} />
+      <>
+        <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" />
+        <link rel="canonical" href={canonicalURL} />
+      </>
     )}
     <link rel="sitemap" href="/sitemap-index.xml" />
-    <meta property="og:type" content="website" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <meta property="og:type" content={ogType} />
+    <meta property="og:locale" content="en_US" />
     <meta property="og:site_name" content="OmniBuf" />
     <meta property="og:url" content={canonicalURL} />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:image" content={ogImageURL} />
+    <meta property="og:image:type" content={ogImageType} />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
-    <meta property="og:image:alt" content={ogImageAlt} />
+    <meta property="og:image:alt" content={resolvedOgImageAlt} />
     <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:url" content={canonicalURL} />
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={ogImageURL} />
-    <meta name="twitter:image:alt" content={ogImageAlt} />
+    <meta name="twitter:image:alt" content={resolvedOgImageAlt} />
+    {jsonLdItems.map((item) => (
+      <script is:inline type="application/ld+json" set:html={JSON.stringify(item)} />
+    ))}
     <link rel="icon" href="/favicon.ico" sizes="any" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
