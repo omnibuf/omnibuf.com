@@ -74,22 +74,23 @@ test('Hero and Comparisons scope benchmark widgets, ARIA tab linkage, and clean 
   const comparisons = readRepoFile('src/components/Comparisons.astro');
   const benchmarksData = readRepoFile('src/data/benchmarks.ts');
 
-  assert.match(hero, /\[data-home-bench\]/);
-  assert.match(hero, /href=\{suite\.href\}/);
-  assert.match(hero, /data-home-bench-tab=/);
-  assert.match(hero, /data-home-bench-panel=/);
-  assert.doesNotMatch(hero, /data-autorotate=/);
-  assert.doesNotMatch(hero, /CYCLE_MS/);
+  assert.match(motivation, /\[data-home-bench\]/);
+  assert.match(motivation, /href=\{suite\.href\}/);
+  assert.match(motivation, /data-home-bench-tab=/);
+  assert.match(motivation, /data-home-bench-panel=/);
+  assert.doesNotMatch(motivation, /data-autorotate=/);
+  assert.doesNotMatch(motivation, /CYCLE_MS/);
   assert.match(hero, /peer\.proto/);
   assert.match(hero, /Plain structs/);
   assert.match(hero, /366 B/);
   assert.match(hero, /341 B/);
   assert.match(hero, /803 B/);
-  assert.match(hero, /bench-matrix-cell/);
-  assert.doesNotMatch(hero, /ns \/ op/);
-  assert.match(hero, /stat\.multiple\} faster/);
-  assert.match(hero, /Compared against/);
+  assert.match(motivation, /bench-matrix-cell/);
+  assert.doesNotMatch(motivation, /ns \/ op/);
+  assert.match(motivation, /stat\.multiple\} faster/);
+  assert.doesNotMatch(hero, /Encode and decode benchmarks/);
   assert.doesNotMatch(hero, /bg-\[#E5E0D5\]|text-\[#FF4F18\]/);
+  assert.doesNotMatch(motivation, /bg-\[#E5E0D5\]|text-\[#FF4F18\]/);
 
   for (const homeFile of [hero, motivation]) {
     assert.doesNotMatch(homeFile, /—|&mdash;/);
