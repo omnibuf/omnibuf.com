@@ -79,29 +79,6 @@ const vimPlugSnippet = `Plug 'omnibuf/omnibuf-vim'`;
           binary file stays intact.
         </p>
 
-        <figure class="space-y-2">
-          <a
-            href="/images/tooling/vscode-split.webp"
-            target="_blank"
-            rel="noopener noreferrer"
-            title="Open full-size VS Code screenshot"
-            class="block rounded-lg overflow-hidden border border-ink/15 hover:border-ink/40 bg-ink transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#FF4F18]"
-          >
-            <img
-              src="/images/tooling/vscode-split.webp"
-              alt="Visual Studio Code custom editor showing peer_update.obuf in Split mode with editable syntax-highlighted JSON on the left and a 16-byte binary hex dump on the right."
-              width="2560"
-              height="1480"
-              loading="eager"
-              class="w-full h-auto block"
-            />
-          </a>
-          <figcaption class="text-xs text-ink/65">
-            VS Code custom editor in Split mode: editable JSON on the left, live 16-byte hex dump on
-            the right. Click image to view full size.
-          </figcaption>
-        </figure>
-
         <div class="bg-ink text-paper rounded-lg border border-ink/15 overflow-hidden">
           <div class="flex items-center justify-between gap-2 px-3.5 py-2 border-b border-paper/12 text-xs font-mono text-paper/70">
             <span>Install VS Code extension</span>
@@ -118,7 +95,7 @@ const vimPlugSnippet = `Plug 'omnibuf/omnibuf-vim'`;
           </div>
         </div>
 
-        <div class="flex flex-wrap gap-2.5 text-xs sm:text-sm pt-1 no-print">
+        <div class="flex flex-wrap gap-2.5 text-xs sm:text-sm no-print">
           <a
             href="https://marketplace.visualstudio.com/items?itemName=omnibuf.omnibuf-vscode"
             target="_blank"
@@ -144,6 +121,29 @@ const vimPlugSnippet = `Plug 'omnibuf/omnibuf-vim'`;
             GitHub &rarr;
           </a>
         </div>
+
+        <figure class="space-y-2 pt-1">
+          <a
+            href="/images/tooling/vscode-split.webp"
+            target="_blank"
+            rel="noopener noreferrer"
+            title="Open full-size VS Code screenshot"
+            class="block rounded-lg overflow-hidden border border-ink/15 hover:border-ink/40 bg-ink transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#FF4F18]"
+          >
+            <img
+              src="/images/tooling/vscode-split.webp"
+              alt="Visual Studio Code custom editor showing peer_update.obuf in Split mode with editable syntax-highlighted JSON on the left and a 16-byte binary hex dump on the right."
+              width="2560"
+              height="1480"
+              loading="eager"
+              class="w-full h-auto block"
+            />
+          </a>
+          <figcaption class="text-xs text-ink/65">
+            VS Code custom editor in Split mode: editable JSON on the left, live 16-byte hex dump on
+            the right. Click image to view full size.
+          </figcaption>
+        </figure>
       </div>
 
       <!-- Neovim / Vim -->
@@ -175,29 +175,6 @@ const vimPlugSnippet = `Plug 'omnibuf/omnibuf-vim'`;
           with atomic write-back, companion hex split view (<code>:OmnibufSplit</code>), hex toggle
           (<code>:OmnibufHex</code>), and per-buffer schema switching (<code>:OmnibufSchema</code>).
         </p>
-
-        <figure class="space-y-2">
-          <a
-            href="/images/tooling/vim-split.webp"
-            target="_blank"
-            rel="noopener noreferrer"
-            title="Open full-size Neovim screenshot"
-            class="block rounded-lg overflow-hidden border border-ink/15 hover:border-ink/40 bg-ink transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#FF4F18]"
-          >
-            <img
-              src="/images/tooling/vim-split.webp"
-              alt="Neovim with omnibuf-vim showing peer_update.obuf decoded as JSON on the left and a read-only xxd hex companion buffer on the right via :OmnibufSplit."
-              width="2560"
-              height="1380"
-              loading="lazy"
-              class="w-full h-auto block"
-            />
-          </a>
-          <figcaption class="text-xs text-ink/65">
-            <code>:OmnibufSplit</code> opening the decoded JSON buffer alongside a read-only{' '}
-            <code>xxd</code> hex view. Click image to view full size.
-          </figcaption>
-        </figure>
 
         <div class="space-y-3">
           <div class="bg-ink text-paper rounded-lg border border-ink/15 overflow-hidden">
@@ -233,7 +210,7 @@ const vimPlugSnippet = `Plug 'omnibuf/omnibuf-vim'`;
           </div>
         </div>
 
-        <div class="flex flex-wrap gap-2.5 text-xs sm:text-sm pt-1 no-print">
+        <div class="flex flex-wrap gap-2.5 text-xs sm:text-sm no-print">
           <a
             href="https://github.com/omnibuf/omnibuf-vim"
             target="_blank"
@@ -243,6 +220,29 @@ const vimPlugSnippet = `Plug 'omnibuf/omnibuf-vim'`;
             GitHub Repository &rarr;
           </a>
         </div>
+
+        <figure class="space-y-2 pt-1">
+          <a
+            href="/images/tooling/vim-split.webp"
+            target="_blank"
+            rel="noopener noreferrer"
+            title="Open full-size Neovim screenshot"
+            class="block rounded-lg overflow-hidden border border-ink/15 hover:border-ink/40 bg-ink transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#FF4F18]"
+          >
+            <img
+              src="/images/tooling/vim-split.webp"
+              alt="Neovim with omnibuf-vim showing peer_update.obuf decoded as JSON on the left and a read-only xxd hex companion buffer on the right via :OmnibufSplit."
+              width="2560"
+              height="1380"
+              loading="lazy"
+              class="w-full h-auto block"
+            />
+          </a>
+          <figcaption class="text-xs text-ink/65">
+            <code>:OmnibufSplit</code> opening the decoded JSON buffer alongside a read-only{' '}
+            <code>xxd</code> hex view. Click image to view full size.
+          </figcaption>
+        </figure>
       </div>
     </section>
   </main>

@@ -210,7 +210,7 @@ export const toolingPages: ToolingEntry[] = [
     key: 'tooling-devtools',
     href: '/tooling/devtools',
     label: 'DevTools',
-    desc: 'Chrome and Chromium network inspector',
+    desc: 'Chrome, Chromium, and Firefox inspector',
     repoUrl: 'https://github.com/omnibuf/omnibuf-devtools',
   },
   {

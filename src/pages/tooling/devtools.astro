@@ -6,7 +6,7 @@ import Footer from '../../components/Footer.astro';
 
 <Layout
   title="Browser DevTools | OmniBuf Network Inspector"
-  description="Chrome and Chromium DevTools panel for inspecting application/omnibuf, Connect, and gRPC-Web payloads directly next to the Network tab."
+  description="Chrome, Chromium, and Firefox DevTools extension for inspecting application/omnibuf, Connect, and gRPC-Web payloads directly next to the Network tab."
 >
   <Navbar currentPage="tooling-devtools" />
 
@@ -16,8 +16,8 @@ import Footer from '../../components/Footer.astro';
         Browser DevTools
       </h1>
       <p class="text-base sm:text-lg text-ink/80 leading-relaxed max-w-[64ch]">
-        Chrome and Chromium DevTools extension that intercepts OmniBuf traffic right inside the
-        browser, with zero proxy setup or TLS certificates.
+        Chrome, Chromium, and Firefox DevTools extension that intercepts OmniBuf traffic right
+        inside the browser, with zero proxy setup or TLS certificates.
       </p>
     </section>
 
@@ -52,12 +52,43 @@ import Footer from '../../components/Footer.astro';
         </div>
 
         <p class="text-sm sm:text-base text-ink/85 leading-relaxed max-w-[65ch]">
-          Adds an OmniBuf panel next to the Chrome Network tab. Requests and responses carrying
-          OmniBuf content types decode automatically into structured field trees with hex byte
-          ranges, wire types, and inline <code>Field #0</code> field names when present.
+          Adds an OmniBuf panel next to the browser Network tab in Chrome, Edge, Brave, and Firefox.
+          Requests and responses carrying OmniBuf content types decode automatically into structured
+          field trees with hex byte ranges, wire types, and inline <code>Field #0</code> field names
+          when present.
         </p>
 
-        <figure class="space-y-2">
+        <div class="flex flex-wrap gap-2.5 text-xs sm:text-sm no-print">
+          <a
+            href="https://chromewebstore.google.com/detail/omnibuf-devtools/gfbedgldanfgmgdnimmoplmaciejcfik"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="btn-primary px-4 py-2.5"
+          >
+            Chrome Web Store &rarr;
+          </a>
+          <a
+            href="https://addons.mozilla.org/en-US/firefox/addon/omnibuf-devtools/"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="btn-primary px-4 py-2.5"
+          >
+            Firefox Add-ons &rarr;
+          </a>
+          <a
+            href="https://github.com/omnibuf/omnibuf-devtools"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="btn-secondary px-3.5 py-2.5"
+          >
+            GitHub Repository &rarr;
+          </a>
+          <a href="/es" class="btn-secondary px-3.5 py-2.5">
+            TypeScript / JS Guide &rarr;
+          </a>
+        </div>
+
+        <figure class="space-y-2 pt-1">
           <a
             href="/images/tooling/devtools-hex.webp"
             target="_blank"
@@ -102,20 +133,6 @@ import Footer from '../../components/Footer.astro';
             to view full size.
           </figcaption>
         </figure>
-
-        <div class="flex flex-wrap gap-2.5 text-xs sm:text-sm pt-1 no-print">
-          <a
-            href="https://github.com/omnibuf/omnibuf-devtools"
-            target="_blank"
-            rel="noopener noreferrer"
-            class="btn-primary px-3.5 py-2"
-          >
-            GitHub Repository &rarr;
-          </a>
-          <a href="/es" class="btn-secondary px-3.5 py-2">
-            TypeScript / JS Guide &rarr;
-          </a>
-        </div>
       </div>
 
       <!-- Supported content types -->
