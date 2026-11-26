@@ -4,11 +4,14 @@ import {
   cliNavPage,
   getGitHubUrlForPage,
   languages,
+  languagesNavPage,
   primaryNavPages,
   specNavPage,
+  toolingPages,
   totalSitePages,
   type PageKey,
 } from '../data/languages';
+import Breadcrumbs from './Breadcrumbs.astro';
 
 interface Props {
   currentPage?: PageKey;
@@ -17,18 +20,21 @@ interface Props {
 const { currentPage = 'home' } = Astro.props;
 
 const activeLang = languages.find((l) => l.key === currentPage);
+const isLanguagesActive = currentPage === languagesNavPage.key || Boolean(activeLang);
+const activeTool = toolingPages.find((t) => t.key === currentPage);
+const isToolingActive = currentPage === cliNavPage.key || Boolean(activeTool);
 const docsNavItems = [
   {
     href: '/',
     key: 'home' as PageKey,
     label: 'Overview',
-    desc: 'Wire format summary & quickstart',
+    desc: 'Wire format overview and examples',
   },
   {
     href: '/how-it-works',
     key: 'how-it-works' as PageKey,
     label: 'How It Works',
-    desc: 'Prefix-Varints, 16 wire types & comparisons',
+    desc: 'Prefix-Varints, 16 wire types, and comparisons',
   },
   {
     href: specNavPage.href,
@@ -41,6 +47,8 @@ const activeDoc = docsNavItems.find((d) => d.key === currentPage);
 const activePageLabel =
   activeDoc?.label ??
   (currentPage === benchmarksNavPage.key ? benchmarksNavPage.label : undefined) ??
+  (currentPage === languagesNavPage.key ? languagesNavPage.label : undefined) ??
+  (activeTool ? `Tooling: ${activeTool.label}` : undefined) ??
   (currentPage === cliNavPage.key ? cliNavPage.label : undefined) ??
   (activeLang ? `Languages: ${activeLang.shortLabel}` : 'Menu');
 
@@ -48,85 +56,117 @@ const githubUrl = getGitHubUrlForPage(currentPage);
 const isMultiColDropdown = languages.length >= 5;
 ---
 
-<header class="sticky top-0 z-50 bg-[#FAF8F2] border-b-2 border-ink no-print select-none">
-  <div class="max-w-7xl mx-auto px-3 sm:px-6 h-14 flex items-center justify-between gap-2 text-xs sm:text-base font-mono">
-    <div class="flex items-center gap-2 sm:gap-5 min-w-0">
+<header class="sticky top-0 z-50 bg-[#FAF8F2] border-b border-ink/15 no-print select-none">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between gap-3 text-sm">
+    <div class="flex items-center gap-3 sm:gap-6 min-w-0">
       <a
         href="/"
-        class="font-bold bg-ink text-paper border-2 border-ink px-2.5 sm:px-3 py-1 rounded flex items-center gap-1.5 sm:gap-2 shrink-0 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink"
+        class="font-bold text-base tracking-tight text-ink flex items-center gap-2 shrink-0 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#FF4F18]"
       >
-        <span class="w-2.5 h-2.5 bg-acid inline-block shrink-0"></span>
+        <span
+          class="w-2.5 h-2.5 rounded-[2px] bg-[#FF4F18] inline-block shrink-0"
+          aria-hidden="true"
+        ></span>
         <span>OmniBuf</span>
       </a>
 
-      <!-- Desktop Navigation (4 top-level items: Docs, Languages, Benchmarks, CLI) -->
+      <!-- Desktop Navigation -->
       <nav
         aria-label="Page navigation"
-        class="hidden lg:flex items-center gap-2 font-medium min-w-0 py-1.5 px-0.5"
+        class="hidden lg:flex items-center gap-1 font-medium min-w-0"
       >
-        <!-- Docs Dropdown -->
-        <details id="docs-nav-menu" class="relative group">
-          <summary
+        <!-- Docs Dropdown (clicking label navigates to /; hover or toggle opens menu) -->
+        <div id="docs-nav-menu" data-open="false" class="relative group flex items-stretch">
+          <a
+            href="/"
             data-active={activeDoc ? 'true' : 'false'}
-            class="nav-link list-none cursor-pointer flex items-center gap-1.5 select-none"
+            aria-current={currentPage === 'home' ? 'page' : undefined}
+            class="nav-link rounded-r-none! pr-1! flex items-center select-none"
           >
-            <span>Docs</span>
-            <span class="text-[10px] transition-transform group-open:rotate-180" aria-hidden="true">
+            Docs
+          </a>
+          <button
+            type="button"
+            data-dropdown-toggle
+            data-active={activeDoc ? 'true' : 'false'}
+            aria-label="Toggle Docs menu"
+            aria-haspopup="true"
+            aria-expanded="false"
+            class="nav-link rounded-l-none! pl-1! pr-2! cursor-pointer flex items-center select-none"
+          >
+            <span
+              class="link-dropdown-caret text-[10px] opacity-65 transition-transform"
+              aria-hidden="true"
+            >
               &#9662;
             </span>
-          </summary>
+          </button>
 
-          <div class="lang-dropdown-panel absolute left-0 top-full pt-2 z-50">
-            <div class="w-72 bg-[#FAF8F2] border-2 border-ink rounded-md overflow-hidden divide-y divide-ink/15">
+          <div class="lang-dropdown-panel link-dropdown-panel absolute left-0 top-full pt-2 z-50">
+            <div class="w-72 bg-[#FAF8F2] border border-ink/15 rounded-lg shadow-sm overflow-hidden divide-y divide-ink/10">
               {docsNavItems.map((item) => {
                 const isActive = currentPage === item.key;
                 return (
                   <a
                     href={item.href}
                     aria-current={isActive ? 'page' : undefined}
-                    class={`flex items-center justify-between gap-3 px-3.5 py-2.5 text-sm font-bold transition-colors focus-visible:outline-none ${
+                    class={`flex items-center justify-between gap-3 px-3.5 py-2.5 text-sm transition-colors focus-visible:outline-none ${
                       isActive
-                        ? 'bg-acid text-ink'
-                        : 'bg-[#FAF8F2] text-ink hover:bg-[#E5E0D5] focus-visible:bg-[#E5E0D5]'
+                        ? 'bg-[#EDE8DC] text-ink font-semibold'
+                        : 'bg-[#FAF8F2] text-ink hover:bg-[#EDE8DC] focus-visible:bg-[#EDE8DC]'
                     }`}
                   >
                     <div class="min-w-0">
-                      <div class="truncate">{item.label}</div>
-                      <div
-                        class={`text-[11px] font-normal truncate transition-colors ${
-                          isActive ? 'text-ink/80' : 'text-ink/70'
-                        }`}
-                      >
-                        {item.desc}
-                      </div>
+                      <div class="truncate font-semibold">{item.label}</div>
+                      <div class="text-xs font-normal truncate text-ink/65">{item.desc}</div>
                     </div>
-                    {isActive && <span class="text-xs shrink-0">&bull;</span>}
+                    {isActive && (
+                      <span
+                        class="w-1.5 h-1.5 rounded-full bg-[#FF4F18] shrink-0"
+                        aria-hidden="true"
+                      />
+                    )}
                   </a>
                 );
               })}
             </div>
           </div>
-        </details>
+        </div>
 
-        <!-- Languages Dropdown -->
-        <details id="lang-nav-menu" class="relative group">
-          <summary
-            data-active={activeLang ? 'true' : 'false'}
-            class="nav-link list-none cursor-pointer flex items-center gap-1.5 select-none"
+        <!-- Languages Dropdown (clicking label navigates to /languages; hover or toggle opens menu) -->
+        <div id="lang-nav-menu" data-open="false" class="relative group flex items-stretch">
+          <a
+            href={languagesNavPage.href}
+            data-active={isLanguagesActive ? 'true' : 'false'}
+            aria-current={currentPage === languagesNavPage.key ? 'page' : undefined}
+            class="nav-link rounded-r-none! pr-1! flex items-center select-none"
           >
-            <span>{activeLang ? `Languages: ${activeLang.shortLabel}` : 'Languages'}</span>
-            <span class="text-[10px] transition-transform group-open:rotate-180" aria-hidden="true">
+            {activeLang ? `Languages: ${activeLang.shortLabel}` : 'Languages'}
+          </a>
+          <button
+            type="button"
+            data-dropdown-toggle
+            data-active={isLanguagesActive ? 'true' : 'false'}
+            aria-label="Toggle Languages menu"
+            aria-haspopup="true"
+            aria-expanded="false"
+            class="nav-link rounded-l-none! pl-1! pr-2! cursor-pointer flex items-center select-none"
+          >
+            <span
+              class="link-dropdown-caret text-[10px] opacity-65 transition-transform"
+              aria-hidden="true"
+            >
               &#9662;
             </span>
-          </summary>
+          </button>
 
-          <div class="lang-dropdown-panel absolute left-0 top-full pt-2 z-50">
+          <div class="lang-dropdown-panel link-dropdown-panel absolute left-0 top-full pt-2 z-50">
             <div
               class:list={[
-                'bg-[#FAF8F2] border-2 border-ink rounded-md overflow-hidden',
+                'bg-[#FAF8F2] border border-ink/15 rounded-lg shadow-sm overflow-hidden',
                 isMultiColDropdown
                   ? 'w-[26rem] grid grid-cols-2'
-                  : 'w-64 divide-y divide-ink/15 py-1.5',
+                  : 'w-64 divide-y divide-ink/10 py-1',
               ]}
             >
               {languages.map((lang, idx) => {
@@ -135,8 +175,8 @@ const isMultiColDropdown = languages.length >= 5;
                 const rowIdx = Math.floor(idx / 2);
                 const cellBorders = isMultiColDropdown
                   ? [
-                      idx % 2 === 0 ? 'border-r border-ink/15' : '',
-                      rowIdx < totalRows - 1 ? 'border-b border-ink/15' : '',
+                      idx % 2 === 0 ? 'border-r border-ink/10' : '',
+                      rowIdx < totalRows - 1 ? 'border-b border-ink/10' : '',
                     ]
                       .filter(Boolean)
                       .join(' ')
@@ -145,23 +185,24 @@ const isMultiColDropdown = languages.length >= 5;
                   <a
                     href={lang.href}
                     aria-current={isActive ? 'page' : undefined}
-                    class={`flex items-center justify-between gap-3 px-3.5 py-2.5 text-sm font-bold transition-colors focus-visible:outline-none ${cellBorders} ${
+                    class={`flex items-center justify-between gap-3 px-3.5 py-2.5 text-sm transition-colors focus-visible:outline-none ${cellBorders} ${
                       isActive
-                        ? 'bg-acid text-ink'
-                        : 'bg-[#FAF8F2] text-ink hover:bg-[#E5E0D5] focus-visible:bg-[#E5E0D5]'
+                        ? 'bg-[#EDE8DC] text-ink font-semibold'
+                        : 'bg-[#FAF8F2] text-ink hover:bg-[#EDE8DC] focus-visible:bg-[#EDE8DC]'
                     }`}
                   >
                     <div class="min-w-0">
-                      <div class="truncate">{lang.label}</div>
-                      <div
-                        class={`text-[11px] font-normal truncate transition-colors ${
-                          isActive ? 'text-ink/80' : 'text-ink/70'
-                        }`}
-                      >
+                      <div class="truncate font-semibold">{lang.label}</div>
+                      <div class="font-mono text-xs font-normal truncate text-ink/65">
                         {lang.shortPackage}
                       </div>
                     </div>
-                    {isActive && <span class="text-xs shrink-0">&bull;</span>}
+                    {isActive && (
+                      <span
+                        class="w-1.5 h-1.5 rounded-full bg-[#FF4F18] shrink-0"
+                        aria-hidden="true"
+                      />
+                    )}
                   </a>
                 );
               })}
@@ -170,7 +211,7 @@ const isMultiColDropdown = languages.length >= 5;
               )}
             </div>
           </div>
-        </details>
+        </div>
 
         <a
           href={benchmarksNavPage.href}
@@ -181,41 +222,93 @@ const isMultiColDropdown = languages.length >= 5;
           {benchmarksNavPage.label}
         </a>
 
-        <a
-          href={cliNavPage.href}
-          class="nav-link"
-          data-active={currentPage === cliNavPage.key ? 'true' : 'false'}
-          aria-current={currentPage === cliNavPage.key ? 'page' : undefined}
-        >
-          {cliNavPage.label}
-        </a>
+        <!-- Tooling Dropdown (clicking label navigates to /tooling; hover or toggle opens menu) -->
+        <div id="tooling-nav-menu" data-open="false" class="relative group flex items-stretch">
+          <a
+            href={cliNavPage.href}
+            data-active={isToolingActive ? 'true' : 'false'}
+            aria-current={currentPage === cliNavPage.key ? 'page' : undefined}
+            class="nav-link rounded-r-none! pr-1! flex items-center select-none"
+          >
+            {activeTool ? `Tooling: ${activeTool.label}` : cliNavPage.label}
+          </a>
+          <button
+            type="button"
+            data-dropdown-toggle
+            data-active={isToolingActive ? 'true' : 'false'}
+            aria-label="Toggle Tooling menu"
+            aria-haspopup="true"
+            aria-expanded="false"
+            class="nav-link rounded-l-none! pl-1! pr-2! cursor-pointer flex items-center select-none"
+          >
+            <span
+              class="link-dropdown-caret text-[10px] opacity-65 transition-transform"
+              aria-hidden="true"
+            >
+              &#9662;
+            </span>
+          </button>
+
+          <div class="lang-dropdown-panel link-dropdown-panel absolute left-0 top-full pt-2 z-50">
+            <div class="w-72 bg-[#FAF8F2] border border-ink/15 rounded-lg shadow-sm overflow-hidden divide-y divide-ink/10">
+              {toolingPages.map((tool) => {
+                const isActive = currentPage === tool.key;
+                return (
+                  <a
+                    href={tool.href}
+                    aria-current={isActive ? 'page' : undefined}
+                    class={`flex items-center justify-between gap-3 px-3.5 py-2.5 text-sm transition-colors focus-visible:outline-none ${
+                      isActive
+                        ? 'bg-[#EDE8DC] text-ink font-semibold'
+                        : 'bg-[#FAF8F2] text-ink hover:bg-[#EDE8DC] focus-visible:bg-[#EDE8DC]'
+                    }`}
+                  >
+                    <div class="min-w-0">
+                      <div class="truncate font-semibold">{tool.label}</div>
+                      <div class="text-xs font-normal truncate text-ink/65">{tool.desc}</div>
+                    </div>
+                    {isActive && (
+                      <span
+                        class="w-1.5 h-1.5 rounded-full bg-[#FF4F18] shrink-0"
+                        aria-hidden="true"
+                      />
+                    )}
+                  </a>
+                );
+              })}
+            </div>
+          </div>
+        </div>
       </nav>
 
-      <!-- Mobile Hamburger / Dropdown Selector -->
+      <!-- Mobile Dropdown Selector -->
       <details id="mobile-nav-menu" class="relative lg:hidden group">
         <summary
           aria-label="Toggle navigation menu"
-          class="list-none cursor-pointer px-2.5 py-1.5 bg-[#E5E0D5] text-ink border-2 border-ink rounded font-bold flex items-center gap-2 select-none shadow-[2px_2px_0px_#111111] group-open:bg-acid group-open:translate-x-[1px] group-open:translate-y-[1px] group-open:shadow-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink"
+          class="list-none cursor-pointer min-h-10 sm:min-h-0 px-2.5 py-1.5 bg-[#EDE8DC] text-ink border border-ink/15 rounded-md text-xs sm:text-sm font-medium flex items-center gap-1.5 max-w-[11.5rem] whitespace-nowrap select-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#FF4F18]"
         >
           <svg
             class="w-4 h-4 stroke-current shrink-0"
             viewBox="0 0 24 24"
             fill="none"
-            stroke-width="2.5"
-            stroke-linecap="square"
+            stroke-width="2"
+            stroke-linecap="round"
             aria-hidden="true"
           >
             <path d="M4 6h16M4 12h16M4 18h16"></path>
           </svg>
-          <span>{activePageLabel}</span>
-          <span class="text-[10px] transition-transform group-open:rotate-180" aria-hidden="true">
+          <span class="truncate">{activePageLabel}</span>
+          <span
+            class="text-[10px] opacity-65 transition-transform group-open:rotate-180 shrink-0"
+            aria-hidden="true"
+          >
             &#9662;
           </span>
         </summary>
 
         <nav
           aria-label="Mobile page navigation"
-          class="absolute left-0 mt-2 w-64 bg-[#FAF8F2] border-2 border-ink rounded-md py-1.5 z-50 divide-y divide-ink/15"
+          class="absolute left-0 mt-2 w-64 max-w-[calc(100vw-2rem)] max-h-[calc(100dvh-4.5rem)] overflow-y-auto bg-[#FAF8F2] border border-ink/15 rounded-lg shadow-sm py-1 z-50 divide-y divide-ink/10"
         >
           {primaryNavPages.map((p) => {
             const isActive = currentPage === p.key;
@@ -223,31 +316,49 @@ const isMultiColDropdown = languages.length >= 5;
               <a
                 href={p.href}
                 aria-current={isActive ? 'page' : undefined}
-                class={`flex items-center justify-between px-3.5 py-2.5 text-sm font-bold transition-colors ${
-                  isActive ? 'bg-acid text-ink' : 'text-ink hover:bg-[#E5E0D5]'
+                class={`flex items-center justify-between px-3.5 py-2.5 text-sm font-medium transition-colors ${
+                  isActive ? 'bg-[#EDE8DC] text-ink font-semibold' : 'text-ink hover:bg-[#EDE8DC]'
                 }`}
               >
                 <span>{p.label}</span>
-                {isActive && <span class="text-xs">&bull;</span>}
+                {isActive && (
+                  <span class="w-1.5 h-1.5 rounded-full bg-[#FF4F18] shrink-0" aria-hidden="true" />
+                )}
               </a>
             );
           })}
-          <div class="px-3.5 pt-2 pb-1 text-[11px] font-bold uppercase text-ink/70 bg-[#E5E0D5]/50">
-            Languages
-          </div>
-          <div class="grid grid-cols-2 divide-x divide-ink/15">
+          <a
+            href={languagesNavPage.href}
+            aria-current={currentPage === languagesNavPage.key ? 'page' : undefined}
+            class={`flex items-center justify-between px-3.5 pt-2 pb-1 text-xs font-semibold transition-colors ${
+              currentPage === languagesNavPage.key
+                ? 'bg-[#EDE8DC] text-ink'
+                : 'text-ink/70 bg-[#EDE8DC]/50 hover:bg-[#EDE8DC] hover:text-ink'
+            }`}
+          >
+            <span>Languages</span>
+            {currentPage === languagesNavPage.key && (
+              <span class="w-1.5 h-1.5 rounded-full bg-[#FF4F18] shrink-0" aria-hidden="true" />
+            )}
+          </a>
+          <div class="grid grid-cols-2 divide-x divide-ink/10">
             {languages.map((lang) => {
               const isActive = currentPage === lang.key;
               return (
                 <a
                   href={lang.href}
                   aria-current={isActive ? 'page' : undefined}
-                  class={`flex items-center justify-between px-3 py-2 text-xs font-bold transition-colors ${
-                    isActive ? 'bg-acid text-ink' : 'text-ink hover:bg-[#E5E0D5]'
+                  class={`flex items-center justify-between px-3 py-2 text-xs font-medium transition-colors ${
+                    isActive ? 'bg-[#EDE8DC] text-ink font-semibold' : 'text-ink hover:bg-[#EDE8DC]'
                   }`}
                 >
                   <span class="truncate">{lang.shortLabel}</span>
-                  {isActive && <span class="text-xs shrink-0">&bull;</span>}
+                  {isActive && (
+                    <span
+                      class="w-1.5 h-1.5 rounded-full bg-[#FF4F18] shrink-0"
+                      aria-hidden="true"
+                    />
+                  )}
                 </a>
               );
             })}
@@ -255,40 +366,72 @@ const isMultiColDropdown = languages.length >= 5;
           <a
             href={benchmarksNavPage.href}
             aria-current={currentPage === benchmarksNavPage.key ? 'page' : undefined}
-            class={`flex items-center justify-between px-3.5 py-2.5 text-sm font-bold transition-colors ${
+            class={`flex items-center justify-between px-3.5 py-2.5 text-sm font-medium transition-colors ${
               currentPage === benchmarksNavPage.key
-                ? 'bg-acid text-ink'
-                : 'text-ink hover:bg-[#E5E0D5]'
+                ? 'bg-[#EDE8DC] text-ink font-semibold'
+                : 'text-ink hover:bg-[#EDE8DC]'
             }`}
           >
             <span>{benchmarksNavPage.label}</span>
-            {currentPage === benchmarksNavPage.key && <span class="text-xs">&bull;</span>}
+            {currentPage === benchmarksNavPage.key && (
+              <span class="w-1.5 h-1.5 rounded-full bg-[#FF4F18] shrink-0" aria-hidden="true" />
+            )}
           </a>
           <a
             href={cliNavPage.href}
             aria-current={currentPage === cliNavPage.key ? 'page' : undefined}
-            class={`flex items-center justify-between px-3.5 py-2.5 text-sm font-bold transition-colors ${
-              currentPage === cliNavPage.key ? 'bg-acid text-ink' : 'text-ink hover:bg-[#E5E0D5]'
+            class={`flex items-center justify-between px-3.5 pt-2 pb-1 text-xs font-semibold transition-colors ${
+              currentPage === cliNavPage.key
+                ? 'bg-[#EDE8DC] text-ink'
+                : 'text-ink/70 bg-[#EDE8DC]/50 hover:bg-[#EDE8DC] hover:text-ink'
             }`}
           >
-            <span>{cliNavPage.label}</span>
-            {currentPage === cliNavPage.key && <span class="text-xs">&bull;</span>}
+            <span>Tooling</span>
+            {currentPage === cliNavPage.key && (
+              <span class="w-1.5 h-1.5 rounded-full bg-[#FF4F18] shrink-0" aria-hidden="true" />
+            )}
           </a>
+          <div class="grid grid-cols-2 divide-x divide-ink/10">
+            {toolingPages.map((tool) => {
+              const isActive = currentPage === tool.key;
+              return (
+                <a
+                  href={tool.href}
+                  aria-current={isActive ? 'page' : undefined}
+                  class={`flex items-center justify-between px-3 py-2 text-xs font-medium transition-colors ${
+                    isActive ? 'bg-[#EDE8DC] text-ink font-semibold' : 'text-ink hover:bg-[#EDE8DC]'
+                  }`}
+                >
+                  <span class="truncate">{tool.label}</span>
+                  {isActive && (
+                    <span
+                      class="w-1.5 h-1.5 rounded-full bg-[#FF4F18] shrink-0"
+                      aria-hidden="true"
+                    />
+                  )}
+                </a>
+              );
+            })}
+          </div>
           <a
             href={specNavPage.href}
             aria-current={currentPage === specNavPage.key ? 'page' : undefined}
-            class={`flex items-center justify-between px-3.5 py-2.5 text-sm font-bold transition-colors ${
-              currentPage === specNavPage.key ? 'bg-acid text-ink' : 'text-ink hover:bg-[#E5E0D5]'
+            class={`flex items-center justify-between px-3.5 py-2.5 text-sm font-medium transition-colors ${
+              currentPage === specNavPage.key
+                ? 'bg-[#EDE8DC] text-ink font-semibold'
+                : 'text-ink hover:bg-[#EDE8DC]'
             }`}
           >
             <span>{specNavPage.label}</span>
-            {currentPage === specNavPage.key && <span class="text-xs">&bull;</span>}
+            {currentPage === specNavPage.key && (
+              <span class="w-1.5 h-1.5 rounded-full bg-[#FF4F18] shrink-0" aria-hidden="true" />
+            )}
           </a>
         </nav>
       </details>
     </div>
 
-    <div class="flex items-center gap-2 shrink-0">
+    <div class="flex items-center gap-1.5 sm:gap-2 shrink-0">
       <button
         type="button"
         id="search-trigger"
@@ -296,13 +439,13 @@ const isMultiColDropdown = languages.length >= 5;
         aria-haspopup="dialog"
         aria-controls="search-dialog"
         title="Search documentation (⌘K or /)"
-        class="p-1.5 sm:px-2.5 sm:py-1.5 bg-[#FAF8F2] text-ink border-2 border-ink font-bold shadow-[2px_2px_0px_#111111] hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-[3px_3px_0px_#111111] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink transition text-xs sm:text-sm rounded flex items-center gap-1.5 cursor-pointer"
+        class="min-w-10 min-h-10 sm:min-w-0 sm:min-h-0 p-2 sm:px-2.5 sm:py-1.5 bg-[#FAF8F2] text-ink/80 hover:text-ink hover:bg-[#EDE8DC] border border-ink/15 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#FF4F18] transition text-xs sm:text-sm font-medium rounded-md flex items-center justify-center gap-1.5 cursor-pointer"
       >
         <svg
           class="w-4 h-4 stroke-current shrink-0"
           viewBox="0 0 24 24"
           fill="none"
-          stroke-width="2.5"
+          stroke-width="2"
           stroke-linecap="round"
           stroke-linejoin="round"
           aria-hidden="true"
@@ -311,7 +454,7 @@ const isMultiColDropdown = languages.length >= 5;
           <line x1="20" y1="20" x2="16.2" y2="16.2"></line>
         </svg>
         <span class="hidden sm:inline">Search</span>
-        <kbd class="hidden md:inline-block px-1.5 py-0.5 text-[10px] font-bold bg-[#E5E0D5] text-ink border border-ink rounded leading-none">
+        <kbd class="hidden md:inline-block px-1.5 py-0.5 font-mono text-xs font-medium bg-[#EDE8DC] text-ink/70 border border-ink/15 rounded leading-none">
           /
         </kbd>
       </button>
@@ -321,7 +464,7 @@ const isMultiColDropdown = languages.length >= 5;
         target="_blank"
         rel="noopener noreferrer"
         aria-label="OmniBuf on GitHub"
-        class="px-2.5 sm:px-3.5 py-1.5 bg-ink text-paper border-2 border-ink font-bold shadow-[2px_2px_0px_#FF4F18] hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-[3px_3px_0px_#FF4F18] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink transition text-xs sm:text-sm rounded flex items-center gap-1.5"
+        class="min-w-10 min-h-10 sm:min-w-0 sm:min-h-0 p-2 sm:px-3 sm:py-1.5 bg-[#FAF8F2] text-ink/85 hover:text-ink hover:bg-[#EDE8DC] border border-ink/15 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#FF4F18] transition text-xs sm:text-sm font-medium rounded-md flex items-center justify-center gap-1.5"
       >
         <svg class="w-4 h-4 fill-current" viewBox="0 0 16 16" aria-hidden="true">
           <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"></path>
@@ -334,7 +477,7 @@ const isMultiColDropdown = languages.length >= 5;
         id="theme-toggle"
         aria-label="Toggle dark mode"
         title="Toggle dark mode"
-        class="p-1.5 sm:px-2.5 sm:py-1.5 bg-[#E5E0D5] text-ink border-2 border-ink font-bold shadow-[2px_2px_0px_#111111] hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-[3px_3px_0px_#111111] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink transition rounded flex items-center justify-center cursor-pointer"
+        class="min-w-10 min-h-10 sm:min-w-0 sm:min-h-0 p-2 sm:px-2 sm:py-1.5 bg-[#FAF8F2] text-ink/75 hover:text-ink hover:bg-[#EDE8DC] border border-ink/15 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#FF4F18] transition rounded-md flex items-center justify-center cursor-pointer"
       >
         <!-- Sun icon (shown in dark mode) -->
         <svg
@@ -342,7 +485,7 @@ const isMultiColDropdown = languages.length >= 5;
           class="hidden w-4 h-4 stroke-current"
           viewBox="0 0 24 24"
           fill="none"
-          stroke-width="2.2"
+          stroke-width="2"
           stroke-linecap="round"
           stroke-linejoin="round"
           aria-hidden="true"
@@ -363,7 +506,7 @@ const isMultiColDropdown = languages.length >= 5;
           class="w-4 h-4 stroke-current"
           viewBox="0 0 24 24"
           fill="none"
-          stroke-width="2.2"
+          stroke-width="2"
           stroke-linecap="round"
           stroke-linejoin="round"
           aria-hidden="true"
@@ -375,31 +518,19 @@ const isMultiColDropdown = languages.length >= 5;
   </div>
 </header>
 
+<Breadcrumbs currentPage={currentPage} />
+
 <dialog
   id="search-dialog"
   aria-label="Search documentation and wire specification"
-  class="fixed inset-0 z-[70] m-auto mt-8 sm:mt-16 w-[calc(100%-1.5rem)] max-w-2xl max-h-[82vh] p-0 bg-[#FAF8F2] text-ink border-2 border-ink rounded-md font-mono overflow-hidden open:flex open:flex-col no-print select-none"
+  class="fixed inset-0 z-[70] m-auto mt-10 sm:mt-16 w-[calc(100%-1.5rem)] max-w-2xl max-h-[82vh] p-0 bg-[#FAF8F2] text-ink border border-ink/20 rounded-lg shadow-xl overflow-hidden open:flex open:flex-col no-print select-none"
 >
-  <div class="os-titlebar bg-[#E5E0D5] shrink-0">
-    <span class="font-bold uppercase text-ink text-xs sm:text-sm">
-      Search Documentation &amp; Spec
-    </span>
-    <button
-      type="button"
-      id="search-close"
-      aria-label="Close search"
-      class="px-2 py-0.5 bg-[#FAF8F2] text-ink border border-ink rounded text-xs font-bold hover:bg-acid focus-visible:outline focus-visible:outline-2 focus-visible:outline-ink transition cursor-pointer"
-    >
-      ESC
-    </button>
-  </div>
-
-  <div class="p-3 sm:p-3.5 border-b-2 border-ink bg-white flex items-center gap-2.5 shrink-0">
+  <div class="p-3.5 sm:px-4 border-b border-ink/15 bg-white flex items-center gap-2.5 shrink-0">
     <svg
-      class="w-4 h-4 stroke-current text-ink/70 shrink-0"
+      class="w-4 h-4 stroke-current text-ink/60 shrink-0"
       viewBox="0 0 24 24"
       fill="none"
-      stroke-width="2.5"
+      stroke-width="2"
       stroke-linecap="round"
       stroke-linejoin="round"
       aria-hidden="true"
@@ -410,19 +541,31 @@ const isMultiColDropdown = languages.length >= 5;
     <input
       id="search-input"
       type="search"
+      role="combobox"
+      aria-expanded="true"
+      aria-autocomplete="list"
       autocomplete="off"
       spellcheck="false"
       placeholder="Search wire types, Prefix-Varint, Opaque, Go, Rust, Python, C++..."
       aria-label="Search documentation"
       aria-controls="search-results"
-      class="w-full bg-transparent text-ink placeholder:text-ink/55 text-sm sm:text-base font-mono focus:outline-none"
+      aria-activedescendant="search-opt-0"
+      class="w-full bg-transparent text-ink placeholder:text-ink/50 text-sm sm:text-base focus:outline-none"
     />
     <button
       type="button"
       id="search-clear"
-      class="hidden px-2 py-0.5 text-xs font-bold uppercase bg-[#E5E0D5] text-ink border border-ink rounded hover:bg-acid focus-visible:outline focus-visible:outline-2 focus-visible:outline-ink cursor-pointer shrink-0"
+      class="hidden px-2 py-0.5 text-xs font-medium bg-[#EDE8DC] text-ink border border-ink/15 rounded hover:border-ink/30 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#FF4F18] cursor-pointer shrink-0"
     >
       Clear
+    </button>
+    <button
+      type="button"
+      id="search-close"
+      aria-label="Close search"
+      class="px-2 py-0.5 font-mono text-xs text-ink/65 bg-[#EDE8DC] border border-ink/15 rounded hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#FF4F18] transition cursor-pointer shrink-0"
+    >
+      ESC
     </button>
   </div>
 
@@ -430,61 +573,63 @@ const isMultiColDropdown = languages.length >= 5;
     id="search-results"
     role="listbox"
     aria-label="Search results"
-    class="flex-1 overflow-y-auto p-3 sm:p-4 space-y-1.5"
+    class="flex-1 overflow-y-auto p-3.5 sm:p-4 space-y-1.5"
   >
-    <div id="search-default-links" class="space-y-2.5">
+    <div id="search-default-links" class="space-y-3">
       <div class="grid sm:grid-cols-3 gap-2">
         <a
+          id="search-opt-0"
           href="/how-it-works#wire-types"
           role="option"
           aria-selected="true"
           data-search-item
           data-active="true"
-          class="block p-2.5 rounded border-2 border-ink/25 hover:border-ink transition"
+          class="block p-2.5 rounded-md border border-ink/15 hover:border-ink/35 transition"
         >
-          <div class="text-[10px] font-bold uppercase text-ink/65">How It Works</div>
-          <div class="text-xs sm:text-sm font-bold text-ink mt-0.5">The 16 Wire Types</div>
+          <div class="text-xs font-medium text-ink/65">How It Works</div>
+          <div class="text-xs sm:text-sm font-semibold text-ink mt-0.5">The 16 Wire Types</div>
         </a>
         <a
+          id="search-opt-1"
           href="/spec"
           role="option"
           aria-selected="false"
           data-search-item
-          class="block p-2.5 rounded border-2 border-ink/25 hover:border-ink transition"
+          class="block p-2.5 rounded-md border border-ink/15 hover:border-ink/35 transition"
         >
-          <div class="text-[10px] font-bold uppercase text-ink/65">Specification</div>
-          <div class="text-xs sm:text-sm font-bold text-ink mt-0.5">
+          <div class="text-xs font-medium text-ink/65">Specification</div>
+          <div class="text-xs sm:text-sm font-semibold text-ink mt-0.5">
             Wire Specification v1 DRAFT-1
           </div>
         </a>
         <a
+          id="search-opt-2"
           href="/tooling"
           role="option"
           aria-selected="false"
           data-search-item
-          class="block p-2.5 rounded border-2 border-ink/25 hover:border-ink transition"
+          class="block p-2.5 rounded-md border border-ink/15 hover:border-ink/35 transition"
         >
-          <div class="text-[10px] font-bold uppercase text-ink/65">Tooling</div>
-          <div class="text-xs sm:text-sm font-bold text-ink mt-0.5">
+          <div class="text-xs font-medium text-ink/65">Tooling</div>
+          <div class="text-xs sm:text-sm font-semibold text-ink mt-0.5">
             CLI &amp; Editor Extensions
           </div>
         </a>
       </div>
       <div>
-        <div class="text-[10px] font-bold uppercase text-ink/65 px-0.5 mb-1.5">
-          Language Implementations
-        </div>
+        <div class="text-xs font-medium text-ink/65 px-0.5 mb-1.5">Language Implementations</div>
         <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
-          {languages.map((lang) => (
+          {languages.map((lang, idx) => (
             <a
+              id={`search-opt-${idx + 3}`}
               href={lang.href}
               role="option"
               aria-selected="false"
               data-search-item
-              class="block p-2 rounded border-2 border-ink/25 hover:border-ink transition"
+              class="block p-2 rounded-md border border-ink/15 hover:border-ink/35 transition"
             >
-              <div class="text-xs font-bold text-ink">{lang.label}</div>
-              <div class="text-[11px] text-ink/65 truncate">{lang.shortPackage}</div>
+              <div class="text-xs font-semibold text-ink">{lang.label}</div>
+              <div class="font-mono text-xs text-ink/65 truncate">{lang.shortPackage}</div>
             </a>
           ))}
         </div>
@@ -493,28 +638,27 @@ const isMultiColDropdown = languages.length >= 5;
     <div id="search-dynamic-results" class="hidden space-y-1.5"></div>
   </div>
 
-  <div class="px-3 sm:px-4 py-2 bg-[#E5E0D5] border-t-2 border-ink flex items-center justify-between gap-2 text-[11px] text-ink/80 shrink-0">
-    <span id="search-status" data-default-status={`Type to search all ${totalSitePages} pages`}>
+  <div class="px-3.5 sm:px-4 py-2 bg-[#EDE8DC] border-t border-ink/12 flex items-center justify-between gap-2 font-mono text-xs text-ink/70 shrink-0">
+    <span
+      id="search-status"
+      aria-live="polite"
+      data-default-status={`Type to search all ${totalSitePages} pages`}
+    >
       Type to search all {totalSitePages} pages
     </span>
     <div class="hidden sm:flex items-center gap-3">
       <span>
-        <kbd class="px-1 py-0.5 bg-[#FAF8F2] border border-ink rounded text-[10px] font-bold">
+        <kbd class="px-1 py-0.5 bg-[#FAF8F2] border border-ink/20 rounded text-xs">
           &uarr;&darr;
         </kbd>{' '}
         Navigate
       </span>
       <span>
-        <kbd class="px-1 py-0.5 bg-[#FAF8F2] border border-ink rounded text-[10px] font-bold">
-          &crarr;
-        </kbd>{' '}
+        <kbd class="px-1 py-0.5 bg-[#FAF8F2] border border-ink/20 rounded text-xs">&crarr;</kbd>{' '}
         Open
       </span>
       <span>
-        <kbd class="px-1 py-0.5 bg-[#FAF8F2] border border-ink rounded text-[10px] font-bold">
-          ESC
-        </kbd>{' '}
-        Close
+        <kbd class="px-1 py-0.5 bg-[#FAF8F2] border border-ink/20 rounded text-xs">ESC</kbd> Close
       </span>
     </div>
   </div>
@@ -522,22 +666,34 @@ const isMultiColDropdown = languages.length >= 5;
 
 <script>
   const mobileNavMenu = document.getElementById('mobile-nav-menu') as HTMLDetailsElement | null;
-  const docsNavMenu = document.getElementById('docs-nav-menu') as HTMLDetailsElement | null;
-  const langNavMenu = document.getElementById('lang-nav-menu') as HTMLDetailsElement | null;
-  const hoverDropdowns = [docsNavMenu, langNavMenu].filter(
-    (el): el is HTMLDetailsElement => el !== null,
+  const docsNavMenu = document.getElementById('docs-nav-menu') as HTMLDivElement | null;
+  const langNavMenu = document.getElementById('lang-nav-menu') as HTMLDivElement | null;
+  const toolingNavMenu = document.getElementById('tooling-nav-menu') as HTMLDivElement | null;
+  const linkDropdowns = [docsNavMenu, langNavMenu, toolingNavMenu].filter(
+    (el): el is HTMLDivElement => el !== null,
   );
-  const navMenus = [mobileNavMenu, ...hoverDropdowns].filter(
-    (el): el is HTMLDetailsElement => el !== null,
-  );
+  const navMenus = [mobileNavMenu].filter((el): el is HTMLDetailsElement => el !== null);
 
-  for (const dropdown of hoverDropdowns) {
+  const closeLinkMenu = (menu: HTMLDivElement) => {
+    menu.dataset.open = 'false';
+    delete menu.dataset.closing;
+    const toggleBtn = menu.querySelector<HTMLButtonElement>(
+      ':scope > button[data-dropdown-toggle]',
+    );
+    toggleBtn?.setAttribute('aria-expanded', 'false');
+  };
+
+  for (const menu of linkDropdowns) {
     const HOVER_CLOSE_DELAY_MS = 260;
     const FADE_OUT_MS = 140;
     let hoverCloseTimer: number | null = null;
     let fadeCloseTimer: number | null = null;
+    const rootLink = menu.querySelector<HTMLAnchorElement>(':scope > a');
+    const toggleBtn = menu.querySelector<HTMLButtonElement>(
+      ':scope > button[data-dropdown-toggle]',
+    );
 
-    const cancelClose = () => {
+    const cancelLinkClose = () => {
       if (hoverCloseTimer !== null) {
         window.clearTimeout(hoverCloseTimer);
         hoverCloseTimer = null;
@@ -546,44 +702,70 @@ const isMultiColDropdown = languages.length >= 5;
         window.clearTimeout(fadeCloseTimer);
         fadeCloseTimer = null;
       }
-      delete dropdown.dataset.closing;
+      delete menu.dataset.closing;
     };
 
-    dropdown.addEventListener('pointerenter', (e) => {
-      if (e.pointerType !== 'mouse') return;
-      for (const other of hoverDropdowns) {
-        if (other !== dropdown && other.open) {
-          other.open = false;
-        }
+    const openLinkMenu = () => {
+      for (const other of linkDropdowns) {
+        if (other !== menu && other.dataset.open === 'true') closeLinkMenu(other);
       }
-      cancelClose();
-      dropdown.open = true;
+      cancelLinkClose();
+      menu.dataset.open = 'true';
+      toggleBtn?.setAttribute('aria-expanded', 'true');
+    };
+
+    menu.addEventListener('pointerenter', (e) => {
+      if (e.pointerType !== 'mouse') return;
+      openLinkMenu();
     });
-    dropdown.addEventListener('pointerleave', (e) => {
-      if (e.pointerType !== 'mouse' || !dropdown.open) return;
-      cancelClose();
+    menu.addEventListener('pointerleave', (e) => {
+      if (e.pointerType !== 'mouse' || menu.dataset.open !== 'true') return;
+      cancelLinkClose();
       hoverCloseTimer = window.setTimeout(() => {
         hoverCloseTimer = null;
-        dropdown.dataset.closing = 'true';
+        menu.dataset.closing = 'true';
         fadeCloseTimer = window.setTimeout(() => {
           fadeCloseTimer = null;
-          dropdown.open = false;
-          delete dropdown.dataset.closing;
+          closeLinkMenu(menu);
         }, FADE_OUT_MS);
       }, HOVER_CLOSE_DELAY_MS);
     });
-    dropdown.addEventListener('toggle', () => {
-      if (!dropdown.open) {
-        cancelClose();
+    toggleBtn?.addEventListener('click', () => {
+      if (menu.dataset.open === 'true') {
+        cancelLinkClose();
+        closeLinkMenu(menu);
+      } else {
+        openLinkMenu();
+      }
+    });
+    const handleArrowOpen = (e: KeyboardEvent) => {
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        openLinkMenu();
+        menu.querySelector<HTMLAnchorElement>('.link-dropdown-panel a')?.focus();
+      }
+    };
+    rootLink?.addEventListener('keydown', handleArrowOpen);
+    toggleBtn?.addEventListener('keydown', handleArrowOpen);
+    menu.addEventListener('focusout', (e) => {
+      const next = e.relatedTarget as Node | null;
+      if (!next || !menu.contains(next)) {
+        cancelLinkClose();
+        closeLinkMenu(menu);
       }
     });
   }
 
-  if (navMenus.length > 0) {
+  if (navMenus.length > 0 || linkDropdowns.length > 0) {
     document.addEventListener('click', (e) => {
       for (const menu of navMenus) {
         if (menu.open && !menu.contains(e.target as Node)) {
           menu.open = false;
+        }
+      }
+      for (const menu of linkDropdowns) {
+        if (menu.dataset.open === 'true' && !menu.contains(e.target as Node)) {
+          closeLinkMenu(menu);
         }
       }
     });
@@ -591,7 +773,23 @@ const isMultiColDropdown = languages.length >= 5;
       if (e.key === 'Escape') {
         for (const menu of navMenus) {
           if (menu.open) {
+            const wasInside = menu.contains(document.activeElement);
             menu.open = false;
+            if (wasInside) {
+              menu.querySelector<HTMLElement>(':scope > summary')?.focus();
+            }
+          }
+        }
+        for (const menu of linkDropdowns) {
+          if (menu.dataset.open === 'true') {
+            const wasInside = menu.contains(document.activeElement);
+            closeLinkMenu(menu);
+            if (wasInside) {
+              (
+                menu.querySelector<HTMLButtonElement>(':scope > button[data-dropdown-toggle]') ??
+                menu.querySelector<HTMLAnchorElement>(':scope > a')
+              )?.focus();
+            }
           }
         }
       }
@@ -652,20 +850,30 @@ const isMultiColDropdown = languages.length >= 5;
   const searchDynamicResults = document.getElementById('search-dynamic-results');
   const searchStatus = document.getElementById('search-status');
 
-  let searchIndexPromise: Promise<SearchEntry[]> | null = null;
+  let searchIndexPromise: Promise<SearchEntry[] | null> | null = null;
   let searchEntries: SearchEntry[] | null = null;
+  let searchLoadFailed = false;
   let activeIndex = 0;
 
-  function loadSearchIndex(): Promise<SearchEntry[]> {
+  function loadSearchIndex(): Promise<SearchEntry[] | null> {
     if (searchEntries) return Promise.resolve(searchEntries);
     if (!searchIndexPromise) {
+      searchLoadFailed = false;
       searchIndexPromise = fetch('/search-index.json')
-        .then((res) => (res.ok ? (res.json() as Promise<SearchEntry[]>) : []))
+        .then((res) => {
+          if (!res.ok) throw new Error(`HTTP ${res.status}`);
+          return res.json() as Promise<SearchEntry[]>;
+        })
         .then((data) => {
           searchEntries = data;
+          searchLoadFailed = false;
           return data;
         })
-        .catch(() => []);
+        .catch(() => {
+          searchLoadFailed = true;
+          searchIndexPromise = null;
+          return null;
+        });
     }
     return searchIndexPromise;
   }
@@ -695,7 +903,7 @@ const isMultiColDropdown = languages.length >= 5;
     return parts
       .map((part, i) =>
         i % 2 === 1
-          ? `<mark class="underline decoration-[#FF4F18] decoration-2 underline-offset-2 font-bold bg-transparent text-inherit">${escapeHtml(part)}</mark>`
+          ? `<mark class="underline decoration-[#FF4F18] decoration-2 underline-offset-2 font-semibold bg-transparent text-inherit">${escapeHtml(part)}</mark>`
           : escapeHtml(part),
       )
       .join('');
@@ -737,6 +945,7 @@ const isMultiColDropdown = languages.length >= 5;
     const items = getVisibleItems();
     if (items.length === 0) {
       activeIndex = 0;
+      searchInput?.removeAttribute('aria-activedescendant');
       return;
     }
     activeIndex = ((nextIndex % items.length) + items.length) % items.length;
@@ -745,6 +954,9 @@ const isMultiColDropdown = languages.length >= 5;
       el.setAttribute('data-active', isSelected ? 'true' : 'false');
       el.setAttribute('aria-selected', isSelected ? 'true' : 'false');
       if (isSelected) {
+        if (el.id) {
+          searchInput?.setAttribute('aria-activedescendant', el.id);
+        }
         el.scrollIntoView({ block: 'nearest' });
       }
     });
@@ -768,6 +980,23 @@ const isMultiColDropdown = languages.length >= 5;
     }
 
     const entries = await loadSearchIndex();
+    if (!entries || searchLoadFailed) {
+      searchDefaultLinks?.classList.add('hidden');
+      if (searchDynamicResults) {
+        searchDynamicResults.classList.remove('hidden');
+        searchDynamicResults.innerHTML = `
+          <div class="p-4 text-center space-y-2">
+            <div class="text-sm font-semibold text-ink">Could not load the search index</div>
+            <div class="text-xs text-ink/70">Check your network connection and retry, or use the top navigation links.</div>
+          </div>
+        `;
+      }
+      if (searchStatus) {
+        searchStatus.textContent = 'Search index unavailable';
+      }
+      updateActiveItem(0);
+      return;
+    }
     const lowerQuery = query.toLowerCase();
     const tokens = lowerQuery.split(/\s+/).filter(Boolean);
 
@@ -820,13 +1049,13 @@ const isMultiColDropdown = languages.length >= 5;
         ];
         searchDynamicResults.innerHTML = `
           <div class="p-4 text-center space-y-3">
-            <div class="text-sm font-bold text-ink">No sections matched &ldquo;${escapeHtml(query)}&rdquo;</div>
-            <div class="text-xs text-ink/70">Try one of these topics:</div>
+            <div class="text-sm font-semibold text-ink">No sections matched &ldquo;${escapeHtml(query)}&rdquo;</div>
+            <div class="text-xs text-ink/65">Try one of these topics:</div>
             <div class="flex flex-wrap justify-center gap-1.5 pt-1">
               ${suggestions
                 .map(
                   (s) =>
-                    `<button type="button" data-search-suggest="${escapeHtml(s)}" class="px-2.5 py-1 text-xs font-bold bg-[#E5E0D5] text-ink border border-ink rounded hover:bg-acid cursor-pointer">${escapeHtml(s)}</button>`,
+                    `<button type="button" data-search-suggest="${escapeHtml(s)}" class="px-2.5 py-1 font-mono text-xs font-medium bg-[#EDE8DC] text-ink border border-ink/15 rounded hover:border-ink/35 cursor-pointer">${escapeHtml(s)}</button>`,
                 )
                 .join('')}
             </div>
@@ -852,18 +1081,19 @@ const isMultiColDropdown = languages.length >= 5;
               : escapeHtml(entry.page);
             return `
               <a
+                id="search-dyn-${idx}"
                 href="${escapeHtml(entry.url)}"
                 role="option"
                 aria-selected="${idx === 0 ? 'true' : 'false'}"
                 data-search-item
                 data-active="${idx === 0 ? 'true' : 'false'}"
-                class="block p-2.5 sm:p-3 rounded border-2 border-transparent hover:border-ink transition"
+                class="block p-2.5 sm:p-3 rounded-md border border-transparent hover:border-ink/25 transition"
               >
-                <div class="text-[10px] font-bold uppercase text-ink/65 truncate">${breadcrumb}</div>
-                <div class="text-xs sm:text-sm font-bold text-ink mt-0.5">${highlightMatches(entry.title, tokens)}</div>
+                <div class="text-xs font-medium text-ink/65 truncate">${breadcrumb}</div>
+                <div class="text-xs sm:text-sm font-semibold text-ink mt-0.5">${highlightMatches(entry.title, tokens)}</div>
                 ${
                   entry.text
-                    ? `<div class="text-xs text-ink/80 mt-1 line-clamp-2 leading-relaxed font-sans">${buildSnippet(entry.text, tokens)}</div>`
+                    ? `<div class="text-xs text-ink/75 mt-1 line-clamp-2 leading-relaxed">${buildSnippet(entry.text, tokens)}</div>`
                     : ''
                 }
               </a>
@@ -974,7 +1204,9 @@ const isMultiColDropdown = languages.length >= 5;
 </script>
 
 <style>
-  #lang-nav-menu .lang-dropdown-panel {
+  #lang-nav-menu .lang-dropdown-panel,
+  #docs-nav-menu .lang-dropdown-panel,
+  #tooling-nav-menu .lang-dropdown-panel {
     opacity: 1;
     transform: translateY(0);
     transition:
@@ -982,13 +1214,29 @@ const isMultiColDropdown = languages.length >= 5;
       transform 140ms ease-out;
   }
 
-  #lang-nav-menu[data-closing='true'] .lang-dropdown-panel {
+  #docs-nav-menu[data-open='false'] .link-dropdown-panel,
+  #lang-nav-menu[data-open='false'] .link-dropdown-panel,
+  #tooling-nav-menu[data-open='false'] .link-dropdown-panel {
+    display: none;
+  }
+
+  #docs-nav-menu[data-open='true'] .link-dropdown-caret,
+  #lang-nav-menu[data-open='true'] .link-dropdown-caret,
+  #tooling-nav-menu[data-open='true'] .link-dropdown-caret {
+    transform: rotate(180deg);
+  }
+
+  #lang-nav-menu[data-closing='true'] .lang-dropdown-panel,
+  #docs-nav-menu[data-closing='true'] .lang-dropdown-panel,
+  #tooling-nav-menu[data-closing='true'] .lang-dropdown-panel {
     opacity: 0;
     transform: translateY(-4px);
   }
 
   @media (prefers-reduced-motion: reduce) {
-    #lang-nav-menu .lang-dropdown-panel {
+    #lang-nav-menu .lang-dropdown-panel,
+    #docs-nav-menu .lang-dropdown-panel,
+    #tooling-nav-menu .lang-dropdown-panel {
       transition: none;
     }
   }

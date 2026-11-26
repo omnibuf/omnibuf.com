@@ -43,7 +43,7 @@ const goFaqItems = [
     id: 'go-faq-blind',
     question: 'How do I decode without a schema?',
     paragraphs: [
-      '<code>omnibuf.DecodeBlind(pkt)</code> returns a map with synthetic <code>field_1</code>, <code>field_2</code>, ... keys. Setting <code>MarshalOptions{SelfDescribing: true}</code> on encode embeds Field #0 so <code>DecodeBlind</code> keys the map by field name.',
+      '<code>omnibuf.DecodeBlind(pkt)</code> returns a map with synthetic <code>field_1</code>, <code>field_2</code>, ... keys. Pass <code>MarshalOptions{SelfDescribing: true}</code> on encode to embed Field #0 so <code>DecodeBlind</code> keys the map by field name.',
     ],
     codeBlock: field0BlindCode,
     codeLabel: 'Example',
@@ -61,7 +61,7 @@ const goFaqItems = [
     id: 'go-faq-plugin',
     question: 'Do I need protoc-gen-omnibuf-go?',
     paragraphs: [
-      'Code generation is optional. Core <code>omnibuf.Marshal</code> and <code>omnibuf.Unmarshal</code> serialize tagged Go structs with zero external dependencies, while the separate <code>omnibufproto</code> submodule handles standard <code>.pb.go</code> messages via <code>protoreflect</code>. Adding <code>protoc-gen-omnibuf-go</code> compiles single-pass struct methods and lazy <code>Opaque</code> packet views.',
+      'Code generation is optional. Core <code>omnibuf.Marshal</code> and <code>omnibuf.Unmarshal</code> serialize tagged Go structs with zero external dependencies, while the separate <code>omnibufproto</code> submodule handles standard <code>.pb.go</code> messages via <code>protoreflect</code>. For the fastest path, <code>protoc-gen-omnibuf-go</code> compiles single-pass struct methods and lazy <code>Opaque</code> packet views.',
     ],
   },
 ];
@@ -90,16 +90,14 @@ const goFaqJsonLd = {
 
   <main id="main-content">
     <!-- Page Header + Up-Front Install Bar -->
-    <section class="relative pt-10 pb-8 sm:pt-16 sm:pb-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-      <h1 class="text-[2.6rem] sm:text-7xl lg:text-[5.5rem] font-bold tracking-tight leading-[0.94] text-ink uppercase">
-        OmniBuf
-        <br />
-        <span class="text-[#FF4F18]">for Go.</span>
+    <section class="relative pt-10 pb-8 sm:pt-14 sm:pb-10 px-4 sm:px-6 max-w-6xl mx-auto">
+      <h1 class="text-3xl sm:text-5xl font-bold tracking-tight leading-[1.1] text-ink">
+        OmniBuf <span class="text-[#FF4F18]">for Go</span>
       </h1>
 
       <div class="mt-6 grid lg:grid-cols-12 gap-6 lg:gap-8 items-end">
         <div class="lg:col-span-7 space-y-4">
-          <p class="text-lg sm:text-2xl text-ink/85 font-medium leading-snug">
+          <p class="text-base sm:text-lg text-ink/80 leading-relaxed max-w-[65ch]">
             Zero-dependency runtime for Go. Serialize{' '}
             <a href="#struct-tags" class="doc-link">
               tagged structs
@@ -115,12 +113,12 @@ const goFaqJsonLd = {
             . Generated packet views read and update individual fields in place on raw byte slices,
             and self-describing payloads decode straight to maps or JSON.
           </p>
-          <div class="flex flex-wrap gap-3 font-mono text-sm sm:text-base pt-1 no-print">
+          <div class="flex flex-wrap gap-2.5 text-sm pt-1 no-print">
             <a
               href="https://github.com/omnibuf/omnibuf-go"
               target="_blank"
               rel="noopener noreferrer"
-              class="os-btn px-4 py-2.5 bg-acid text-ink font-bold rounded-md"
+              class="btn-primary px-4 py-2"
             >
               GitHub Repository &rarr;
             </a>
@@ -128,7 +126,7 @@ const goFaqJsonLd = {
               href="https://pkg.go.dev/github.com/omnibuf/omnibuf-go"
               target="_blank"
               rel="noopener noreferrer"
-              class="os-btn px-4 py-2.5 bg-[#FAF8F2] text-ink font-bold rounded-md"
+              class="btn-secondary px-4 py-2"
             >
               pkg.go.dev &rarr;
             </a>
@@ -136,13 +134,13 @@ const goFaqJsonLd = {
         </div>
 
         <div class="lg:col-span-5 min-w-0">
-          <div class="p-4 sm:p-5 bg-ink text-paper rounded-md font-mono text-xs sm:text-sm overflow-x-auto leading-relaxed border-2 border-ink">
-            <div class="flex items-center justify-between gap-2 mb-2 pb-2 border-b border-paper/15">
-              <div class="text-xs font-bold uppercase text-acid">Install Go Runtime</div>
+          <div class="p-4 sm:p-5 bg-ink text-paper rounded-lg font-mono text-xs sm:text-sm overflow-x-auto leading-relaxed border border-ink/15">
+            <div class="flex items-center justify-between gap-2 mb-2 pb-2 border-b border-paper/12">
+              <div class="text-xs font-medium text-paper/70">Install Go Runtime</div>
               <button
                 type="button"
                 data-copy="go get github.com/omnibuf/omnibuf-go"
-                class="copy-snippet-btn min-w-[4.75rem] text-center px-2.5 py-1 text-xs font-bold uppercase bg-paper/15 hover:bg-acid hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-acid text-paper border border-paper/30 rounded shrink-0 transition"
+                class="copy-snippet-btn min-w-[4.25rem] text-center px-2.5 py-1 text-xs font-medium bg-paper/10 hover:bg-paper/20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#FF7A4D] text-paper border border-paper/20 rounded shrink-0 transition cursor-pointer"
               >
                 Copy
               </button>
@@ -168,21 +166,19 @@ const goFaqJsonLd = {
 
     <section
       id="go-faq"
-      class="scroll-mt-16 py-16 sm:py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto border-t-2 border-ink/15"
+      class="scroll-mt-16 py-12 sm:py-16 px-4 sm:px-6 max-w-6xl mx-auto border-t border-ink/15"
     >
       <div class="max-w-3xl mb-10">
-        <h2 class="text-3xl sm:text-5xl font-bold tracking-tight uppercase leading-none">
-          Go questions.
-        </h2>
+        <h2 class="text-2xl sm:text-3xl font-bold tracking-tight text-ink">Go questions.</h2>
       </div>
 
-      <div class="border-t-2 border-ink divide-y-2 divide-ink/20">
+      <div class="border-t border-ink/15 divide-y divide-ink/12">
         {goFaqItems.map((item) => (
           <div
             id={item.id}
             class="scroll-mt-16 py-8 sm:py-10 grid lg:grid-cols-12 gap-6 lg:gap-8 items-start"
           >
-            <h3 class="lg:col-span-5 text-xl sm:text-2xl font-bold uppercase tracking-tight text-ink leading-snug">
+            <h3 class="lg:col-span-5 text-lg sm:text-xl font-bold tracking-tight text-ink leading-snug">
               {item.question}
             </h3>
 
@@ -191,15 +187,15 @@ const goFaqJsonLd = {
                 <p set:html={paragraph} />
               ))}
               {item.codeBlock && (
-                <div class="bg-ink text-paper p-4 sm:p-5 rounded-md border-2 border-ink font-mono text-xs sm:text-sm leading-relaxed overflow-x-auto [&>pre]:bg-transparent! [&>pre]:p-0! [&>pre]:m-0! [&>pre]:border-0!">
-                  <div class="flex items-center justify-between gap-2 mb-2.5 pb-2 border-b border-paper/15">
-                    <div class="text-xs font-bold uppercase text-acid">
+                <div class="bg-ink text-paper p-4 sm:p-5 rounded-lg border border-ink/15 font-mono text-xs sm:text-sm leading-relaxed overflow-x-auto [&>pre]:bg-transparent! [&>pre]:p-0! [&>pre]:m-0! [&>pre]:border-0!">
+                  <div class="flex items-center justify-between gap-2 mb-2.5 pb-2 border-b border-paper/12">
+                    <div class="text-xs font-medium text-paper/70">
                       {item.codeLabel ?? 'Example'}
                     </div>
                     <button
                       type="button"
                       data-copy={item.codeBlock}
-                      class="copy-snippet-btn min-w-[4.75rem] text-center px-2.5 py-1 text-xs font-bold uppercase bg-paper/15 hover:bg-acid hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-acid text-paper border border-paper/30 rounded shrink-0 transition"
+                      class="copy-snippet-btn min-w-[4.25rem] text-center px-2.5 py-1 text-xs font-medium bg-paper/10 hover:bg-paper/20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#FF7A4D] text-paper border border-paper/20 rounded shrink-0 transition cursor-pointer"
                     >
                       Copy
                     </button>

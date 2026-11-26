@@ -1,1265 +1,868 @@
 ---
-import { languageBenchmarkList } from '../data/benchmarks';
+import { languageBenchmarkList, type BenchmarkRow } from '../data/benchmarks';
 
-const heroLanguageCharts = languageBenchmarkList.map((suite) => {
-  const maxEnc = Math.max(...suite.butterflyEncodeRows.map((r) => r.val), 1);
-  const maxDec = Math.max(...suite.butterflyDecodeRows.map((r) => r.val), 1);
-  const decodeByName = new Map(suite.butterflyDecodeRows.map((r) => [r.name, r.val]));
-  const bRows = suite.butterflyEncodeRows.map((r) => {
-    const decVal = decodeByName.get(r.name) ?? r.val;
-    return {
-      name: r.name,
-      baseline: Boolean(r.baseline),
-      encVal: r.val,
-      decVal,
-      encPct: Math.max(4.5, Math.min(100, (r.val / maxEnc) * 100)).toFixed(1),
-      decPct: Math.max(4.5, Math.min(100, (decVal / maxDec) * 100)).toFixed(1),
-    };
-  });
-  const omniRow = bRows.find((r) => r.baseline) ?? bRows[0];
-  const restRows = bRows.filter((r) => !r.baseline);
-  return {
-    ...suite,
-    omniRow,
-    restRows,
-  };
-});
+function formatNs(val: number): string {
+  if (val >= 1_000_000) {
+    return `${(val / 1_000_000).toFixed(2)} ms`;
+  }
+  if (val >= 10_000) {
+    return `${(val / 1_000).toFixed(1)} µs`;
+  }
+  return `${val.toLocaleString('en-US')} ns`;
+}
 
-const stackedPeerFiles = [
-  { step: 10, file: 'peer.ex' },
-  { step: 9, file: 'Peer.php' },
-  { step: 8, file: 'peer.dart' },
-  { step: 7, file: 'Peer.swift' },
-  { step: 6, file: 'Peer.java' },
-  { step: 5, file: 'Peer.cs' },
-  { step: 4, file: 'peer.hpp' },
-  { step: 3, file: 'peer.py' },
-  { step: 2, file: 'peer.rs' },
-  { step: 1, file: 'peer.ts' },
-];
+function formatRatio(val: number, baselineVal: number): string {
+  if (baselineVal <= 0 || val === baselineVal) return 'baseline';
+  if (val > baselineVal) {
+    const ratio = val / baselineVal;
+    if (ratio < 1.15) {
+      const pct = Math.round((ratio - 1) * 100);
+      return pct === 0 ? '~same' : `${pct}% slower`;
+    }
+    return ratio >= 10 ? `${Math.round(ratio)}x slower` : `${ratio.toFixed(1)}x slower`;
+  }
+  const ratio = baselineVal / val;
+  if (ratio < 1.15) {
+    const pct = Math.round((ratio - 1) * 100);
+    return pct === 0 ? '~same' : `${pct}% faster`;
+  }
+  return `${ratio.toFixed(1)}x faster`;
+}
+
+function prepareBarRows(rows: BenchmarkRow[]) {
+  const maxVal = Math.max(...rows.map((r) => r.val), 1);
+  const baselineVal =
+    rows.find((r) => r.baseline)?.val ?? rows.find((r) => r.highlight)?.val ?? rows[0]?.val ?? 1;
+  return rows.map((r) => ({
+    name: r.name,
+    val: r.val,
+    formattedVal: formatNs(r.val),
+    ratioLabel: formatRatio(r.val, baselineVal),
+    isOmni: Boolean(r.baseline || r.highlight),
+    pct: Math.max(1, Math.min(100, (r.val / maxVal) * 100)).toFixed(1),
+  }));
+}
+
+const benchmarkPreviews = languageBenchmarkList.map((suite) => ({
+  key: suite.key,
+  label: suite.label,
+  shortLabel: suite.shortLabel,
+  href: suite.href,
+  langHref: `/${suite.key}`,
+  encodeRows: prepareBarRows(suite.butterflyEncodeRows),
+  decodeRows: prepareBarRows(suite.butterflyDecodeRows),
+}));
 ---
 
-<section class="relative pt-10 pb-14 sm:pt-16 sm:pb-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-  <div class="mb-5">
-    <a
-      href="/spec"
-      class="inline-flex flex-wrap items-center gap-2 px-3 py-1.5 bg-[#FAF8F2] text-ink border-2 border-ink shadow-[2px_2px_0px_#111111] hover:bg-acid transition rounded font-mono text-xs sm:text-sm font-bold"
-    >
-      <span class="px-1.5 py-0.5 bg-[#FF4F18] text-white border border-ink rounded-sm uppercase text-xs leading-none">
-        Experimental
-      </span>
-      <span>v1 DRAFT-1 &rarr;</span>
-    </a>
-  </div>
+<section class="pt-12 pb-10 sm:pt-16 sm:pb-14 px-4 sm:px-6 max-w-4xl mx-auto">
+  <!-- Opening Statement -->
+  <div class="space-y-5">
+    <h1 class="text-3xl sm:text-5xl font-bold tracking-tight leading-[1.1] text-ink max-w-[24ch]">
+      <span class="text-accent">OmniBuf:</span> a fast,{' '}
+      <span class="whitespace-nowrap">self-describing</span> wire format
+    </h1>
 
-  <h1 class="text-[2.6rem] sm:text-7xl lg:text-[5.5rem] font-bold tracking-tight leading-[0.94] text-ink uppercase">
-    A modern wire format
-    <br />
-    <span class="text-[#FF4F18]">for structs and Protobuf.</span>
-  </h1>
-
-  <div class="mt-8 space-y-5">
-    <!-- prettier-ignore -->
-    <p class="max-w-3xl text-lg sm:text-2xl font-medium leading-snug text-ink/90">
-      I built OmniBuf as an evolution of <a href="https://protobuf.dev/programming-guides/encoding/" target="_blank" rel="noopener noreferrer" class="doc-link">Protobuf</a> with a smoother on-ramp to schemas. It is faster, parsable without a schema, and works with plain structs or <code>.proto</code> files for <a href="https://connectrpc.com/" target="_blank" rel="noopener noreferrer" class="doc-link">Connect</a> and <a href="https://grpc.io/" target="_blank" rel="noopener noreferrer" class="doc-link">gRPC</a> across <a href="#status" class="doc-link">12 languages</a> on the exact same wire format.
+    <p class="text-base sm:text-lg text-ink/85 leading-relaxed max-w-[65ch]">
+      OmniBuf is a faster and more expressive binary serialization format for <code>.proto</code>{' '}
+      files or plain structs with simple annotations. Most of Protobuf is great: schemas, explicit
+      field numbers, gRPC, Connect. OmniBuf just replaces the wire format underneath. Packets encode
+      and decode faster, and raw <code>.obuf</code> bytes dump straight to JSON when the schema
+      isn't around.
     </p>
 
-    <div
-      class="grid lg:grid-cols-12 gap-5 items-stretch"
-      data-butterfly-widget="hero"
-      data-autorotate="idle"
-      style="--hero-cycle-ms: 14000ms;"
+    <div class="flex flex-wrap items-center gap-3 pt-1 text-sm">
+      <a href="/how-it-works" class="btn-primary px-4 py-2">
+        How It Works &rarr;
+      </a>
+      <a href="/spec" class="btn-secondary px-4 py-2">
+        Wire Specification
+      </a>
+      <a href="/benchmarks" class="btn-secondary px-4 py-2">
+        Benchmarks
+      </a>
+      <span class="font-mono text-xs text-ink/65 sm:ml-2">v1 DRAFT-1</span>
+    </div>
+  </div>
+
+  <!-- Simplified Architecture Diagram: .proto or Plain Structs -> Wire Encodings -->
+  <figure class="mt-10 sm:mt-12 os-window p-4 sm:p-6">
+    <figcaption class="flex flex-wrap items-baseline justify-between gap-2 pb-3 mb-4 border-b border-ink/12">
+      <span class="text-sm font-semibold text-ink">
+        Same schemas or plain structs, different wire formats
+      </span>
+      <span class="font-mono text-xs text-ink/60">11-field PeerUpdate packet</span>
+    </figcaption>
+
+    <!-- Desktop Horizontal SVG -->
+    <svg
+      viewBox="0 0 820 316"
+      class="hidden md:block w-full h-auto"
+      role="img"
+      aria-label="Diagram showing peer.proto schemas and plain native structs both encoding into identical self-describing OmniBuf wire bytes (366 bytes), compared with Protobuf (341 bytes, ambiguous wire types without schema) and JSON (803 bytes, plain text)."
     >
-      <div class="lg:col-span-7 flex flex-col justify-between bg-[#FAF8F2] border-2 border-ink rounded-md overflow-hidden">
-        <div class="p-5 sm:p-6 flex-1 grid items-center text-base sm:text-xl font-medium text-ink/90 leading-relaxed">
-          {heroLanguageCharts.map((chart, idx) => (
-            <p
-              data-butterfly-summary={chart.key}
-              data-active={idx === 0 ? 'true' : 'false'}
-              aria-hidden={idx === 0 ? undefined : 'true'}
-              class="hero-butterfly-summary [grid-area:1/1]"
-              set:html={chart.heroSummaryHtml}
-            />
-          ))}
-        </div>
+      <defs>
+        <marker
+          id="arch-arrow-accent"
+          viewBox="0 0 10 10"
+          refX="8"
+          refY="5"
+          markerWidth="6"
+          markerHeight="6"
+          orient="auto"
+        >
+          <path d="M 0 1.5 L 9 5 L 0 8.5 z" class="arch-arrow-accent"></path>
+        </marker>
+        <marker
+          id="arch-arrow-muted"
+          viewBox="0 0 10 10"
+          refX="8"
+          refY="5"
+          markerWidth="6"
+          markerHeight="6"
+          orient="auto"
+        >
+          <path d="M 0 1.5 L 9 5 L 0 8.5 z" class="arch-arrow"></path>
+        </marker>
+      </defs>
 
-        <div class="px-4 sm:px-5 py-2.5 bg-[#E5E0D5]/70 border-t-2 border-ink flex items-center justify-between gap-2 select-none">
-          <div
-            role="tablist"
-            aria-label="Select benchmark language"
-            class="flex flex-wrap items-center gap-1.5 min-w-0 font-mono text-xs font-bold uppercase"
-          >
-            {heroLanguageCharts.map((chart, idx) => (
-              <button
-                id={`hero-butterfly-tab-${chart.key}`}
-                type="button"
-                role="tab"
-                data-butterfly-tab={chart.key}
-                aria-selected={idx === 0 ? 'true' : 'false'}
-                aria-controls={`hero-butterfly-panel-${chart.key}`}
-                tabindex={idx === 0 ? 0 : -1}
-                class:list={[
-                  'px-2 py-1 rounded border-2 border-ink transition cursor-pointer',
-                  idx === 0
-                    ? 'bg-acid text-ink shadow-[2px_2px_0px_#111111]'
-                    : 'bg-[#FAF8F2] text-ink/75 hover:bg-[#E5E0D5] hover:text-ink',
-                ]}
-              >
-                {chart.shortLabel}
-              </button>
-            ))}
-          </div>
+      <!-- Column labels -->
+      <text
+        x="16"
+        y="18"
+        class="arch-muted"
+        font-family="Space Grotesk, sans-serif"
+        font-size="11.5"
+        font-weight="600"
+      >
+        Your types
+      </text>
+      <text
+        x="408"
+        y="18"
+        class="arch-muted"
+        font-family="Space Grotesk, sans-serif"
+        font-size="11.5"
+        font-weight="600"
+      >
+        On the wire
+      </text>
 
-          <button
-            type="button"
-            data-butterfly-next
-            aria-label="Next language"
-            class="inline-flex items-center gap-1 px-2.5 py-1 rounded border-2 border-ink bg-[#FAF8F2] text-ink hover:bg-acid shadow-[2px_2px_0px_#111111] active:translate-x-[1px] active:translate-y-[1px] font-mono text-xs font-bold uppercase transition cursor-pointer shrink-0"
-          >
-            <span>Next</span>
-            <span aria-hidden="true">&rarr;</span>
-          </button>
-        </div>
+      <!-- Input 1: .proto schemas -->
+      <rect x="16" y="32" width="284" height="128" rx="8" class="arch-card" stroke-width="1"></rect>
+      <text
+        x="30"
+        y="52"
+        class="arch-title"
+        font-family="IBM Plex Mono, monospace"
+        font-size="12.5"
+        font-weight="600"
+      >
+        peer.proto
+      </text>
+      <text
+        x="286"
+        y="52"
+        text-anchor="end"
+        class="arch-muted"
+        font-family="Space Grotesk, sans-serif"
+        font-size="10.5"
+      >
+        Protobuf schema
+      </text>
+      <line x1="16" y1="62" x2="300" y2="62" class="arch-divider" stroke-width="1"></line>
+      <!-- prettier-ignore -->
+      <text x="30" y="81" class="arch-title" font-family="IBM Plex Mono, monospace" font-size="11.5"><tspan class="arch-muted">message</tspan> PeerUpdate <tspan class="arch-muted">&#123;</tspan></text>
+      <!-- prettier-ignore -->
+      <text x="42" y="97" class="arch-title" font-family="IBM Plex Mono, monospace" font-size="11.5"><tspan class="arch-muted">uint32</tspan> id<tspan x="128" class="arch-accent">= 1;</tspan></text>
+      <!-- prettier-ignore -->
+      <text x="42" y="113" class="arch-title" font-family="IBM Plex Mono, monospace" font-size="11.5"><tspan class="arch-muted">string</tspan> city<tspan x="128" class="arch-accent">= 2;</tspan></text>
+      <text
+        x="42"
+        y="129"
+        class="arch-comment"
+        font-family="IBM Plex Mono, monospace"
+        font-size="11"
+      >
+        // ... 9 more fields
+      </text>
+      <text
+        x="30"
+        y="145"
+        class="arch-muted"
+        font-family="IBM Plex Mono, monospace"
+        font-size="11.5"
+      >
+        &#125;
+      </text>
 
-        <div aria-hidden="true" class="hero-panel-progress-track">
-          <div class="hero-panel-progress" />
-        </div>
+      <!-- Input 2: Plain native structs -->
+      <rect
+        x="16"
+        y="174"
+        width="284"
+        height="128"
+        rx="8"
+        class="arch-card"
+        stroke-width="1"
+      ></rect>
+      <text
+        x="30"
+        y="194"
+        class="arch-title"
+        font-family="Space Grotesk, sans-serif"
+        font-size="12.5"
+        font-weight="600"
+      >
+        Plain structs
+      </text>
+      <line x1="16" y1="204" x2="300" y2="204" class="arch-divider" stroke-width="1"></line>
+      <!-- prettier-ignore -->
+      <text x="30" y="223" class="arch-title" font-family="IBM Plex Mono, monospace" font-size="11.5"><tspan class="arch-muted">type</tspan> PeerUpdate <tspan class="arch-muted">struct &#123;</tspan></text>
+      <!-- prettier-ignore -->
+      <text x="42" y="239" class="arch-title" font-family="IBM Plex Mono, monospace" font-size="11.5">ID<tspan x="78" class="arch-muted">uint32</tspan><tspan x="128" class="arch-accent">`omnibuf:"1"`</tspan></text>
+      <!-- prettier-ignore -->
+      <text x="42" y="255" class="arch-title" font-family="IBM Plex Mono, monospace" font-size="11.5">City<tspan x="78" class="arch-muted">string</tspan><tspan x="128" class="arch-accent">`omnibuf:"2"`</tspan></text>
+      <text
+        x="42"
+        y="271"
+        class="arch-comment"
+        font-family="IBM Plex Mono, monospace"
+        font-size="11"
+      >
+        // ... 9 more fields
+      </text>
+      <text
+        x="30"
+        y="287"
+        class="arch-muted"
+        font-family="IBM Plex Mono, monospace"
+        font-size="11.5"
+      >
+        &#125;
+      </text>
+
+      <!-- Connector paths: muted comparison lines first so accent lines paint cleanly over crossings -->
+      <!-- .proto -> Protobuf (muted) -->
+      <path
+        d="M 300 130 H 330 V 203 H 398"
+        fill="none"
+        class="arch-line"
+        stroke-width="1.25"
+        stroke-dasharray="4 3"
+        marker-end="url(#arch-arrow-muted)"
+      ></path>
+      <!-- Plain structs -> JSON (muted) -->
+      <path
+        d="M 300 273 H 398"
+        fill="none"
+        class="arch-line"
+        stroke-width="1.25"
+        stroke-dasharray="4 3"
+        marker-end="url(#arch-arrow-muted)"
+      ></path>
+      <!-- .proto -> OmniBuf (primary) -->
+      <path
+        d="M 300 96 H 398"
+        fill="none"
+        class="arch-line-accent"
+        stroke-width="1.75"
+        marker-end="url(#arch-arrow-accent)"
+      ></path>
+      <!-- Plain structs -> OmniBuf (primary, terminates at junction) -->
+      <path
+        d="M 300 226 H 354 V 96"
+        fill="none"
+        class="arch-line-accent"
+        stroke-width="1.75"
+      ></path>
+
+      <!-- Output 1: OmniBuf (highlighted) -->
+      <rect
+        x="408"
+        y="32"
+        width="396"
+        height="128"
+        rx="8"
+        class="arch-card-accent"
+        stroke-width="1.5"
+      ></rect>
+      <text
+        x="424"
+        y="59"
+        class="arch-accent"
+        font-family="Space Grotesk, sans-serif"
+        font-size="14"
+        font-weight="700"
+      >
+        OmniBuf
+      </text>
+      <rect x="730" y="42" width="58" height="22" rx="4" class="arch-pill-accent"></rect>
+      <text
+        x="759"
+        y="57"
+        text-anchor="middle"
+        class="arch-accent"
+        font-family="IBM Plex Mono, monospace"
+        font-size="11.5"
+        font-weight="600"
+      >
+        366 B
+      </text>
+      <rect
+        x="424"
+        y="74"
+        width="364"
+        height="34"
+        rx="5"
+        class="arch-code-well"
+        stroke-width="1"
+      ></rect>
+      <text
+        x="436"
+        y="95"
+        class="arch-title"
+        font-family="IBM Plex Mono, monospace"
+        font-size="12"
+        font-weight="500"
+      >
+        21 03 55 07 46 52 41 ...
+      </text>
+      <text
+        x="424"
+        y="134"
+        class="arch-muted"
+        font-family="Space Grotesk, sans-serif"
+        font-size="12"
+      >
+        1-pass encode &middot; 16 explicit wire types &middot; optional Field #0 names
+      </text>
+
+      <!-- Output 2: Protobuf -->
+      <rect
+        x="408"
+        y="174"
+        width="396"
+        height="58"
+        rx="8"
+        class="arch-card-muted"
+        stroke-width="1"
+      ></rect>
+      <text
+        x="424"
+        y="198"
+        class="arch-title"
+        font-family="Space Grotesk, sans-serif"
+        font-size="13"
+        font-weight="600"
+      >
+        Protobuf
+      </text>
+      <rect x="730" y="183" width="58" height="20" rx="4" class="arch-pill"></rect>
+      <text
+        x="759"
+        y="197"
+        text-anchor="middle"
+        class="arch-muted"
+        font-family="IBM Plex Mono, monospace"
+        font-size="11"
+        font-weight="500"
+      >
+        341 B
+      </text>
+      <text
+        x="424"
+        y="218"
+        class="arch-muted"
+        font-family="Space Grotesk, sans-serif"
+        font-size="11.5"
+      >
+        ~7% smaller &middot; 2-pass encode &middot; ambiguous without schema
+      </text>
+
+      <!-- Output 3: JSON -->
+      <rect
+        x="408"
+        y="244"
+        width="396"
+        height="58"
+        rx="8"
+        class="arch-card-muted"
+        stroke-width="1"
+      ></rect>
+      <text
+        x="424"
+        y="268"
+        class="arch-title"
+        font-family="Space Grotesk, sans-serif"
+        font-size="13"
+        font-weight="600"
+      >
+        JSON
+      </text>
+      <rect x="730" y="253" width="58" height="20" rx="4" class="arch-pill"></rect>
+      <text
+        x="759"
+        y="267"
+        text-anchor="middle"
+        class="arch-muted"
+        font-family="IBM Plex Mono, monospace"
+        font-size="11"
+        font-weight="500"
+      >
+        803 B
+      </text>
+      <text
+        x="424"
+        y="288"
+        class="arch-muted"
+        font-family="Space Grotesk, sans-serif"
+        font-size="11.5"
+      >
+        Plain text for curl and jq &middot; repeats keys on every object
+      </text>
+    </svg>
+
+    <!-- Mobile Vertical SVG -->
+    <svg
+      viewBox="0 0 360 392"
+      class="block md:hidden w-full h-auto"
+      role="img"
+      aria-label="Diagram showing peer.proto schemas and plain native structs both encoding into identical self-describing OmniBuf wire bytes (366 bytes), compared with Protobuf (341 bytes) and JSON (803 bytes)."
+    >
+      <defs>
+        <marker
+          id="arch-arrow-accent-m"
+          viewBox="0 0 10 10"
+          refX="8"
+          refY="5"
+          markerWidth="6"
+          markerHeight="6"
+          orient="auto"
+        >
+          <path d="M 0 1.5 L 9 5 L 0 8.5 z" class="arch-arrow-accent"></path>
+        </marker>
+      </defs>
+
+      <!-- Two inputs side by side -->
+      <rect x="8" y="8" width="166" height="74" rx="8" class="arch-card" stroke-width="1"></rect>
+      <text
+        x="20"
+        y="32"
+        class="arch-title"
+        font-family="IBM Plex Mono, monospace"
+        font-size="12.5"
+        font-weight="600"
+      >
+        peer.proto
+      </text>
+      <text x="20" y="52" class="arch-muted" font-family="Space Grotesk, sans-serif" font-size="11">
+        Protobuf schemas,
+      </text>
+      <text x="20" y="67" class="arch-muted" font-family="Space Grotesk, sans-serif" font-size="11">
+        buf or protoc
+      </text>
+
+      <rect x="186" y="8" width="166" height="74" rx="8" class="arch-card" stroke-width="1"></rect>
+      <text
+        x="198"
+        y="32"
+        class="arch-title"
+        font-family="Space Grotesk, sans-serif"
+        font-size="12.5"
+        font-weight="600"
+      >
+        Plain structs
+      </text>
+      <text
+        x="198"
+        y="52"
+        class="arch-muted"
+        font-family="Space Grotesk, sans-serif"
+        font-size="11"
+      >
+        Annotated structs,
+      </text>
+      <text
+        x="198"
+        y="67"
+        class="arch-muted"
+        font-family="Space Grotesk, sans-serif"
+        font-size="11"
+      >
+        classes, or records
+      </text>
+
+      <!-- Merge arrow down to OmniBuf -->
+      <path
+        d="M 91 82 V 104 H 269 V 82"
+        fill="none"
+        class="arch-line-accent"
+        stroke-width="1.5"
+      ></path>
+      <path
+        d="M 180 104 V 126"
+        fill="none"
+        class="arch-line-accent"
+        stroke-width="1.75"
+        marker-end="url(#arch-arrow-accent-m)"
+      ></path>
+
+      <!-- Output 1: OmniBuf -->
+      <rect
+        x="8"
+        y="134"
+        width="344"
+        height="94"
+        rx="8"
+        class="arch-card-accent"
+        stroke-width="1.5"
+      ></rect>
+      <text
+        x="22"
+        y="159"
+        class="arch-accent"
+        font-family="Space Grotesk, sans-serif"
+        font-size="14"
+        font-weight="700"
+      >
+        OmniBuf
+      </text>
+      <rect x="284" y="143" width="54" height="20" rx="4" class="arch-pill-accent"></rect>
+      <text
+        x="311"
+        y="157"
+        text-anchor="middle"
+        class="arch-accent"
+        font-family="IBM Plex Mono, monospace"
+        font-size="11"
+        font-weight="600"
+      >
+        366 B
+      </text>
+      <text
+        x="22"
+        y="182"
+        class="arch-title"
+        font-family="IBM Plex Mono, monospace"
+        font-size="11.5"
+      >
+        21 03 55 07 46 52 41 ...
+      </text>
+      <text
+        x="22"
+        y="205"
+        class="arch-muted"
+        font-family="Space Grotesk, sans-serif"
+        font-size="11.5"
+      >
+        1-pass encode &middot; 16 wire types &middot; optional Field #0
+      </text>
+
+      <!-- Comparison divider -->
+      <line
+        x1="12"
+        y1="250"
+        x2="112"
+        y2="250"
+        class="arch-line"
+        stroke-width="1"
+        stroke-dasharray="3 3"
+      ></line>
+      <text
+        x="180"
+        y="254"
+        text-anchor="middle"
+        class="arch-muted"
+        font-family="Space Grotesk, sans-serif"
+        font-size="11"
+        font-weight="600"
+      >
+        Compared against
+      </text>
+      <line
+        x1="248"
+        y1="250"
+        x2="348"
+        y2="250"
+        class="arch-line"
+        stroke-width="1"
+        stroke-dasharray="3 3"
+      ></line>
+
+      <!-- Output 2: Protobuf -->
+      <rect
+        x="8"
+        y="268"
+        width="344"
+        height="52"
+        rx="8"
+        class="arch-card-muted"
+        stroke-width="1"
+      ></rect>
+      <text
+        x="22"
+        y="290"
+        class="arch-title"
+        font-family="Space Grotesk, sans-serif"
+        font-size="12.5"
+        font-weight="600"
+      >
+        Protobuf
+      </text>
+      <text
+        x="338"
+        y="290"
+        text-anchor="end"
+        class="arch-muted"
+        font-family="IBM Plex Mono, monospace"
+        font-size="11"
+      >
+        341 B
+      </text>
+      <text
+        x="22"
+        y="308"
+        class="arch-muted"
+        font-family="Space Grotesk, sans-serif"
+        font-size="11"
+      >
+        ~7% smaller &middot; 2-pass &middot; ambiguous without schema
+      </text>
+
+      <!-- Output 3: JSON -->
+      <rect
+        x="8"
+        y="330"
+        width="344"
+        height="52"
+        rx="8"
+        class="arch-card-muted"
+        stroke-width="1"
+      ></rect>
+      <text
+        x="22"
+        y="352"
+        class="arch-title"
+        font-family="Space Grotesk, sans-serif"
+        font-size="12.5"
+        font-weight="600"
+      >
+        JSON
+      </text>
+      <text
+        x="338"
+        y="352"
+        text-anchor="end"
+        class="arch-muted"
+        font-family="IBM Plex Mono, monospace"
+        font-size="11"
+      >
+        803 B
+      </text>
+      <text
+        x="22"
+        y="370"
+        class="arch-muted"
+        font-family="Space Grotesk, sans-serif"
+        font-size="11"
+      >
+        Plain text for curl and jq &middot; repeats keys on every object
+      </text>
+    </svg>
+  </figure>
+  <p class="mt-2.5 text-xs sm:text-sm text-ink/65">
+    Plain-struct annotations work in most supported languages, not just Go (Rust derives, Python
+    dataclasses, Java/C# annotations, and similar).
+  </p>
+
+  <!-- Calm Static-Default Benchmark Visualization -->
+  <div id="speed" class="mt-14 sm:mt-16 pt-10 border-t border-ink/15 scroll-mt-16" data-home-bench>
+    <div class="flex flex-wrap items-baseline justify-between gap-3 mb-4">
+      <div>
+        <h2 class="text-2xl sm:text-[1.75rem] font-bold tracking-tight text-ink">
+          Encode and decode benchmarks
+        </h2>
+        <p class="mt-1 text-sm sm:text-base text-ink/75 max-w-[62ch]">
+          Full encode and decode on the 11-field <code>PeerUpdate</code> struct (Apple M1 Pro).
+          Shorter bars are faster.
+        </p>
       </div>
+      <a href="/benchmarks" class="doc-link text-sm shrink-0">
+        All 12 benchmarks &rarr;
+      </a>
+    </div>
 
-      <!-- Open Butterfly Speed Diagram -->
-      <div class="lg:col-span-5 flex flex-col justify-between px-1 sm:px-2 py-1 select-none">
-        <div>
-          <div class="flex flex-wrap items-center justify-between gap-2 mb-2.5">
-            <h2 class="text-2xl sm:text-3xl lg:text-4xl font-bold uppercase tracking-tight leading-none text-ink">
-              Ludicrous speed.
-            </h2>
-            <div class="grid justify-items-end font-mono text-xs font-bold uppercase">
-              {heroLanguageCharts.map((chart, idx) => (
-                <span
-                  data-butterfly-badge={chart.key}
-                  data-active={idx === 0 ? 'true' : 'false'}
-                  aria-hidden={idx === 0 ? undefined : 'true'}
-                  class="hero-butterfly-link [grid-area:1/1] px-2.5 py-1 rounded bg-acid border-2 border-ink text-ink shadow-[2px_2px_0px_#111111]"
-                >
-                  {chart.label}
-                </span>
-              ))}
+    <!-- Language Selector (manual only, no auto-rotation) -->
+    <div
+      role="tablist"
+      aria-label="Select language benchmark"
+      class="flex flex-wrap gap-1.5 mb-4 text-xs font-medium"
+    >
+      {benchmarkPreviews.map((suite, idx) => (
+        <button
+          id={`home-bench-tab-${suite.key}`}
+          type="button"
+          role="tab"
+          data-home-bench-tab={suite.key}
+          aria-selected={idx === 0 ? 'true' : 'false'}
+          aria-controls={`home-bench-panel-${suite.key}`}
+          tabindex={idx === 0 ? 0 : -1}
+          class="seg-tab px-2.5 py-1.5 font-mono"
+        >
+          {suite.shortLabel}
+        </button>
+      ))}
+    </div>
+
+    <!-- Grouped Horizontal Bar Panels -->
+    <div class="os-window p-4 sm:p-6">
+      {benchmarkPreviews.map((suite, idx) => (
+        <div
+          id={`home-bench-panel-${suite.key}`}
+          role="tabpanel"
+          aria-labelledby={`home-bench-tab-${suite.key}`}
+          data-home-bench-panel={suite.key}
+          class:list={[idx === 0 ? '' : 'hidden']}
+        >
+          <div class="grid md:grid-cols-2 gap-6 sm:gap-8">
+            <!-- Full Encode Column -->
+            <div class="min-w-0">
+              <div class="flex items-baseline justify-between pb-2 mb-3 border-b border-ink/12">
+                <span class="text-sm font-semibold text-ink">Full message encode</span>
+                <span class="font-mono text-xs text-ink/65">time / op</span>
+              </div>
+              <div class="space-y-3">
+                {suite.encodeRows.map((row) => (
+                  <div class="space-y-1">
+                    <div class="flex items-baseline justify-between gap-2 text-xs sm:text-sm">
+                      <span
+                        class:list={[
+                          'truncate',
+                          row.isOmni ? 'font-semibold text-ink' : 'text-ink/80',
+                        ]}
+                        title={row.name}
+                      >
+                        {row.name}
+                      </span>
+                      <span class="font-mono text-xs tabular-nums shrink-0">
+                        <span class={row.isOmni ? 'font-semibold text-accent' : 'text-ink/85'}>
+                          {row.formattedVal}
+                        </span>
+                        {!row.isOmni && <span class="text-ink/65 ml-1.5">{row.ratioLabel}</span>}
+                      </span>
+                    </div>
+                    <div class="w-full h-2 rounded-full bench-track overflow-hidden">
+                      <div
+                        class:list={[
+                          'h-full rounded-full min-w-[3px]',
+                          row.isOmni ? 'bench-bar-omni' : 'bench-bar-competitor',
+                        ]}
+                        style={`width: ${row.pct}%;`}
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <!-- Full Decode Column -->
+            <div class="min-w-0">
+              <div class="flex items-baseline justify-between pb-2 mb-3 border-b border-ink/12">
+                <span class="text-sm font-semibold text-ink">Full message decode</span>
+                <span class="font-mono text-xs text-ink/65">time / op</span>
+              </div>
+              <div class="space-y-3">
+                {suite.decodeRows.map((row) => (
+                  <div class="space-y-1">
+                    <div class="flex items-baseline justify-between gap-2 text-xs sm:text-sm">
+                      <span
+                        class:list={[
+                          'truncate',
+                          row.isOmni ? 'font-semibold text-ink' : 'text-ink/80',
+                        ]}
+                        title={row.name}
+                      >
+                        {row.name}
+                      </span>
+                      <span class="font-mono text-xs tabular-nums shrink-0">
+                        <span class={row.isOmni ? 'font-semibold text-accent' : 'text-ink/85'}>
+                          {row.formattedVal}
+                        </span>
+                        {!row.isOmni && <span class="text-ink/65 ml-1.5">{row.ratioLabel}</span>}
+                      </span>
+                    </div>
+                    <div class="w-full h-2 rounded-full bench-track overflow-hidden">
+                      <div
+                        class:list={[
+                          'h-full rounded-full min-w-[3px]',
+                          row.isOmni ? 'bench-bar-omni' : 'bench-bar-competitor',
+                        ]}
+                        style={`width: ${row.pct}%;`}
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
 
-          <!-- Top Butterfly Axis Header -->
-          <div class="grid grid-cols-2 items-baseline border-b-2 border-ink pb-1 mb-2 font-mono text-xs font-bold uppercase text-ink">
-            <div class="text-right pr-3">&larr; Encode</div>
-            <div class="text-left pl-3 border-l-2 border-ink">Decode &rarr;</div>
-          </div>
-
-          <div class="grid items-start">
-            {heroLanguageCharts.map((chart, idx) => (
-              <div
-                id={`hero-butterfly-panel-${chart.key}`}
-                role="tabpanel"
-                aria-labelledby={`hero-butterfly-tab-${chart.key}`}
-                aria-hidden={idx === 0 ? undefined : 'true'}
-                data-butterfly-panel={chart.key}
-                data-active={idx === 0 ? 'true' : 'false'}
-                class="hero-butterfly-panel [grid-area:1/1]"
-              >
-                <!-- Row 1: OmniBuf (Tiny Wings + Callout Arrow) -->
-                <div
-                  class="grid grid-cols-2 items-center py-1"
-                  title={`${chart.omniRow.name} - Encode: ${chart.omniRow.encVal} ns, Decode: ${chart.omniRow.decVal} ns`}
-                >
-                  <div class="flex items-center justify-end pr-0.5 min-w-0">
-                    <svg
-                      class="butterfly-omni-tag-left w-5 h-3.5 text-[#FF4F18] shrink-0 mr-1"
-                      viewBox="0 0 22 14"
-                      fill="none"
-                      aria-hidden="true"
-                    >
-                      <path
-                        d="M1 7H19M19 7L14 2M19 7L14 12"
-                        stroke="currentColor"
-                        stroke-width="2.2"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                      />
-                    </svg>
-                    <div
-                      class="butterfly-wing-enc h-4 bench-bar-omni border-2 border-ink rounded-l-sm shadow-[1px_1px_0px_#111111] shrink-0"
-                      style={`width: min(${chart.omniRow.encPct}%, calc(100% - 1.5rem)); --row-delay: 0ms;`}
-                    />
-                  </div>
-
-                  <div class="flex items-center justify-start pl-0.5 border-l-2 border-ink min-w-0">
-                    <div
-                      class="butterfly-wing-dec h-4 bench-bar-omni border-2 border-ink rounded-r-sm shadow-[1px_1px_0px_#111111] shrink-0"
-                      style={`width: min(${chart.omniRow.decPct}%, calc(100% - 5.75rem)); --row-delay: 0ms;`}
-                    />
-                    <div class="butterfly-omni-tag-right flex items-center shrink-0">
-                      <svg
-                        class="w-5 h-3.5 text-[#FF4F18] shrink-0 mx-1"
-                        viewBox="0 0 22 14"
-                        fill="none"
-                        aria-hidden="true"
-                      >
-                        <path
-                          d="M21 7H3M3 7L8 2M3 7L8 12"
-                          stroke="currentColor"
-                          stroke-width="2.2"
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                        />
-                      </svg>
-                      <span class="font-mono text-xs font-bold uppercase px-2 py-0.5 bg-acid border-2 border-ink text-ink shadow-[2px_2px_0px_#111111] leading-none rounded-sm shrink-0">
-                        OmniBuf
-                      </span>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- Rows 2..N: Competitor Butterfly Wings + Callout -->
-                <div class="mt-0.5 space-y-1">
-                  {chart.restRows.map((r, rIdx) => (
-                    <div
-                      class="grid grid-cols-2 items-center"
-                      title={`${r.name} - Encode: ${r.encVal} ns, Decode: ${r.decVal} ns`}
-                    >
-                      <div class="flex items-center justify-end pr-0.5 min-w-0">
-                        <div
-                          class="butterfly-wing-enc h-2.5 bench-bar-competitor border border-ink/65 rounded-l-sm opacity-80"
-                          style={`width: ${r.encPct}%; --row-delay: ${(rIdx + 1) * 22}ms;`}
-                        />
-                      </div>
-                      <div class="flex items-center justify-start pl-0.5 border-l-2 border-ink min-w-0">
-                        <div
-                          class="butterfly-wing-dec h-2.5 bench-bar-competitor border border-ink/65 rounded-r-sm opacity-80"
-                          style={`width: ${r.decPct}%; --row-delay: ${(rIdx + 1) * 22}ms;`}
-                        />
-                      </div>
-                    </div>
-                  ))}
-                </div>
-
-                <!-- Dual Upward Callout Arrows Pointing to Competitor Wings -->
-                <div class="butterfly-callout mt-2 flex items-center justify-center gap-2">
-                  <svg
-                    class="w-7 h-4 text-ink/75 shrink-0"
-                    viewBox="0 0 28 16"
-                    fill="none"
-                    aria-hidden="true"
-                  >
-                    <path
-                      d="M26 13C16 13 11 9 6 2M6 2L5 8.5M6 2L12.5 4"
-                      stroke="currentColor"
-                      stroke-width="2"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                    />
-                  </svg>
-                  <span class="font-mono text-xs font-bold uppercase px-2 py-1 bg-[#E5E0D5] border border-ink text-ink text-center leading-tight rounded-sm">
-                    {chart.competitorsLabel}
-                  </span>
-                  <svg
-                    class="w-7 h-4 text-ink/75 shrink-0"
-                    viewBox="0 0 28 16"
-                    fill="none"
-                    aria-hidden="true"
-                  >
-                    <path
-                      d="M2 13C12 13 17 9 22 2M22 2L23 8.5M22 2L15.5 4"
-                      stroke="currentColor"
-                      stroke-width="2"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                    />
-                  </svg>
-                </div>
-              </div>
-            ))}
+          <div class="mt-5 pt-4 border-t border-ink/12 flex flex-wrap items-center justify-between gap-2 text-xs sm:text-sm">
+            <a href={suite.langHref} class="doc-link">
+              {suite.label} guide &rarr;
+            </a>
+            <a href={suite.href} class="doc-link text-ink/75">
+              Full {suite.shortLabel} benchmark suite &rarr;
+            </a>
           </div>
         </div>
-
-        <div class="pt-2.5 mt-2 border-t border-ink/20 flex flex-wrap items-center justify-between gap-2 font-mono text-xs font-bold uppercase">
-          <span class="text-ink/65">Shorter = Faster</span>
-          <div class="grid justify-items-end">
-            {heroLanguageCharts.map((chart, idx) => (
-              <a
-                href={chart.href}
-                data-butterfly-link={chart.key}
-                data-active={idx === 0 ? 'true' : 'false'}
-                aria-hidden={idx === 0 ? undefined : 'true'}
-                tabindex={idx === 0 ? undefined : -1}
-                class="hero-butterfly-link [grid-area:1/1] text-ink underline decoration-ink/50 underline-offset-2 hover:text-[#FF4F18]"
-              >
-                {chart.ctaLabel} &rarr;
-              </a>
-            ))}
-          </div>
-        </div>
-      </div>
+      ))}
     </div>
-  </div>
 
-  <!-- SVG VISUALIZATION: .PROTO SCHEMAS OR PLAIN STRUCTS -> WIRE ENCODINGS -->
-  <div class="mt-10 os-window overflow-hidden select-none">
-    <div class="os-titlebar bg-[#E5E0D5]">
-      <span class="font-mono text-sm sm:text-base font-bold uppercase">
-        .proto Schemas or Plain Structs &rarr; Wire Encodings
-      </span>
-    </div>
-    <div class="p-4 sm:p-6 bg-[#FAF8F2]">
-      <!-- DESKTOP SVG (Horizontal Tree) -->
-      <svg
-        viewBox="0 0 860 542"
-        class="hidden md:block w-full max-h-[535px] mx-auto"
-        role="img"
-        aria-label="Diagram showing peer.proto branching to Protobuf encoding, JSON encoding, and OmniBuf encoding, alongside peer.go with peer.ex, Peer.php, peer.dart, Peer.swift, Peer.java, Peer.cs, peer.hpp, peer.py, peer.rs, and peer.ts stacked behind it pointing directly to OmniBuf encoding."
-      >
-        <!-- TOP-LEFT NODE: .PROTO FILE -->
-        <rect x="22" y="24" width="278" height="160" rx="8" fill="#111111" />
-        <rect
-          x="16"
-          y="18"
-          width="278"
-          height="160"
-          rx="8"
-          fill="#FAF8F2"
-          stroke="#111111"
-          stroke-width="2.5"
-        />
-        <path
-          d="M 16 26 Q 16 18 24 18 L 286 18 Q 294 18 294 26 L 294 54 L 16 54 Z"
-          fill="#111111"
-        />
-        <circle cx="36" cy="36" r="5" fill="#FF4F18" />
-        <circle cx="52" cy="36" r="5" fill="#D4FF33" />
-        <text
-          x="70"
-          y="41"
-          font-family="IBM Plex Mono, monospace"
-          font-size="14"
-          font-weight="700"
-          fill="#FAF8F2"
-        >
-          peer.proto
-        </text>
-
-        <text
-          x="34"
-          y="84"
-          font-family="IBM Plex Mono, monospace"
-          font-size="14.5"
-          font-weight="700"
-          fill="#111111"
-        >
-          message Peer &#123;
-        </text>
-        <text x="50" y="112" font-family="IBM Plex Mono, monospace" font-size="14" fill="#111111">
-          <tspan fill="#FF4F18" font-weight="700">
-            uint32
-          </tspan>{' '}
-          id = 1;
-        </text>
-        <text x="50" y="138" font-family="IBM Plex Mono, monospace" font-size="14" fill="#111111">
-          <tspan fill="#FF4F18" font-weight="700">
-            string
-          </tspan>{' '}
-          host = 2;
-        </text>
-        <text
-          x="34"
-          y="164"
-          font-family="IBM Plex Mono, monospace"
-          font-size="14.5"
-          font-weight="700"
-          fill="#111111"
-        >
-          &#125;
-        </text>
-
-        <!-- BOTTOM-LEFT STACK: OTHER SUPPORTED LANGUAGES BEHIND peer.go (SHIFTING UP AND LEFT) -->
-        {stackedPeerFiles.map(({ step, file }) => {
-          const bx = 58 - step * 4.2;
-          const by = 358 - step * 15.6;
-          return (
-            <g>
-              <rect x={bx} y={by} width="236" height="158" rx="7" fill="#FAF8F2" />
-              <rect x={bx} y={by} width="236" height="20" rx="7" fill="#E5E0D5" />
-              <rect x={bx} y={by + 13} width="236" height="7" fill="#E5E0D5" />
-              <rect
-                x={bx}
-                y={by}
-                width="236"
-                height="158"
-                rx="7"
-                fill="none"
-                stroke="#111111"
-                stroke-width="2"
-              />
-              <circle cx={bx + 13} cy={by + 8} r="2.6" fill="#FF4F18" opacity="0.8" />
-              <circle cx={bx + 22} cy={by + 8} r="2.6" fill="#111111" opacity="0.28" />
-              <text
-                x={bx + 33}
-                y={by + 11.4}
-                font-family="IBM Plex Mono, monospace"
-                font-size="10.2"
-                font-weight="700"
-                fill="#111111"
-              >
-                {file}
-              </text>
-            </g>
-          );
-        })}
-
-        <!-- FRONT CARD OF STACK: PLAIN GO STRUCT (peer.go) -->
-        <rect x="64" y="364" width="236" height="162" rx="8" fill="#111111" />
-        <rect
-          x="58"
-          y="358"
-          width="236"
-          height="162"
-          rx="8"
-          fill="#FAF8F2"
-          stroke="#111111"
-          stroke-width="2.5"
-        />
-        <path
-          d="M 58 366 Q 58 358 66 358 L 286 358 Q 294 358 294 366 L 294 392 L 58 392 Z"
-          fill="#111111"
-        />
-        <circle cx="76" cy="375" r="4.5" fill="#FF4F18" />
-        <circle cx="91" cy="375" r="4.5" fill="#D4FF33" />
-        <text
-          x="107"
-          y="380"
-          font-family="IBM Plex Mono, monospace"
-          font-size="13.5"
-          font-weight="700"
-          fill="#FAF8F2"
-        >
-          peer.go
-        </text>
-        <text
-          x="282"
-          y="379"
-          text-anchor="end"
-          font-family="IBM Plex Mono, monospace"
-          font-size="10.5"
-          font-weight="700"
-          fill="#D4FF33"
-        >
-          NO .PROTO
-        </text>
-
-        <text
-          x="72"
-          y="422"
-          font-family="IBM Plex Mono, monospace"
-          font-size="13.5"
-          font-weight="700"
-          fill="#111111"
-        >
-          type Peer struct &#123;
-        </text>
-        <text y="449" font-family="IBM Plex Mono, monospace" font-size="13" fill="#111111">
-          <tspan x="84">ID</tspan>
-          <tspan x="124" fill="#FF4F18" font-weight="700">
-            uint32
-          </tspan>
-          <tspan x="178">`omnibuf:"1"`</tspan>
-        </text>
-        <text y="476" font-family="IBM Plex Mono, monospace" font-size="13" fill="#111111">
-          <tspan x="84">Host</tspan>
-          <tspan x="124" fill="#FF4F18" font-weight="700">
-            string
-          </tspan>
-          <tspan x="178">`omnibuf:"2"`</tspan>
-        </text>
-        <text
-          x="72"
-          y="503"
-          font-family="IBM Plex Mono, monospace"
-          font-size="13.5"
-          font-weight="700"
-          fill="#111111"
-        >
-          &#125;
-        </text>
-
-        <!-- ROUTING ARROWS (ZERO CROSSINGS) -->
-        <!-- Stem from peer.proto right edge (300, 98) to fork (330, 98) -->
-        <path d="M 300 98 L 330 98" fill="none" stroke="#111111" stroke-width="2.5" />
-        <!-- peer.proto -> Protobuf (y = 79) -->
-        <path
-          d="M 330 98 L 330 91 Q 330 79 342 79 L 354 79"
-          fill="none"
-          stroke="#111111"
-          stroke-width="2.5"
-          stroke-dasharray="5 4"
-        />
-        <polygon points="352,72 366,79 352,86" fill="#111111" />
-        <!-- peer.proto -> JSON (y = 259) -->
-        <path
-          d="M 330 98 L 330 245 Q 330 259 344 259 L 354 259"
-          fill="none"
-          stroke="#111111"
-          stroke-width="2.5"
-          stroke-dasharray="5 4"
-        />
-        <polygon points="352,252 366,259 352,266" fill="#111111" />
-        <!-- peer.proto -> OmniBuf upper entry (y = 422) -->
-        <path
-          d="M 330 259 L 330 408 Q 330 422 344 422 L 352 422"
-          fill="none"
-          stroke="#FF4F18"
-          stroke-width="3.5"
-        />
-        <polygon points="350,414 366,422 350,430" fill="#FF4F18" />
-        <circle cx="330" cy="98" r="4.5" fill="#111111" />
-        <circle cx="330" cy="259" r="4" fill="#111111" />
-
-        <!-- peer.go -> OmniBuf ONLY (straight horizontal at y = 472) -->
-        <path d="M 300 472 L 352 472" fill="none" stroke="#FF4F18" stroke-width="3.5" />
-        <polygon points="350,464 366,472 350,480" fill="#FF4F18" />
-
-        <!-- OUTPUT 1: PROTOBUF -->
-        <rect x="374" y="24" width="470" height="122" rx="8" fill="#111111" />
-        <rect
-          x="368"
-          y="18"
-          width="470"
-          height="122"
-          rx="8"
-          fill="#FAF8F2"
-          stroke="#111111"
-          stroke-width="2.5"
-        />
-        <text
-          x="390"
-          y="54"
-          font-family="Space Grotesk, sans-serif"
-          font-size="20"
-          font-weight="700"
-          fill="#111111"
-        >
-          Protobuf Encoding
-        </text>
-        <rect
-          x="714"
-          y="34"
-          width="104"
-          height="26"
-          rx="4"
-          fill="#E5E0D5"
-          stroke="#111111"
-          stroke-width="1.5"
-        />
-        <text
-          x="766"
-          y="51"
-          text-anchor="middle"
-          font-family="IBM Plex Mono, monospace"
-          font-size="12"
-          font-weight="700"
-          fill="#111111"
-        >
-          STANDARD
-        </text>
-        <text x="390" y="88" font-family="IBM Plex Mono, monospace" font-size="14" fill="#111111">
-          <tspan fill="#00805A" font-weight="700">
-            ✓
-          </tspan>{' '}
-          Compact binary size
-        </text>
-        <text x="390" y="116" font-family="IBM Plex Mono, monospace" font-size="14" fill="#111111">
-          <tspan fill="#FF4F18" font-weight="700">
-            ✗
-          </tspan>{' '}
-          Needs schema to decode &amp; slow varints
-        </text>
-
-        <!-- OUTPUT 2: JSON -->
-        <rect x="374" y="204" width="470" height="122" rx="8" fill="#111111" />
-        <rect
-          x="368"
-          y="198"
-          width="470"
-          height="122"
-          rx="8"
-          fill="#FAF8F2"
-          stroke="#111111"
-          stroke-width="2.5"
-        />
-        <text
-          x="390"
-          y="234"
-          font-family="Space Grotesk, sans-serif"
-          font-size="20"
-          font-weight="700"
-          fill="#111111"
-        >
-          JSON Encoding
-        </text>
-        <rect
-          x="658"
-          y="214"
-          width="160"
-          height="26"
-          rx="4"
-          fill="#E5E0D5"
-          stroke="#111111"
-          stroke-width="1.5"
-        />
-        <text
-          x="738"
-          y="231"
-          text-anchor="middle"
-          font-family="IBM Plex Mono, monospace"
-          font-size="12"
-          font-weight="700"
-          fill="#111111"
-        >
-          EASIER DEBUGGING
-        </text>
-        <text x="390" y="268" font-family="IBM Plex Mono, monospace" font-size="14" fill="#111111">
-          <tspan fill="#00805A" font-weight="700">
-            ✓
-          </tspan>{' '}
-          Easy to inspect without a schema
-        </text>
-        <text x="390" y="296" font-family="IBM Plex Mono, monospace" font-size="14" fill="#111111">
-          <tspan fill="#FF4F18" font-weight="700">
-            ✗
-          </tspan>{' '}
-          Bloated size &amp; slow text parsing
-        </text>
-
-        <!-- OUTPUT 3: OMNIBUF -->
-        <rect x="374" y="384" width="470" height="142" rx="8" fill="#FF4F18" />
-        <rect
-          x="368"
-          y="378"
-          width="470"
-          height="142"
-          rx="8"
-          fill="#111111"
-          stroke="#111111"
-          stroke-width="2.5"
-        />
-        <text
-          x="390"
-          y="416"
-          font-family="Space Grotesk, sans-serif"
-          font-size="20"
-          font-weight="700"
-          fill="#D4FF33"
-        >
-          OmniBuf Encoding
-        </text>
-        <rect x="628" y="396" width="190" height="26" rx="4" fill="#D4FF33" />
-        <text
-          x="723"
-          y="413"
-          text-anchor="middle"
-          font-family="IBM Plex Mono, monospace"
-          font-size="12"
-          font-weight="700"
-          fill="#111111"
-        >
-          SPEED + DEBUGGABILITY
-        </text>
-        <text
-          x="390"
-          y="456"
-          font-family="IBM Plex Mono, monospace"
-          font-size="13.5"
-          font-weight="600"
-          fill="#FAF8F2"
-        >
-          <tspan fill="#D4FF33" font-weight="700">
-            ✓
-          </tspan>{' '}
-          Works with .proto schemas or plain structs
-        </text>
-        <text
-          x="390"
-          y="488"
-          font-family="IBM Plex Mono, monospace"
-          font-size="13.5"
-          font-weight="600"
-          fill="#FAF8F2"
-        >
-          <tspan fill="#D4FF33" font-weight="700">
-            ✓
-          </tspan>{' '}
-          Readable without schema &amp; around 5x to 6x faster
-        </text>
-      </svg>
-
-      <!-- MOBILE SVG (Vertical Layout) -->
-      <svg
-        viewBox="0 0 360 882"
-        class="block md:hidden w-full max-w-[380px] mx-auto h-auto"
-        role="img"
-        aria-label="Vertical diagram showing peer.proto branching to Protobuf, JSON, and OmniBuf, and peer.go with peer.ex, Peer.php, peer.dart, Peer.swift, Peer.java, Peer.cs, peer.hpp, peer.py, peer.rs, and peer.ts stacked behind it pointing directly into OmniBuf."
-      >
-        <!-- TOP NODE: .PROTO FILE -->
-        <rect x="18" y="18" width="328" height="140" rx="8" fill="#111111" />
-        <rect
-          x="14"
-          y="14"
-          width="328"
-          height="140"
-          rx="8"
-          fill="#FAF8F2"
-          stroke="#111111"
-          stroke-width="2.5"
-        />
-        <path
-          d="M 14 22 Q 14 14 22 14 L 334 14 Q 342 14 342 22 L 342 46 L 14 46 Z"
-          fill="#111111"
-        />
-        <circle cx="32" cy="30" r="4.5" fill="#FF4F18" />
-        <circle cx="46" cy="30" r="4.5" fill="#D4FF33" />
-        <text
-          x="62"
-          y="35"
-          font-family="IBM Plex Mono, monospace"
-          font-size="13.5"
-          font-weight="700"
-          fill="#FAF8F2"
-        >
-          peer.proto
-        </text>
-
-        <text
-          x="32"
-          y="70"
-          font-family="IBM Plex Mono, monospace"
-          font-size="14"
-          font-weight="700"
-          fill="#111111"
-        >
-          message Peer &#123;
-        </text>
-        <text x="48" y="94" font-family="IBM Plex Mono, monospace" font-size="13.5" fill="#111111">
-          <tspan fill="#FF4F18" font-weight="700">
-            uint32
-          </tspan>{' '}
-          id = 1;
-        </text>
-        <text x="48" y="117" font-family="IBM Plex Mono, monospace" font-size="13.5" fill="#111111">
-          <tspan fill="#FF4F18" font-weight="700">
-            string
-          </tspan>{' '}
-          host = 2;
-        </text>
-        <text
-          x="32"
-          y="139"
-          font-family="IBM Plex Mono, monospace"
-          font-size="14"
-          font-weight="700"
-          fill="#111111"
-        >
-          &#125;
-        </text>
-
-        <!-- VERTICAL SPINE FROM peer.proto -->
-        <path
-          d="M 28 158 L 28 340 Q 28 350 38 350 L 50 350"
-          fill="none"
-          stroke="#111111"
-          stroke-width="2.5"
-          stroke-dasharray="4 3"
-        />
-        <path
-          d="M 28 226 L 50 226"
-          fill="none"
-          stroke="#111111"
-          stroke-width="2.5"
-          stroke-dasharray="4 3"
-        />
-        <polygon points="48,220 60,226 48,232" fill="#111111" />
-        <polygon points="48,344 60,350 48,356" fill="#111111" />
-        <path
-          d="M 28 350 L 28 466 Q 28 476 38 476 L 48 476"
-          fill="none"
-          stroke="#FF4F18"
-          stroke-width="3"
-        />
-        <polygon points="46,469 60,476 46,483" fill="#FF4F18" />
-        <circle cx="28" cy="226" r="3.5" fill="#111111" />
-        <circle cx="28" cy="350" r="3.5" fill="#111111" />
-
-        <!-- OUTPUT 1: PROTOBUF -->
-        <rect x="68" y="176" width="276" height="106" rx="8" fill="#111111" />
-        <rect
-          x="64"
-          y="172"
-          width="276"
-          height="106"
-          rx="8"
-          fill="#FAF8F2"
-          stroke="#111111"
-          stroke-width="2"
-        />
-        <text
-          x="80"
-          y="199"
-          font-family="Space Grotesk, sans-serif"
-          font-size="16"
-          font-weight="700"
-          fill="#111111"
-        >
-          Protobuf Encoding
-        </text>
-        <text x="80" y="226" font-family="IBM Plex Mono, monospace" font-size="12.5" fill="#111111">
-          <tspan fill="#00805A" font-weight="700">
-            ✓
-          </tspan>{' '}
-          Compact binary size
-        </text>
-        <text x="80" y="247" font-family="IBM Plex Mono, monospace" font-size="12.5" fill="#111111">
-          <tspan fill="#FF4F18" font-weight="700">
-            ✗
-          </tspan>{' '}
-          Needs schema to decode
-        </text>
-        <text x="80" y="267" font-family="IBM Plex Mono, monospace" font-size="12.5" fill="#111111">
-          <tspan fill="#FF4F18" font-weight="700">
-            ✗
-          </tspan>{' '}
-          Slow varints &amp; 2-pass
-        </text>
-
-        <!-- OUTPUT 2: JSON -->
-        <rect x="68" y="300" width="276" height="106" rx="8" fill="#111111" />
-        <rect
-          x="64"
-          y="296"
-          width="276"
-          height="106"
-          rx="8"
-          fill="#FAF8F2"
-          stroke="#111111"
-          stroke-width="2"
-        />
-        <text
-          x="80"
-          y="323"
-          font-family="Space Grotesk, sans-serif"
-          font-size="16"
-          font-weight="700"
-          fill="#111111"
-        >
-          JSON Encoding
-        </text>
-        <text x="80" y="350" font-family="IBM Plex Mono, monospace" font-size="12.5" fill="#111111">
-          <tspan fill="#00805A" font-weight="700">
-            ✓
-          </tspan>{' '}
-          Debuggable without schema
-        </text>
-        <text x="80" y="371" font-family="IBM Plex Mono, monospace" font-size="12.5" fill="#111111">
-          <tspan fill="#FF4F18" font-weight="700">
-            ✗
-          </tspan>{' '}
-          Bloated payload size
-        </text>
-        <text x="80" y="391" font-family="IBM Plex Mono, monospace" font-size="12.5" fill="#111111">
-          <tspan fill="#FF4F18" font-weight="700">
-            ✗
-          </tspan>{' '}
-          Slow text parsing
-        </text>
-
-        <!-- OUTPUT 3: OMNIBUF -->
-        <rect x="68" y="424" width="276" height="110" rx="8" fill="#FF4F18" />
-        <rect
-          x="64"
-          y="420"
-          width="276"
-          height="110"
-          rx="8"
-          fill="#111111"
-          stroke="#111111"
-          stroke-width="2"
-        />
-        <text
-          x="80"
-          y="447"
-          font-family="Space Grotesk, sans-serif"
-          font-size="16"
-          font-weight="700"
-          fill="#D4FF33"
-        >
-          OmniBuf Encoding
-        </text>
-        <text
-          x="80"
-          y="474"
-          font-family="IBM Plex Mono, monospace"
-          font-size="12.5"
-          font-weight="600"
-          fill="#FAF8F2"
-        >
-          <tspan fill="#D4FF33" font-weight="700">
-            ✓
-          </tspan>{' '}
-          .proto or plain structs
-        </text>
-        <text
-          x="80"
-          y="495"
-          font-family="IBM Plex Mono, monospace"
-          font-size="12.5"
-          font-weight="600"
-          fill="#FAF8F2"
-        >
-          <tspan fill="#D4FF33" font-weight="700">
-            ✓
-          </tspan>{' '}
-          Debuggable without schema
-        </text>
-        <text
-          x="80"
-          y="515"
-          font-family="IBM Plex Mono, monospace"
-          font-size="12.5"
-          font-weight="600"
-          fill="#FAF8F2"
-        >
-          <tspan fill="#D4FF33" font-weight="700">
-            ✓
-          </tspan>{' '}
-          Around 5x to 6x faster
-        </text>
-
-        <!-- DIRECT UPWARD ARROW FROM PLAIN STRUCT STACK -> OmniBuf ONLY -->
-        <path d="M 202 568 L 202 544" fill="none" stroke="#FF4F18" stroke-width="3.5" />
-        <polygon points="194,548 202,534 210,548" fill="#FF4F18" />
-
-        <!-- BOTTOM STACK: OTHER SUPPORTED LANGUAGES BEHIND peer.go (SHIFTING UP AND LEFT) -->
-        {stackedPeerFiles.map(({ step, file }) => {
-          const mx = 76 - step * 4.5;
-          const my = 725 - step * 15.5;
-          return (
-            <g>
-              <rect x={mx} y={my} width="264" height="134" rx="7" fill="#FAF8F2" />
-              <rect x={mx} y={my} width="264" height="20" rx="7" fill="#E5E0D5" />
-              <rect x={mx} y={my + 13} width="264" height="7" fill="#E5E0D5" />
-              <rect
-                x={mx}
-                y={my}
-                width="264"
-                height="134"
-                rx="7"
-                fill="none"
-                stroke="#111111"
-                stroke-width="2"
-              />
-              <circle cx={mx + 13} cy={my + 8} r="2.5" fill="#FF4F18" opacity="0.8" />
-              <circle cx={mx + 22} cy={my + 8} r="2.5" fill="#111111" opacity="0.28" />
-              <text
-                x={mx + 33}
-                y={my + 11.4}
-                font-family="IBM Plex Mono, monospace"
-                font-size="10"
-                font-weight="700"
-                fill="#111111"
-              >
-                {file}
-              </text>
-            </g>
-          );
-        })}
-
-        <!-- FRONT CARD OF BOTTOM STACK: PLAIN GO STRUCT (peer.go) -->
-        <rect x="80" y="729" width="264" height="138" rx="8" fill="#111111" />
-        <rect
-          x="76"
-          y="725"
-          width="264"
-          height="138"
-          rx="8"
-          fill="#FAF8F2"
-          stroke="#111111"
-          stroke-width="2.5"
-        />
-        <path
-          d="M 76 733 Q 76 725 84 725 L 332 725 Q 340 725 340 733 L 340 755 L 76 755 Z"
-          fill="#111111"
-        />
-        <circle cx="93" cy="740" r="4.5" fill="#FF4F18" />
-        <circle cx="107" cy="740" r="4.5" fill="#D4FF33" />
-        <text
-          x="122"
-          y="745"
-          font-family="IBM Plex Mono, monospace"
-          font-size="13"
-          font-weight="700"
-          fill="#FAF8F2"
-        >
-          peer.go
-        </text>
-        <text
-          x="328"
-          y="744"
-          text-anchor="end"
-          font-family="IBM Plex Mono, monospace"
-          font-size="10.5"
-          font-weight="700"
-          fill="#D4FF33"
-        >
-          NO .PROTO
-        </text>
-
-        <text
-          x="90"
-          y="780"
-          font-family="IBM Plex Mono, monospace"
-          font-size="13"
-          font-weight="700"
-          fill="#111111"
-        >
-          type Peer struct &#123;
-        </text>
-        <text y="804" font-family="IBM Plex Mono, monospace" font-size="12" fill="#111111">
-          <tspan x="102">ID</tspan>
-          <tspan x="140" fill="#FF4F18" font-weight="700">
-            uint32
-          </tspan>
-          <tspan x="192">`omnibuf:"1"`</tspan>
-        </text>
-        <text y="827" font-family="IBM Plex Mono, monospace" font-size="12" fill="#111111">
-          <tspan x="102">Host</tspan>
-          <tspan x="140" fill="#FF4F18" font-weight="700">
-            string
-          </tspan>
-          <tspan x="192">`omnibuf:"2"`</tspan>
-        </text>
-        <text
-          x="90"
-          y="849"
-          font-family="IBM Plex Mono, monospace"
-          font-size="13"
-          font-weight="700"
-          fill="#111111"
-        >
-          &#125;
-        </text>
-      </svg>
-    </div>
+    <!-- Honest Tradeoffs -->
+    <p class="mt-4 text-sm sm:text-base text-ink/80 leading-relaxed max-w-[65ch]">
+      OmniBuf can replace a lot of Protobuf and JSON, though every wire format comes with tradeoffs.
+      Protobuf ends up around 7% smaller on dense messages (341 B vs 366 B on{' '}
+      <code>PeerUpdate</code>) and has twenty years of tooling behind it. FlatBuffers and Cap'n
+      Proto stay quicker at grabbing a single field out of a huge buffer via offset tables, though
+      their payloads run a good bit larger and you have to deal with builder APIs. And for public
+      APIs where you just want to send someone a <code>curl</code> command, JSON still makes sense.
+    </p>
   </div>
 </section>
 
 <script>
-  const CYCLE_MS = 14_000;
-  const MANUAL_PAUSE_MS = 90_000;
+  document.querySelectorAll<HTMLElement>('[data-home-bench]').forEach((widget) => {
+    const tabs = Array.from(widget.querySelectorAll<HTMLButtonElement>('[data-home-bench-tab]'));
+    const panels = Array.from(widget.querySelectorAll<HTMLElement>('[data-home-bench-panel]'));
 
-  document.querySelectorAll<HTMLElement>('[data-butterfly-widget="hero"]').forEach((widget) => {
-    const tabs = Array.from(widget.querySelectorAll<HTMLButtonElement>('[data-butterfly-tab]'));
-    const panels = Array.from(widget.querySelectorAll<HTMLElement>('[data-butterfly-panel]'));
-    const summaries = Array.from(widget.querySelectorAll<HTMLElement>('[data-butterfly-summary]'));
-    const links = Array.from(widget.querySelectorAll<HTMLElement>('[data-butterfly-link]'));
-    const badges = Array.from(widget.querySelectorAll<HTMLElement>('[data-butterfly-badge]'));
-    const nextBtn = widget.querySelector<HTMLButtonElement>('[data-butterfly-next]');
-    const panelProgressEl = widget.querySelector<HTMLElement>('.hero-panel-progress');
-
-    if (tabs.length === 0) return;
-
-    let currentIdx = Math.max(
-      0,
-      tabs.findIndex((t) => t.getAttribute('aria-selected') === 'true'),
-    );
-    let cycleTimer: number | undefined;
-    let resumeTimer: number | undefined;
-    let isPausedManually = false;
-    let isInViewport = true;
-    const reducedMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
-
-    function syncFocusableItems(items: HTMLElement[], attrName: string, activeKey: string) {
-      items.forEach((item) => {
-        const isActive = item.getAttribute(attrName) === activeKey;
-        item.setAttribute('data-active', isActive ? 'true' : 'false');
-        if (isActive) {
-          item.removeAttribute('aria-hidden');
-          item.removeAttribute('tabindex');
-        } else {
-          item.setAttribute('aria-hidden', 'true');
-          item.setAttribute('tabindex', '-1');
-        }
-        item.inert = !isActive;
-      });
-    }
-
-    function syncInertState(activeKey: string) {
-      panels.forEach((panel) => {
-        const isActive = panel.getAttribute('data-butterfly-panel') === activeKey;
-        panel.setAttribute('data-active', isActive ? 'true' : 'false');
-        if (isActive) {
-          panel.removeAttribute('aria-hidden');
-        } else {
-          panel.setAttribute('aria-hidden', 'true');
-        }
-        panel.inert = !isActive;
-      });
-      summaries.forEach((summary) => {
-        const isActive = summary.getAttribute('data-butterfly-summary') === activeKey;
-        summary.setAttribute('data-active', isActive ? 'true' : 'false');
-        if (isActive) {
-          summary.removeAttribute('aria-hidden');
-        } else {
-          summary.setAttribute('aria-hidden', 'true');
-        }
-        summary.inert = !isActive;
-      });
-      syncFocusableItems(links, 'data-butterfly-link', activeKey);
-      badges.forEach((badge) => {
-        const isActive = badge.getAttribute('data-butterfly-badge') === activeKey;
-        badge.setAttribute('data-active', isActive ? 'true' : 'false');
-        if (isActive) {
-          badge.removeAttribute('aria-hidden');
-        } else {
-          badge.setAttribute('aria-hidden', 'true');
-        }
-      });
-    }
-
-    function activateIdx(nextIdx: number) {
-      currentIdx = ((nextIdx % tabs.length) + tabs.length) % tabs.length;
-      const targetTab = tabs[currentIdx];
-      const key = targetTab?.getAttribute('data-butterfly-tab');
-      if (!key) return;
-
-      tabs.forEach((tab, idx) => {
-        const isActive = idx === currentIdx;
+    function activate(key: string) {
+      tabs.forEach((tab) => {
+        const isActive = tab.getAttribute('data-home-bench-tab') === key;
         tab.setAttribute('aria-selected', isActive ? 'true' : 'false');
         tab.setAttribute('tabindex', isActive ? '0' : '-1');
-        tab.classList.toggle('bg-acid', isActive);
-        tab.classList.toggle('text-ink', isActive);
-        tab.classList.toggle('shadow-[2px_2px_0px_#111111]', isActive);
-        tab.classList.toggle('bg-[#FAF8F2]', !isActive);
-        tab.classList.toggle('text-ink/75', !isActive);
-        tab.classList.toggle('hover:bg-[#E5E0D5]', !isActive);
-        tab.classList.toggle('hover:text-ink', !isActive);
       });
-
-      syncInertState(key);
-    }
-
-    function restartPanelProgress() {
-      if (!panelProgressEl) return;
-      panelProgressEl.style.animation = 'none';
-      void panelProgressEl.offsetWidth;
-      panelProgressEl.style.removeProperty('animation');
-    }
-
-    function canAutoRotate() {
-      return (
-        tabs.length > 1 &&
-        !reducedMotionQuery.matches &&
-        !isPausedManually &&
-        isInViewport &&
-        !document.hidden
-      );
-    }
-
-    function scheduleNextCycle() {
-      window.clearTimeout(cycleTimer);
-      cycleTimer = undefined;
-
-      if (!canAutoRotate()) {
-        widget.setAttribute('data-autorotate', isPausedManually ? 'paused' : 'idle');
-        return;
-      }
-
-      widget.setAttribute('data-autorotate', 'running');
-      restartPanelProgress();
-      cycleTimer = window.setTimeout(() => {
-        activateIdx(currentIdx + 1);
-        scheduleNextCycle();
-      }, CYCLE_MS);
-    }
-
-    function pauseForUserInteraction() {
-      window.clearTimeout(cycleTimer);
-      cycleTimer = undefined;
-      isPausedManually = true;
-      widget.setAttribute('data-autorotate', 'paused');
-
-      window.clearTimeout(resumeTimer);
-      resumeTimer = window.setTimeout(() => {
-        resumeTimer = undefined;
-        isPausedManually = false;
-        if (canAutoRotate()) {
-          activateIdx(currentIdx + 1);
-        }
-        scheduleNextCycle();
-      }, MANUAL_PAUSE_MS);
-    }
-
-    const initialKey = tabs[currentIdx]?.getAttribute('data-butterfly-tab');
-    if (initialKey) {
-      syncInertState(initialKey);
+      panels.forEach((panel) => {
+        panel.classList.toggle('hidden', panel.getAttribute('data-home-bench-panel') !== key);
+      });
     }
 
     tabs.forEach((tab, idx) => {
       tab.addEventListener('click', () => {
-        activateIdx(idx);
-        pauseForUserInteraction();
+        const key = tab.getAttribute('data-home-bench-tab');
+        if (key) activate(key);
       });
       tab.addEventListener('keydown', (e) => {
-        let nextIdx: number | undefined;
-        if (e.key === 'ArrowRight') nextIdx = idx + 1;
-        else if (e.key === 'ArrowLeft') nextIdx = idx - 1;
-        else if (e.key === 'Home') nextIdx = 0;
-        else if (e.key === 'End') nextIdx = tabs.length - 1;
-
-        if (nextIdx !== undefined) {
+        if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') {
           e.preventDefault();
-          activateIdx(nextIdx);
-          tabs[currentIdx]?.focus();
-          pauseForUserInteraction();
+          const dir = e.key === 'ArrowRight' ? 1 : -1;
+          const next = tabs[(idx + dir + tabs.length) % tabs.length];
+          if (next) {
+            next.focus();
+            const key = next.getAttribute('data-home-bench-tab');
+            if (key) activate(key);
+          }
         }
       });
     });
-
-    nextBtn?.addEventListener('click', () => {
-      activateIdx(currentIdx + 1);
-      pauseForUserInteraction();
-    });
-
-    // Any new pointer, keyboard, or focus interaction inside the hero widget resets the 90s pause.
-    widget.addEventListener('pointerdown', pauseForUserInteraction);
-    widget.addEventListener('keydown', pauseForUserInteraction);
-    widget.addEventListener('focusin', pauseForUserInteraction);
-
-    if ('IntersectionObserver' in window) {
-      const observer = new IntersectionObserver(
-        (entries) => {
-          for (const entry of entries) {
-            if (entry.target === widget) {
-              isInViewport = entry.isIntersecting;
-              scheduleNextCycle();
-            }
-          }
-        },
-        { threshold: 0.15 },
-      );
-      observer.observe(widget);
-    }
-
-    document.addEventListener('visibilitychange', () => {
-      scheduleNextCycle();
-    });
-
-    reducedMotionQuery.addEventListener('change', () => {
-      scheduleNextCycle();
-    });
-
-    scheduleNextCycle();
   });
 </script>

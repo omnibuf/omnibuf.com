@@ -3,60 +3,60 @@
 
 <section
   id="capabilities"
-  class="py-12 sm:py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto border-t-2 border-ink/15"
+  class="py-12 sm:py-16 px-4 sm:px-6 max-w-6xl mx-auto border-t border-ink/15"
 >
   <div class="max-w-3xl mb-8">
-    <h2 class="text-3xl sm:text-5xl font-bold tracking-tight uppercase leading-none">
-      What OmniBuf does beyond Protobuf.
+    <h2 class="text-2xl sm:text-3xl font-bold tracking-tight text-ink">
+      What OmniBuf does beyond Protobuf
     </h2>
   </div>
 
-  <div class="border-t-2 border-ink divide-y-2 divide-ink/20">
+  <div class="border-t border-ink/15 divide-y divide-ink/12">
     <!-- Row 1: Schema-Less Wire Inspection -->
     <div
       id="explicit-wire-types"
-      class="scroll-mt-16 py-8 sm:py-10 grid lg:grid-cols-12 gap-6 lg:gap-8 items-center"
+      class="scroll-mt-16 py-8 sm:py-10 grid lg:grid-cols-12 gap-6 lg:gap-8 items-start"
     >
       <div class="lg:col-span-6 space-y-2.5 min-w-0">
-        <h3 class="text-2xl sm:text-3xl font-bold uppercase tracking-tight leading-snug">
+        <h3 class="text-lg sm:text-xl font-bold tracking-tight leading-snug text-ink">
           Self-describing wire types
         </h3>
         <p class="text-base sm:text-lg text-ink/85 leading-relaxed max-w-[65ch]">
           Protobuf only has a 3-bit wire type, so strings, byte slices, sub-messages, maps, and
           packed arrays all get lumped into <code>Wire Type 2</code>. Fixed 32-bit and 64-bit
           numbers mix floats with signed and unsigned integers. OmniBuf widens the wire type to 4
-          bits and puts element types on arrays and maps. Running the{' '}
-          <a href="/tooling" class="doc-link">
+          bits and puts element types on arrays and maps. The{' '}
+          <a href="/tooling/cli" class="doc-link">
             <code>omnibuf</code> CLI
           </a>{' '}
-          or calling <code>DecodeBlind</code> on a raw buffer returns the exact numbers, booleans,
-          strings, arrays, and maps that were sent. You only need the schema for things that aren't
-          sent on the wire, like enum names, default values, or <code>oneof</code> groupings.
+          and <code>DecodeBlind</code> return the exact numbers, booleans, strings, arrays, and maps
+          straight from a raw buffer. You only need the schema for things that aren't sent on the
+          wire, like enum names, default values, or <code>oneof</code> groupings.
         </p>
       </div>
       <div class="lg:col-span-6 space-y-3 font-mono text-sm min-w-0">
-        <div class="p-3.5 bg-[#FAF8F2] border-2 border-ink rounded-md overflow-x-auto">
+        <div class="p-3.5 bg-[#FAF8F2] border border-ink/15 rounded-lg overflow-x-auto">
           <!-- prettier-ignore -->
-          <div class="flex items-center justify-between gap-2 text-xs font-bold text-ink/75 mb-1.5">
+          <div class="flex items-center justify-between gap-2 text-xs font-semibold text-ink/70 mb-1.5">
             <a href="https://github.com/protocolbuffers/protoscope" target="_blank" rel="noopener noreferrer" class="doc-link">$ protoscope packet.pb</a>
             <span class="font-normal">Protobuf</span>
           </div>
-          <pre class="text-xs sm:text-sm text-ink/85 leading-snug"><span class="text-[#C23000] font-bold">3:</span> 1                <span class="text-ink/75"># int or bool?</span>
-<span class="text-[#C23000] font-bold">9:</span> &#123;<span class="text-ink/75">"\x1a\x03FRA\x20*"</span>&#125; <span class="text-ink/75"># string, bytes, or sub-msg?</span></pre>
+          <pre class="text-xs sm:text-sm text-ink/85 leading-snug"><span class="text-[#C23000] font-semibold">3:</span> 1                <span class="text-ink/60"># int or bool?</span>
+<span class="text-[#C23000] font-semibold">9:</span> &#123;<span class="text-ink/60">"\x1a\x03FRA\x20*"</span>&#125; <span class="text-ink/60"># string, bytes, or sub-msg?</span></pre>
         </div>
-        <div class="p-3.5 bg-ink text-paper border-2 border-ink rounded-md overflow-x-auto">
-          <div class="flex items-center justify-between gap-2 text-xs font-bold text-acid mb-1.5">
+        <div class="p-3.5 bg-ink text-paper border border-ink/15 rounded-lg overflow-x-auto">
+          <div class="flex items-center justify-between gap-2 text-xs font-semibold text-acid mb-1.5">
             <span>$ omnibuf -c packet.obuf</span>
-            <span class="font-normal text-paper/65">OmniBuf</span>
+            <span class="font-normal text-paper/60">OmniBuf</span>
           </div>
-          <pre class="text-xs sm:text-sm text-paper/95 leading-snug">&#123;<span class="text-acid font-bold">"field_3":</span> <span class="text-[#FF4F18] font-bold">true</span>, <span class="text-acid font-bold">"field_9":</span> &#123;<span class="text-acid">"field_3":</span> <span class="text-paper font-bold">"FRA"</span>, <span class="text-acid">"field_4":</span> 42&#125;&#125;</pre>
+          <pre class="text-xs sm:text-sm text-paper/95 leading-snug">&#123;<span class="text-acid">"field_3":</span> <span class="text-[#FF7A4D] font-semibold">true</span>, <span class="text-acid">"field_9":</span> &#123;<span class="text-acid">"field_3":</span> <span class="text-paper font-semibold">"FRA"</span>, <span class="text-acid">"field_4":</span> 42&#125;&#125;</pre>
         </div>
-        <div class="p-3.5 bg-ink text-paper border-2 border-ink rounded-md overflow-x-auto">
-          <div class="flex items-center justify-between gap-2 text-xs font-bold text-acid mb-1.5">
+        <div class="p-3.5 bg-ink text-paper border border-ink/15 rounded-lg overflow-x-auto">
+          <div class="flex items-center justify-between gap-2 text-xs font-semibold text-acid mb-1.5">
             <span>$ omnibuf -c packet-field0.obuf</span>
-            <span class="font-normal text-acid/85">OmniBuf + Field #0</span>
+            <span class="font-normal text-paper/60">OmniBuf + Field #0</span>
           </div>
-          <pre class="text-xs sm:text-sm text-paper/95 leading-snug">&#123;<span class="text-acid font-bold">"active":</span> <span class="text-[#FF4F18] font-bold">true</span>, <span class="text-acid font-bold">"node":</span> &#123;<span class="text-acid">"city":</span> <span class="text-paper font-bold">"FRA"</span>, <span class="text-acid">"asn":</span> 42&#125;&#125;</pre>
+          <pre class="text-xs sm:text-sm text-paper/95 leading-snug">&#123;<span class="text-acid">"active":</span> <span class="text-[#FF7A4D] font-semibold">true</span>, <span class="text-acid">"node":</span> &#123;<span class="text-acid">"city":</span> <span class="text-paper font-semibold">"FRA"</span>, <span class="text-acid">"asn":</span> 42&#125;&#125;</pre>
         </div>
       </div>
     </div>
@@ -64,14 +64,14 @@
     <!-- Row 2: Optional Field #0 Inline Field Names -->
     <div
       id="field-0-names"
-      class="scroll-mt-16 py-8 sm:py-10 grid lg:grid-cols-12 gap-6 lg:gap-8 items-center"
+      class="scroll-mt-16 py-8 sm:py-10 grid lg:grid-cols-12 gap-6 lg:gap-8 items-start"
     >
       <div class="lg:col-span-6 space-y-3 min-w-0">
-        <h3 class="text-2xl sm:text-3xl font-bold uppercase tracking-tight leading-snug">
+        <h3 class="text-lg sm:text-xl font-bold tracking-tight leading-snug text-ink">
           Optional field names in Field #0
         </h3>
         <p class="text-base sm:text-lg text-ink/85 leading-relaxed max-w-[65ch]">
-          By default, OmniBuf only writes numeric field IDs to keep packets small. Turning on{' '}
+          By default, OmniBuf only writes numeric field IDs to keep packets small. Optional{' '}
           <code>Field #0</code> (<code>omnibuf.v1.SchemaMeta</code>) writes a field-number-to-name
           map once at the start of the packet so the wire bytes carry their own string field names.
         </p>
@@ -90,34 +90,34 @@
       </div>
       <div class="lg:col-span-6 font-mono text-xs sm:text-sm min-w-0">
         <div class="os-window overflow-hidden">
-          <div class="os-titlebar bg-[#E5E0D5]">
-            <span class="font-bold uppercase text-ink text-xs">
-              1,000-Item Array: Repeated Keys vs. Field #0 Inheritance
+          <div class="os-titlebar">
+            <span class="font-mono font-semibold text-ink/80 text-xs">
+              1,000-item array: repeated keys vs. Field #0 inheritance
             </span>
           </div>
-          <div class="bg-ink text-paper p-4 space-y-3">
-            <div class="bg-[#1F1F1F] p-3.5 rounded border border-paper/15">
+          <div class="bg-ink text-paper p-4 space-y-4">
+            <div>
               <div class="flex items-center justify-between gap-2 text-xs mb-2">
-                <span class="uppercase font-bold text-[#FF4F18]">JSON &amp; MessagePack</span>
-                <span class="text-paper/65">keys repeated 1,000x</span>
+                <span class="font-semibold text-[#FF7A4D]">JSON &amp; MessagePack</span>
+                <span class="text-paper/60">keys repeated 1,000x</span>
               </div>
               <pre class="leading-relaxed overflow-x-auto"><code>"neighbors": [
-  &#123;<span class="text-[#FF4F18]">"router_id"</span>: "fra-1", <span class="text-[#FF4F18]">"latency_ns"</span>: 420&#125;,
-  &#123;<span class="text-[#FF4F18]">"router_id"</span>: "ams-2", <span class="text-[#FF4F18]">"latency_ns"</span>: 890&#125;,
+  &#123;<span class="text-[#FF7A4D]">"router_id"</span>: "fra-1", <span class="text-[#FF7A4D]">"latency_ns"</span>: 420&#125;,
+  &#123;<span class="text-[#FF7A4D]">"router_id"</span>: "ams-2", <span class="text-[#FF7A4D]">"latency_ns"</span>: 890&#125;,
   ...
 ]</code></pre>
             </div>
-            <div class="bg-[#1F1F1F] p-3.5 rounded border border-acid/45 space-y-2.5">
+            <div class="pt-3.5 border-t border-paper/12 space-y-2">
               <div class="flex items-center justify-between gap-2 text-xs">
-                <span class="uppercase font-bold text-acid">OmniBuf + Field #0</span>
-                <span class="text-acid/85">names written once</span>
+                <span class="font-semibold text-acid">OmniBuf + Field #0</span>
+                <span class="text-paper/60">names written once</span>
               </div>
-              <pre class="leading-relaxed overflow-x-auto"><code><span class="text-paper/65">// Field #0: name table (once per packet)</span>
+              <pre class="leading-relaxed overflow-x-auto"><code><span class="text-paper/55">// Field #0: name table (once per packet)</span>
 <span class="text-acid">10</span>   = "neighbors"
 <span class="text-acid">10.1</span> = "router_id"
 <span class="text-acid">10.2</span> = "latency_ns"
 
-<span class="text-paper/65">// Field #10: 1,000 items (numeric IDs only)</span>
+<span class="text-paper/55">// Field #10: 1,000 items (numeric IDs only)</span>
 &#123;<span class="text-acid">1</span>: "fra-1", <span class="text-acid">2</span>: 420&#125;
 &#123;<span class="text-acid">1</span>: "ams-2", <span class="text-acid">2</span>: 890&#125;
 ...</code></pre>

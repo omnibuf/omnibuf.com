@@ -16,23 +16,23 @@ const { heading, accent, summary, code, lang, codeLabel = 'gRPC & Connect Codec'
 
 <section
   id="grpc-connect"
-  class="scroll-mt-16 py-12 sm:py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto border-t-2 border-ink/15"
+  class="scroll-mt-16 py-12 sm:py-16 px-4 sm:px-6 max-w-6xl mx-auto border-t border-ink/15"
 >
-  <div class="border-t-2 border-ink pt-8 sm:pt-12 grid lg:grid-cols-12 gap-6 lg:gap-8 items-start">
+  <div class="grid lg:grid-cols-12 gap-6 lg:gap-8 items-start">
     <div class="lg:col-span-5 space-y-3.5 min-w-0">
-      <h2 class="text-2xl sm:text-3xl font-bold uppercase tracking-tight leading-snug text-ink">
+      <h2 class="text-xl sm:text-2xl font-bold tracking-tight leading-snug text-ink">
         {heading} {accent}
       </h2>
       <p class="text-base sm:text-lg text-ink/85 leading-relaxed" set:html={summary} />
       <dl class="pt-1 space-y-2 text-sm text-ink/80">
         <div class="flex flex-wrap items-baseline gap-x-2 gap-y-1">
-          <dt class="font-mono font-bold text-xs px-2 py-0.5 bg-ink/8 border border-ink/20 rounded text-ink">
+          <dt class="font-mono font-semibold text-xs px-2 py-0.5 bg-ink/8 border border-ink/15 rounded text-ink">
             omnibuf
           </dt>
           <dd>Compact wire payload (schema known by both peers)</dd>
         </div>
         <div class="flex flex-wrap items-baseline gap-x-2 gap-y-1">
-          <dt class="font-mono font-bold text-xs px-2 py-0.5 bg-ink/8 border border-ink/20 rounded text-ink">
+          <dt class="font-mono font-semibold text-xs px-2 py-0.5 bg-ink/8 border border-ink/15 rounded text-ink">
             x-omnibuf
           </dt>
           <dd>Self-describing payload with Field #0 schema metadata inline</dd>
@@ -41,13 +41,13 @@ const { heading, accent, summary, code, lang, codeLabel = 'gRPC & Connect Codec'
     </div>
 
     <div class="lg:col-span-7 min-w-0">
-      <div class="p-4 sm:p-5 bg-ink text-paper rounded-md font-mono text-xs sm:text-sm overflow-x-auto leading-relaxed border-2 border-ink [&>pre]:bg-transparent! [&>pre]:p-0! [&>pre]:m-0! [&>pre]:border-0!">
-        <div class="flex items-center justify-between gap-2 mb-2.5 pb-2 border-b border-paper/15">
-          <div class="text-xs font-bold uppercase text-acid">{codeLabel}</div>
+      <div class="p-4 sm:p-5 bg-ink text-paper rounded-lg font-mono text-xs sm:text-sm overflow-x-auto leading-relaxed border border-ink/15 [&>pre]:bg-transparent! [&>pre]:p-0! [&>pre]:m-0! [&>pre]:border-0!">
+        <div class="flex items-center justify-between gap-2 mb-2.5 pb-2 border-b border-paper/12">
+          <div class="text-xs font-medium text-paper/70">{codeLabel}</div>
           <button
             type="button"
             data-copy={code}
-            class="copy-snippet-btn min-w-[4.75rem] text-center px-2.5 py-1 text-xs font-bold uppercase bg-paper/15 hover:bg-acid hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-acid text-paper border border-paper/30 rounded shrink-0 transition"
+            class="copy-snippet-btn min-w-[4.25rem] text-center px-2.5 py-1 text-xs font-medium bg-paper/10 hover:bg-paper/20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#FF7A4D] text-paper border border-paper/20 rounded shrink-0 transition cursor-pointer"
           >
             Copy
           </button>

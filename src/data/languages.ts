@@ -1,8 +1,18 @@
 export type LanguageKey =
   'go' | 'es' | 'rs' | 'py' | 'cpp' | 'nano' | 'java' | 'cs' | 'swift' | 'dart' | 'php' | 'elixir';
 
+export type ToolingPageKey =
+  'tooling' | 'tooling-cli' | 'tooling-editors' | 'tooling-devtools' | 'tooling-traffic';
+
 export type PageKey =
-  'home' | 'how-it-works' | 'benchmarks' | 'spec' | 'tooling' | LanguageKey | 'none';
+  | 'home'
+  | 'how-it-works'
+  | 'benchmarks'
+  | 'spec'
+  | 'languages'
+  | ToolingPageKey
+  | LanguageKey
+  | 'none';
 
 export interface LanguageEntry {
   key: LanguageKey;
@@ -12,6 +22,7 @@ export interface LanguageEntry {
   repoUrl: string;
   packageLabel: string;
   shortPackage: string;
+  summary: string;
   status: 'stable' | 'experimental';
 }
 
@@ -24,6 +35,7 @@ export const languages: LanguageEntry[] = [
     repoUrl: 'https://github.com/omnibuf/omnibuf-go',
     packageLabel: 'github.com/omnibuf/omnibuf-go',
     shortPackage: 'omnibuf-go',
+    summary: 'Zero-alloc codecs, struct tags, protobuf-go reflection, Opaque views, gRPC/Connect.',
     status: 'experimental',
   },
   {
@@ -34,6 +46,8 @@ export const languages: LanguageEntry[] = [
     repoUrl: 'https://github.com/omnibuf/omnibuf-es',
     packageLabel: '@omnibuf/core',
     shortPackage: '@omnibuf/core',
+    summary:
+      'defineMessage schemas, protobuf-es reflection, and buf codegen for Node and browsers.',
     status: 'experimental',
   },
   {
@@ -44,6 +58,7 @@ export const languages: LanguageEntry[] = [
     repoUrl: 'https://github.com/omnibuf/omnibuf-rs',
     packageLabel: 'omnibuf',
     shortPackage: 'omnibuf crate',
+    summary: '#[derive(OmniBuf)], buffa and prost bridges, zero-copy views, and buf codegen.',
     status: 'experimental',
   },
   {
@@ -54,6 +69,8 @@ export const languages: LanguageEntry[] = [
     repoUrl: 'https://github.com/omnibuf/omnibuf-py',
     packageLabel: 'omnibuf',
     shortPackage: 'omnibuf (PyPI)',
+    summary:
+      'Prebuilt Rust-backed wheels, annotated dataclasses, protobuf-py support, and buf codegen.',
     status: 'experimental',
   },
   {
@@ -64,6 +81,8 @@ export const languages: LanguageEntry[] = [
     repoUrl: 'https://github.com/omnibuf/omnibuf-cpp',
     packageLabel: 'omnibuf/omnibuf.hpp',
     shortPackage: 'C++20 headers',
+    summary:
+      'Header-only C++20 runtime, compile-time StructTraits, descriptor sets, and buf codegen.',
     status: 'experimental',
   },
   {
@@ -74,6 +93,8 @@ export const languages: LanguageEntry[] = [
     repoUrl: 'https://github.com/omnibuf/omnibuf-nano',
     packageLabel: 'omnibuf-nano',
     shortPackage: 'C99 embedded',
+    summary:
+      'Static-bounds C99 runtime with zero heap allocation for microcontrollers and firmware.',
     status: 'experimental',
   },
   {
@@ -84,6 +105,7 @@ export const languages: LanguageEntry[] = [
     repoUrl: 'https://github.com/omnibuf/omnibuf-java',
     packageLabel: 'com.omnibuf:omnibuf-java',
     shortPackage: 'com.omnibuf',
+    summary: 'Annotated Java 21 records and POJOs, protobuf-java interop, and generated codecs.',
     status: 'experimental',
   },
   {
@@ -94,6 +116,7 @@ export const languages: LanguageEntry[] = [
     repoUrl: 'https://github.com/omnibuf/omnibuf-cs',
     packageLabel: 'OmniBuf',
     shortPackage: 'OmniBuf (.NET 8)',
+    summary: 'Attribute-annotated records and classes, Google.Protobuf interop, and Span views.',
     status: 'experimental',
   },
   {
@@ -104,6 +127,7 @@ export const languages: LanguageEntry[] = [
     repoUrl: 'https://github.com/omnibuf/omnibuf-swift',
     packageLabel: 'omnibuf-swift',
     shortPackage: 'SwiftPM (Swift 6)',
+    summary: 'Declarative Swift structs with key paths, SwiftProtobuf interop, and Opaque views.',
     status: 'experimental',
   },
   {
@@ -114,6 +138,7 @@ export const languages: LanguageEntry[] = [
     repoUrl: 'https://github.com/omnibuf/omnibuf-dart',
     packageLabel: 'omnibuf',
     shortPackage: 'omnibuf (pub.dev)',
+    summary: 'Declarative OmniBufSchema codecs, package:protobuf support, and Dart 3 AOT codegen.',
     status: 'experimental',
   },
   {
@@ -124,6 +149,7 @@ export const languages: LanguageEntry[] = [
     repoUrl: 'https://github.com/omnibuf/omnibuf-php',
     packageLabel: 'omnibuf/omnibuf',
     shortPackage: 'Packagist (PHP 8.3+)',
+    summary: 'PHP 8 attribute classes, google/protobuf interop, and optional native extension.',
     status: 'experimental',
   },
   {
@@ -134,6 +160,8 @@ export const languages: LanguageEntry[] = [
     repoUrl: 'https://github.com/omnibuf/omnibuf-elixir',
     packageLabel: 'omnibuf',
     shortPackage: 'omnibuf (Hex.pm)',
+    summary:
+      'Compile-time OmniBuf.Schema DSL, elixir-protobuf support, and Rustler NIF acceleration.',
     status: 'experimental',
   },
 ];
@@ -143,11 +171,56 @@ export const primaryNavPages = [
   { href: '/how-it-works', key: 'how-it-works', label: 'How It Works' },
 ] as const;
 
+export const languagesNavPage = {
+  href: '/languages',
+  key: 'languages',
+  label: 'Languages',
+} as const;
+
 export const benchmarksNavPage = {
   href: '/benchmarks',
   key: 'benchmarks',
   label: 'Benchmarks',
 } as const;
+
+export interface ToolingEntry {
+  key: Exclude<ToolingPageKey, 'tooling'>;
+  href: string;
+  label: string;
+  desc: string;
+  repoUrl: string;
+}
+
+export const toolingPages: ToolingEntry[] = [
+  {
+    key: 'tooling-cli',
+    href: '/tooling/cli',
+    label: 'CLI',
+    desc: 'Decode, encode, and jq-query .obuf files',
+    repoUrl: 'https://github.com/omnibuf/omnibuf-cli',
+  },
+  {
+    key: 'tooling-editors',
+    href: '/tooling/editors',
+    label: 'Editor Plugins',
+    desc: 'VS Code and Neovim extensions',
+    repoUrl: 'https://github.com/omnibuf/omnibuf-vscode',
+  },
+  {
+    key: 'tooling-devtools',
+    href: '/tooling/devtools',
+    label: 'DevTools',
+    desc: 'Chrome and Chromium network inspector',
+    repoUrl: 'https://github.com/omnibuf/omnibuf-devtools',
+  },
+  {
+    key: 'tooling-traffic',
+    href: '/tooling/traffic',
+    label: 'Traffic Inspection',
+    desc: 'Wireshark, tshark, and mitmproxy',
+    repoUrl: 'https://github.com/omnibuf/omnibuf-wireshark',
+  },
+];
 
 export const cliNavPage = {
   href: '/tooling',
@@ -163,11 +236,16 @@ export const specNavPage = {
 } as const;
 
 export const totalSitePages =
-  primaryNavPages.length + languages.length + 3; /* Benchmarks + Tooling + Specification */
+  primaryNavPages.length +
+  languages.length +
+  toolingPages.length +
+  4; /* Benchmarks + Languages + Tooling + Specification */
 
 export function getGitHubUrlForPage(currentPage: PageKey): string {
   const lang = languages.find((l) => l.key === currentPage);
   if (lang) return lang.repoUrl;
+  const tool = toolingPages.find((t) => t.key === currentPage);
+  if (tool) return tool.repoUrl;
   if (currentPage === 'tooling') return cliNavPage.repoUrl;
   return 'https://github.com/omnibuf';
 }

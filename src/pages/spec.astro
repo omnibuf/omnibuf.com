@@ -178,21 +178,13 @@ const tocSections = sectionTitles.map((title, index) => ({
 >
   <Navbar currentPage="spec" />
 
-  <main id="main-content" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-16">
+  <main id="main-content" class="max-w-6xl mx-auto px-4 sm:px-6 py-10 sm:py-14">
     <!-- Spec Header -->
-    <div class="mb-12">
-      <div class="mb-5">
-        <span class="inline-flex items-center gap-2.5 px-3.5 py-1.5 bg-ink text-acid font-mono text-xs sm:text-sm font-bold uppercase tracking-wider rounded border-2 border-ink shadow-[2px_2px_0px_#111]">
-          <span class="w-2.5 h-2.5 rounded-full bg-[#FF4F18] inline-block shrink-0"></span>
-          <span>v1 DRAFT-1</span>
-        </span>
-      </div>
-      <h1 class="text-[2.6rem] sm:text-7xl lg:text-[5.5rem] font-bold tracking-tight uppercase leading-[0.94] text-ink">
-        Wire Format
-        <br />
-        <span class="text-[#FF4F18]">Specification v1 DRAFT-1.</span>
+    <div class="mb-10 space-y-3">
+      <h1 class="text-3xl sm:text-5xl font-bold tracking-tight leading-[1.1] text-ink">
+        Wire format specification <span class="text-[#FF4F18]">v1 DRAFT-1</span>
       </h1>
-      <p class="mt-6 max-w-3xl text-lg sm:text-2xl text-ink/85 font-medium leading-snug">
+      <p class="max-w-[65ch] text-base sm:text-lg text-ink/80 leading-relaxed">
         The byte-level encoding rules for Prefix-Varints, field tags, scalars, containers, Field #0
         metadata, and cross-language conformance.
       </p>
@@ -201,12 +193,12 @@ const tocSections = sectionTitles.map((title, index) => ({
     <!-- Sticky Mobile Section Jump Bar (< lg viewports) -->
     <div class="lg:hidden sticky top-14 z-30 mb-6 flex items-start gap-2 font-mono text-sm no-print select-none">
       <details id="mobile-spec-toc" class="flex-1 os-window bg-[#FAF8F2]">
-        <summary class="px-4 py-2.5 font-bold uppercase cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink">
-          <span id="mobile-spec-toc-label">Jump to Spec Section</span>
+        <summary class="px-4 py-2.5 font-semibold cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#FF4F18]">
+          <span id="mobile-spec-toc-label">Jump to spec section</span>
         </summary>
         <nav
           aria-label="Mobile specification sections"
-          class="p-3 border-t-2 border-ink space-y-1 max-h-64 overflow-y-auto"
+          class="p-3 border-t border-ink/15 space-y-1 max-h-64 overflow-y-auto"
         >
           {tocSections.map((sec) => (
             <div>
@@ -214,18 +206,18 @@ const tocSections = sectionTitles.map((title, index) => ({
                 href={`#${sec.id}`}
                 data-mobile-spec-link={sec.id}
                 data-active="false"
-                class="block px-2.5 py-1.5 rounded font-bold hover:bg-ink/5 data-[active=true]:bg-acid data-[active=true]:text-ink"
+                class="block px-2.5 py-1.5 rounded-md font-medium hover:bg-ink/5 transition-colors"
               >
                 {sec.label}
               </a>
               {sec.children.length > 0 && (
-                <div class="pl-3 ml-2.5 mt-0.5 mb-1 space-y-0.5 border-l-2 border-ink/25">
+                <div class="pl-3 ml-2.5 mt-0.5 mb-1 space-y-0.5 border-l border-ink/15">
                   {sec.children.map((sub) => (
                     <a
                       href={`#${sub.id}`}
                       data-mobile-spec-link={sub.id}
                       data-active="false"
-                      class="block px-2 py-1 rounded text-xs text-ink/80 hover:text-ink hover:bg-ink/5 data-[active=true]:bg-acid/40 data-[active=true]:text-ink data-[active=true]:font-bold"
+                      class="block px-2 py-1 rounded text-xs text-ink/75 hover:text-ink hover:bg-ink/5 transition-colors"
                     >
                       {sub.label}
                     </a>
@@ -236,10 +228,7 @@ const tocSections = sectionTitles.map((title, index) => ({
           ))}
         </nav>
       </details>
-      <a
-        href="#main-content"
-        class="os-btn px-3 py-2.5 bg-[#FAF8F2] text-ink font-bold rounded-md shrink-0"
-      >
+      <a href="#main-content" class="btn-secondary px-3 py-2.5 text-xs shrink-0">
         Top &uarr;
       </a>
     </div>
@@ -248,23 +237,23 @@ const tocSections = sectionTitles.map((title, index) => ({
       <!-- Left Sticky Table of Contents -->
       <aside class="hidden lg:block lg:col-span-3 lg:sticky lg:top-16 no-print select-none">
         <div class="os-window bg-[#FAF8F2] p-4 lg:max-h-[calc(100vh-5.5rem)] lg:overflow-y-auto">
-          <div class="font-mono text-sm font-bold uppercase pb-2.5 mb-2.5 border-b-2 border-ink flex items-center justify-between gap-2">
+          <div class="text-xs font-semibold text-ink/60 pb-2.5 mb-2.5 border-b border-ink/12 flex items-center justify-between gap-2">
             <span>Contents</span>
             <a
               href="#main-content"
-              class="text-xs px-2 py-0.5 bg-white border border-ink rounded hover:bg-acid transition shrink-0 whitespace-nowrap"
+              class="font-mono text-xs px-2 py-0.5 bg-[#EDE8DC] border border-ink/15 rounded hover:border-ink/30 transition shrink-0 whitespace-nowrap text-ink/80"
             >
               Top &uarr;
             </a>
           </div>
-          <nav aria-label="Specification sections" class="space-y-1 font-mono text-sm">
+          <nav aria-label="Specification sections" class="space-y-1 font-mono text-xs sm:text-sm">
             {tocSections.map((sec) => (
               <div>
                 <a
                   href={`#${sec.id}`}
                   data-spec-link={sec.id}
                   data-active="false"
-                  class="block px-2.5 py-1.5 rounded border border-transparent hover:bg-ink/5 transition data-[active=true]:bg-acid data-[active=true]:border-ink data-[active=true]:font-bold"
+                  class="block px-2.5 py-1.5 rounded-md border border-transparent hover:bg-ink/5 transition-colors"
                 >
                   {sec.label}
                 </a>
@@ -272,7 +261,7 @@ const tocSections = sectionTitles.map((title, index) => ({
                   <div
                     data-subtoc={sec.id}
                     class:list={[
-                      'pl-3 ml-2.5 mt-1 mb-1.5 space-y-1 border-l-2 border-ink/25',
+                      'pl-3 ml-2.5 mt-1 mb-1.5 space-y-1 border-l border-ink/15',
                       sec.id === 'sec-6' ? 'block' : 'hidden',
                     ]}
                   >
@@ -281,7 +270,7 @@ const tocSections = sectionTitles.map((title, index) => ({
                         href={`#${sub.id}`}
                         data-spec-h3={sub.id}
                         data-active="false"
-                        class="block px-2 py-1 rounded text-xs sm:text-sm text-ink/80 hover:text-ink hover:bg-ink/5 transition data-[active=true]:text-ink data-[active=true]:font-bold data-[active=true]:bg-acid/40"
+                        class="block px-2 py-1 rounded text-xs text-ink/75 hover:text-ink hover:bg-ink/5 transition-colors"
                       >
                         {sub.label}
                       </a>
@@ -358,11 +347,11 @@ const tocSections = sectionTitles.map((title, index) => ({
           </li>
         </ul>
         <p>
-          Decoding into an existing message object comes in two modes: <strong>replace</strong>{' '}
-          (standard unmarshal) resets any field omitted from the packet to its default value, and
-          the first occurrence of an array or map replaces prior contents before any subsequent
-          occurrences in the same packet append or merge. <strong>Merge</strong> leaves omitted
-          fields intact and appends or merges incoming occurrences onto existing values.
+          Existing message objects support two decode modes. <strong>Replace</strong> (standard
+          unmarshal) resets any omitted field to its default value, and the first occurrence of an
+          array or map clears prior contents before any later occurrences in the same packet append
+          or merge. <strong>Merge</strong> keeps omitted fields intact and appends or merges
+          incoming occurrences onto existing values.
         </p>
         <p>
           Schema-aware decoders apply <code>oneof</code> and explicit-presence rules from their
@@ -1135,24 +1124,19 @@ WireSubMsg (12): [ByteLen: Prefix-Varint][Message field stream]</code></pre>
       </article>
     </div>
 
-    <div class="mt-12 pt-10 border-t-2 border-ink flex flex-wrap items-center justify-between gap-4 no-print">
-      <div class="font-mono text-sm sm:text-base font-bold uppercase text-ink/80">
-        More about OmniBuf
-      </div>
-      <div class="flex flex-wrap gap-3 font-mono text-sm sm:text-base">
-        <a
-          href="#main-content"
-          class="os-btn px-4 py-2.5 bg-[#FAF8F2] text-ink font-bold rounded-md"
-        >
+    <div class="mt-12 pt-8 border-t border-ink/15 flex flex-wrap items-center justify-between gap-4 no-print">
+      <div class="text-sm font-medium text-ink/70">More about OmniBuf</div>
+      <div class="flex flex-wrap gap-2.5 text-sm">
+        <a href="#main-content" class="btn-secondary px-3.5 py-2">
           Top &uarr;
         </a>
-        <a href="/how-it-works" class="os-btn px-5 py-2.5 bg-acid text-ink font-bold rounded-md">
+        <a href="/how-it-works" class="btn-primary px-4 py-2">
           How It Works &rarr;
         </a>
-        <a href="/go" class="os-btn px-5 py-2.5 bg-[#FAF8F2] text-ink font-bold rounded-md">
-          OmniBuf for Go &rarr;
+        <a href="/go" class="btn-secondary px-3.5 py-2">
+          Go &rarr;
         </a>
-        <a href="/es" class="os-btn px-5 py-2.5 bg-[#FAF8F2] text-ink font-bold rounded-md">
+        <a href="/es" class="btn-secondary px-3.5 py-2">
           TypeScript / JS &rarr;
         </a>
       </div>

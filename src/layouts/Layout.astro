@@ -86,7 +86,7 @@ const ogImageURL = new URL(ogImage, siteBase);
   <body class="font-display antialiased selection:bg-[#FF4F18] selection:text-white">
     <a
       href="#main-content"
-      class="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-[60] os-btn px-3 py-1.5 bg-acid text-ink font-mono text-sm font-bold rounded"
+      class="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-[60] btn-primary px-3 py-1.5 text-sm"
     >
       Skip to main content
     </a>
@@ -96,12 +96,9 @@ const ogImageURL = new URL(ogImage, siteBase);
       const liveRegion = document.getElementById('copy-live-region');
       const copyTimers = new WeakMap<HTMLButtonElement, number>();
       document.querySelectorAll<HTMLButtonElement>('.copy-snippet-btn').forEach((btn) => {
-        btn.addEventListener('click', () => {
+        btn.addEventListener('click', async () => {
           const text = btn.getAttribute('data-copy') || '';
           if (!text) return;
-          if (navigator.clipboard && navigator.clipboard.writeText) {
-            void navigator.clipboard.writeText(text);
-          }
           if (!btn.dataset.origText) {
             btn.dataset.origText = btn.textContent?.trim() || 'Copy';
           }
@@ -109,9 +106,21 @@ const ogImageURL = new URL(ogImage, siteBase);
           if (prevTimer !== undefined) {
             window.clearTimeout(prevTimer);
           }
-          btn.textContent = 'Copied!';
+          let copied: boolean;
+          try {
+            if (!navigator.clipboard || !navigator.clipboard.writeText) {
+              throw new Error('Clipboard API unavailable');
+            }
+            await navigator.clipboard.writeText(text);
+            copied = true;
+          } catch {
+            copied = false;
+          }
+          btn.textContent = copied ? 'Copied!' : 'Copy failed';
           if (liveRegion) {
-            liveRegion.textContent = 'Copied code snippet to clipboard.';
+            liveRegion.textContent = copied
+              ? 'Copied code snippet to clipboard.'
+              : 'Could not copy snippet automatically. Select and copy manually.';
           }
           const timerId = window.setTimeout(() => {
             btn.textContent = btn.dataset.origText || 'Copy';

@@ -10,22 +10,22 @@ const nodeSchemaCode = `message Node {
 
 <section
   id="how-it-works"
-  class="py-12 sm:py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto border-t-2 border-ink/15"
+  class="py-12 sm:py-16 px-4 sm:px-6 max-w-6xl mx-auto border-t border-ink/15"
 >
   <div class="max-w-3xl mb-8">
-    <h2 class="text-3xl sm:text-5xl font-bold tracking-tight uppercase leading-none">
-      Why the encoding is so fast.
+    <h2 class="text-2xl sm:text-3xl font-bold tracking-tight text-ink">
+      Why the encoding is so fast
     </h2>
   </div>
 
-  <div class="border-t-2 border-ink divide-y-2 divide-ink/20">
+  <div class="border-t border-ink/15 divide-y divide-ink/12">
     <!-- Row 1: Read integers without byte-by-byte loops -->
     <div
       id="prefix-varints"
-      class="scroll-mt-16 py-8 sm:py-10 grid lg:grid-cols-12 gap-6 lg:gap-8 items-center"
+      class="scroll-mt-16 py-8 sm:py-10 grid lg:grid-cols-12 gap-6 lg:gap-8 items-start"
     >
       <div class="lg:col-span-6 space-y-3 min-w-0">
-        <h3 class="text-2xl sm:text-3xl font-bold uppercase tracking-tight leading-snug">
+        <h3 class="text-lg sm:text-xl font-bold tracking-tight leading-snug text-ink">
           Read integers without byte-by-byte loops
         </h3>
         <!-- prettier-ignore -->
@@ -41,18 +41,18 @@ const nodeSchemaCode = `message Node {
         </p>
       </div>
       <div class="lg:col-span-6 min-w-0 space-y-3 select-none">
-        <div class="p-4 sm:p-5 bg-ink text-paper border-2 border-ink rounded-md font-mono text-xs sm:text-sm space-y-4">
+        <div class="p-4 sm:p-5 bg-ink text-paper border border-ink/15 rounded-lg font-mono text-xs sm:text-sm space-y-4">
           <div class="space-y-1.5">
             <div class="flex items-center justify-between gap-2">
-              <span class="text-[#FF4F18] font-bold uppercase text-xs">Protobuf LEB128</span>
-              <span class="text-paper/65 text-xs">Value: 300 (2 bytes)</span>
+              <span class="text-[#FF7A4D] font-semibold text-xs">Protobuf LEB128</span>
+              <span class="text-paper/60 text-xs">Value: 300 (2 bytes)</span>
             </div>
-            <div class="grid grid-cols-2 gap-2 text-center text-sm sm:text-base font-bold max-w-xs">
-              <div class="bg-[#1F1F1F] border border-[#FF4F18]/60 rounded py-2">
-                <span class="text-[#FF4F18]">1</span>
+            <div class="grid grid-cols-2 gap-2 text-center text-sm sm:text-base font-semibold max-w-xs">
+              <div class="bg-[#1F232B] border border-[#FF7A4D]/45 rounded py-2">
+                <span class="text-[#FF7A4D]">1</span>
                 <span class="text-paper/80">0101100</span>
               </div>
-              <div class="bg-[#1F1F1F] border border-paper/30 rounded py-2">
+              <div class="bg-[#1F232B] border border-paper/20 rounded py-2">
                 <span class="text-acid">0</span>
                 <span class="text-paper/80">0000010</span>
               </div>
@@ -61,10 +61,10 @@ const nodeSchemaCode = `message Node {
 
           <div class="space-y-1.5">
             <div class="flex items-center justify-between gap-2">
-              <span class="text-acid font-bold uppercase text-xs">OmniBuf Prefix-Varint</span>
-              <span class="text-paper/65 text-xs">Value: 300 (2 bytes)</span>
+              <span class="text-acid font-semibold text-xs">OmniBuf Prefix-Varint</span>
+              <span class="text-paper/60 text-xs">Value: 300 (2 bytes)</span>
             </div>
-            <div class="grid grid-cols-2 gap-2 text-center text-sm sm:text-base font-bold bg-[#1F1F1F] border-2 border-acid rounded p-2 max-w-xs">
+            <div class="grid grid-cols-2 gap-2 text-center text-sm sm:text-base font-semibold bg-[#1F232B] border border-[#b7e48a]/50 rounded p-2 max-w-xs">
               <div>
                 <span class="text-paper/80">101100</span>
                 <span class="text-acid">10</span>
@@ -74,26 +74,26 @@ const nodeSchemaCode = `message Node {
           </div>
         </div>
 
-        <div class="p-4 sm:p-5 bg-ink text-paper border-2 border-ink rounded-md font-mono text-xs sm:text-sm space-y-4">
+        <div class="p-4 sm:p-5 bg-ink text-paper border border-ink/15 rounded-lg font-mono text-xs sm:text-sm space-y-4">
           <div class="space-y-1.5">
             <div class="flex items-center justify-between gap-2">
-              <span class="text-[#FF4F18] font-bold uppercase text-xs">Protobuf LEB128</span>
-              <span class="text-paper/65 text-xs">Value: 5,000,013 (4 bytes)</span>
+              <span class="text-[#FF7A4D] font-semibold text-xs">Protobuf LEB128</span>
+              <span class="text-paper/60 text-xs">Value: 5,000,013 (4 bytes)</span>
             </div>
-            <div class="grid grid-cols-4 gap-2 text-center text-sm sm:text-base font-bold">
-              <div class="bg-[#1F1F1F] border border-[#FF4F18]/60 rounded py-2">
-                <span class="text-[#FF4F18]">1</span>
+            <div class="grid grid-cols-4 gap-2 text-center text-sm sm:text-base font-semibold">
+              <div class="bg-[#1F232B] border border-[#FF7A4D]/45 rounded py-2">
+                <span class="text-[#FF7A4D]">1</span>
                 <span class="text-paper/80">1001101</span>
               </div>
-              <div class="bg-[#1F1F1F] border border-[#FF4F18]/60 rounded py-2">
-                <span class="text-[#FF4F18]">1</span>
+              <div class="bg-[#1F232B] border border-[#FF7A4D]/45 rounded py-2">
+                <span class="text-[#FF7A4D]">1</span>
                 <span class="text-paper/80">0010110</span>
               </div>
-              <div class="bg-[#1F1F1F] border border-[#FF4F18]/60 rounded py-2">
-                <span class="text-[#FF4F18]">1</span>
+              <div class="bg-[#1F232B] border border-[#FF7A4D]/45 rounded py-2">
+                <span class="text-[#FF7A4D]">1</span>
                 <span class="text-paper/80">0110001</span>
               </div>
-              <div class="bg-[#1F1F1F] border border-paper/30 rounded py-2">
+              <div class="bg-[#1F232B] border border-paper/20 rounded py-2">
                 <span class="text-acid">0</span>
                 <span class="text-paper/80">0000010</span>
               </div>
@@ -102,10 +102,10 @@ const nodeSchemaCode = `message Node {
 
           <div class="space-y-1.5">
             <div class="flex items-center justify-between gap-2">
-              <span class="text-acid font-bold uppercase text-xs">OmniBuf Prefix-Varint</span>
-              <span class="text-paper/65 text-xs">Value: 5,000,013 (4 bytes)</span>
+              <span class="text-acid font-semibold text-xs">OmniBuf Prefix-Varint</span>
+              <span class="text-paper/60 text-xs">Value: 5,000,013 (4 bytes)</span>
             </div>
-            <div class="grid grid-cols-4 gap-2 text-center text-sm sm:text-base font-bold bg-[#1F1F1F] border-2 border-acid rounded p-2">
+            <div class="grid grid-cols-4 gap-2 text-center text-sm sm:text-base font-semibold bg-[#1F232B] border border-[#b7e48a]/50 rounded p-2">
               <div>
                 <span class="text-paper/80">01101</span>
                 <span class="text-acid">100</span>
@@ -122,10 +122,10 @@ const nodeSchemaCode = `message Node {
     <!-- Row 2: Single-Pass Encoding -->
     <div
       id="single-pass"
-      class="scroll-mt-16 py-8 sm:py-10 grid lg:grid-cols-12 gap-6 lg:gap-8 items-center"
+      class="scroll-mt-16 py-8 sm:py-10 grid lg:grid-cols-12 gap-6 lg:gap-8 items-start"
     >
       <div class="lg:col-span-6 space-y-3 min-w-0">
-        <h3 class="text-2xl sm:text-3xl font-bold uppercase tracking-tight leading-snug">
+        <h3 class="text-lg sm:text-xl font-bold tracking-tight leading-snug text-ink">
           Encode in one pass with 2-byte length slots
         </h3>
         <p class="text-base sm:text-lg text-ink/85 leading-relaxed max-w-[65ch]">
@@ -145,14 +145,14 @@ const nodeSchemaCode = `message Node {
         </p>
       </div>
       <div class="lg:col-span-6 min-w-0 space-y-3">
-        <div class="p-4 sm:p-5 bg-ink text-paper border-2 border-ink rounded-md font-mono text-xs sm:text-sm space-y-4">
+        <div class="p-4 sm:p-5 bg-ink text-paper border border-ink/15 rounded-lg font-mono text-xs sm:text-sm space-y-4">
           <div class="space-y-1.5">
-            <div class="text-paper/75 text-xs uppercase font-bold">
+            <div class="text-paper/70 text-xs font-semibold">
               1. Reserve 2B slot &amp; write payload forward
             </div>
-            <div class="flex items-center gap-2 bg-[#1F1F1F] border border-paper/20 rounded p-2.5 text-sm sm:text-base font-bold">
-              <span class="text-paper/70">99</span>
-              <span class="px-2 py-0.5 border border-dashed border-acid text-acid rounded">
+            <div class="flex items-center gap-2 bg-[#1F232B] border border-paper/15 rounded p-2.5 text-sm sm:text-base font-semibold">
+              <span class="text-paper/65">99</span>
+              <span class="px-2 py-0.5 border border-dashed border-[#b7e48a]/70 text-acid rounded">
                 00 00
               </span>
               <span class="text-paper">35 07 46 52 41 41 55</span>
@@ -160,23 +160,23 @@ const nodeSchemaCode = `message Node {
           </div>
 
           <div class="space-y-1.5">
-            <div class="text-acid text-xs uppercase font-bold">2. Patch 2B length at end</div>
-            <div class="flex items-center gap-2 bg-[#1F1F1F] border border-paper/20 rounded p-2.5 text-sm sm:text-base font-bold">
-              <span class="text-paper/70">99</span>
-              <span class="px-2 py-0.5 bg-acid text-ink rounded">1E 00</span>
+            <div class="text-acid text-xs font-semibold">2. Patch 2B length at end</div>
+            <div class="flex items-center gap-2 bg-[#1F232B] border border-paper/15 rounded p-2.5 text-sm sm:text-base font-semibold">
+              <span class="text-paper/65">99</span>
+              <span class="px-2 py-0.5 bg-[#b7e48a] text-[#111111] rounded">1E 00</span>
               <span class="text-paper">35 07 46 52 41 41 55</span>
             </div>
           </div>
         </div>
 
-        <div class="p-4 sm:p-5 bg-ink text-paper border-2 border-ink rounded-md font-mono text-xs sm:text-sm space-y-4">
+        <div class="p-4 sm:p-5 bg-ink text-paper border border-ink/15 rounded-lg font-mono text-xs sm:text-sm space-y-4">
           <div class="space-y-1.5">
-            <div class="text-paper/75 text-xs uppercase font-bold">
+            <div class="text-paper/70 text-xs font-semibold">
               1. Payload exceeds 16 KiB (2B slot too small)
             </div>
-            <div class="flex items-center gap-2 bg-[#1F1F1F] border border-paper/20 rounded p-2.5 text-sm sm:text-base font-bold">
-              <span class="text-paper/70">99</span>
-              <span class="px-2 py-0.5 border border-dashed border-[#FF4F18] text-[#FF4F18] rounded">
+            <div class="flex items-center gap-2 bg-[#1F232B] border border-paper/15 rounded p-2.5 text-sm sm:text-base font-semibold">
+              <span class="text-paper/65">99</span>
+              <span class="px-2 py-0.5 border border-dashed border-[#FF7A4D] text-[#FF7A4D] rounded">
                 00 00
               </span>
               <span class="text-paper">35 07 46 52 41 &hellip;</span>
@@ -184,13 +184,13 @@ const nodeSchemaCode = `message Node {
           </div>
 
           <div class="space-y-1.5">
-            <div class="text-acid text-xs uppercase font-bold">
+            <div class="text-acid text-xs font-semibold">
               2. Shift payload +2B (memmove) &amp; patch 4B length
             </div>
-            <div class="flex items-center gap-2 bg-[#1F1F1F] border border-paper/20 rounded p-2.5 text-sm sm:text-base font-bold">
-              <span class="text-paper/70">99</span>
-              <span class="px-2 py-0.5 bg-acid text-ink rounded">04 00 02 00</span>
-              <span class="text-[#FF4F18]">&rarr;</span>
+            <div class="flex items-center gap-2 bg-[#1F232B] border border-paper/15 rounded p-2.5 text-sm sm:text-base font-semibold">
+              <span class="text-paper/65">99</span>
+              <span class="px-2 py-0.5 bg-[#b7e48a] text-[#111111] rounded">04 00 02 00</span>
+              <span class="text-[#FF7A4D]">&rarr;</span>
               <span class="text-paper">35 07 46 52 41 &hellip;</span>
             </div>
           </div>
@@ -201,7 +201,7 @@ const nodeSchemaCode = `message Node {
     <!-- Row 3: Native Maps -->
     <div id="native-maps" class="scroll-mt-16 py-8 sm:py-10 space-y-6">
       <div class="space-y-3 min-w-0">
-        <h3 class="text-2xl sm:text-3xl font-bold uppercase tracking-tight leading-snug">
+        <h3 class="text-lg sm:text-xl font-bold tracking-tight leading-snug text-ink">
           Native map wire type
         </h3>
         <p class="text-base sm:text-lg text-ink/85 leading-relaxed max-w-[75ch]">
@@ -223,9 +223,9 @@ const nodeSchemaCode = `message Node {
 
       <!-- Clean Map Lowering & Wire Hex Diagram -->
       <div class="os-window overflow-hidden">
-        <div class="os-titlebar bg-[#E5E0D5]">
-          <span class="font-mono text-sm sm:text-base font-bold uppercase">
-            Map Lowering &amp; Wire Hex: Protobuf vs. OmniBuf
+        <div class="os-titlebar">
+          <span class="text-sm font-semibold text-ink">
+            Map lowering and wire hex: Protobuf vs. OmniBuf
           </span>
         </div>
 
@@ -560,22 +560,22 @@ const nodeSchemaCode = `message Node {
 
           <!-- MOBILE STACK -->
           <div class="block md:hidden font-mono text-xs space-y-3">
-            <div class="p-3 bg-[#FAF8F2] border-2 border-ink rounded">
-              <div class="font-bold text-ink">
+            <div class="p-3 bg-[#FAF8F2] border border-ink/15 rounded-md">
+              <div class="font-semibold text-ink">
                 <span class="text-[#C23000]">map&lt;string, uint64&gt;</span> counters = 1;
               </div>
             </div>
-            <div class="p-3 bg-[#FAF8F2] border-2 border-ink rounded font-bold text-ink">
+            <div class="p-3 bg-[#FAF8F2] border border-ink/15 rounded-md font-semibold text-ink">
               &#123;"a": 1, "b": 2&#125;
             </div>
 
-            <div class="p-3 bg-[#FAF8F2] border-2 border-ink rounded space-y-2">
-              <div class="font-bold text-[#C23000] uppercase">Protobuf</div>
-              <div class="p-2.5 bg-white border border-ink/20 rounded text-xs">
+            <div class="p-3 bg-[#FAF8F2] border border-ink/15 rounded-md space-y-2">
+              <div class="font-semibold text-[#C23000]">Protobuf</div>
+              <div class="p-2.5 bg-white border border-ink/12 rounded text-xs">
                 <div>message CountersEntry &#123; string key = 1; uint64 value = 2; &#125;</div>
-                <div class="font-bold text-[#C23000]">repeated CountersEntry counters = 1;</div>
+                <div class="font-semibold text-[#C23000]">repeated CountersEntry counters = 1;</div>
               </div>
-              <div class="p-2.5 bg-white border border-ink/20 rounded text-sm font-bold leading-relaxed">
+              <div class="p-2.5 bg-white border border-ink/12 rounded text-sm font-semibold leading-relaxed">
                 <div>
                   <span class="text-[#FF4F18]">0A 05 0A</span> 01 61{' '}
                   <span class="text-[#FF4F18]">10</span> 01
@@ -585,17 +585,17 @@ const nodeSchemaCode = `message Node {
                   <span class="text-[#FF4F18]">10</span> 02
                 </div>
               </div>
-              <div class="text-right font-bold text-[#C23000]">14 bytes</div>
+              <div class="text-right font-semibold text-[#C23000]">14 bytes</div>
             </div>
 
-            <div class="p-3 bg-ink text-paper border-2 border-ink rounded space-y-2">
-              <div class="font-bold text-acid uppercase">OmniBuf</div>
-              <div class="text-sm font-bold leading-relaxed">
+            <div class="p-3 bg-ink text-paper border border-ink/15 rounded-md space-y-2">
+              <div class="font-semibold text-acid">OmniBuf</div>
+              <div class="text-sm font-semibold leading-relaxed">
                 <div class="text-acid">3D 26 00 0A 00 05</div>
                 <div>03 61 03</div>
                 <div>03 62 05</div>
               </div>
-              <div class="text-right font-bold text-acid">12 bytes</div>
+              <div class="text-right font-semibold text-acid">12 bytes</div>
             </div>
           </div>
         </div>
@@ -606,37 +606,37 @@ const nodeSchemaCode = `message Node {
     <div id="skip-fields" class="scroll-mt-16 py-8 sm:py-10 space-y-6">
       <div class="grid lg:grid-cols-12 gap-6 lg:gap-8 items-start">
         <div class="lg:col-span-6 space-y-2.5 min-w-0">
-          <h3 class="text-2xl sm:text-3xl font-bold uppercase tracking-tight leading-snug">
+          <h3 class="text-lg sm:text-xl font-bold tracking-tight leading-snug text-ink">
             Skip fields by jumping their byte length
           </h3>
           <p class="text-base sm:text-lg text-ink/85 leading-relaxed max-w-[65ch]">
             Every field header tells the reader how many bytes follow. Booleans take <code>0</code>{' '}
             value bytes, fixed numbers take <code>4</code> or <code>8</code>, Prefix-Varints put
             their width (<code>1</code>, <code>2</code>, <code>4</code>, or <code>9</code> bytes) in
-            the first byte, and containers start with their <code>byteLen</code>. Skipping a field
-            just adds that length to the buffer offset (<code>pos += byteLen</code>). The reader
-            still steps through earlier field headers in the message to find a tag, so it isn't an{' '}
-            <code>O(1)</code> offset table like FlatBuffers, but each hop is one addition, not a
-            byte-by-byte varint loop.
+            the first byte, and containers start with their <code>byteLen</code>. To skip a field,
+            the reader just adds that length to the buffer offset (<code>pos += byteLen</code>). The
+            reader still steps through earlier field headers in the message to find a tag, so it
+            isn't an <code>O(1)</code> offset table like FlatBuffers, but each hop is one addition,
+            not a byte-by-byte varint loop.
           </p>
         </div>
         <div class="lg:col-span-6 min-w-0">
-          <div class="p-4 bg-ink text-paper border-2 border-ink rounded-md font-mono text-sm space-y-3">
-            <div class="text-xs uppercase font-bold text-acid">
+          <div class="p-4 bg-ink text-paper border border-ink/15 rounded-lg font-mono text-sm space-y-3">
+            <div class="text-xs font-semibold text-paper/70">
               How the reader advances past a field
             </div>
             <div class="grid sm:grid-cols-3 gap-2 text-xs sm:text-sm">
-              <div class="p-2.5 bg-[#1F1F1F] rounded border border-paper/20">
-                <div class="text-paper/65 text-xs uppercase">Bool (Types 2..3)</div>
-                <div class="font-bold text-acid mt-0.5">pos += 0</div>
+              <div class="p-2.5 bg-[#1F232B] rounded border border-paper/15">
+                <div class="text-paper/60 text-xs">Bool (2..3)</div>
+                <div class="font-semibold text-acid mt-0.5">pos += 0</div>
               </div>
-              <div class="p-2.5 bg-[#1F1F1F] rounded border border-paper/20">
-                <div class="text-paper/65 text-xs uppercase">Scalar (Types 0..1, 4..9)</div>
-                <div class="font-bold text-acid mt-0.5">pos += width</div>
+              <div class="p-2.5 bg-[#1F232B] rounded border border-paper/15">
+                <div class="text-paper/60 text-xs">Scalar (0..1, 4..9)</div>
+                <div class="font-semibold text-acid mt-0.5">pos += width</div>
               </div>
-              <div class="p-2.5 bg-[#1F1F1F] rounded border border-paper/20">
-                <div class="text-paper/65 text-xs uppercase">Container (Types 10..15)</div>
-                <div class="font-bold text-acid mt-0.5">pos += byteLen</div>
+              <div class="p-2.5 bg-[#1F232B] rounded border border-paper/15">
+                <div class="text-paper/60 text-xs">Container (10..15)</div>
+                <div class="font-semibold text-acid mt-0.5">pos += byteLen</div>
               </div>
             </div>
           </div>
@@ -644,15 +644,15 @@ const nodeSchemaCode = `message Node {
       </div>
 
       <!-- Schema + Explanation + Color Key -->
-      <div class="grid lg:grid-cols-12 gap-5 items-center bg-[#FAF8F2] border-2 border-ink rounded-md p-5">
+      <div class="grid lg:grid-cols-12 gap-5 items-center bg-[#FAF8F2] border border-ink/15 rounded-lg p-5">
         <div class="lg:col-span-5 font-mono min-w-0">
-          <div class="bg-ink text-paper p-4 rounded text-sm leading-relaxed overflow-x-auto [&>pre]:bg-transparent! [&>pre]:p-0! [&>pre]:m-0! [&>pre]:border-0!">
-            <div class="flex items-center justify-between gap-2 mb-2.5 pb-2 border-b border-paper/15">
-              <div class="text-xs font-bold uppercase text-acid">node.proto</div>
+          <div class="bg-ink text-paper p-4 rounded-lg text-sm leading-relaxed overflow-x-auto [&>pre]:bg-transparent! [&>pre]:p-0! [&>pre]:m-0! [&>pre]:border-0!">
+            <div class="flex items-center justify-between gap-2 mb-2.5 pb-2 border-b border-paper/12">
+              <div class="text-xs font-medium text-paper/70">node.proto</div>
               <button
                 type="button"
                 data-copy={nodeSchemaCode}
-                class="copy-snippet-btn min-w-[4.75rem] text-center px-2.5 py-1 text-xs font-bold uppercase bg-paper/15 hover:bg-acid hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-acid text-paper border border-paper/30 rounded shrink-0 transition"
+                class="copy-snippet-btn min-w-[4.25rem] text-center px-2.5 py-1 text-xs font-medium bg-paper/10 hover:bg-paper/20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#FF7A4D] text-paper border border-paper/20 rounded shrink-0 transition cursor-pointer"
               >
                 Copy
               </button>
@@ -661,7 +661,7 @@ const nodeSchemaCode = `message Node {
           </div>
         </div>
         <div class="lg:col-span-7 space-y-3 min-w-0">
-          <p class="text-base sm:text-lg text-ink/90 leading-relaxed">
+          <p class="text-base sm:text-lg text-ink/85 leading-relaxed">
             Suppose a reader wants <code>city</code> and needs to skip <code>id</code> and{' '}
             <code>active</code>. Protobuf has to inspect <strong>every byte</strong> of the tag and
             integer varints to find where they end. OmniBuf reads the width from the first byte and
@@ -669,17 +669,17 @@ const nodeSchemaCode = `message Node {
           </p>
           <!-- Simple Color Key -->
           <div class="flex flex-wrap items-center gap-4 text-xs sm:text-sm font-mono pt-1">
-            <span class="flex items-center gap-2 font-bold">
-              <span class="w-4 h-4 bg-ink inline-block border border-ink rounded-sm"></span> Tag
-              Byte
+            <span class="flex items-center gap-2 font-medium">
+              <span class="w-3.5 h-3.5 bg-ink inline-block border border-ink/25 rounded-sm"></span>
+              Tag byte
             </span>
-            <span class="flex items-center gap-2 font-bold">
-              <span class="w-4 h-4 bg-[#E5E0D5] inline-block border border-ink rounded-sm"></span>{' '}
-              Value Byte
+            <span class="flex items-center gap-2 font-medium">
+              <span class="w-3.5 h-3.5 bg-[#E5E0D5] inline-block border border-ink/25 rounded-sm"></span>{' '}
+              Value byte
             </span>
-            <span class="flex items-center gap-2 font-bold">
-              <span class="w-4 h-4 bg-acid inline-block border border-ink rounded-sm"></span> Target
-              Field
+            <span class="flex items-center gap-2 font-medium">
+              <span class="w-3.5 h-3.5 bg-[#D4FF33] inline-block border border-ink/25 rounded-sm"></span>{' '}
+              Target field
             </span>
           </div>
         </div>
@@ -687,9 +687,9 @@ const nodeSchemaCode = `message Node {
 
       <!-- Flagship Header-Hopping Diagram inside .os-window -->
       <div class="os-window overflow-hidden">
-        <div class="os-titlebar bg-[#E5E0D5]">
-          <span class="font-mono text-sm sm:text-base font-bold uppercase">
-            Varint Bouncing (8 Stops) vs. Header Hopping (3 Jumps)
+        <div class="os-titlebar">
+          <span class="text-sm font-semibold text-ink">
+            Varint bouncing (8 stops) vs. header hopping (3 jumps)
           </span>
         </div>
         <div class="bg-white p-3 sm:p-6">

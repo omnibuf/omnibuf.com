@@ -44,7 +44,7 @@ const labelCoords: { x: number; y: number; anchor: 'middle' | 'start' | 'end' }[
 const axes = angles.map((a, i) => ({
   x2: (cx + rMax * Math.cos(a)).toFixed(1),
   y2: (cy + rMax * Math.sin(a)).toFixed(1),
-  label: omni[i].label.toUpperCase(),
+  label: omni[i].label,
   lx: labelCoords[i].x,
   ly: labelCoords[i].y,
   anchor: labelCoords[i].anchor,
@@ -103,33 +103,49 @@ const dots = angles.map((a, i) => {
   ))}
   {isSelfOnly ? (
     <>
-      <polygon
-        points={omniPts}
-        fill="rgba(212, 255, 51, 0.32)"
-        stroke="#D4FF33"
-        stroke-width="2.5"
-      />
+      <polygon points={omniPts} fill="rgba(255, 79, 24, 0.28)" stroke="#FF4F18" stroke-width="2" />
       {dots.map((d) => (
-        <circle cx={d.omniX} cy={d.omniY} r="3.6" fill="#D4FF33" stroke="#111" stroke-width="1.5" />
+        <circle
+          cx={d.omniX}
+          cy={d.omniY}
+          r="3.4"
+          fill="#FF4F18"
+          stroke="#16181D"
+          stroke-width="1.5"
+        />
       ))}
     </>
   ) : (
     <>
-      <!-- OmniBuf rendered behind the compared format -->
+      <!-- OmniBuf reference baseline in Signal Orange -->
+      <polygon points={omniPts} fill="rgba(255, 79, 24, 0.22)" stroke="#FF4F18" stroke-width="2" />
+      {dots.map((d) => (
+        <circle
+          cx={d.omniX}
+          cy={d.omniY}
+          r="3"
+          fill="#FF4F18"
+          stroke="#16181D"
+          stroke-width="1.4"
+        />
+      ))}
+      <!-- Compared format rendered in calm sky-slate -->
       <polygon
-        points={omniPts}
-        fill="rgba(212, 255, 51, 0.18)"
-        stroke="#D4FF33"
+        points={oppPts}
+        fill="rgba(56, 189, 248, 0.24)"
+        stroke="#38BDF8"
         stroke-width="2"
         stroke-dasharray="4 2"
       />
       {dots.map((d) => (
-        <circle cx={d.omniX} cy={d.omniY} r="3" fill="#D4FF33" stroke="#111" stroke-width="1.2" />
-      ))}
-      <!-- Compared format rendered in front of OmniBuf -->
-      <polygon points={oppPts} fill="rgba(255, 79, 24, 0.52)" stroke="#FF4F18" stroke-width="2.5" />
-      {dots.map((d) => (
-        <circle cx={d.oppX} cy={d.oppY} r="3.6" fill="#FF4F18" stroke="#111" stroke-width="1.5" />
+        <circle
+          cx={d.oppX}
+          cy={d.oppY}
+          r="3.2"
+          fill="#38BDF8"
+          stroke="#16181D"
+          stroke-width="1.4"
+        />
       ))}
     </>
   )}

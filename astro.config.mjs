@@ -8,24 +8,30 @@ import {
   benchmarksNavPage,
   cliNavPage,
   languages,
+  languagesNavPage,
   primaryNavPages,
   specNavPage,
+  toolingPages,
 } from './src/data/languages.ts';
 
 const PAGE_LABELS = Object.fromEntries([
   ...primaryNavPages.map((p) => [p.href, p.label]),
   [benchmarksNavPage.href, benchmarksNavPage.label],
   [specNavPage.href, specNavPage.label],
+  [languagesNavPage.href, languagesNavPage.label],
   ...languages.map((l) => [l.href, l.label]),
   [cliNavPage.href, cliNavPage.label],
+  ...toolingPages.map((t) => [t.href, `Tooling: ${t.label}`]),
 ]);
 
 const PAGE_ORDER = [
   ...primaryNavPages.map((p) => p.href),
   benchmarksNavPage.href,
   specNavPage.href,
+  languagesNavPage.href,
   ...languages.map((l) => l.href),
   cliNavPage.href,
+  ...toolingPages.map((t) => t.href),
 ];
 
 const NAMED_HTML_ENTITIES = {
@@ -110,7 +116,9 @@ function extractSearchEntries(route, html) {
     if (!id && tag !== 'h1') {
       const prevStart = Math.max(0, m.index - 450);
       const beforeSlice = mainHtml.slice(prevStart, m.index);
-      const containerIds = [...beforeSlice.matchAll(/<(?:section|div)\b[^>]*?\bid="([^"]+)"/gi)];
+      const containerIds = [
+        ...beforeSlice.matchAll(/<(?:section|div|article)\b[^>]*?\bid="([^"]+)"/gi),
+      ];
       if (containerIds.length > 0) {
         id = containerIds[containerIds.length - 1][1];
       } else if (tag === 'h3' && currentH2Id) {
@@ -126,7 +134,17 @@ function extractSearchEntries(route, html) {
     const bodyStart = m.index + m[0].length;
     const bodyEnd = i + 1 < matches.length ? matches[i + 1].index : mainHtml.length;
     const text = cleanHtmlText(mainHtml.slice(bodyStart, bodyEnd));
-    const url = id ? `${route === '/' ? '/' : route}#${id}` : route;
+    let url = id ? `${route === '/' ? '/' : route}#${id}` : route;
+    if (route === '/benchmarks' && id.startsWith('lang-panel-')) {
+      const langKey = id.slice('lang-panel-'.length);
+      url = langKey === 'go' ? '/benchmarks' : `/benchmarks?lang=${langKey}`;
+    } else if (route === '/benchmarks' && id.startsWith('bench-panel-')) {
+      const benchSlug = id.slice('bench-panel-'.length);
+      url =
+        benchSlug === 'decode'
+          ? '/benchmarks?view=compare'
+          : `/benchmarks?view=compare&bench=${benchSlug}`;
+    }
 
     entries.push({
       page,
@@ -173,10 +191,32 @@ function checkInternalLinksAndAnchors() {
           }
           if (url === '/sitemap.xml' || url === '/sitemap-0.xml' || url === '/sitemap-index.xml') {
             const pagesDir = path.join(path.dirname(fileURLToPath(import.meta.url)), 'src/pages');
-            const entries = await readdir(pagesDir);
-            const urls = entries
-              .filter((name) => name.endsWith('.astro') && name !== '404.astro')
-              .map((name) => (name === 'index.astro' ? '/' : `/${name.replace(/\.astro$/, '')}/`))
+            async function collectAstroRoutes(dirPath, prefix = '') {
+              const dirEntries = await readdir(dirPath, { withFileTypes: true });
+              const routes = [];
+              for (const entry of dirEntries) {
+                if (entry.isDirectory()) {
+                  routes.push(
+                    ...(await collectAstroRoutes(
+                      path.join(dirPath, entry.name),
+                      `${prefix}/${entry.name}`,
+                    )),
+                  );
+                } else if (
+                  entry.isFile() &&
+                  entry.name.endsWith('.astro') &&
+                  entry.name !== '404.astro'
+                ) {
+                  if (entry.name === 'index.astro') {
+                    routes.push(prefix ? `${prefix}/` : '/');
+                  } else {
+                    routes.push(`${prefix}/${entry.name.replace(/\.astro$/, '')}/`);
+                  }
+                }
+              }
+              return routes;
+            }
+            const urls = (await collectAstroRoutes(pagesDir))
               .sort()
               .map((route) => `<url><loc>https://omnibuf.com${route}</loc></url>`)
               .join('');

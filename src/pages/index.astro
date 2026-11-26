@@ -35,7 +35,7 @@ const siteJsonLd = {
   <main id="main-content">
     <Hero />
     <Motivation />
-    <LanguageStrip id="status" currentPage="home" />
+    <LanguageStrip id="status" currentPage="home" narrow={true} />
     <script is:inline type="application/ld+json" set:html={JSON.stringify(siteJsonLd)} />
   </main>
   <Footer />

@@ -1,4 +1,5 @@
 dist/
 .astro/
+.impeccable/
 node_modules/
 pnpm-lock.yaml

@@ -1,0 +1,110 @@
+---
+import type { ToolingEntry } from '../data/languages';
+
+interface Props {
+  tool: ToolingEntry['key'];
+  class?: string;
+}
+
+const { tool, class: className = 'w-10 h-10 shrink-0' } = Astro.props;
+---
+
+{tool === 'tooling-cli' && (
+  <svg aria-hidden="true" viewBox="0 0 40 40" class={className} fill="none">
+    <rect
+      x="0.5"
+      y="0.5"
+      width="39"
+      height="39"
+      rx="8.5"
+      fill="#1E232A"
+      stroke="rgba(255,255,255,0.14)"
+    />
+    <path
+      d="M11 14.5L18.5 20L11 25.5"
+      stroke="#FF4F18"
+      stroke-width="2.8"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    />
+    <path d="M21 25.5H29.5" stroke="#FAF8F2" stroke-width="2.8" stroke-linecap="round" />
+  </svg>
+)}
+
+{tool === 'tooling-editors' && (
+  <svg aria-hidden="true" viewBox="0 0 40 40" class={className} fill="none">
+    <rect width="40" height="40" rx="9" fill="#007ACC" />
+    <rect
+      x="6.5"
+      y="8.5"
+      width="27"
+      height="23"
+      rx="3"
+      fill="#005A9E"
+      stroke="#FFFFFF"
+      stroke-width="1.6"
+    />
+    <path d="M20.5 9V31" stroke="#FFFFFF" stroke-width="1.4" stroke-opacity="0.7" />
+    <path
+      d="M10.5 14.5H16.5M10.5 19.5H15M10.5 24.5H17"
+      stroke="#FFFFFF"
+      stroke-width="2"
+      stroke-linecap="round"
+    />
+    <rect x="23.5" y="13.5" width="3" height="2.4" rx="0.6" fill="#7DD3FC" />
+    <rect x="28" y="13.5" width="2.5" height="2.4" rx="0.6" fill="#FFFFFF" fill-opacity="0.75" />
+    <rect x="23.5" y="18.5" width="2.5" height="2.4" rx="0.6" fill="#FFFFFF" fill-opacity="0.75" />
+    <rect x="27.5" y="18.5" width="3" height="2.4" rx="0.6" fill="#7DD3FC" />
+    <rect x="23.5" y="23.5" width="3" height="2.4" rx="0.6" fill="#7DD3FC" />
+    <rect x="28" y="23.5" width="2.5" height="2.4" rx="0.6" fill="#FFFFFF" fill-opacity="0.75" />
+  </svg>
+)}
+
+{tool === 'tooling-devtools' && (
+  <svg aria-hidden="true" viewBox="0 0 40 40" class={className} fill="none">
+    <rect width="40" height="40" rx="9" fill="#4338CA" />
+    <rect
+      x="6.5"
+      y="8.5"
+      width="27"
+      height="23"
+      rx="3"
+      fill="#312E81"
+      stroke="#FFFFFF"
+      stroke-width="1.6"
+    />
+    <path d="M7 14.5H33" stroke="#FFFFFF" stroke-width="1.4" stroke-opacity="0.65" />
+    <circle cx="10.2" cy="11.5" r="1.1" fill="#A5B4FC" />
+    <circle cx="13.6" cy="11.5" r="1.1" fill="#A5B4FC" />
+    <path
+      d="M10.5 19.5H17.5M10.5 23.5H15.5M10.5 27.5H18"
+      stroke="#C7D2FE"
+      stroke-width="1.8"
+      stroke-linecap="round"
+    />
+    <circle cx="25.2" cy="22.5" r="3.8" stroke="#FFFFFF" stroke-width="2" />
+    <path d="M28 25.3L30.8 28.1" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" />
+  </svg>
+)}
+
+{tool === 'tooling-traffic' && (
+  <svg aria-hidden="true" viewBox="0 0 40 40" class={className} fill="none">
+    <rect width="40" height="40" rx="9" fill="#0E7490" />
+    <path
+      d="M7.5 26.5H13.5C15.2 19 19.6 13.4 25.5 11.2C24.2 16.4 24.4 21.8 26.5 26.5H32.5"
+      stroke="#FFFFFF"
+      stroke-width="2.4"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    />
+    <path
+      d="M15.2 26.5C16.8 20.6 20.2 16 24.4 13.6C23.5 18 23.7 22.4 25.2 26.5H15.2Z"
+      fill="#67E8F9"
+      fill-opacity="0.35"
+    />
+    <circle cx="10.5" cy="31" r="1.6" fill="#67E8F9" />
+    <circle cx="16.8" cy="31" r="1.6" fill="#FFFFFF" fill-opacity="0.85" />
+    <circle cx="23.2" cy="31" r="1.6" fill="#67E8F9" />
+    <circle cx="29.5" cy="31" r="1.6" fill="#FFFFFF" fill-opacity="0.85" />
+  </svg>
+)}

@@ -4,56 +4,42 @@
 <!-- COMPACT BENCHMARK & FORMAT COMPARISON SUMMARY -->
 <section
   id="benchmarks"
-  class="py-10 sm:py-14 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto border-t-2 border-ink/15"
+  class="py-10 sm:py-14 px-4 sm:px-6 max-w-6xl mx-auto border-t border-ink/15"
 >
   <div class="flex flex-wrap items-end justify-between gap-3 mb-5">
     <div class="max-w-2xl">
-      <h2 class="text-2xl sm:text-4xl font-bold tracking-tight uppercase leading-none">
-        Format comparison.
-      </h2>
-      <p class="mt-2 text-sm sm:text-base text-ink/80 font-medium">
+      <h2 class="text-2xl sm:text-3xl font-bold tracking-tight text-ink">Format comparison</h2>
+      <p class="mt-1.5 text-sm sm:text-base text-ink/75">
         Measured with the 11-field <code>PeerUpdate</code> test struct.
       </p>
     </div>
-    <div class="flex flex-wrap gap-2">
-      <a
-        href="/how-it-works#comparisons"
-        class="os-btn px-3 py-1.5 bg-acid text-ink font-mono font-bold text-xs sm:text-sm rounded"
-      >
+    <div class="flex flex-wrap gap-2 text-sm">
+      <a href="/how-it-works#comparisons" class="btn-primary px-3.5 py-1.5">
         Format Comparisons &rarr;
       </a>
-      <a
-        href="/benchmarks"
-        class="os-btn px-3 py-1.5 bg-[#FAF8F2] text-ink font-mono font-bold text-xs sm:text-sm rounded"
-      >
+      <a href="/benchmarks" class="btn-secondary px-3.5 py-1.5">
         All Benchmarks &rarr;
       </a>
     </div>
   </div>
 
-  <!-- Feature Matrix Table (Compact bordered ledger) -->
-  <div class="overflow-x-auto border-2 border-ink rounded-md bg-[#FAF8F2]">
+  <!-- Feature Matrix Table -->
+  <div class="overflow-x-auto border border-ink/15 rounded-lg bg-[#FAF8F2]">
     <table class="w-full text-left border-collapse font-mono text-xs sm:text-sm tabular-nums leading-snug">
       <thead>
-        <tr class="border-b-2 border-ink bg-[#E5E0D5]">
-          <th class="px-3 py-2 sm:px-3.5 sm:py-2 font-bold uppercase whitespace-nowrap">Format</th>
-          <th class="px-3 py-2 sm:px-3.5 sm:py-2 font-bold uppercase whitespace-nowrap">Schema</th>
-          <th class="px-3 py-2 sm:px-3.5 sm:py-2 font-bold uppercase whitespace-nowrap">
-            Wire Size
-          </th>
-          <th class="px-3 py-2 sm:px-3.5 sm:py-2 font-bold uppercase whitespace-nowrap">
-            1-Pass Encode
-          </th>
-          <th class="px-3 py-2 sm:px-3.5 sm:py-2 font-bold uppercase whitespace-nowrap">
-            Decode Without Schema
-          </th>
-          <th class="px-3 py-2 sm:px-3.5 sm:py-2 font-bold uppercase whitespace-nowrap">
+        <tr class="border-b border-ink/15 bg-[#EDE8DC] text-ink/75 text-xs">
+          <th class="px-3.5 py-2.5 font-semibold whitespace-nowrap">Format</th>
+          <th class="px-3.5 py-2.5 font-semibold whitespace-nowrap">Schema</th>
+          <th class="px-3.5 py-2.5 font-semibold whitespace-nowrap">Wire Size</th>
+          <th class="px-3.5 py-2.5 font-semibold whitespace-nowrap">1-Pass Encode</th>
+          <th class="px-3.5 py-2.5 font-semibold whitespace-nowrap">Decode Without Schema</th>
+          <th class="px-3.5 py-2.5 font-semibold whitespace-nowrap">
             <code>append(a, b)</code> Merge
           </th>
         </tr>
       </thead>
-      <tbody class="divide-y divide-ink/15">
-        <tr class="bg-acid/30 font-bold">
+      <tbody class="divide-y divide-ink/10">
+        <tr class="bg-[#FF4F18]/[0.07] font-semibold">
           <td class="px-3 py-1.5 sm:px-3.5 sm:py-2 whitespace-nowrap">OmniBuf</td>
           <td class="px-3 py-1.5 sm:px-3.5 sm:py-2 text-ink whitespace-nowrap">
             <code>.proto</code> or structs

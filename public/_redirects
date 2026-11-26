@@ -1,5 +1,7 @@
-/cli /tooling 301
-/cli/ /tooling 301
+/cli /tooling/cli 301
+/cli/ /tooling/cli 301
+/tools /tooling 301
+/tools/ /tooling 301
 
 # Redirect naive Markdown link-scraper paths that capture trailing ")." or ")"
 /go). /go 301

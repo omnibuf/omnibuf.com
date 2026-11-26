@@ -39,7 +39,6 @@ export interface LanguageBenchmarkSuite {
   label: string;
   shortLabel: string;
   headingPrefix: string;
-  subtitleHtml: string;
   href: string;
   ctaLabel: string;
   competitorsLabel: string;
@@ -98,7 +97,7 @@ export const formatProfiles: Record<string, FormatProfile> = {
     name: "Cap'n Proto",
     url: 'https://capnproto.org/',
     verdict:
-      "Cap'n Proto lays out messages in memory as fixed-offset pointer structures and has its own RPC protocol with promise pipelining. Reading a single field in place takes 6 ns. Serializing normal language structs still requires copying fields in and out of segment builders: OmniBuf is 35% smaller and several times faster to encode and decode.",
+      "Cap'n Proto lays out messages in memory as fixed-offset pointer structures and has its own RPC protocol with promise pipelining. A single field read takes 6 ns in place. Serializing normal language structs still requires copying fields in and out of segment builders: OmniBuf is 35% smaller and several times faster to encode and decode.",
     stats: [
       { label: 'Wire Size', score: 61 },
       { label: 'Encode Speed', score: 56 },
@@ -182,7 +181,7 @@ export const benchmarkCategories: BenchmarkCategory[] = [
     unit: 'ns',
     maxVal: 2300,
     methodology:
-      "Serializing the 11-field Go struct into a reused byte slice. FlatBuffers and Cap'n Proto times include building the buffer from the struct.",
+      "Serializes the 11-field Go struct into a reused byte slice. FlatBuffers and Cap'n Proto times include building the buffer from the struct.",
     rows: [
       { name: 'OmniBuf (Generated)', val: 104, highlight: true, baseline: true },
       { name: 'OmniBuf (Go Struct Tags)', val: 346, highlight: true },
@@ -200,7 +199,7 @@ export const benchmarkCategories: BenchmarkCategory[] = [
     unit: 'ns',
     maxVal: 4600,
     methodology:
-      'Unpacking and reading all 11 fields into a reused destination struct across every codec, including Protobuf.',
+      'Unpacks and reads all 11 fields into a reused destination struct across every codec, including Protobuf.',
     rows: [
       { name: 'OmniBuf (Generated)', val: 184, highlight: true, baseline: true },
       { name: 'FlatBuffers', val: 193 },
@@ -218,7 +217,7 @@ export const benchmarkCategories: BenchmarkCategory[] = [
     unit: 'ns',
     maxVal: 1350,
     methodology:
-      "Reading a nested string field directly from the raw byte slice. Cap'n Proto and FlatBuffers use offset tables; OmniBuf hops over preceding field headers by length.",
+      "Reads a nested string field directly from the raw byte slice. Cap'n Proto and FlatBuffers use offset tables; OmniBuf hops over preceding field headers by length.",
     rows: [
       { name: "Cap'n Proto", val: 5 },
       { name: 'FlatBuffers', val: 27 },
@@ -233,7 +232,7 @@ export const benchmarkCategories: BenchmarkCategory[] = [
     unit: 'ns',
     maxVal: 7000,
     methodology:
-      'Checking a nested city string, incrementing the 64-bit sequence counter, and returning the updated packet. OmniBuf splices the field in place; the others decode and re-encode.',
+      'Checks a nested city string, increments the 64-bit sequence counter, and returns the updated packet. OmniBuf splices the field in place; the others decode and re-encode.',
     rows: [
       { name: 'OmniBuf (Opaque Splice)', val: 219, highlight: true, baseline: true },
       { name: 'FlatBuffers', val: 767 },
@@ -250,7 +249,7 @@ export const benchmarkCategories: BenchmarkCategory[] = [
     unit: 'ns',
     maxVal: 42000,
     methodology:
-      'Serializing a 39 KiB packet whose 20 KiB and 18 KiB nested sub-messages exceed the 2-byte 16,383 B length reservation and trigger 2B-to-4B header shifts.',
+      'Serializes a 39 KiB packet whose 20 KiB and 18 KiB nested sub-messages exceed the 2-byte 16,383 B length reservation and trigger 2B-to-4B header shifts.',
     rows: [
       { name: 'OmniBuf (Generated)', val: 650, highlight: true, baseline: true },
       { name: 'FlatBuffers', val: 1079 },
@@ -268,7 +267,7 @@ export const benchmarkCategories: BenchmarkCategory[] = [
     unit: 'ns',
     maxVal: 48000,
     methodology:
-      'Growing a nested string field past 16 KiB ahead of 32 trailing Neighbor entries via Opaque splicing vs full decode and re-encode.',
+      'Grows a nested string field past 16 KiB ahead of 32 trailing Neighbor entries via Opaque splicing vs full decode and re-encode.',
     rows: [
       { name: 'OmniBuf (Opaque Splice)', val: 861, highlight: true, baseline: true },
       { name: 'FlatBuffers', val: 2981 },
@@ -306,7 +305,7 @@ export const esBenchmarkCategories: EsBenchmarkCategory[] = [
     title: 'Full Message Encode Speed',
     unit: 'ns',
     maxVal: 4339,
-    methodology: 'Serializing the 11-field PeerUpdate object into a fresh Uint8Array (366 B).',
+    methodology: 'Serializes the 11-field PeerUpdate object into a fresh Uint8Array (366 B).',
     rows: [
       {
         name: 'OmniBuf',
@@ -332,7 +331,7 @@ export const esBenchmarkCategories: EsBenchmarkCategory[] = [
     title: 'Full Message Decode Speed',
     unit: 'ns',
     maxVal: 2987,
-    methodology: 'Decoding Uint8Array into a fresh PeerUpdate object and reading all 11 fields.',
+    methodology: 'Decodes Uint8Array into a fresh PeerUpdate object and reads all 11 fields.',
     rows: [
       { name: 'OmniBuf', val: 588, ops: '1,088,873 ops/s', highlight: true, baseline: true },
       { name: 'protobufjs', val: 1706, ops: '566,331 ops/s' },
@@ -347,7 +346,7 @@ export const esBenchmarkCategories: EsBenchmarkCategory[] = [
     unit: 'ns',
     maxVal: 2828,
     methodology:
-      'Reading a nested city string from a Uint8Array. The other JS libraries decode the whole message first; OmniBuf skips earlier fields by byte length.',
+      'Reads a nested city string from a Uint8Array. The other JS libraries decode the whole message first; OmniBuf skips earlier fields by byte length.',
     rows: [
       { name: 'OmniBuf', val: 240, ops: '3,181,492 ops/s', highlight: true, baseline: true },
       { name: 'protobufjs', val: 1105, ops: '833,605 ops/s' },
@@ -362,7 +361,7 @@ export const esBenchmarkCategories: EsBenchmarkCategory[] = [
     unit: 'ns',
     maxVal: 7214,
     methodology:
-      'Checking a nested city string, incrementing the sequence number from the packet, and returning an updated Uint8Array.',
+      'Checks a nested city string, increments the sequence number from the packet, and returns an updated Uint8Array.',
     rows: [
       { name: 'OmniBuf', val: 1138, ops: '315,312 ops/s', highlight: true, baseline: true },
       { name: 'JSON', val: 2633, ops: '305,466 ops/s' },
@@ -377,7 +376,7 @@ export const esBenchmarkCategories: EsBenchmarkCategory[] = [
     unit: 'ns',
     maxVal: 91321,
     methodology:
-      'Serializing a 39 KiB packet whose 20 KiB and 18 KiB nested messages exceed the 2-byte 16,383 B length reservation.',
+      'Serializes a 39 KiB packet whose 20 KiB and 18 KiB nested messages exceed the 2-byte 16,383 B length reservation.',
     rows: [
       {
         name: 'OmniBuf',
@@ -404,7 +403,7 @@ export const esBenchmarkCategories: EsBenchmarkCategory[] = [
     unit: 'ns',
     maxVal: 80234,
     methodology:
-      'Growing a nested string field past 16 KiB ahead of 32 trailing Neighbor entries and emitting an updated Uint8Array.',
+      'Grows a nested string field past 16 KiB ahead of 32 trailing Neighbor entries and emits an updated Uint8Array.',
     rows: [
       { name: 'OmniBuf', val: 4877, ops: '77,561 ops/s', highlight: true, baseline: true },
       { name: 'protobufjs', val: 18574, ops: '49,865 ops/s' },
@@ -422,7 +421,7 @@ export const rsBenchmarkCategories: BenchmarkCategory[] = [
     title: 'Full Message Encode Speed',
     unit: 'ns',
     maxVal: 768,
-    methodology: 'Serializing PeerUpdate into a freshly allocated Vec<u8> across every library.',
+    methodology: 'Serializes PeerUpdate into a freshly allocated Vec<u8> across every library.',
     rows: [
       { name: 'OmniBuf (Generated)', val: 138, sizeBytes: 366, highlight: true, baseline: true },
       { name: 'OmniBuf (#[derive(OmniBuf)])', val: 135, sizeBytes: 366, highlight: true },
@@ -436,7 +435,7 @@ export const rsBenchmarkCategories: BenchmarkCategory[] = [
     title: 'Full Message Decode Speed',
     unit: 'ns',
     maxVal: 1260,
-    methodology: 'Decoding &[u8] into a fresh owned PeerUpdate struct and reading all 11 fields.',
+    methodology: 'Decodes &[u8] into a fresh owned PeerUpdate struct and reads all 11 fields.',
     rows: [
       { name: 'OmniBuf (Generated)', val: 340, highlight: true, baseline: true },
       { name: 'OmniBuf (#[derive(OmniBuf)])', val: 360, highlight: true },
@@ -451,7 +450,7 @@ export const rsBenchmarkCategories: BenchmarkCategory[] = [
     unit: 'ns',
     maxVal: 1253,
     methodology:
-      'Borrowing a nested &str directly from &[u8] via OpaquePeerUpdate vs buffa PeerUpdateView vs full decode.',
+      'Borrows a nested &str directly from &[u8] via OpaquePeerUpdate vs buffa PeerUpdateView vs full decode.',
     rows: [
       { name: 'OmniBuf (Generated)', val: 76, highlight: true, baseline: true },
       { name: 'buffa (Protobuf)', val: 368 },
@@ -465,7 +464,7 @@ export const rsBenchmarkCategories: BenchmarkCategory[] = [
     unit: 'ns',
     maxVal: 2071,
     methodology:
-      'Checking a nested city string and splicing an incremented 64-bit sequence counter into &[u8] vs decode and re-encode.',
+      'Checks a nested city string and splices an incremented 64-bit sequence counter into &[u8] vs decode and re-encode.',
     rows: [
       { name: 'OmniBuf (Generated)', val: 222, highlight: true, baseline: true },
       { name: 'buffa (Protobuf)', val: 711 },
@@ -479,7 +478,7 @@ export const rsBenchmarkCategories: BenchmarkCategory[] = [
     unit: 'ns',
     maxVal: 14143,
     methodology:
-      'Serializing a 39 KiB packet whose >16 KiB nested sub-messages trigger 4-byte container length pre-sizing vs two-pass encoded_len() in buffa and prost.',
+      'Serializes a 39 KiB packet whose >16 KiB nested sub-messages trigger 4-byte container length pre-sizing vs two-pass encoded_len() in buffa and prost.',
     rows: [
       { name: 'OmniBuf (Generated)', val: 1259, sizeBytes: 39256, highlight: true, baseline: true },
       { name: 'OmniBuf (#[derive(OmniBuf)])', val: 1698, sizeBytes: 39256, highlight: true },
@@ -494,7 +493,7 @@ export const rsBenchmarkCategories: BenchmarkCategory[] = [
     unit: 'ns',
     maxVal: 15287,
     methodology:
-      'Growing a nested string field past 16 KiB ahead of 32 trailing Neighbor entries via Opaque splicing vs full decode and re-encode.',
+      'Grows a nested string field past 16 KiB ahead of 32 trailing Neighbor entries via Opaque splicing vs full decode and re-encode.',
     rows: [
       { name: 'OmniBuf (Generated)', val: 1914, highlight: true, baseline: true },
       { name: 'buffa (Protobuf)', val: 3551 },
@@ -512,7 +511,7 @@ export const pyBenchmarkCategories: BenchmarkCategory[] = [
     unit: 'ns',
     maxVal: 4766,
     methodology:
-      'Serializing PeerUpdate into fresh bytes across native Rust and C extensions (omnibuf, upb, protobuf-py, msgspec, msgpack, stdlib json).',
+      'Serializes PeerUpdate into fresh bytes across native Rust and C extensions (omnibuf, upb, protobuf-py, msgspec, msgpack, stdlib json).',
     rows: [
       { name: 'OmniBuf (Generated)', val: 363, sizeBytes: 366, highlight: true, baseline: true },
       { name: 'OmniBuf (@dataclass)', val: 366, sizeBytes: 366, highlight: true },
@@ -528,7 +527,7 @@ export const pyBenchmarkCategories: BenchmarkCategory[] = [
     unit: 'ns',
     maxVal: 6000,
     methodology:
-      'Decoding bytes and reading all 11 fields in Python. Accessing every field forces upb to materialize Python strings and sub-messages out of its C arena.',
+      'Decodes bytes and reads all 11 fields in Python. Accessing every field forces upb to materialize Python strings and sub-messages out of its C arena.',
     rows: [
       { name: 'OmniBuf (Generated)', val: 1740, highlight: true, baseline: true },
       { name: 'OmniBuf (@dataclass)', val: 1750, highlight: true },
@@ -558,7 +557,7 @@ export const pyBenchmarkCategories: BenchmarkCategory[] = [
     unit: 'ns',
     maxVal: 10133,
     methodology:
-      'Checking a nested city string and splicing an updated sequence number vs full decode and re-encode.',
+      'Checks a nested city string and splices an updated sequence number vs full decode and re-encode.',
     rows: [
       { name: 'OmniBuf (Generated)', val: 754, highlight: true, baseline: true },
       { name: 'google.protobuf (upb)', val: 1342 },
@@ -573,7 +572,7 @@ export const pyBenchmarkCategories: BenchmarkCategory[] = [
     unit: 'ns',
     maxVal: 66919,
     methodology:
-      'Serializing a 39 KiB packet whose 20 KiB and 18 KiB nested strings trigger 4-byte container length pre-sizing.',
+      'Serializes a 39 KiB packet whose 20 KiB and 18 KiB nested strings trigger 4-byte container length pre-sizing.',
     rows: [
       { name: 'msgspec', val: 1845, sizeBytes: 39516 },
       { name: 'OmniBuf (Generated)', val: 1918, sizeBytes: 39256, highlight: true, baseline: true },
@@ -589,7 +588,7 @@ export const pyBenchmarkCategories: BenchmarkCategory[] = [
     unit: 'ns',
     maxVal: 63035,
     methodology:
-      'Growing a nested string field past 16 KiB ahead of 32 trailing Neighbor entries via Opaque splicing vs full decode and re-encode.',
+      'Grows a nested string field past 16 KiB ahead of 32 trailing Neighbor entries via Opaque splicing vs full decode and re-encode.',
     rows: [
       { name: 'OmniBuf (Generated)', val: 2470, highlight: true, baseline: true },
       { name: 'google.protobuf (upb)', val: 4677 },
@@ -608,7 +607,7 @@ export const cppBenchmarkCategories: BenchmarkCategory[] = [
     unit: 'ns',
     maxVal: 600,
     methodology:
-      'Serializing PeerUpdate into a fresh std::vector<uint8_t> against official libprotobuf (C++), an in-tree LEB128 wire codec, and JSON.',
+      'Serializes PeerUpdate into a fresh std::vector<uint8_t> against official libprotobuf (C++), an in-tree LEB128 wire codec, and JSON.',
     rows: [
       { name: 'OmniBuf (Generated)', val: 170, sizeBytes: 366, highlight: true, baseline: true },
       { name: 'OmniBuf (C++ Struct)', val: 203, sizeBytes: 366, highlight: true },
@@ -621,7 +620,7 @@ export const cppBenchmarkCategories: BenchmarkCategory[] = [
     title: 'Full Message Decode Speed',
     unit: 'ns',
     maxVal: 1400,
-    methodology: 'Decoding into a fresh C++20 PeerUpdate struct and touching all 11 fields.',
+    methodology: 'Decodes into a fresh C++20 PeerUpdate struct and touches all 11 fields.',
     rows: [
       { name: 'OmniBuf (Generated)', val: 330, highlight: true, baseline: true },
       { name: 'OmniBuf (C++ Struct)', val: 374, highlight: true },
@@ -635,7 +634,7 @@ export const cppBenchmarkCategories: BenchmarkCategory[] = [
     unit: 'ns',
     maxVal: 1450,
     methodology:
-      'Returning std::string_view into the packet via OpaquePeerUpdate vs full message decode.',
+      'Returns std::string_view into the packet via OpaquePeerUpdate vs full message decode.',
     rows: [
       { name: 'OmniBuf (Generated)', val: 99, highlight: true, baseline: true },
       { name: 'Protobuf (LEB128 Wire)', val: 425 },
@@ -648,7 +647,7 @@ export const cppBenchmarkCategories: BenchmarkCategory[] = [
     unit: 'ns',
     maxVal: 2000,
     methodology:
-      'Checking a nested city string and splicing an updated sequence counter via OpaquePeerUpdate vs full decode and re-encode.',
+      'Checks a nested city string and splices an updated sequence counter via OpaquePeerUpdate vs full decode and re-encode.',
     rows: [
       { name: 'OmniBuf (Generated)', val: 294, highlight: true, baseline: true },
       { name: 'Protobuf (LEB128 Wire)', val: 644 },
@@ -661,7 +660,7 @@ export const cppBenchmarkCategories: BenchmarkCategory[] = [
     unit: 'ns',
     maxVal: 55000,
     methodology:
-      'Serializing a 39 KiB packet whose >16 KiB nested sub-messages trigger 2B-to-4B header expansion vs Protobuf two-pass sizing.',
+      'Serializes a 39 KiB packet whose >16 KiB nested sub-messages trigger 2B-to-4B header expansion vs Protobuf two-pass sizing.',
     rows: [
       { name: 'OmniBuf (C++ Struct)', val: 1426, sizeBytes: 39256, highlight: true },
       { name: 'OmniBuf (Generated)', val: 1431, sizeBytes: 39256, highlight: true, baseline: true },
@@ -675,7 +674,7 @@ export const cppBenchmarkCategories: BenchmarkCategory[] = [
     unit: 'ns',
     maxVal: 38000,
     methodology:
-      'Growing a nested string field past 16 KiB ahead of 32 trailing Neighbor entries via Opaque splicing vs full decode and re-encode.',
+      'Grows a nested string field past 16 KiB ahead of 32 trailing Neighbor entries via Opaque splicing vs full decode and re-encode.',
     rows: [
       { name: 'OmniBuf (Generated)', val: 1701, highlight: true, baseline: true },
       { name: 'Protobuf (LEB128 Wire)', val: 3528 },
@@ -692,7 +691,7 @@ export const javaBenchmarkCategories: BenchmarkCategory[] = [
     unit: 'ns',
     maxVal: 1743,
     methodology:
-      'Serializing PeerUpdate into a fresh byte[] across generated OmniBuf, protobuf-java, FlatBuffers, and Jackson.',
+      'Serializes PeerUpdate into a fresh byte[] across generated OmniBuf, protobuf-java, FlatBuffers, and Jackson.',
     rows: [
       { name: 'OmniBuf (Generated)', val: 247, sizeBytes: 366, highlight: true, baseline: true },
       { name: 'Protobuf (protobuf-java)', val: 288, sizeBytes: 341 },
@@ -707,7 +706,7 @@ export const javaBenchmarkCategories: BenchmarkCategory[] = [
     title: 'Full Message Decode Speed',
     unit: 'ns',
     maxVal: 2768,
-    methodology: 'Decoding byte[] into a fresh PeerUpdate object and reading all 11 fields.',
+    methodology: 'Decodes byte[] into a fresh PeerUpdate object and reads all 11 fields.',
     rows: [
       { name: 'OmniBuf (@OmniBufField)', val: 778, highlight: true },
       { name: 'OmniBuf (Generated)', val: 641, highlight: true, baseline: true },
@@ -723,7 +722,7 @@ export const javaBenchmarkCategories: BenchmarkCategory[] = [
     unit: 'ns',
     maxVal: 2402,
     methodology:
-      'Reading a nested city string via FlatBuffers vtables or OpaquePeerUpdate vs full decode.',
+      'Reads a nested city string via FlatBuffers vtables or OpaquePeerUpdate vs full decode.',
     rows: [
       { name: 'FlatBuffers', val: 14 },
       { name: 'OmniBuf (Generated)', val: 76, highlight: true, baseline: true },
@@ -737,7 +736,7 @@ export const javaBenchmarkCategories: BenchmarkCategory[] = [
     unit: 'ns',
     maxVal: 4319,
     methodology:
-      'Checking a nested city string and splicing an updated sequence counter via OpaquePeerUpdate vs full decode and re-encode.',
+      'Checks a nested city string and splices an updated sequence counter via OpaquePeerUpdate vs full decode and re-encode.',
     rows: [
       { name: 'OmniBuf (Generated)', val: 252, highlight: true, baseline: true },
       { name: 'FlatBuffers', val: 1109 },
@@ -751,7 +750,7 @@ export const javaBenchmarkCategories: BenchmarkCategory[] = [
     unit: 'ns',
     maxVal: 92073,
     methodology:
-      'Serializing a 39 KiB packet with >16 KiB nested strings. Immutable protobuf-java reuses cached ByteString UTF-8 bytes and memoizedSerializedSize.',
+      'Serializes a 39 KiB packet with >16 KiB nested strings. Immutable protobuf-java reuses cached ByteString UTF-8 bytes and memoizedSerializedSize.',
     rows: [
       { name: 'Protobuf (protobuf-java)', val: 3664, sizeBytes: 39227 },
       { name: 'OmniBuf (@OmniBufField)', val: 4701, sizeBytes: 39256, highlight: true },
@@ -773,7 +772,7 @@ export const javaBenchmarkCategories: BenchmarkCategory[] = [
     unit: 'ns',
     maxVal: 64950,
     methodology:
-      'Growing a nested string field past 16 KiB ahead of 32 trailing Neighbor entries via Opaque splicing vs full decode and re-encode.',
+      'Grows a nested string field past 16 KiB ahead of 32 trailing Neighbor entries via Opaque splicing vs full decode and re-encode.',
     rows: [
       { name: 'OmniBuf (Generated)', val: 2665, highlight: true, baseline: true },
       { name: 'Protobuf (protobuf-java)', val: 18855 },
@@ -790,7 +789,7 @@ export const csBenchmarkCategories: BenchmarkCategory[] = [
     title: 'Full Message Encode Speed',
     unit: 'ns',
     maxVal: 843,
-    methodology: 'Serializing PeerUpdate into a fresh byte[] on .NET 8 RyuJIT.',
+    methodology: 'Serializes PeerUpdate into a fresh byte[] on .NET 8 RyuJIT.',
     rows: [
       { name: 'OmniBuf (Generated)', val: 273, sizeBytes: 366, highlight: true, baseline: true },
       { name: 'OmniBuf ([OmniBufField])', val: 304, sizeBytes: 366, highlight: true },
@@ -804,7 +803,7 @@ export const csBenchmarkCategories: BenchmarkCategory[] = [
     unit: 'ns',
     maxVal: 2478,
     methodology:
-      'Decoding ReadOnlySpan<byte> into a fresh PeerUpdate instance and reading all 11 fields.',
+      'Decodes ReadOnlySpan<byte> into a fresh PeerUpdate instance and reads all 11 fields.',
     rows: [
       { name: 'OmniBuf (Generated)', val: 294, highlight: true, baseline: true },
       { name: 'OmniBuf ([OmniBufField])', val: 498, highlight: true },
@@ -817,7 +816,7 @@ export const csBenchmarkCategories: BenchmarkCategory[] = [
     title: 'Read a Single Nested Field',
     unit: 'ns',
     maxVal: 2378,
-    methodology: 'Reading a nested city string via OpaquePeerUpdate vs full message decode.',
+    methodology: 'Reads a nested city string via OpaquePeerUpdate vs full message decode.',
     rows: [
       { name: 'OmniBuf (Generated)', val: 104, highlight: true, baseline: true },
       { name: 'Google.Protobuf', val: 632 },
@@ -830,7 +829,7 @@ export const csBenchmarkCategories: BenchmarkCategory[] = [
     unit: 'ns',
     maxVal: 3284,
     methodology:
-      'Checking a nested city string and splicing an updated sequence counter via OpaquePeerUpdate vs full decode and re-encode.',
+      'Checks a nested city string and splices an updated sequence counter via OpaquePeerUpdate vs full decode and re-encode.',
     rows: [
       { name: 'OmniBuf (Generated)', val: 273, highlight: true, baseline: true },
       { name: 'Google.Protobuf', val: 1138 },
@@ -843,7 +842,7 @@ export const csBenchmarkCategories: BenchmarkCategory[] = [
     unit: 'ns',
     maxVal: 21528,
     methodology:
-      'Serializing a 39 KiB packet whose >16 KiB nested sub-messages trigger 2B-to-4B header expansion.',
+      'Serializes a 39 KiB packet whose >16 KiB nested sub-messages trigger 2B-to-4B header expansion.',
     rows: [
       {
         name: 'OmniBuf (Generated)',
@@ -863,7 +862,7 @@ export const csBenchmarkCategories: BenchmarkCategory[] = [
     unit: 'ns',
     maxVal: 15413,
     methodology:
-      'Growing a nested string field past 16 KiB ahead of 32 trailing Neighbor entries via Opaque splicing vs full decode and re-encode.',
+      'Grows a nested string field past 16 KiB ahead of 32 trailing Neighbor entries via Opaque splicing vs full decode and re-encode.',
     rows: [
       { name: 'OmniBuf (Generated)', val: 3829, highlight: true, baseline: true },
       { name: 'MessagePack-CSharp', val: 6680 },
@@ -879,7 +878,7 @@ export const swiftBenchmarkCategories: BenchmarkCategory[] = [
     title: 'Full Message Encode Speed',
     unit: 'ns',
     maxVal: 22000,
-    methodology: 'Serializing PeerUpdate into a fresh byte buffer in Swift 6 release mode.',
+    methodology: 'Serializes PeerUpdate into a fresh byte buffer in Swift 6 release mode.',
     rows: [
       { name: 'OmniBuf (Generated)', val: 355, sizeBytes: 365, highlight: true, baseline: true },
       { name: 'SwiftProtobuf', val: 1341, sizeBytes: 341 },
@@ -891,7 +890,7 @@ export const swiftBenchmarkCategories: BenchmarkCategory[] = [
     title: 'Full Message Decode Speed',
     unit: 'ns',
     maxVal: 25000,
-    methodology: 'Decoding raw bytes into a fresh PeerUpdate value and reading all 11 fields.',
+    methodology: 'Decodes raw bytes into a fresh PeerUpdate value and reads all 11 fields.',
     rows: [
       { name: 'OmniBuf (Generated)', val: 980, highlight: true, baseline: true },
       { name: 'SwiftProtobuf', val: 2214 },
@@ -903,7 +902,7 @@ export const swiftBenchmarkCategories: BenchmarkCategory[] = [
     title: 'Read a Single Nested Field',
     unit: 'ns',
     maxVal: 24000,
-    methodology: 'Reading a nested city string via OpaquePeerUpdate vs full message decode.',
+    methodology: 'Reads a nested city string via OpaquePeerUpdate vs full message decode.',
     rows: [
       { name: 'OmniBuf (Generated)', val: 146, highlight: true, baseline: true },
       { name: 'SwiftProtobuf', val: 2278 },
@@ -915,7 +914,7 @@ export const swiftBenchmarkCategories: BenchmarkCategory[] = [
     unit: 'ns',
     maxVal: 46000,
     methodology:
-      'Checking a nested city string and splicing an updated sequence counter via OpaquePeerUpdate vs full decode and re-encode.',
+      'Checks a nested city string and splices an updated sequence counter via OpaquePeerUpdate vs full decode and re-encode.',
     rows: [
       { name: 'OmniBuf (Generated)', val: 513, highlight: true, baseline: true },
       { name: 'SwiftProtobuf', val: 3702 },
@@ -927,7 +926,7 @@ export const swiftBenchmarkCategories: BenchmarkCategory[] = [
     unit: 'ns',
     maxVal: 135000,
     methodology:
-      'Serializing a 39 KiB packet whose >16 KiB nested sub-messages trigger 2B-to-4B header expansion.',
+      'Serializes a 39 KiB packet whose >16 KiB nested sub-messages trigger 2B-to-4B header expansion.',
     rows: [
       { name: 'OmniBuf (Generated)', val: 2098, sizeBytes: 39255, highlight: true, baseline: true },
       { name: 'SwiftProtobuf', val: 2908, sizeBytes: 39227 },
@@ -940,7 +939,7 @@ export const swiftBenchmarkCategories: BenchmarkCategory[] = [
     unit: 'ns',
     maxVal: 215000,
     methodology:
-      'Growing a nested string field past 16 KiB ahead of 32 trailing Neighbor entries via Opaque splicing vs full decode and re-encode.',
+      'Grows a nested string field past 16 KiB ahead of 32 trailing Neighbor entries via Opaque splicing vs full decode and re-encode.',
     rows: [
       { name: 'OmniBuf (Generated)', val: 1549, highlight: true, baseline: true },
       { name: 'SwiftProtobuf', val: 17327 },
@@ -955,7 +954,7 @@ export const dartBenchmarkCategories: BenchmarkCategory[] = [
     title: 'Full Message Encode Speed',
     unit: 'ns',
     maxVal: 11000,
-    methodology: 'Serializing PeerUpdate into a fresh Uint8List in Dart 3 AOT native binary.',
+    methodology: 'Serializes PeerUpdate into a fresh Uint8List in Dart 3 AOT native binary.',
     rows: [
       { name: 'OmniBuf (Generated)', val: 971, sizeBytes: 365, highlight: true, baseline: true },
       { name: 'OmniBuf (Schema)', val: 1568, sizeBytes: 365, highlight: true },
@@ -967,7 +966,7 @@ export const dartBenchmarkCategories: BenchmarkCategory[] = [
     title: 'Full Message Decode Speed',
     unit: 'ns',
     maxVal: 6500,
-    methodology: 'Decoding Uint8List into a fresh PeerUpdate object and reading all 11 fields.',
+    methodology: 'Decodes Uint8List into a fresh PeerUpdate object and reads all 11 fields.',
     rows: [
       { name: 'OmniBuf (Generated)', val: 1057, highlight: true, baseline: true },
       { name: 'OmniBuf (Schema)', val: 3199, highlight: true },
@@ -979,7 +978,7 @@ export const dartBenchmarkCategories: BenchmarkCategory[] = [
     title: 'Read a Single Nested Field',
     unit: 'ns',
     maxVal: 6500,
-    methodology: 'Reading a nested city string via OpaquePeerUpdate vs full message decode.',
+    methodology: 'Reads a nested city string via OpaquePeerUpdate vs full message decode.',
     rows: [
       { name: 'OmniBuf (Opaque)', val: 393, highlight: true, baseline: true },
       { name: 'package:protobuf', val: 3674 },
@@ -991,7 +990,7 @@ export const dartBenchmarkCategories: BenchmarkCategory[] = [
     unit: 'ns',
     maxVal: 18000,
     methodology:
-      'Checking a nested city string and splicing an updated sequence counter via OpaquePeerUpdate vs full decode and re-encode.',
+      'Checks a nested city string and splices an updated sequence counter via OpaquePeerUpdate vs full decode and re-encode.',
     rows: [
       { name: 'OmniBuf (Opaque Splice)', val: 759, highlight: true, baseline: true },
       { name: 'package:protobuf', val: 7172 },
@@ -1003,7 +1002,7 @@ export const dartBenchmarkCategories: BenchmarkCategory[] = [
     unit: 'ns',
     maxVal: 240000,
     methodology:
-      'Serializing a 39 KiB packet whose >16 KiB nested sub-messages trigger 2B-to-4B header expansion.',
+      'Serializes a 39 KiB packet whose >16 KiB nested sub-messages trigger 2B-to-4B header expansion.',
     rows: [
       {
         name: 'OmniBuf (Generated)',
@@ -1021,7 +1020,7 @@ export const dartBenchmarkCategories: BenchmarkCategory[] = [
     unit: 'ns',
     maxVal: 185000,
     methodology:
-      'Growing a nested string field past 16 KiB ahead of 32 trailing Neighbor entries via Opaque splicing vs full decode and re-encode.',
+      'Grows a nested string field past 16 KiB ahead of 32 trailing Neighbor entries via Opaque splicing vs full decode and re-encode.',
     rows: [
       { name: 'OmniBuf (Opaque Splice)', val: 48002, highlight: true, baseline: true },
       { name: 'package:protobuf', val: 110549 },
@@ -1037,7 +1036,7 @@ export const phpBenchmarkCategories: BenchmarkCategory[] = [
     unit: 'ns',
     maxVal: 95000,
     methodology:
-      'Serializing PeerUpdate into a PHP binary string on PHP 8.6 via the public PHP APIs (marshalOmnibuf / OmniBuf::marshal) with the optional 100% Rust ext-omnibuf extension, pure-PHP OmniBuf, pure-PHP google/protobuf, and stdlib JSON.',
+      'Serializes PeerUpdate into a PHP binary string on PHP 8.6 via the public PHP APIs (marshalOmnibuf / OmniBuf::marshal) with the optional 100% Rust ext-omnibuf extension, pure-PHP OmniBuf, pure-PHP google/protobuf, and stdlib JSON.',
     rows: [
       {
         name: 'OmniBuf (ext-omnibuf)',
@@ -1057,8 +1056,7 @@ export const phpBenchmarkCategories: BenchmarkCategory[] = [
     title: 'Full Message Decode Speed',
     unit: 'ns',
     maxVal: 58000,
-    methodology:
-      'Decoding a binary string into a fresh PeerUpdate object and reading all 11 fields.',
+    methodology: 'Decodes a binary string into a fresh PeerUpdate object and reads all 11 fields.',
     rows: [
       { name: 'OmniBuf (ext-omnibuf)', val: 1653, highlight: true, baseline: true },
       { name: 'OmniBuf Attributes (ext-omnibuf)', val: 1782, highlight: true },
@@ -1072,7 +1070,7 @@ export const phpBenchmarkCategories: BenchmarkCategory[] = [
     title: 'Read a Single Nested Field',
     unit: 'ns',
     maxVal: 52000,
-    methodology: 'Reading a nested city string via OpaquePeerUpdate vs full message decode.',
+    methodology: 'Reads a nested city string via OpaquePeerUpdate vs full message decode.',
     rows: [
       { name: 'OmniBuf (ext-omnibuf)', val: 513, highlight: true, baseline: true },
       { name: 'JSON (stdlib)', val: 3692 },
@@ -1085,7 +1083,7 @@ export const phpBenchmarkCategories: BenchmarkCategory[] = [
     unit: 'ns',
     maxVal: 155000,
     methodology:
-      'Checking a nested city string and splicing an updated sequence counter via OpaquePeerUpdate vs full decode and re-encode.',
+      'Checks a nested city string and splices an updated sequence counter via OpaquePeerUpdate vs full decode and re-encode.',
     rows: [
       { name: 'OmniBuf (ext-omnibuf)', val: 1514, highlight: true, baseline: true },
       { name: 'JSON (stdlib)', val: 5181 },
@@ -1098,7 +1096,7 @@ export const phpBenchmarkCategories: BenchmarkCategory[] = [
     unit: 'ns',
     maxVal: 1280000,
     methodology:
-      'Serializing a 39 KiB packet whose >16 KiB nested sub-messages trigger 4-byte container length backpatching.',
+      'Serializes a 39 KiB packet whose >16 KiB nested sub-messages trigger 4-byte container length backpatching.',
     rows: [
       {
         name: 'OmniBuf (ext-omnibuf)',
@@ -1119,7 +1117,7 @@ export const phpBenchmarkCategories: BenchmarkCategory[] = [
     unit: 'ns',
     maxVal: 1260000,
     methodology:
-      'Growing a nested string field past 16 KiB ahead of 32 trailing Neighbor entries via Opaque splicing vs full decode and re-encode.',
+      'Grows a nested string field past 16 KiB ahead of 32 trailing Neighbor entries via Opaque splicing vs full decode and re-encode.',
     rows: [
       { name: 'OmniBuf (ext-omnibuf)', val: 4432, highlight: true, baseline: true },
       { name: 'OmniBuf (Pure PHP Generated)', val: 11263, highlight: true },
@@ -1136,7 +1134,7 @@ export const elixirBenchmarkCategories: BenchmarkCategory[] = [
     unit: 'ns',
     maxVal: 7000,
     methodology:
-      'Serializing PeerUpdate to a flat binary on BEAM OTP 27 across optional Rustler NIF (omnibuf-rs), pure-Elixir iodata, Jason JSON, and elixir-protobuf.',
+      'Serializes PeerUpdate to a flat binary on BEAM OTP 27 across optional Rustler NIF (omnibuf-rs), pure-Elixir iodata, Jason JSON, and elixir-protobuf.',
     rows: [
       {
         name: 'OmniBuf (Rust NIF)',
@@ -1154,7 +1152,7 @@ export const elixirBenchmarkCategories: BenchmarkCategory[] = [
     title: 'Full Message Decode Speed',
     unit: 'ns',
     maxVal: 7000,
-    methodology: 'Decoding a binary into a fresh PeerUpdate struct and reading all 11 fields.',
+    methodology: 'Decodes a binary into a fresh PeerUpdate struct and reads all 11 fields.',
     rows: [
       { name: 'OmniBuf (Rust NIF)', val: 1482, highlight: true, baseline: true },
       { name: 'OmniBuf (Pure Elixir)', val: 3662, highlight: true },
@@ -1166,7 +1164,7 @@ export const elixirBenchmarkCategories: BenchmarkCategory[] = [
     title: 'Read a Single Nested Field',
     unit: 'ns',
     maxVal: 7000,
-    methodology: 'Reading a nested city string via PeerUpdate.Opaque vs full message decode.',
+    methodology: 'Reads a nested city string via PeerUpdate.Opaque vs full message decode.',
     rows: [
       { name: 'OmniBuf (Rust NIF)', val: 387, highlight: true, baseline: true },
       { name: 'OmniBuf (Pure Elixir)', val: 1383, highlight: true },
@@ -1179,7 +1177,7 @@ export const elixirBenchmarkCategories: BenchmarkCategory[] = [
     unit: 'ns',
     maxVal: 14000,
     methodology:
-      'Checking a nested city string and splicing an updated sequence counter via zero-copy BEAM sub-binaries vs full decode and re-encode.',
+      'Checks a nested city string and splices an updated sequence counter via zero-copy BEAM sub-binaries vs full decode and re-encode.',
     rows: [
       { name: 'OmniBuf (Rust NIF)', val: 621, highlight: true, baseline: true },
       { name: 'OmniBuf (Pure Elixir)', val: 1943, highlight: true },
@@ -1192,7 +1190,7 @@ export const elixirBenchmarkCategories: BenchmarkCategory[] = [
     unit: 'ns',
     maxVal: 120000,
     methodology:
-      'Serializing a 39 KiB packet whose >16 KiB nested sub-messages trigger 2B-to-4B header expansion.',
+      'Serializes a 39 KiB packet whose >16 KiB nested sub-messages trigger 2B-to-4B header expansion.',
     rows: [
       {
         name: 'OmniBuf (Rust NIF)',
@@ -1211,7 +1209,7 @@ export const elixirBenchmarkCategories: BenchmarkCategory[] = [
     unit: 'ns',
     maxVal: 125000,
     methodology:
-      'Growing a nested string field past 16 KiB ahead of 32 trailing Neighbor entries via Opaque splicing vs full decode and re-encode.',
+      'Grows a nested string field past 16 KiB ahead of 32 trailing Neighbor entries via Opaque splicing vs full decode and re-encode.',
     rows: [
       { name: 'OmniBuf (Rust NIF)', val: 4530, highlight: true, baseline: true },
       { name: 'OmniBuf (Pure Elixir)', val: 6499, highlight: true },
@@ -1228,7 +1226,7 @@ export const nanoBenchmarkCategories: BenchmarkCategory[] = [
     unit: 'ns',
     maxVal: 1500,
     methodology:
-      'Serializing a static 976-byte PeerUpdate C99 struct into a fixed stack buffer (zero malloc) using descriptor tables in RODATA, comparing omnibuf-nano against nanopb 0.4.9.1.',
+      'Serializes a static 976-byte PeerUpdate C99 struct into a fixed stack buffer (zero malloc) using descriptor tables in RODATA, comparing omnibuf-nano against nanopb 0.4.9.1.',
     rows: [
       {
         name: 'OmniBuf Nano (C99)',
@@ -1245,7 +1243,7 @@ export const nanoBenchmarkCategories: BenchmarkCategory[] = [
     unit: 'ns',
     maxVal: 1500,
     methodology:
-      'Zero-initializing and decoding a full 11-field PeerUpdate packet into a static 976-byte C99 struct using streaming input callbacks.',
+      'Zero-initializes and decodes a full 11-field PeerUpdate packet into a static 976-byte C99 struct using streaming input callbacks.',
     rows: [
       {
         name: 'OmniBuf Nano (C99)',
@@ -1293,8 +1291,6 @@ export const languageBenchmarks: Record<LanguageKey, LanguageBenchmarkSuite> = {
     label: 'Go',
     shortLabel: 'Go',
     headingPrefix: 'Go',
-    subtitleHtml:
-      '11-field <code>PeerUpdate</code> struct on Apple M1 Pro (Go 1.27.1). <strong>Shorter bars = Faster.</strong>',
     href: '/benchmarks?lang=go',
     ctaLabel: 'See full results',
     competitorsLabel: "Protobuf, FlatBuffers, Avro, Cap'n Proto, MsgPack, JSON",
@@ -1311,11 +1307,10 @@ export const languageBenchmarks: Record<LanguageKey, LanguageBenchmarkSuite> = {
       'CPU: Apple M1 Pro (darwin/arm64)',
       'Compiler: Go 1.27.1',
       'Samples: 5 × 250 ms, CPU=1',
-      'Workload: 11-field PeerUpdate (366 B)',
     ],
     environmentParagraphs: [
-      'M1 Pro MacBook Pro, Go 1.27.1 (<code>GOEXPERIMENT=jsonv2</code>), <code>-benchtime=250ms -count=5 -cpu=1</code>. Every decode benchmark reads all 11 fields into a non-inlined checksum sink and reuses the destination struct across codecs, including Protobuf.',
-      'Benchmark source lives in <a href="https://github.com/omnibuf/omnibuf-go/blob/main/benchmarks/omnibuf_bench_test.go" target="_blank" rel="noopener noreferrer" class="doc-link font-mono">benchmarks/omnibuf_bench_test.go</a>, <a href="https://github.com/omnibuf/omnibuf-go/blob/main/benchmarks/opaque_table_bench_test.go" target="_blank" rel="noopener noreferrer" class="doc-link font-mono">benchmarks/opaque_table_bench_test.go</a>, <a href="https://github.com/omnibuf/omnibuf-go/blob/main/benchmarks/jsonv2_bench_test.go" target="_blank" rel="noopener noreferrer" class="doc-link font-mono">benchmarks/jsonv2_bench_test.go</a>, and <a href="https://github.com/omnibuf/omnibuf-go/blob/main/benchmarks/competitors_test.go" target="_blank" rel="noopener noreferrer" class="doc-link font-mono">benchmarks/competitors_test.go</a>, with recorded output in <a href="https://github.com/omnibuf/omnibuf-go/blob/main/testdata/benchmarks.txt" target="_blank" rel="noopener noreferrer" class="doc-link font-mono">testdata/benchmarks.txt</a> and <a href="https://github.com/omnibuf/omnibuf-go/blob/main/testdata/benchmarks.json" target="_blank" rel="noopener noreferrer" class="doc-link font-mono">testdata/benchmarks.json</a>.',
+      'M1 Pro MacBook Pro, Go 1.27.1 (<code>GOEXPERIMENT=jsonv2</code>), <code>-benchtime=250ms -count=5 -cpu=1</code>. Every decode benchmark reads all 11 fields into a checksum (so the compiler cannot skip unused work) and reuses the destination struct across codecs, including Protobuf.',
+      'Benchmark source lives in <a href="https://github.com/omnibuf/omnibuf-go/tree/main/benchmarks" target="_blank" rel="noopener noreferrer" class="doc-link font-mono">benchmarks/</a>, with recorded output in <a href="https://github.com/omnibuf/omnibuf-go/blob/main/testdata/benchmarks.txt" target="_blank" rel="noopener noreferrer" class="doc-link font-mono">testdata/benchmarks.txt</a> and <a href="https://github.com/omnibuf/omnibuf-go/blob/main/testdata/benchmarks.json" target="_blank" rel="noopener noreferrer" class="doc-link font-mono">testdata/benchmarks.json</a>.',
     ],
   },
   es: {
@@ -1323,8 +1318,6 @@ export const languageBenchmarks: Record<LanguageKey, LanguageBenchmarkSuite> = {
     label: 'TypeScript & JS',
     shortLabel: 'TS / JS',
     headingPrefix: 'TypeScript & JS',
-    subtitleHtml:
-      '11-field <code>PeerUpdate</code> numbers on Node.js v24 (Apple M1 Pro) across <code>@omnibuf/core</code>, <code>protobufjs</code>, <code>@bufbuild/protobuf</code>, <code>google-protobuf</code>, <code>@msgpack/msgpack</code>, and <code>JSON</code>. <strong>Shorter bars = Faster.</strong>',
     href: '/benchmarks?lang=es',
     ctaLabel: 'See full results',
     competitorsLabel: 'protobufjs, protobuf-es, google-protobuf, MsgPack, JSON',
@@ -1340,7 +1333,7 @@ export const languageBenchmarks: Record<LanguageKey, LanguageBenchmarkSuite> = {
     ],
     environmentParagraphs: [
       'Measured on an Apple M1 Pro Mac using Node.js v26.5.0. Every decode benchmark reads all 11 fields of the <code>PeerUpdate</code> message, and every mutation benchmark checks <code>location.city</code> before incrementing <code>sequence</code> from the input packet.',
-      'Benchmark source is in <a href="https://github.com/omnibuf/omnibuf-es/blob/main/benchmarks/bench.ts" target="_blank" rel="noopener noreferrer" class="doc-link font-mono">benchmarks/bench.ts</a> in the <code>omnibuf-es</code> repository (<code>pnpm run bench</code>), with recorded output in <a href="https://github.com/omnibuf/omnibuf-es/blob/main/testdata/benchmarks.json" target="_blank" rel="noopener noreferrer" class="doc-link font-mono">testdata/benchmarks.json</a>.',
+      'Benchmark source lives in <a href="https://github.com/omnibuf/omnibuf-es/tree/main/benchmarks" target="_blank" rel="noopener noreferrer" class="doc-link font-mono">benchmarks/</a> in the <code>omnibuf-es</code> repository (<code>pnpm run bench</code>), with recorded output in <a href="https://github.com/omnibuf/omnibuf-es/blob/main/testdata/benchmarks.json" target="_blank" rel="noopener noreferrer" class="doc-link font-mono">testdata/benchmarks.json</a>.',
     ],
   },
   rs: {
@@ -1348,8 +1341,6 @@ export const languageBenchmarks: Record<LanguageKey, LanguageBenchmarkSuite> = {
     label: 'Rust',
     shortLabel: 'Rust',
     headingPrefix: 'Rust',
-    subtitleHtml:
-      '11-field <code>PeerUpdate</code> struct on Apple M1 Pro (<code>rustc 1.94.0</code>) across <code>omnibuf</code>, <code>buffa</code>, <code>prost</code>, <code>rmp-serde</code>, and <code>serde_json</code>. <strong>Shorter bars = Faster.</strong>',
     href: '/benchmarks?lang=rs',
     ctaLabel: 'See full results',
     competitorsLabel: 'buffa, prost, rmp-serde, serde_json',
@@ -1364,8 +1355,8 @@ export const languageBenchmarks: Record<LanguageKey, LanguageBenchmarkSuite> = {
       'Command: just bench',
     ],
     environmentParagraphs: [
-      'Compiled with <code>rustc 1.94.0</code> in release mode on an Apple M1 Pro Mac. Encode benchmarks start from identical <code>Vec::with_capacity(128)</code> buffers, and decode benchmarks read all 11 fields into a <code>black_box</code> checksum sink.',
-      'Benchmark source lives in <a href="https://github.com/omnibuf/omnibuf-rs/blob/main/crates/omnibuf-bench/src/main.rs" target="_blank" rel="noopener noreferrer" class="doc-link font-mono">crates/omnibuf-bench/src/main.rs</a>, with recorded output in <a href="https://github.com/omnibuf/omnibuf-rs/blob/main/testdata/benchmarks.json" target="_blank" rel="noopener noreferrer" class="doc-link font-mono">testdata/benchmarks.json</a>.',
+      'Compiled with <code>rustc 1.94.0</code> in release mode on an Apple M1 Pro Mac. Encode benchmarks start from identical <code>Vec::with_capacity(128)</code> buffers, and decode benchmarks read all 11 fields through <code>black_box</code> so the compiler cannot optimize them away.',
+      'Benchmark source lives in <a href="https://github.com/omnibuf/omnibuf-rs/tree/main/crates/omnibuf-bench" target="_blank" rel="noopener noreferrer" class="doc-link font-mono">crates/omnibuf-bench/</a>, with recorded output in <a href="https://github.com/omnibuf/omnibuf-rs/blob/main/testdata/benchmarks.json" target="_blank" rel="noopener noreferrer" class="doc-link font-mono">testdata/benchmarks.json</a>.',
     ],
   },
   py: {
@@ -1373,8 +1364,6 @@ export const languageBenchmarks: Record<LanguageKey, LanguageBenchmarkSuite> = {
     label: 'Python',
     shortLabel: 'Python',
     headingPrefix: 'Python',
-    subtitleHtml:
-      '11-field <code>PeerUpdate</code> workload on Python 3.14.5 across <code>omnibuf</code> (compiled Rust extension), <code>protobuf-py</code>, <code>upb</code>, <code>msgspec</code>, <code>msgpack</code>, and stdlib <code>json</code>. <strong>Shorter bars = Faster.</strong>',
     href: '/benchmarks?lang=py',
     ctaLabel: 'See full results',
     competitorsLabel: 'protobuf-py (Rust), upb (C), msgspec (C), msgpack (C), json (C)',
@@ -1390,7 +1379,7 @@ export const languageBenchmarks: Record<LanguageKey, LanguageBenchmarkSuite> = {
     ],
     environmentParagraphs: [
       'Measured on CPython 3.14.5 on an Apple M1 Pro Mac. Every serializer in this chart runs compiled native code: <code>omnibuf</code> (Rust), <code>protobuf-py</code> (Rust), Google <code>upb</code> (C), <code>msgspec</code> (C), <code>msgpack</code> (C), and stdlib <code>json</code> (C). Full decode reads all 11 fields in Python so lazy C-arena wrappers materialize the exact same Python strings and sub-messages as eager dataclasses.',
-      'Benchmark source lives in <a href="https://github.com/omnibuf/omnibuf-py/blob/main/benchmarks/bench.py" target="_blank" rel="noopener noreferrer" class="doc-link font-mono">benchmarks/bench.py</a>, with recorded output in <a href="https://github.com/omnibuf/omnibuf-py/blob/main/testdata/benchmarks.json" target="_blank" rel="noopener noreferrer" class="doc-link font-mono">testdata/benchmarks.json</a>.',
+      'Benchmark source lives in <a href="https://github.com/omnibuf/omnibuf-py/tree/main/benchmarks" target="_blank" rel="noopener noreferrer" class="doc-link font-mono">benchmarks/</a>, with recorded output in <a href="https://github.com/omnibuf/omnibuf-py/blob/main/testdata/benchmarks.json" target="_blank" rel="noopener noreferrer" class="doc-link font-mono">testdata/benchmarks.json</a>.',
     ],
   },
   cpp: {
@@ -1398,8 +1387,6 @@ export const languageBenchmarks: Record<LanguageKey, LanguageBenchmarkSuite> = {
     label: 'C++',
     shortLabel: 'C++',
     headingPrefix: 'C++',
-    subtitleHtml:
-      '11-field <code>PeerUpdate</code> struct on Apple Clang 21 (<code>-O3 -DNDEBUG</code>, C++20). <strong>Shorter bars = Faster.</strong>',
     href: '/benchmarks?lang=cpp',
     ctaLabel: 'See full results',
     competitorsLabel: 'libprotobuf, Protobuf (LEB128 Wire), JSON',
@@ -1419,8 +1406,8 @@ export const languageBenchmarks: Record<LanguageKey, LanguageBenchmarkSuite> = {
       'Command: just bench',
     ],
     environmentParagraphs: [
-      'Compiled with Apple Clang 21.0.0 (<code>-O3 -DNDEBUG -std=c++20</code>) on an Apple M1 Pro Mac. Zero-dependency <code>omnibuf-cpp</code> headers are benchmarked against official <code>libprotobuf</code> 36.2 (<code>google::protobuf::Message</code>), an in-tree LEB128 Protobuf wire codec, and JSON on the exact same <code>PeerUpdate</code> workload, UTF-8 rules, and 11-field checksum sink.',
-      'Benchmark source lives in <a href="https://github.com/omnibuf/omnibuf-cpp/blob/main/benchmarks/peer_bench.cpp" target="_blank" rel="noopener noreferrer" class="doc-link font-mono">benchmarks/peer_bench.cpp</a> and <a href="https://github.com/omnibuf/omnibuf-cpp/blob/main/benchmarks/libprotobuf_peer.cpp" target="_blank" rel="noopener noreferrer" class="doc-link font-mono">benchmarks/libprotobuf_peer.cpp</a>, with recorded output in <a href="https://github.com/omnibuf/omnibuf-cpp/blob/main/testdata/benchmarks.json" target="_blank" rel="noopener noreferrer" class="doc-link font-mono">testdata/benchmarks.json</a>.',
+      'Compiled with Apple Clang 21.0.0 (<code>-O3 -DNDEBUG -std=c++20</code>) on an Apple M1 Pro Mac. Zero-dependency <code>omnibuf-cpp</code> headers are benchmarked against official <code>libprotobuf</code> 36.2 (<code>google::protobuf::Message</code>), an in-tree LEB128 Protobuf wire codec, and JSON on the exact same <code>PeerUpdate</code> workload, UTF-8 rules, and full 11-field decode check.',
+      'Benchmark source lives in <a href="https://github.com/omnibuf/omnibuf-cpp/tree/main/benchmarks" target="_blank" rel="noopener noreferrer" class="doc-link font-mono">benchmarks/</a>, with recorded output in <a href="https://github.com/omnibuf/omnibuf-cpp/blob/main/testdata/benchmarks.json" target="_blank" rel="noopener noreferrer" class="doc-link font-mono">testdata/benchmarks.json</a>.',
     ],
   },
   java: {
@@ -1428,8 +1415,6 @@ export const languageBenchmarks: Record<LanguageKey, LanguageBenchmarkSuite> = {
     label: 'Java',
     shortLabel: 'Java',
     headingPrefix: 'Java',
-    subtitleHtml:
-      '11-field <code>PeerUpdate</code> workload on OpenJDK 21.0.13 (C2 JIT) across <code>com.omnibuf</code>, <code>protobuf-java</code>, <code>FlatBuffers</code>, Jackson JSON, and Jackson MessagePack. <strong>Shorter bars = Faster.</strong>',
     href: '/benchmarks?lang=java',
     ctaLabel: 'See full results',
     competitorsLabel: 'protobuf-java, FlatBuffers, Jackson JSON, Jackson MsgPack',
@@ -1444,8 +1429,8 @@ export const languageBenchmarks: Record<LanguageKey, LanguageBenchmarkSuite> = {
       'Command: just bench',
     ],
     environmentParagraphs: [
-      'Measured on Eclipse Temurin OpenJDK 21.0.13 after C2 JIT warmup on an Apple M1 Pro Mac. Every decode benchmark reads all 11 fields into a volatile checksum sink. Immutable <code>protobuf-java</code> instances cache UTF-8 <code>ByteString</code> slices and <code>memoizedSerializedSize</code> after the first pass, giving it an advantage on repeated encodes of unchanged 39 KiB messages.',
-      'Benchmark source lives in <a href="https://github.com/omnibuf/omnibuf-java/blob/main/src/test/java/com/omnibuf/bench/BenchmarkMain.java" target="_blank" rel="noopener noreferrer" class="doc-link font-mono">BenchmarkMain.java</a>, with recorded output in <a href="https://github.com/omnibuf/omnibuf-java/blob/main/testdata/benchmarks.json" target="_blank" rel="noopener noreferrer" class="doc-link font-mono">testdata/benchmarks.json</a>.',
+      'Measured on Eclipse Temurin OpenJDK 21.0.13 after C2 JIT warmup on an Apple M1 Pro Mac. Every decode benchmark reads all 11 fields into a volatile checksum so the JIT cannot optimize unused reads away. Immutable <code>protobuf-java</code> instances cache UTF-8 <code>ByteString</code> slices and <code>memoizedSerializedSize</code> after the first pass, giving it an advantage on repeated encodes of unchanged 39 KiB messages.',
+      'Benchmark source lives in <a href="https://github.com/omnibuf/omnibuf-java/tree/main/src/test/java/com/omnibuf/bench" target="_blank" rel="noopener noreferrer" class="doc-link font-mono">src/test/java/com/omnibuf/bench/</a>, with recorded output in <a href="https://github.com/omnibuf/omnibuf-java/blob/main/testdata/benchmarks.json" target="_blank" rel="noopener noreferrer" class="doc-link font-mono">testdata/benchmarks.json</a>.',
     ],
   },
   cs: {
@@ -1453,8 +1438,6 @@ export const languageBenchmarks: Record<LanguageKey, LanguageBenchmarkSuite> = {
     label: 'C# / .NET',
     shortLabel: 'C#',
     headingPrefix: 'C# & .NET',
-    subtitleHtml:
-      '11-field <code>PeerUpdate</code> workload on .NET 8.0.29 (RyuJIT) across <code>OmniBuf</code>, <code>Google.Protobuf</code>, <code>MessagePack-CSharp</code>, and <code>System.Text.Json</code>. <strong>Shorter bars = Faster.</strong>',
     href: '/benchmarks?lang=cs',
     ctaLabel: 'See full results',
     competitorsLabel: 'Google.Protobuf, MessagePack-CSharp, System.Text.Json',
@@ -1470,7 +1453,7 @@ export const languageBenchmarks: Record<LanguageKey, LanguageBenchmarkSuite> = {
     ],
     environmentParagraphs: [
       'Measured on .NET 8.0.29 (Release build with Dynamic PGO warmup) on an Apple M1 Pro Mac. Every benchmark allocates a fresh <code>byte[]</code> on encode and reads all 11 fields on decode, tracking per-operation heap bytes with <code>GC.GetAllocatedBytesForCurrentThread</code>.',
-      'Benchmark source lives in <a href="https://github.com/omnibuf/omnibuf-cs/blob/main/src/OmniBuf.Benchmarks/Program.cs" target="_blank" rel="noopener noreferrer" class="doc-link font-mono">src/OmniBuf.Benchmarks/Program.cs</a>, with recorded output in <a href="https://github.com/omnibuf/omnibuf-cs/blob/main/testdata/benchmarks.json" target="_blank" rel="noopener noreferrer" class="doc-link font-mono">testdata/benchmarks.json</a>.',
+      'Benchmark source lives in <a href="https://github.com/omnibuf/omnibuf-cs/tree/main/src/OmniBuf.Benchmarks" target="_blank" rel="noopener noreferrer" class="doc-link font-mono">src/OmniBuf.Benchmarks/</a>, with recorded output in <a href="https://github.com/omnibuf/omnibuf-cs/blob/main/testdata/benchmarks.json" target="_blank" rel="noopener noreferrer" class="doc-link font-mono">testdata/benchmarks.json</a>.',
     ],
   },
   swift: {
@@ -1478,8 +1461,6 @@ export const languageBenchmarks: Record<LanguageKey, LanguageBenchmarkSuite> = {
     label: 'Swift',
     shortLabel: 'Swift',
     headingPrefix: 'Swift',
-    subtitleHtml:
-      '11-field <code>PeerUpdate</code> workload on Swift 6.3.2 (Apple M1 Pro) across <code>OmniBuf</code>, <code>SwiftProtobuf</code>, and Foundation <code>JSONEncoder</code> / <code>JSONDecoder</code>. <strong>Shorter bars = Faster.</strong>',
     href: '/benchmarks?lang=swift',
     ctaLabel: 'See full results',
     competitorsLabel: 'SwiftProtobuf, Foundation JSON',
@@ -1494,8 +1475,8 @@ export const languageBenchmarks: Record<LanguageKey, LanguageBenchmarkSuite> = {
       'Command: just bench',
     ],
     environmentParagraphs: [
-      'Compiled with Swift 6.3.2 in release mode on an Apple M1 Pro Mac. Every decode benchmark reads all 11 fields of <code>PeerUpdate</code> into an accumulator sink so lazy wrappers and eager decoders perform the same work.',
-      'Benchmark source lives in <a href="https://github.com/omnibuf/omnibuf-swift/tree/main/Sources/OmniBufBench" target="_blank" rel="noopener noreferrer" class="doc-link font-mono">Sources/OmniBufBench</a>, with recorded output in <a href="https://github.com/omnibuf/omnibuf-swift/blob/main/testdata/benchmarks.json" target="_blank" rel="noopener noreferrer" class="doc-link font-mono">testdata/benchmarks.json</a>.',
+      'Compiled with Swift 6.3.2 in release mode on an Apple M1 Pro Mac. Every decode benchmark reads all 11 fields of <code>PeerUpdate</code> into a checksum so lazy and eager decoders do the same work.',
+      'Benchmark source lives in <a href="https://github.com/omnibuf/omnibuf-swift/tree/main/Sources/OmniBufBench" target="_blank" rel="noopener noreferrer" class="doc-link font-mono">Sources/OmniBufBench/</a>, with recorded output in <a href="https://github.com/omnibuf/omnibuf-swift/blob/main/testdata/benchmarks.json" target="_blank" rel="noopener noreferrer" class="doc-link font-mono">testdata/benchmarks.json</a>.',
     ],
   },
   dart: {
@@ -1503,8 +1484,6 @@ export const languageBenchmarks: Record<LanguageKey, LanguageBenchmarkSuite> = {
     label: 'Dart',
     shortLabel: 'Dart',
     headingPrefix: 'Dart',
-    subtitleHtml:
-      '11-field <code>PeerUpdate</code> workload on Dart 3.14.1 AOT (Apple M1 Pro) across <code>omnibuf</code>, <code>package:protobuf</code>, and <code>dart:convert</code> JSON. <strong>Shorter bars = Faster.</strong>',
     href: '/benchmarks?lang=dart',
     ctaLabel: 'See full results',
     competitorsLabel: 'package:protobuf, dart:convert (JSON)',
@@ -1519,8 +1498,8 @@ export const languageBenchmarks: Record<LanguageKey, LanguageBenchmarkSuite> = {
       'Command: just bench',
     ],
     environmentParagraphs: [
-      'Compiled as a native Dart 3.14.1 AOT executable on an Apple M1 Pro Mac. Every decode benchmark touches all 11 fields of <code>PeerUpdate</code> into a checksum sink.',
-      'Benchmark source lives in <a href="https://github.com/omnibuf/omnibuf-dart/blob/main/benchmark/peer_update_bench.dart" target="_blank" rel="noopener noreferrer" class="doc-link font-mono">benchmark/peer_update_bench.dart</a>, with recorded output in <a href="https://github.com/omnibuf/omnibuf-dart/blob/main/testdata/benchmarks.json" target="_blank" rel="noopener noreferrer" class="doc-link font-mono">testdata/benchmarks.json</a>.',
+      'Compiled as a native Dart 3.14.1 AOT executable on an Apple M1 Pro Mac. Every decode benchmark reads all 11 fields of <code>PeerUpdate</code> into a checksum so nothing gets optimized away.',
+      'Benchmark source lives in <a href="https://github.com/omnibuf/omnibuf-dart/tree/main/benchmark" target="_blank" rel="noopener noreferrer" class="doc-link font-mono">benchmark/</a>, with recorded output in <a href="https://github.com/omnibuf/omnibuf-dart/blob/main/testdata/benchmarks.json" target="_blank" rel="noopener noreferrer" class="doc-link font-mono">testdata/benchmarks.json</a>.',
     ],
   },
   php: {
@@ -1528,8 +1507,6 @@ export const languageBenchmarks: Record<LanguageKey, LanguageBenchmarkSuite> = {
     label: 'PHP',
     shortLabel: 'PHP',
     headingPrefix: 'PHP',
-    subtitleHtml:
-      '11-field <code>PeerUpdate</code> workload on PHP 8.6 (Apple M1 Pro) across the optional pure-Rust <code>ext-omnibuf</code> extension (<code>ext-php-rs</code>), pure-PHP <code>omnibuf/omnibuf</code>, pure-PHP <code>google/protobuf</code>, and C-backed <code>json_encode</code> / <code>json_decode</code>. <strong>Shorter bars = Faster.</strong>',
     href: '/benchmarks?lang=php',
     ctaLabel: 'See full results',
     competitorsLabel: 'google/protobuf (pure PHP), JSON (C stdlib)',
@@ -1545,7 +1522,7 @@ export const languageBenchmarks: Record<LanguageKey, LanguageBenchmarkSuite> = {
     ],
     environmentParagraphs: [
       'Measured on PHP 8.6.0 on an Apple M1 Pro Mac through the public PHP APIs (<code>marshalOmnibuf</code>, <code>OmniBuf::marshal</code>, and <code>OpaquePeerUpdate</code>) with the optional 100% Rust <code>ext-omnibuf</code> extension (<code>ext-php-rs</code>) alongside pure-PHP <code>omnibuf/omnibuf</code>, pure-PHP <code>google/protobuf</code>, and C stdlib <code>json_encode</code> / <code>json_decode</code>.',
-      'Benchmark source lives in <a href="https://github.com/omnibuf/omnibuf-php/blob/main/benchmarks/bench.php" target="_blank" rel="noopener noreferrer" class="doc-link font-mono">benchmarks/bench.php</a>, with recorded output in <a href="https://github.com/omnibuf/omnibuf-php/blob/main/testdata/benchmarks.json" target="_blank" rel="noopener noreferrer" class="doc-link font-mono">testdata/benchmarks.json</a>.',
+      'Benchmark source lives in <a href="https://github.com/omnibuf/omnibuf-php/tree/main/benchmarks" target="_blank" rel="noopener noreferrer" class="doc-link font-mono">benchmarks/</a>, with recorded output in <a href="https://github.com/omnibuf/omnibuf-php/blob/main/testdata/benchmarks.json" target="_blank" rel="noopener noreferrer" class="doc-link font-mono">testdata/benchmarks.json</a>.',
     ],
   },
   elixir: {
@@ -1553,8 +1530,6 @@ export const languageBenchmarks: Record<LanguageKey, LanguageBenchmarkSuite> = {
     label: 'Elixir',
     shortLabel: 'Elixir',
     headingPrefix: 'Elixir',
-    subtitleHtml:
-      '11-field <code>PeerUpdate</code> workload on Elixir 1.18.6 / OTP 27 (Apple M1 Pro) across optional Rustler NIF (<code>omnibuf-rs</code>), pure-Elixir <code>omnibuf</code>, <code>elixir-protobuf</code>, and <code>Jason</code> JSON. <strong>Shorter bars = Faster.</strong>',
     href: '/benchmarks?lang=elixir',
     ctaLabel: 'See full results',
     competitorsLabel: 'elixir-protobuf, Jason (JSON)',
@@ -1570,7 +1545,7 @@ export const languageBenchmarks: Record<LanguageKey, LanguageBenchmarkSuite> = {
     ],
     environmentParagraphs: [
       'Measured on Elixir 1.18.6 running on Erlang/OTP 27 on an Apple M1 Pro Mac. Both the optional Rustler NIF backed by <code>omnibuf-rs</code> and the pure-Elixir iodata / binary pattern-matching backend pass all 992 conformance tests.',
-      'Benchmark source lives in <a href="https://github.com/omnibuf/omnibuf-elixir/blob/main/bench/peer_bench.exs" target="_blank" rel="noopener noreferrer" class="doc-link font-mono">bench/peer_bench.exs</a>, with recorded output in <a href="https://github.com/omnibuf/omnibuf-elixir/blob/main/testdata/benchmarks.json" target="_blank" rel="noopener noreferrer" class="doc-link font-mono">testdata/benchmarks.json</a>.',
+      'Benchmark source lives in <a href="https://github.com/omnibuf/omnibuf-elixir/tree/main/bench" target="_blank" rel="noopener noreferrer" class="doc-link font-mono">bench/</a>, with recorded output in <a href="https://github.com/omnibuf/omnibuf-elixir/blob/main/testdata/benchmarks.json" target="_blank" rel="noopener noreferrer" class="doc-link font-mono">testdata/benchmarks.json</a>.',
     ],
   },
   nano: {
@@ -1578,8 +1553,6 @@ export const languageBenchmarks: Record<LanguageKey, LanguageBenchmarkSuite> = {
     label: 'C (Nano)',
     shortLabel: 'C99',
     headingPrefix: 'C99 Nano',
-    subtitleHtml:
-      '11-field <code>PeerUpdate</code> static C99 struct (976 B, zero heap allocation) compiled with <code>-O3 -std=c99</code> against <code>nanopb 0.4.9.1</code>. <strong>Shorter bars = Faster.</strong>',
     href: '/benchmarks?lang=nano',
     ctaLabel: 'See full results',
     competitorsLabel: 'nanopb 0.4.9.1 (C99)',
@@ -1595,7 +1568,7 @@ export const languageBenchmarks: Record<LanguageKey, LanguageBenchmarkSuite> = {
     ],
     environmentParagraphs: [
       'Compiled with Apple Clang at <code>-O3 -DNDEBUG -std=c99</code> on an Apple M1 Pro Mac. Both <code>omnibuf-nano</code> and <code>nanopb 0.4.9.1</code> use identical static <code>PeerUpdate</code> struct bounds (976 bytes) generated from the same <code>.proto</code> and <code>.options</code> files.',
-      'At <code>-Os</code>, the <code>omnibuf-nano</code> C99 runtime compiles to 9,700 bytes of <code>__TEXT</code> (0 bytes <code>.data</code>/<code>.bss</code>), compared to 11,165 bytes for <code>nanopb</code>. Benchmark source lives in <a href="https://github.com/omnibuf/omnibuf-nano/blob/main/benchmarks/peer_bench.c" target="_blank" rel="noopener noreferrer" class="doc-link font-mono">benchmarks/peer_bench.c</a>, with recorded output in <a href="https://github.com/omnibuf/omnibuf-nano/blob/main/testdata/benchmarks.json" target="_blank" rel="noopener noreferrer" class="doc-link font-mono">testdata/benchmarks.json</a>.',
+      'At <code>-Os</code>, the <code>omnibuf-nano</code> C99 runtime compiles to 9,700 bytes of <code>__TEXT</code> (0 bytes <code>.data</code>/<code>.bss</code>), compared to 11,165 bytes for <code>nanopb</code>. Benchmark source lives in <a href="https://github.com/omnibuf/omnibuf-nano/tree/main/benchmarks" target="_blank" rel="noopener noreferrer" class="doc-link font-mono">benchmarks/</a>, with recorded output in <a href="https://github.com/omnibuf/omnibuf-nano/blob/main/testdata/benchmarks.json" target="_blank" rel="noopener noreferrer" class="doc-link font-mono">testdata/benchmarks.json</a>.',
     ],
   },
 };
@@ -1607,8 +1580,8 @@ export const languageBenchmarkList: LanguageBenchmarkSuite[] = [
   languageBenchmarks.py,
   languageBenchmarks.cpp,
   languageBenchmarks.nano,
-  languageBenchmarks.cs,
   languageBenchmarks.java,
+  languageBenchmarks.cs,
   languageBenchmarks.swift,
   languageBenchmarks.dart,
   languageBenchmarks.php,

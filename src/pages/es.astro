@@ -173,16 +173,14 @@ const esFaqJsonLd = {
 
   <main id="main-content">
     <!-- Page Header + Up-Front Install Bar -->
-    <section class="relative pt-10 pb-8 sm:pt-16 sm:pb-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-      <h1 class="text-[2.6rem] sm:text-7xl lg:text-[5.5rem] font-bold tracking-tight leading-[0.94] text-ink uppercase">
-        OmniBuf
-        <br />
-        <span class="text-[#FF4F18]">for TypeScript &amp; JS.</span>
+    <section class="relative pt-10 pb-8 sm:pt-14 sm:pb-10 px-4 sm:px-6 max-w-6xl mx-auto">
+      <h1 class="text-3xl sm:text-5xl font-bold tracking-tight leading-[1.1] text-ink">
+        OmniBuf <span class="text-[#FF4F18]">for TypeScript &amp; JS</span>
       </h1>
 
       <div class="mt-6 grid lg:grid-cols-12 gap-6 lg:gap-8 items-end">
         <div class="lg:col-span-7 space-y-4">
-          <p class="text-lg sm:text-2xl text-ink/85 font-medium leading-snug">
+          <p class="text-base sm:text-lg text-ink/80 leading-relaxed max-w-[65ch]">
             Zero-dependency runtime for browsers, Node.js, and edge workers.{' '}
             <a href="#define-message" class="doc-link">
               Define schemas in TypeScript
@@ -197,12 +195,12 @@ const esFaqJsonLd = {
             </a>{' '}
             with Buf. Dedicated streaming helpers ship for both Web Streams and Node.
           </p>
-          <div class="flex flex-wrap gap-3 font-mono text-sm sm:text-base pt-1 no-print">
+          <div class="flex flex-wrap gap-2.5 text-sm pt-1 no-print">
             <a
               href="https://github.com/omnibuf/omnibuf-es"
               target="_blank"
               rel="noopener noreferrer"
-              class="os-btn px-4 py-2.5 bg-acid text-ink font-bold rounded-md"
+              class="btn-primary px-4 py-2"
             >
               GitHub Repository &rarr;
             </a>
@@ -210,7 +208,7 @@ const esFaqJsonLd = {
               href="https://www.npmjs.com/package/@omnibuf/core"
               target="_blank"
               rel="noopener noreferrer"
-              class="os-btn px-4 py-2.5 bg-[#FAF8F2] text-ink font-bold rounded-md"
+              class="btn-secondary px-4 py-2"
             >
               npm Package &rarr;
             </a>
@@ -218,14 +216,14 @@ const esFaqJsonLd = {
         </div>
 
         <div class="lg:col-span-5 min-w-0">
-          <div class="p-4 sm:p-5 bg-ink text-paper rounded-md font-mono text-xs sm:text-sm overflow-x-auto leading-relaxed border-2 border-ink space-y-3">
+          <div class="p-4 sm:p-5 bg-ink text-paper rounded-lg font-mono text-xs sm:text-sm overflow-x-auto leading-relaxed border border-ink/15 space-y-3">
             <div>
-              <div class="flex items-center justify-between gap-2 mb-2 pb-2 border-b border-paper/15">
-                <div class="text-xs font-bold uppercase text-acid">Core Runtime (Universal)</div>
+              <div class="flex items-center justify-between gap-2 mb-2 pb-2 border-b border-paper/12">
+                <div class="text-xs font-medium text-paper/70">Core Runtime (Universal)</div>
                 <button
                   type="button"
                   data-copy="pnpm add @omnibuf/core"
-                  class="copy-snippet-btn min-w-[4.75rem] text-center px-2.5 py-1 text-xs font-bold uppercase bg-paper/15 hover:bg-acid hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-acid text-paper border border-paper/30 rounded shrink-0 transition"
+                  class="copy-snippet-btn min-w-[4.25rem] text-center px-2.5 py-1 text-xs font-medium bg-paper/10 hover:bg-paper/20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#FF7A4D] text-paper border border-paper/20 rounded shrink-0 transition cursor-pointer"
                 >
                   Copy
                 </button>
@@ -233,8 +231,8 @@ const esFaqJsonLd = {
               <pre class="leading-relaxed whitespace-pre"><code><span class="text-paper/75 select-none">$ </span>pnpm add @omnibuf/core</code></pre>
             </div>
 
-            <div class="pt-2.5 border-t border-paper/15 space-y-1.5 text-xs">
-              <div class="text-paper/70 uppercase font-bold">Runtime-Specific Packages</div>
+            <div class="pt-2.5 border-t border-paper/12 space-y-1.5 text-xs">
+              <div class="text-paper/60 font-medium">Runtime-Specific Packages</div>
               <div class="flex items-center justify-between gap-2">
                 <code class="text-paper/90">
                   <span class="text-paper/65 select-none">$ </span>pnpm add @omnibuf/web
@@ -242,7 +240,7 @@ const esFaqJsonLd = {
                 <button
                   type="button"
                   data-copy="pnpm add @omnibuf/web"
-                  class="copy-snippet-btn min-w-[4.25rem] text-center px-2 py-0.5 text-[11px] font-bold uppercase bg-paper/15 hover:bg-acid hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-acid text-paper border border-paper/30 rounded shrink-0 transition"
+                  class="copy-snippet-btn min-w-[4rem] text-center px-2 py-0.5 text-xs font-medium bg-paper/10 hover:bg-paper/20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#FF7A4D] text-paper border border-paper/20 rounded shrink-0 transition cursor-pointer"
                 >
                   Copy
                 </button>
@@ -254,7 +252,7 @@ const esFaqJsonLd = {
                 <button
                   type="button"
                   data-copy="pnpm add @omnibuf/node"
-                  class="copy-snippet-btn min-w-[4.25rem] text-center px-2 py-0.5 text-[11px] font-bold uppercase bg-paper/15 hover:bg-acid hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-acid text-paper border border-paper/30 rounded shrink-0 transition"
+                  class="copy-snippet-btn min-w-[4rem] text-center px-2 py-0.5 text-xs font-medium bg-paper/10 hover:bg-paper/20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#FF7A4D] text-paper border border-paper/20 rounded shrink-0 transition cursor-pointer"
                 >
                   Copy
                 </button>
@@ -268,25 +266,23 @@ const esFaqJsonLd = {
     <!-- Three Ways to Use OmniBuf in TypeScript & JS -->
     <section
       id="quickstart"
-      class="scroll-mt-16 py-12 sm:py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto border-t-2 border-ink/15"
+      class="scroll-mt-16 py-12 sm:py-16 px-4 sm:px-6 max-w-6xl mx-auto border-t border-ink/15"
     >
       <div class="max-w-3xl mb-8">
-        <h2 class="text-3xl sm:text-5xl font-bold tracking-tight uppercase leading-none">
+        <h2 class="text-2xl sm:text-3xl font-bold tracking-tight text-ink">
           Three ways to use OmniBuf in TypeScript.
         </h2>
-        <p class="mt-3 text-lg sm:text-xl text-ink/80 font-medium">
-          All three produce identical wire bytes.
-        </p>
+        <p class="mt-2 text-base sm:text-lg text-ink/75">All three produce identical wire bytes.</p>
       </div>
 
-      <div class="border-t-2 border-ink divide-y-2 divide-ink/20">
+      <div class="border-t border-ink/15 divide-y divide-ink/12">
         <!-- 1. Declarative TypeScript Schemas -->
         <div
           id="define-message"
-          class="scroll-mt-16 py-8 sm:py-12 grid lg:grid-cols-12 gap-6 lg:gap-8 items-start"
+          class="scroll-mt-16 py-8 sm:py-10 grid lg:grid-cols-12 gap-6 lg:gap-8 items-start"
         >
           <div class="lg:col-span-5 space-y-3.5 min-w-0">
-            <h3 class="text-2xl sm:text-3xl font-bold uppercase tracking-tight leading-snug">
+            <h3 class="text-lg sm:text-xl font-bold tracking-tight leading-snug text-ink">
               Declarative TypeScript schemas
             </h3>
             <p class="text-base sm:text-lg text-ink/85 leading-relaxed">
@@ -301,13 +297,13 @@ const esFaqJsonLd = {
           </div>
 
           <div class="lg:col-span-7 min-w-0">
-            <div class="p-4 sm:p-5 bg-ink text-paper rounded-md font-mono text-xs sm:text-sm overflow-x-auto leading-relaxed border-2 border-ink [&>pre]:bg-transparent! [&>pre]:p-0! [&>pre]:m-0! [&>pre]:border-0!">
-              <div class="flex items-center justify-between gap-2 mb-2.5 pb-2 border-b border-paper/15">
-                <div class="text-xs font-bold uppercase text-acid">defineMessage Schema</div>
+            <div class="p-4 sm:p-5 bg-ink text-paper rounded-lg font-mono text-xs sm:text-sm overflow-x-auto leading-relaxed border border-ink/15 [&>pre]:bg-transparent! [&>pre]:p-0! [&>pre]:m-0! [&>pre]:border-0!">
+              <div class="flex items-center justify-between gap-2 mb-2.5 pb-2 border-b border-paper/12">
+                <div class="text-xs font-medium text-paper/70">defineMessage Schema</div>
                 <button
                   type="button"
                   data-copy={defineMessageSnippet}
-                  class="copy-snippet-btn min-w-[4.75rem] text-center px-2.5 py-1 text-xs font-bold uppercase bg-paper/15 hover:bg-acid hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-acid text-paper border border-paper/30 rounded shrink-0 transition"
+                  class="copy-snippet-btn min-w-[4.25rem] text-center px-2.5 py-1 text-xs font-medium bg-paper/10 hover:bg-paper/20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#FF7A4D] text-paper border border-paper/20 rounded shrink-0 transition cursor-pointer"
                 >
                   Copy
                 </button>
@@ -322,10 +318,10 @@ const esFaqJsonLd = {
         <!-- 2. Existing @bufbuild/protobuf Descriptors -->
         <div
           id="protobuf-es"
-          class="scroll-mt-16 py-8 sm:py-12 grid lg:grid-cols-12 gap-6 lg:gap-8 items-start"
+          class="scroll-mt-16 py-8 sm:py-10 grid lg:grid-cols-12 gap-6 lg:gap-8 items-start"
         >
           <div class="lg:col-span-5 space-y-3.5 min-w-0">
-            <h3 class="text-2xl sm:text-3xl font-bold uppercase tracking-tight leading-snug">
+            <h3 class="text-lg sm:text-xl font-bold tracking-tight leading-snug text-ink">
               Existing @bufbuild/protobuf schemas
             </h3>
             <p class="text-base sm:text-lg text-ink/85 leading-relaxed">
@@ -337,15 +333,15 @@ const esFaqJsonLd = {
           </div>
 
           <div class="lg:col-span-7 min-w-0">
-            <div class="p-4 sm:p-5 bg-ink text-paper rounded-md font-mono text-xs sm:text-sm overflow-x-auto leading-relaxed border-2 border-ink [&>pre]:bg-transparent! [&>pre]:p-0! [&>pre]:m-0! [&>pre]:border-0!">
-              <div class="flex items-center justify-between gap-2 mb-2.5 pb-2 border-b border-paper/15">
-                <div class="text-xs font-bold uppercase text-acid">
+            <div class="p-4 sm:p-5 bg-ink text-paper rounded-lg font-mono text-xs sm:text-sm overflow-x-auto leading-relaxed border border-ink/15 [&>pre]:bg-transparent! [&>pre]:p-0! [&>pre]:m-0! [&>pre]:border-0!">
+              <div class="flex items-center justify-between gap-2 mb-2.5 pb-2 border-b border-paper/12">
+                <div class="text-xs font-medium text-paper/70">
                   Existing @bufbuild/protobuf Descriptors
                 </div>
                 <button
                   type="button"
                   data-copy={protobufEsSnippet}
-                  class="copy-snippet-btn min-w-[4.75rem] text-center px-2.5 py-1 text-xs font-bold uppercase bg-paper/15 hover:bg-acid hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-acid text-paper border border-paper/30 rounded shrink-0 transition"
+                  class="copy-snippet-btn min-w-[4.25rem] text-center px-2.5 py-1 text-xs font-medium bg-paper/10 hover:bg-paper/20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#FF7A4D] text-paper border border-paper/20 rounded shrink-0 transition cursor-pointer"
                 >
                   Copy
                 </button>
@@ -358,15 +354,15 @@ const esFaqJsonLd = {
         <!-- 3. Generated Code with protoc-gen-omnibuf-es -->
         <div
           id="plugin-codegen"
-          class="scroll-mt-16 py-8 sm:py-12 grid lg:grid-cols-12 gap-6 lg:gap-8 items-start"
+          class="scroll-mt-16 py-8 sm:py-10 grid lg:grid-cols-12 gap-6 lg:gap-8 items-start"
         >
           <div class="lg:col-span-5 space-y-3.5 min-w-0">
-            <h3 class="text-2xl sm:text-3xl font-bold uppercase tracking-tight leading-snug">
+            <h3 class="text-lg sm:text-xl font-bold tracking-tight leading-snug text-ink">
               Generated code with protoc-gen-omnibuf-es
             </h3>
             <p class="text-base sm:text-lg text-ink/85 leading-relaxed">
-              Adding <code>@omnibuf/protoc-gen-omnibuf-es</code> to <code>buf.gen.yaml</code>{' '}
-              generates TypeScript interfaces, single-pass encoders, and <code>Opaque</code> wrapper
+              Add <code>@omnibuf/protoc-gen-omnibuf-es</code> to <code>buf.gen.yaml</code> to
+              generate TypeScript interfaces, single-pass encoders, and <code>Opaque</code> wrapper
               classes. The <code>Opaque</code> class reads individual fields from a{' '}
               <code>Uint8Array</code> by stepping over earlier field headers and splices updated
               values directly into the buffer.
@@ -374,13 +370,13 @@ const esFaqJsonLd = {
           </div>
 
           <div class="lg:col-span-7 space-y-3.5 min-w-0">
-            <div class="p-4 sm:p-5 bg-ink text-paper rounded-md font-mono text-xs sm:text-sm overflow-x-auto leading-relaxed border-2 border-ink [&>pre]:bg-transparent! [&>pre]:p-0! [&>pre]:m-0! [&>pre]:border-0!">
-              <div class="flex items-center justify-between gap-2 mb-2.5 pb-2 border-b border-paper/15">
-                <div class="text-xs font-bold uppercase text-acid">buf.gen.yaml</div>
+            <div class="p-4 sm:p-5 bg-ink text-paper rounded-lg font-mono text-xs sm:text-sm overflow-x-auto leading-relaxed border border-ink/15 [&>pre]:bg-transparent! [&>pre]:p-0! [&>pre]:m-0! [&>pre]:border-0!">
+              <div class="flex items-center justify-between gap-2 mb-2.5 pb-2 border-b border-paper/12">
+                <div class="text-xs font-medium text-paper/70">buf.gen.yaml</div>
                 <button
                   type="button"
                   data-copy={bufGenEsSnippet}
-                  class="copy-snippet-btn min-w-[4.75rem] text-center px-2.5 py-1 text-xs font-bold uppercase bg-paper/15 hover:bg-acid hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-acid text-paper border border-paper/30 rounded shrink-0 transition"
+                  class="copy-snippet-btn min-w-[4.25rem] text-center px-2.5 py-1 text-xs font-medium bg-paper/10 hover:bg-paper/20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#FF7A4D] text-paper border border-paper/20 rounded shrink-0 transition cursor-pointer"
                 >
                   Copy
                 </button>
@@ -388,15 +384,13 @@ const esFaqJsonLd = {
               <Code code={bufGenEsSnippet} lang="yaml" theme="github-dark" />
             </div>
 
-            <div class="p-4 sm:p-5 bg-ink text-paper rounded-md font-mono text-xs sm:text-sm overflow-x-auto leading-relaxed border-2 border-ink">
-              <div class="flex items-center justify-between gap-2 mb-2.5 pb-2 border-b border-paper/15">
-                <div class="text-xs font-bold uppercase text-acid">
-                  Install Plugin &amp; Generate
-                </div>
+            <div class="p-4 sm:p-5 bg-ink text-paper rounded-lg font-mono text-xs sm:text-sm overflow-x-auto leading-relaxed border border-ink/15">
+              <div class="flex items-center justify-between gap-2 mb-2.5 pb-2 border-b border-paper/12">
+                <div class="text-xs font-medium text-paper/70">Install Plugin &amp; Generate</div>
                 <button
                   type="button"
                   data-copy="pnpm add -D @omnibuf/protoc-gen-omnibuf-es && buf generate"
-                  class="copy-snippet-btn min-w-[4.75rem] text-center px-2.5 py-1 text-xs font-bold uppercase bg-paper/15 hover:bg-acid hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-acid text-paper border border-paper/30 rounded shrink-0 transition"
+                  class="copy-snippet-btn min-w-[4.25rem] text-center px-2.5 py-1 text-xs font-medium bg-paper/10 hover:bg-paper/20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#FF7A4D] text-paper border border-paper/20 rounded shrink-0 transition cursor-pointer"
                 >
                   Copy
                 </button>
@@ -405,15 +399,15 @@ const esFaqJsonLd = {
 <span class="text-paper/75 select-none">$ </span><span class="text-acid font-bold">buf generate</span></code></pre>
             </div>
 
-            <div class="p-4 sm:p-5 bg-ink text-paper rounded-md font-mono text-xs sm:text-sm overflow-x-auto leading-relaxed border-2 border-ink [&>pre]:bg-transparent! [&>pre]:p-0! [&>pre]:m-0! [&>pre]:border-0!">
-              <div class="flex items-center justify-between gap-2 mb-2.5 pb-2 border-b border-paper/15">
-                <div class="text-xs font-bold uppercase text-acid">
+            <div class="p-4 sm:p-5 bg-ink text-paper rounded-lg font-mono text-xs sm:text-sm overflow-x-auto leading-relaxed border border-ink/15 [&>pre]:bg-transparent! [&>pre]:p-0! [&>pre]:m-0! [&>pre]:border-0!">
+              <div class="flex items-center justify-between gap-2 mb-2.5 pb-2 border-b border-paper/12">
+                <div class="text-xs font-medium text-paper/70">
                   Generated Schema &amp; Lazy Opaque View
                 </div>
                 <button
                   type="button"
                   data-copy={generatedEsSnippet}
-                  class="copy-snippet-btn min-w-[4.75rem] text-center px-2.5 py-1 text-xs font-bold uppercase bg-paper/15 hover:bg-acid hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-acid text-paper border border-paper/30 rounded shrink-0 transition"
+                  class="copy-snippet-btn min-w-[4.25rem] text-center px-2.5 py-1 text-xs font-medium bg-paper/10 hover:bg-paper/20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#FF7A4D] text-paper border border-paper/20 rounded shrink-0 transition cursor-pointer"
                 >
                   Copy
                 </button>
@@ -437,21 +431,21 @@ const esFaqJsonLd = {
 
     <section
       id="es-faq"
-      class="scroll-mt-16 py-16 sm:py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto border-t-2 border-ink/15"
+      class="scroll-mt-16 py-12 sm:py-16 px-4 sm:px-6 max-w-6xl mx-auto border-t border-ink/15"
     >
       <div class="max-w-3xl mb-10">
-        <h2 class="text-3xl sm:text-5xl font-bold tracking-tight uppercase leading-none">
+        <h2 class="text-2xl sm:text-3xl font-bold tracking-tight text-ink">
           TypeScript &amp; JS questions.
         </h2>
       </div>
 
-      <div class="border-t-2 border-ink divide-y-2 divide-ink/20">
+      <div class="border-t border-ink/15 divide-y divide-ink/12">
         {esFaqItems.map((item) => (
           <div
             id={item.id}
             class="scroll-mt-16 py-8 sm:py-10 grid lg:grid-cols-12 gap-6 lg:gap-8 items-start"
           >
-            <h3 class="lg:col-span-5 text-xl sm:text-2xl font-bold uppercase tracking-tight text-ink leading-snug">
+            <h3 class="lg:col-span-5 text-lg sm:text-xl font-bold tracking-tight text-ink leading-snug">
               {item.question}
             </h3>
 
@@ -460,15 +454,15 @@ const esFaqJsonLd = {
                 <p set:html={paragraph} />
               ))}
               {item.codeBlock && (
-                <div class="bg-ink text-paper p-4 sm:p-5 rounded-md border-2 border-ink font-mono text-xs sm:text-sm leading-relaxed overflow-x-auto [&>pre]:bg-transparent! [&>pre]:p-0! [&>pre]:m-0! [&>pre]:border-0!">
-                  <div class="flex items-center justify-between gap-2 mb-2.5 pb-2 border-b border-paper/15">
-                    <div class="text-xs font-bold uppercase text-acid">
+                <div class="bg-ink text-paper p-4 sm:p-5 rounded-lg border border-ink/15 font-mono text-xs sm:text-sm leading-relaxed overflow-x-auto [&>pre]:bg-transparent! [&>pre]:p-0! [&>pre]:m-0! [&>pre]:border-0!">
+                  <div class="flex items-center justify-between gap-2 mb-2.5 pb-2 border-b border-paper/12">
+                    <div class="text-xs font-medium text-paper/70">
                       {item.codeLabel ?? 'Example'}
                     </div>
                     <button
                       type="button"
                       data-copy={item.codeBlock}
-                      class="copy-snippet-btn min-w-[4.75rem] text-center px-2.5 py-1 text-xs font-bold uppercase bg-paper/15 hover:bg-acid hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-acid text-paper border border-paper/30 rounded shrink-0 transition"
+                      class="copy-snippet-btn min-w-[4.25rem] text-center px-2.5 py-1 text-xs font-medium bg-paper/10 hover:bg-paper/20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#FF7A4D] text-paper border border-paper/20 rounded shrink-0 transition cursor-pointer"
                     >
                       Copy
                     </button>

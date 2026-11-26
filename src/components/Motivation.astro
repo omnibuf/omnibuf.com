@@ -3,141 +3,193 @@ import { Code } from 'astro:components';
 
 const spliceSnippet = `var view pb.OpaquePeerUpdate
 _ = view.Unmarshal(pkt)
-router := view.GetRouterId() // skips #1
-view.SetActive(false)        // marks #3 dirty
+router := view.GetRouterId() // skips earlier fields by byte length
+view.SetActive(false)        // marks field #3 dirty
 pkt = view.MarshalAppend(nil)`;
 
-const pbStructSnippet = `pkt, _ := omnibuf.Marshal(&pb.Node{Id: 1, City: "FRA"})`;
+const pbAndStructSnippet = `// From .proto
+pkt, _ := omnibuf.Marshal(&pb.Node{Id: 1, City: "FRA"})
 
-const plainStructSnippet = `type Node struct {
-  ID   uint32 \`omnibuf:"1"\`
-  City string \`omnibuf:"2"\`
+// From a plain Go struct
+type Node struct {
+    ID   uint32 \`omnibuf:"1"\`
+    City string \`omnibuf:"2"\`
 }
 pkt, _ := omnibuf.Marshal(&Node{ID: 1, City: "FRA"})`;
+
+const cliSnippet = `brew install omnibuf/tap/omnibuf
+
+# Encode JSON to self-describing OmniBuf bytes
+omnibuf < event.json > event.obuf
+
+# Query binary packets with jq syntax
+omnibuf -r '.neighbors[] | select(.established) | .router' event.obuf`;
 ---
 
-<section id="motivation" class="py-12 sm:py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-  <div class="max-w-3xl mb-8">
-    <h2 class="text-3xl sm:text-5xl font-bold tracking-tight uppercase leading-none">
-      Faster, inspectable, and spliceable.
-    </h2>
-  </div>
-
-  <div class="border-t-2 border-ink divide-y-2 divide-ink/20">
-    <!-- 1. INSPECTABLE WITHOUT A SCHEMA -->
-    <div
-      id="inspectable-without-schema"
-      class="scroll-mt-16 py-8 sm:py-10 grid lg:grid-cols-12 gap-6 lg:gap-8 items-center"
-    >
-      <div class="lg:col-span-5 space-y-3">
-        <h3 class="text-2xl sm:text-3xl font-bold uppercase tracking-tight leading-snug">
-          Read packets without a schema.
-        </h3>
+<section id="motivation" class="pb-14 sm:pb-20 px-4 sm:px-6 max-w-4xl mx-auto">
+  <div class="border-t border-ink/15 divide-y divide-ink/12">
+    <!-- 1. DECODE RAW PACKETS WITH NO SCHEMA -->
+    <article id="inspectable-without-schema" class="scroll-mt-16 py-10 sm:py-12 space-y-5">
+      <div class="space-y-3 max-w-[65ch]">
+        <h2 class="text-2xl sm:text-[1.75rem] font-bold tracking-tight text-ink">
+          Decode raw packets with no schema
+        </h2>
         <!-- prettier-ignore -->
-        <p class="text-base sm:text-lg text-ink/90 leading-relaxed max-w-[60ch]">
-          Protobuf packs strings, byte slices, sub-messages, maps, and arrays into one wire type, and mixes booleans, unsigned ints, and signed ints together. Without the <code>.proto</code> file, <a href="https://github.com/protocolbuffers/protoscope" target="_blank" rel="noopener noreferrer" class="doc-link"><code>protoscope</code></a> has to guess what each field holds. OmniBuf tags every field with an explicit 4-bit wire type (16 types in total), so the <a href="/tooling" class="doc-link"><code>omnibuf</code> CLI</a> can print the actual values straight from a raw packet. Turning on optional <strong>Field #0</strong> metadata writes the field names once at the top of the packet.
+        <p class="text-base sm:text-lg text-ink/85 leading-relaxed">
+          One of the more annoying parts of binary formats is staring at a raw payload in a log line or a packet capture and having no idea what's inside until you track down the exact <code>.proto</code> file. Even <a href="https://github.com/protocolbuffers/protoscope" target="_blank" rel="noopener noreferrer" class="doc-link"><code>protoscope</code></a> ends up guessing on half the fields in a Protobuf message, because strings, raw bytes, arrays, and sub-messages all look the same on the wire.
         </p>
-      </div>
-      <div class="lg:col-span-7 min-w-0">
-        <div class="os-window overflow-hidden font-mono text-xs sm:text-sm">
-          <div class="os-titlebar bg-[#E5E0D5]">
-            <span class="font-bold uppercase text-ink text-xs">schema-less packet inspection</span>
-          </div>
-          <div class="bg-ink text-paper p-4 space-y-3">
-            <div class="bg-[#1F1F1F] p-3 rounded border border-paper/15">
-              <div class="flex flex-wrap items-center justify-between gap-2 mb-1.5">
-                <span class="text-xs font-bold text-[#FF4F18]">$ protoscope packet.pb</span>
-                <span class="text-[11px] text-paper/55">Protobuf &middot; guesses types</span>
-              </div>
-              <pre class="leading-relaxed overflow-x-auto"><code><span class="text-[#FF4F18] font-bold">1:</span> 1          <span class="text-paper/55"># bool / uint / sint / enum?</span>
-<span class="text-[#FF4F18] font-bold">2:</span> 3          <span class="text-paper/55"># +3 uint or -2 sint?</span>
-<span class="text-[#FF4F18] font-bold">3:</span> &#123;<span class="text-acid">"FRA"</span>&#125;    <span class="text-paper/55"># string / bytes / sub-msg?</span>
-<span class="text-[#FF4F18] font-bold">4:</span> <span class="text-acid">"\x0a\x14"</span> <span class="text-paper/55"># bytes / string / packed array?</span></code></pre>
-            </div>
-            <div class="bg-[#1F1F1F] p-3 rounded border border-paper/25">
-              <div class="flex flex-wrap items-center justify-between gap-2 mb-1.5">
-                <span class="text-xs font-bold text-acid">$ omnibuf -c packet.obuf</span>
-                <span class="text-[11px] text-paper/65">OmniBuf &middot; actual values</span>
-              </div>
-              <pre class="leading-relaxed overflow-x-auto"><code>&#123;<span class="text-acid font-bold">"field_1"</span>: <span class="text-[#FF4F18] font-bold">true</span>, <span class="text-acid font-bold">"field_2"</span>: -2, <span class="text-acid font-bold">"field_3"</span>: <span class="text-acid">"FRA"</span>, <span class="text-acid font-bold">"field_4"</span>: [10, 20]&#125;</code></pre>
-            </div>
-            <div class="bg-[#1F1F1F] p-3 rounded border border-acid/45">
-              <div class="flex flex-wrap items-center justify-between gap-2 mb-1.5">
-                <span class="text-xs font-bold text-acid">$ omnibuf -c packet-field0.obuf</span>
-                <span class="text-[11px] text-acid/85">
-                  OmniBuf + Field #0 &middot; actual values &amp; names
-                </span>
-              </div>
-              <pre class="leading-relaxed overflow-x-auto"><code>&#123;<span class="text-acid font-bold">"active"</span>: <span class="text-[#FF4F18] font-bold">true</span>, <span class="text-acid font-bold">"delta"</span>: -2, <span class="text-acid font-bold">"city"</span>: <span class="text-acid">"FRA"</span>, <span class="text-acid font-bold">"peers"</span>: [10, 20]&#125;</code></pre>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- 2. READ OR SPLICE WITHOUT DECODING -->
-    <div
-      id="read-or-splice"
-      class="scroll-mt-16 py-8 sm:py-10 grid lg:grid-cols-12 gap-6 lg:gap-8 items-center"
-    >
-      <div class="lg:col-span-5 space-y-3">
-        <h3 class="text-2xl sm:text-3xl font-bold uppercase tracking-tight leading-snug">
-          Read or edit one field in place.
-        </h3>
-        <p class="text-base sm:text-lg text-ink/90 leading-relaxed max-w-[60ch]">
-          Routers and proxies often need to inspect a single header field or flip a flag inside a
-          payload. Every integer and container in OmniBuf starts with its byte length, so a reader
-          can jump straight over earlier fields. Generated <code>Opaque</code> views read one tag or
-          splice a new value directly into the byte slice.
-        </p>
-      </div>
-      <div class="lg:col-span-7 min-w-0">
-        <div class="os-window overflow-hidden font-mono text-xs sm:text-sm">
-          <div class="os-titlebar bg-[#E5E0D5]">
-            <span class="font-bold uppercase text-ink text-xs">splice.go</span>
-          </div>
-          <div class="bg-ink text-paper p-4 [&>pre]:bg-transparent! [&>pre]:p-0! [&>pre]:m-0! [&>pre]:border-0! [&>pre]:leading-relaxed [&>pre]:overflow-x-auto">
-            <Code code={spliceSnippet} lang="go" theme="github-dark" />
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- 3. PROTOBUF + GRPC OR PLAIN STRUCTS -->
-    <div
-      id="proto-or-plain-structs"
-      class="scroll-mt-16 py-8 sm:py-10 grid lg:grid-cols-12 gap-6 lg:gap-8 items-center"
-    >
-      <div class="lg:col-span-5 space-y-3">
-        <h3 class="text-2xl sm:text-3xl font-bold uppercase tracking-tight leading-snug">
-          Use Protobuf types or plain structs.
-        </h3>
         <!-- prettier-ignore -->
-        <p class="text-base sm:text-lg text-ink/90 leading-relaxed max-w-[60ch]">
-          OmniBuf is a message serialization format, not a new RPC protocol. Most <a href="https://grpc.io/" target="_blank" rel="noopener noreferrer" class="doc-link">gRPC</a> and <a href="https://connectrpc.com/" target="_blank" rel="noopener noreferrer" class="doc-link">Connect</a> libraries let you register a custom wire codec in a few lines of code and keep your existing Protobuf message types (or run <code>buf generate</code> for generated fast paths and <code>Opaque</code> views). Or skip Protobuf altogether: add <a href="/go#struct-tags" class="doc-link">Go struct tags</a> (<code>omnibuf:"1"</code>) or call <a href="/es#define-message" class="doc-link">TypeScript <code>defineMessage</code></a>, and both paths produce the exact same wire bytes.
+        <p class="text-base sm:text-lg text-ink/85 leading-relaxed">
+          OmniBuf puts a 4-bit type tag on every field (16 wire types total), so booleans, signed ints, strings, bytes, arrays, and maps stay distinct. Point the <a href="/tooling/cli" class="doc-link"><code>omnibuf</code> CLI</a> at a raw <code>.obuf</code> file and you get real typed JSON back immediately. Turn on <strong>Field #0</strong> for inline field names, and the encoder writes a small name table once at the top of the packet, shared across repeated items in an array.
         </p>
       </div>
-      <div class="lg:col-span-7 min-w-0">
-        <div class="os-window overflow-hidden font-mono text-xs sm:text-sm">
-          <div class="os-titlebar bg-[#E5E0D5]">
-            <span class="font-bold uppercase text-ink text-xs">marshal.go</span>
+
+      <div class="bg-ink text-paper rounded-lg border border-ink/15 p-4 sm:p-5 font-mono text-xs sm:text-sm space-y-4">
+        <div>
+          <div class="flex flex-wrap items-center justify-between gap-2 mb-1.5 text-xs">
+            <span class="font-semibold text-paper/85">$ protoscope packet.pb</span>
+            <span class="text-paper/65">Protobuf &middot; guesses types</span>
           </div>
-          <div class="bg-ink text-paper p-4 space-y-3">
-            <div class="bg-[#1F1F1F] p-3 rounded border border-paper/15 [&>pre]:bg-transparent! [&>pre]:p-0! [&>pre]:m-0! [&>pre]:border-0! [&>pre]:leading-relaxed [&>pre]:overflow-x-auto">
-              <div class="text-[11px] uppercase font-bold text-paper/65 mb-1">Protobuf struct</div>
-              <Code code={pbStructSnippet} lang="go" theme="github-dark" />
-            </div>
-            <div class="bg-[#1F1F1F] p-3 rounded border border-paper/15 [&>pre]:bg-transparent! [&>pre]:p-0! [&>pre]:m-0! [&>pre]:border-0! [&>pre]:leading-relaxed [&>pre]:overflow-x-auto">
-              <div class="text-[11px] uppercase font-bold text-paper/65 mb-1">Struct tags</div>
-              <Code code={plainStructSnippet} lang="go" theme="github-dark" />
-            </div>
-            <div class="flex items-center justify-between px-3 py-2 rounded bg-acid text-ink font-bold text-xs border border-ink">
-              <span class="uppercase">Wire bytes (7B)</span>
-              <span>21 03 55 07 46 52 41</span>
-            </div>
+          <pre class="leading-relaxed overflow-x-auto"><code><span class="text-paper/80">1:</span> 1          <span class="text-paper/65"># bool, uint, sint, or enum?</span>
+<span class="text-paper/80">2:</span> 3          <span class="text-paper/65"># +3 uint or -2 sint?</span>
+<span class="text-paper/80">3:</span> &#123;<span class="text-paper/90">"FRA"</span>&#125;    <span class="text-paper/65"># string, bytes, or sub-message?</span>
+<span class="text-paper/80">4:</span> <span class="text-paper/90">"\x0a\x14"</span> <span class="text-paper/65"># bytes, string, or packed array?</span></code></pre>
+        </div>
+
+        <div class="pt-3.5 border-t border-paper/12">
+          <div class="flex flex-wrap items-center justify-between gap-2 mb-1.5 text-xs">
+            <span class="font-semibold text-[#FF7A4D]">$ omnibuf -c packet.obuf</span>
+            <span class="text-paper/65">OmniBuf &middot; exact values, no schema</span>
           </div>
+          <pre class="leading-relaxed overflow-x-auto"><code>&#123;<span class="text-acid">"field_1"</span>: <span class="text-[#FF7A4D]">true</span>, <span class="text-acid">"field_2"</span>: -2, <span class="text-acid">"field_3"</span>: <span class="text-acid">"FRA"</span>, <span class="text-acid">"field_4"</span>: [10, 20]&#125;</code></pre>
+        </div>
+
+        <div class="pt-3.5 border-t border-paper/12">
+          <div class="flex flex-wrap items-center justify-between gap-2 mb-1.5 text-xs">
+            <span class="font-semibold text-[#FF7A4D]">$ omnibuf -c packet-field0.obuf</span>
+            <span class="text-paper/65">OmniBuf + Field #0 &middot; values and names</span>
+          </div>
+          <pre class="leading-relaxed overflow-x-auto"><code>&#123;<span class="text-acid">"active"</span>: <span class="text-[#FF7A4D]">true</span>, <span class="text-acid">"delta"</span>: -2, <span class="text-acid">"city"</span>: <span class="text-acid">"FRA"</span>, <span class="text-acid">"peers"</span>: [10, 20]&#125;</code></pre>
         </div>
       </div>
-    </div>
+    </article>
+
+    <!-- 2. FASTER TO ENCODE AND DECODE -->
+    <article id="faster-encoding" class="scroll-mt-16 py-10 sm:py-12 space-y-4">
+      <div class="space-y-3 max-w-[65ch]">
+        <h2 class="text-2xl sm:text-[1.75rem] font-bold tracking-tight text-ink">
+          Faster to encode and decode
+        </h2>
+        <p class="text-base sm:text-lg text-ink/85 leading-relaxed">
+          Across most runtimes, OmniBuf runs 2x to 6x faster than Protobuf, and it beats JSON too
+          (even the C-backed encoders in Python and PHP). In Go and Rust, you can reuse a buffer and
+          encode with zero heap allocations.
+        </p>
+        <!-- prettier-ignore -->
+        <p class="text-base sm:text-lg text-ink/85 leading-relaxed">
+          Most of that speed comes from skipping work older formats have to do. Nested messages, arrays, and maps go out in a single pass: the encoder leaves a 2-byte slot for the length, writes the fields right after it, and fills the length in at the end. It never has to walk your whole object tree twice just to calculate sizes first. Variable-width integers keep things simple too. The first byte tells the CPU how wide the number is (1, 2, 4, or 9 bytes), so the decoder grabs the whole thing in one load with no byte-by-byte loop. The bit-level details live over in <a href="/how-it-works" class="doc-link">How It Works</a>.
+        </p>
+      </div>
+    </article>
+
+    <!-- 3. READ OR EDIT ONE FIELD IN PLACE -->
+    <article id="read-or-splice" class="scroll-mt-16 py-10 sm:py-12 space-y-5">
+      <div class="space-y-3 max-w-[65ch]">
+        <h2 class="text-2xl sm:text-[1.75rem] font-bold tracking-tight text-ink">
+          Read or edit one field in place
+        </h2>
+        <p class="text-base sm:text-lg text-ink/85 leading-relaxed">
+          A lot of services sitting in the middle of a request only care about one field... maybe a
+          router ID, a tenant check, or flipping an active flag. Normally you end up decoding and
+          allocating the whole message just to touch that one value and re-encode everything.
+        </p>
+        <p class="text-base sm:text-lg text-ink/85 leading-relaxed">
+          Every field in OmniBuf carries its byte length right in the header, so a reader can jump
+          past fields it doesn't care about. Generated <code>Opaque</code> views let you pull out a
+          single field or splice a new value straight back into the raw byte slice, and any unknown
+          fields from newer writers get copied through as-is.
+        </p>
+      </div>
+
+      <div class="bg-ink text-paper rounded-lg border border-ink/15 p-4 sm:p-5 font-mono text-xs sm:text-sm overflow-x-auto [&>pre]:bg-transparent! [&>pre]:p-0! [&>pre]:m-0! [&>pre]:border-0! [&>pre]:leading-relaxed">
+        <div class="flex items-center justify-between gap-2 pb-2.5 mb-3 border-b border-paper/12 text-xs text-paper/60">
+          <span>splice.go</span>
+          <button
+            type="button"
+            data-copy={spliceSnippet}
+            class="copy-snippet-btn px-2 py-0.5 text-xs font-medium bg-paper/10 hover:bg-paper/20 text-paper border border-paper/20 rounded transition cursor-pointer"
+          >
+            Copy
+          </button>
+        </div>
+        <Code code={spliceSnippet} lang="go" theme="github-dark" />
+      </div>
+    </article>
+
+    <!-- 4. PROTOBUF + GRPC OR PLAIN STRUCTS -->
+    <article id="proto-or-plain-structs" class="scroll-mt-16 py-10 sm:py-12 space-y-5">
+      <div class="space-y-3 max-w-[65ch]">
+        <h2 class="text-2xl sm:text-[1.75rem] font-bold tracking-tight text-ink">
+          Use .proto files or plain structs
+        </h2>
+        <!-- prettier-ignore -->
+        <p class="text-base sm:text-lg text-ink/85 leading-relaxed">
+          You can drop OmniBuf into <a href="https://grpc.io/" target="_blank" rel="noopener noreferrer" class="doc-link">gRPC</a> or <a href="https://connectrpc.com/" target="_blank" rel="noopener noreferrer" class="doc-link">Connect</a> as a custom codec in a few lines of code and keep the <code>.proto</code> files and service stubs you already have.
+        </p>
+        <!-- prettier-ignore -->
+        <p class="text-base sm:text-lg text-ink/85 leading-relaxed">
+          Or skip <code>.proto</code> completely. <a href="/go#struct-tags" class="doc-link">Go struct tags</a> (<code>omnibuf:"1"</code>), <a href="/rs" class="doc-link">Rust derive macros</a>, and <a href="/es#define-message" class="doc-link">TypeScript <code>defineMessage</code></a> schemas all write out the exact same bytes as <code>buf generate</code>. Both Go snippets below produce the exact same 7 bytes.
+        </p>
+      </div>
+
+      <div class="bg-ink text-paper rounded-lg border border-ink/15 p-4 sm:p-5 font-mono text-xs sm:text-sm space-y-3.5 overflow-x-auto [&>pre]:bg-transparent! [&>pre]:p-0! [&>pre]:m-0! [&>pre]:border-0! [&>pre]:leading-relaxed">
+        <div class="flex items-center justify-between gap-2 pb-2.5 border-b border-paper/12 text-xs text-paper/60">
+          <span>marshal.go</span>
+          <button
+            type="button"
+            data-copy={pbAndStructSnippet}
+            class="copy-snippet-btn px-2 py-0.5 text-xs font-medium bg-paper/10 hover:bg-paper/20 text-paper border border-paper/20 rounded transition cursor-pointer"
+          >
+            Copy
+          </button>
+        </div>
+        <Code code={pbAndStructSnippet} lang="go" theme="github-dark" />
+        <div class="pt-3 border-t border-paper/12 flex flex-wrap items-center justify-between gap-2 text-xs">
+          <span class="text-paper/60">Identical wire output (7 bytes)</span>
+          <span class="text-acid font-semibold">21 03 55 07 46 52 41</span>
+        </div>
+      </div>
+    </article>
+
+    <!-- 5. CLI, TOOLING & CONFORMANCE -->
+    <article id="tooling-overview" class="scroll-mt-16 py-10 sm:py-12 space-y-5">
+      <div class="space-y-3 max-w-[65ch]">
+        <h2 class="text-2xl sm:text-[1.75rem] font-bold tracking-tight text-ink">
+          CLI, editors, and conformance
+        </h2>
+        <!-- prettier-ignore -->
+        <p class="text-base sm:text-lg text-ink/85 leading-relaxed">
+          All 12 runtimes run against the same 992-case conformance suite, so a packet written in Go decodes the same way in Rust, TypeScript, Python, or C99 (malformed inputs and decode memory limits are tested there too).
+        </p>
+        <!-- prettier-ignore -->
+        <p class="text-base sm:text-lg text-ink/85 leading-relaxed">
+          The <a href="/tooling/cli" class="doc-link"><code>omnibuf</code> CLI</a> handles JSON conversion and <code>jq</code> filters straight on binary files, which covers most terminal debugging. For editors and live traffic, check <a href="/tooling/editors" class="doc-link">Editor Plugins</a>, <a href="/tooling/devtools" class="doc-link">DevTools</a>, and <a href="/tooling/traffic" class="doc-link">Traffic Inspection</a>.
+        </p>
+      </div>
+
+      <div class="bg-ink text-paper rounded-lg border border-ink/15 p-4 sm:p-5 font-mono text-xs sm:text-sm overflow-x-auto [&>pre]:bg-transparent! [&>pre]:p-0! [&>pre]:m-0! [&>pre]:border-0! [&>pre]:leading-relaxed">
+        <div class="flex items-center justify-between gap-2 pb-2.5 mb-3 border-b border-paper/12 text-xs text-paper/60">
+          <span>terminal</span>
+          <button
+            type="button"
+            data-copy={cliSnippet}
+            class="copy-snippet-btn px-2 py-0.5 text-xs font-medium bg-paper/10 hover:bg-paper/20 text-paper border border-paper/20 rounded transition cursor-pointer"
+          >
+            Copy
+          </button>
+        </div>
+        <Code code={cliSnippet} lang="sh" theme="github-dark" />
+      </div>
+    </article>
   </div>
 </section>

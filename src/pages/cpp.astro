@@ -114,16 +114,14 @@ const cppFaqJsonLd = {
   <Navbar currentPage="cpp" />
 
   <main id="main-content">
-    <section class="relative pt-10 pb-8 sm:pt-16 sm:pb-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-      <h1 class="text-[2.6rem] sm:text-7xl lg:text-[5.5rem] font-bold tracking-tight leading-[0.94] text-ink uppercase">
-        OmniBuf
-        <br />
-        <span class="text-[#FF4F18]">for C++.</span>
+    <section class="relative pt-10 pb-8 sm:pt-14 sm:pb-10 px-4 sm:px-6 max-w-6xl mx-auto">
+      <h1 class="text-3xl sm:text-5xl font-bold tracking-tight leading-[1.1] text-ink">
+        OmniBuf <span class="text-[#FF4F18]">for C++</span>
       </h1>
 
       <div class="mt-6 grid lg:grid-cols-12 gap-6 lg:gap-8 items-end">
         <div class="lg:col-span-7 space-y-4">
-          <p class="text-lg sm:text-2xl text-ink/85 font-medium leading-snug">
+          <p class="text-base sm:text-lg text-ink/80 leading-relaxed max-w-[65ch]">
             Single header-only C++20 runtime with zero external library dependencies. Map{' '}
             <a href="#struct-traits" class="doc-link">
               plain C++ structs
@@ -138,12 +136,12 @@ const cppFaqJsonLd = {
             </a>{' '}
             with Buf.
           </p>
-          <div class="flex flex-wrap gap-3 font-mono text-sm sm:text-base pt-1 no-print">
+          <div class="flex flex-wrap gap-2.5 text-sm pt-1 no-print">
             <a
               href="https://github.com/omnibuf/omnibuf-cpp"
               target="_blank"
               rel="noopener noreferrer"
-              class="os-btn px-4 py-2.5 bg-acid text-ink font-bold rounded-md"
+              class="btn-primary px-4 py-2"
             >
               GitHub Repository &rarr;
             </a>
@@ -151,7 +149,7 @@ const cppFaqJsonLd = {
               href="https://github.com/omnibuf/omnibuf-cpp/releases"
               target="_blank"
               rel="noopener noreferrer"
-              class="os-btn px-4 py-2.5 bg-[#FAF8F2] text-ink font-bold rounded-md"
+              class="btn-secondary px-4 py-2"
             >
               Releases &rarr;
             </a>
@@ -159,13 +157,13 @@ const cppFaqJsonLd = {
         </div>
 
         <div class="lg:col-span-5 min-w-0">
-          <div class="p-4 sm:p-5 bg-ink text-paper rounded-md font-mono text-xs sm:text-sm overflow-x-auto leading-relaxed border-2 border-ink">
-            <div class="flex items-center justify-between gap-2 mb-2 pb-2 border-b border-paper/15">
-              <div class="text-xs font-bold uppercase text-acid">Header-Only Runtime</div>
+          <div class="p-4 sm:p-5 bg-ink text-paper rounded-lg font-mono text-xs sm:text-sm overflow-x-auto leading-relaxed border border-ink/15">
+            <div class="flex items-center justify-between gap-2 mb-2 pb-2 border-b border-paper/12">
+              <div class="text-xs font-medium text-paper/70">Header-Only Runtime</div>
               <button
                 type="button"
                 data-copy='#include "omnibuf/omnibuf.hpp"'
-                class="copy-snippet-btn min-w-[4.75rem] text-center px-2.5 py-1 text-xs font-bold uppercase bg-paper/15 hover:bg-acid hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-acid text-paper border border-paper/30 rounded shrink-0 transition"
+                class="copy-snippet-btn min-w-[4.25rem] text-center px-2.5 py-1 text-xs font-medium bg-paper/10 hover:bg-paper/20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#FF7A4D] text-paper border border-paper/20 rounded shrink-0 transition cursor-pointer"
               >
                 Copy
               </button>
@@ -178,24 +176,24 @@ const cppFaqJsonLd = {
 
     <section
       id="quickstart"
-      class="scroll-mt-16 py-12 sm:py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto border-t-2 border-ink/15"
+      class="scroll-mt-16 py-12 sm:py-16 px-4 sm:px-6 max-w-6xl mx-auto border-t border-ink/15"
     >
       <div class="max-w-3xl mb-8">
-        <h2 class="text-3xl sm:text-5xl font-bold tracking-tight uppercase leading-none">
+        <h2 class="text-2xl sm:text-3xl font-bold tracking-tight text-ink">
           Three ways to use OmniBuf in C++20.
         </h2>
-        <p class="mt-3 text-lg sm:text-xl text-ink/80 font-medium">
+        <p class="mt-2 text-base sm:text-lg text-ink/75">
           All three produce identical wire bytes with zero external library dependencies.
         </p>
       </div>
 
-      <div class="border-t-2 border-ink divide-y-2 divide-ink/20">
+      <div class="border-t border-ink/15 divide-y divide-ink/12">
         <div
           id="struct-traits"
-          class="scroll-mt-16 py-8 sm:py-12 grid lg:grid-cols-12 gap-6 lg:gap-8 items-start"
+          class="scroll-mt-16 py-8 sm:py-10 grid lg:grid-cols-12 gap-6 lg:gap-8 items-start"
         >
           <div class="lg:col-span-5 space-y-3.5 min-w-0">
-            <h3 class="text-2xl sm:text-3xl font-bold uppercase tracking-tight leading-snug">
+            <h3 class="text-lg sm:text-xl font-bold tracking-tight leading-snug text-ink">
               Compile-time StructTraits on plain C++ structs
             </h3>
             <p class="text-base sm:text-lg text-ink/85 leading-relaxed">
@@ -207,13 +205,13 @@ const cppFaqJsonLd = {
           </div>
 
           <div class="lg:col-span-7 min-w-0">
-            <div class="p-4 sm:p-5 bg-ink text-paper rounded-md font-mono text-xs sm:text-sm overflow-x-auto leading-relaxed border-2 border-ink [&>pre]:bg-transparent! [&>pre]:p-0! [&>pre]:m-0! [&>pre]:border-0!">
-              <div class="flex items-center justify-between gap-2 mb-2.5 pb-2 border-b border-paper/15">
-                <div class="text-xs font-bold uppercase text-acid">StructTraits&lt;T&gt;</div>
+            <div class="p-4 sm:p-5 bg-ink text-paper rounded-lg font-mono text-xs sm:text-sm overflow-x-auto leading-relaxed border border-ink/15 [&>pre]:bg-transparent! [&>pre]:p-0! [&>pre]:m-0! [&>pre]:border-0!">
+              <div class="flex items-center justify-between gap-2 mb-2.5 pb-2 border-b border-paper/12">
+                <div class="text-xs font-medium text-paper/70">StructTraits&lt;T&gt;</div>
                 <button
                   type="button"
                   data-copy={structTraitsSnippet}
-                  class="copy-snippet-btn min-w-[4.75rem] text-center px-2.5 py-1 text-xs font-bold uppercase bg-paper/15 hover:bg-acid hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-acid text-paper border border-paper/30 rounded shrink-0 transition"
+                  class="copy-snippet-btn min-w-[4.25rem] text-center px-2.5 py-1 text-xs font-medium bg-paper/10 hover:bg-paper/20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#FF7A4D] text-paper border border-paper/20 rounded shrink-0 transition cursor-pointer"
                 >
                   Copy
                 </button>
@@ -227,10 +225,10 @@ const cppFaqJsonLd = {
 
         <div
           id="descriptor-pool"
-          class="scroll-mt-16 py-8 sm:py-12 grid lg:grid-cols-12 gap-6 lg:gap-8 items-start"
+          class="scroll-mt-16 py-8 sm:py-10 grid lg:grid-cols-12 gap-6 lg:gap-8 items-start"
         >
           <div class="lg:col-span-5 space-y-3.5 min-w-0">
-            <h3 class="text-2xl sm:text-3xl font-bold uppercase tracking-tight leading-snug">
+            <h3 class="text-lg sm:text-xl font-bold tracking-tight leading-snug text-ink">
               Buf descriptor sets and Protobuf wire transcoding
             </h3>
             <p class="text-base sm:text-lg text-ink/85 leading-relaxed">
@@ -242,15 +240,15 @@ const cppFaqJsonLd = {
           </div>
 
           <div class="lg:col-span-7 min-w-0">
-            <div class="p-4 sm:p-5 bg-ink text-paper rounded-md font-mono text-xs sm:text-sm overflow-x-auto leading-relaxed border-2 border-ink [&>pre]:bg-transparent! [&>pre]:p-0! [&>pre]:m-0! [&>pre]:border-0!">
-              <div class="flex items-center justify-between gap-2 mb-2.5 pb-2 border-b border-paper/15">
-                <div class="text-xs font-bold uppercase text-acid">
+            <div class="p-4 sm:p-5 bg-ink text-paper rounded-lg font-mono text-xs sm:text-sm overflow-x-auto leading-relaxed border border-ink/15 [&>pre]:bg-transparent! [&>pre]:p-0! [&>pre]:m-0! [&>pre]:border-0!">
+              <div class="flex items-center justify-between gap-2 mb-2.5 pb-2 border-b border-paper/12">
+                <div class="text-xs font-medium text-paper/70">
                   DescriptorPool &amp; DynamicMessage
                 </div>
                 <button
                   type="button"
                   data-copy={descriptorCppSnippet}
-                  class="copy-snippet-btn min-w-[4.75rem] text-center px-2.5 py-1 text-xs font-bold uppercase bg-paper/15 hover:bg-acid hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-acid text-paper border border-paper/30 rounded shrink-0 transition"
+                  class="copy-snippet-btn min-w-[4.25rem] text-center px-2.5 py-1 text-xs font-medium bg-paper/10 hover:bg-paper/20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#FF7A4D] text-paper border border-paper/20 rounded shrink-0 transition cursor-pointer"
                 >
                   Copy
                 </button>
@@ -262,14 +260,14 @@ const cppFaqJsonLd = {
 
         <div
           id="plugin-codegen"
-          class="scroll-mt-16 py-8 sm:py-12 grid lg:grid-cols-12 gap-6 lg:gap-8 items-start"
+          class="scroll-mt-16 py-8 sm:py-10 grid lg:grid-cols-12 gap-6 lg:gap-8 items-start"
         >
           <div class="lg:col-span-5 space-y-3.5 min-w-0">
-            <h3 class="text-2xl sm:text-3xl font-bold uppercase tracking-tight leading-snug">
+            <h3 class="text-lg sm:text-xl font-bold tracking-tight leading-snug text-ink">
               Generated headers with protoc-gen-omnibuf-cpp
             </h3>
             <p class="text-base sm:text-lg text-ink/85 leading-relaxed">
-              Running <code>buf generate</code> with <code>protoc-gen-omnibuf-cpp</code> outputs
+              <code>buf generate</code> with <code>protoc-gen-omnibuf-cpp</code> outputs{' '}
               <code>.omnibuf.pb.hpp</code> headers containing value structs, register-cursor
               encoders, and <code>Opaque</code> views. Nested string reads return{' '}
               <code>std::string_view</code> directly into{' '}
@@ -278,13 +276,13 @@ const cppFaqJsonLd = {
           </div>
 
           <div class="lg:col-span-7 space-y-3.5 min-w-0">
-            <div class="p-4 sm:p-5 bg-ink text-paper rounded-md font-mono text-xs sm:text-sm overflow-x-auto leading-relaxed border-2 border-ink [&>pre]:bg-transparent! [&>pre]:p-0! [&>pre]:m-0! [&>pre]:border-0!">
-              <div class="flex items-center justify-between gap-2 mb-2.5 pb-2 border-b border-paper/15">
-                <div class="text-xs font-bold uppercase text-acid">buf.gen.yaml</div>
+            <div class="p-4 sm:p-5 bg-ink text-paper rounded-lg font-mono text-xs sm:text-sm overflow-x-auto leading-relaxed border border-ink/15 [&>pre]:bg-transparent! [&>pre]:p-0! [&>pre]:m-0! [&>pre]:border-0!">
+              <div class="flex items-center justify-between gap-2 mb-2.5 pb-2 border-b border-paper/12">
+                <div class="text-xs font-medium text-paper/70">buf.gen.yaml</div>
                 <button
                   type="button"
                   data-copy={bufGenCppSnippet}
-                  class="copy-snippet-btn min-w-[4.75rem] text-center px-2.5 py-1 text-xs font-bold uppercase bg-paper/15 hover:bg-acid hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-acid text-paper border border-paper/30 rounded shrink-0 transition"
+                  class="copy-snippet-btn min-w-[4.25rem] text-center px-2.5 py-1 text-xs font-medium bg-paper/10 hover:bg-paper/20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#FF7A4D] text-paper border border-paper/20 rounded shrink-0 transition cursor-pointer"
                 >
                   Copy
                 </button>
@@ -292,13 +290,13 @@ const cppFaqJsonLd = {
               <Code code={bufGenCppSnippet} lang="yaml" theme="github-dark" />
             </div>
 
-            <div class="p-4 sm:p-5 bg-ink text-paper rounded-md font-mono text-xs sm:text-sm overflow-x-auto leading-relaxed border-2 border-ink">
-              <div class="flex items-center justify-between gap-2 mb-2.5 pb-2 border-b border-paper/15">
-                <div class="text-xs font-bold uppercase text-acid">Build Plugin &amp; Generate</div>
+            <div class="p-4 sm:p-5 bg-ink text-paper rounded-lg font-mono text-xs sm:text-sm overflow-x-auto leading-relaxed border border-ink/15">
+              <div class="flex items-center justify-between gap-2 mb-2.5 pb-2 border-b border-paper/12">
+                <div class="text-xs font-medium text-paper/70">Build Plugin &amp; Generate</div>
                 <button
                   type="button"
                   data-copy="cmake --build build --target protoc-gen-omnibuf-cpp && buf generate"
-                  class="copy-snippet-btn min-w-[4.75rem] text-center px-2.5 py-1 text-xs font-bold uppercase bg-paper/15 hover:bg-acid hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-acid text-paper border border-paper/30 rounded shrink-0 transition"
+                  class="copy-snippet-btn min-w-[4.25rem] text-center px-2.5 py-1 text-xs font-medium bg-paper/10 hover:bg-paper/20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#FF7A4D] text-paper border border-paper/20 rounded shrink-0 transition cursor-pointer"
                 >
                   Copy
                 </button>
@@ -307,15 +305,15 @@ const cppFaqJsonLd = {
 <span class="text-paper/75 select-none">$ </span><span class="text-acid font-bold">buf generate</span></code></pre>
             </div>
 
-            <div class="p-4 sm:p-5 bg-ink text-paper rounded-md font-mono text-xs sm:text-sm overflow-x-auto leading-relaxed border-2 border-ink [&>pre]:bg-transparent! [&>pre]:p-0! [&>pre]:m-0! [&>pre]:border-0!">
-              <div class="flex items-center justify-between gap-2 mb-2.5 pb-2 border-b border-paper/15">
-                <div class="text-xs font-bold uppercase text-acid">
+            <div class="p-4 sm:p-5 bg-ink text-paper rounded-lg font-mono text-xs sm:text-sm overflow-x-auto leading-relaxed border border-ink/15 [&>pre]:bg-transparent! [&>pre]:p-0! [&>pre]:m-0! [&>pre]:border-0!">
+              <div class="flex items-center justify-between gap-2 mb-2.5 pb-2 border-b border-paper/12">
+                <div class="text-xs font-medium text-paper/70">
                   Generated Header &amp; Opaque View
                 </div>
                 <button
                   type="button"
                   data-copy={generatedCppSnippet}
-                  class="copy-snippet-btn min-w-[4.75rem] text-center px-2.5 py-1 text-xs font-bold uppercase bg-paper/15 hover:bg-acid hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-acid text-paper border border-paper/30 rounded shrink-0 transition"
+                  class="copy-snippet-btn min-w-[4.25rem] text-center px-2.5 py-1 text-xs font-medium bg-paper/10 hover:bg-paper/20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#FF7A4D] text-paper border border-paper/20 rounded shrink-0 transition cursor-pointer"
                 >
                   Copy
                 </button>
@@ -338,21 +336,19 @@ const cppFaqJsonLd = {
 
     <section
       id="cpp-faq"
-      class="scroll-mt-16 py-16 sm:py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto border-t-2 border-ink/15"
+      class="scroll-mt-16 py-12 sm:py-16 px-4 sm:px-6 max-w-6xl mx-auto border-t border-ink/15"
     >
       <div class="max-w-3xl mb-10">
-        <h2 class="text-3xl sm:text-5xl font-bold tracking-tight uppercase leading-none">
-          C++20 questions.
-        </h2>
+        <h2 class="text-2xl sm:text-3xl font-bold tracking-tight text-ink">C++20 questions.</h2>
       </div>
 
-      <div class="border-t-2 border-ink divide-y-2 divide-ink/20">
+      <div class="border-t border-ink/15 divide-y divide-ink/12">
         {cppFaqItems.map((item) => (
           <div
             id={item.id}
             class="scroll-mt-16 py-8 sm:py-10 grid lg:grid-cols-12 gap-6 lg:gap-8 items-start"
           >
-            <h3 class="lg:col-span-5 text-xl sm:text-2xl font-bold uppercase tracking-tight text-ink leading-snug">
+            <h3 class="lg:col-span-5 text-lg sm:text-xl font-bold tracking-tight text-ink leading-snug">
               {item.question}
             </h3>
 
@@ -361,15 +357,15 @@ const cppFaqJsonLd = {
                 <p set:html={paragraph} />
               ))}
               {item.codeBlock && (
-                <div class="bg-ink text-paper p-4 sm:p-5 rounded-md border-2 border-ink font-mono text-xs sm:text-sm leading-relaxed overflow-x-auto [&>pre]:bg-transparent! [&>pre]:p-0! [&>pre]:m-0! [&>pre]:border-0!">
-                  <div class="flex items-center justify-between gap-2 mb-2.5 pb-2 border-b border-paper/15">
-                    <div class="text-xs font-bold uppercase text-acid">
+                <div class="bg-ink text-paper p-4 sm:p-5 rounded-lg border border-ink/15 font-mono text-xs sm:text-sm leading-relaxed overflow-x-auto [&>pre]:bg-transparent! [&>pre]:p-0! [&>pre]:m-0! [&>pre]:border-0!">
+                  <div class="flex items-center justify-between gap-2 mb-2.5 pb-2 border-b border-paper/12">
+                    <div class="text-xs font-medium text-paper/70">
                       {item.codeLabel ?? 'Example'}
                     </div>
                     <button
                       type="button"
                       data-copy={item.codeBlock}
-                      class="copy-snippet-btn min-w-[4.75rem] text-center px-2.5 py-1 text-xs font-bold uppercase bg-paper/15 hover:bg-acid hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-acid text-paper border border-paper/30 rounded shrink-0 transition"
+                      class="copy-snippet-btn min-w-[4.25rem] text-center px-2.5 py-1 text-xs font-medium bg-paper/10 hover:bg-paper/20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#FF7A4D] text-paper border border-paper/20 rounded shrink-0 transition cursor-pointer"
                     >
                       Copy
                     </button>

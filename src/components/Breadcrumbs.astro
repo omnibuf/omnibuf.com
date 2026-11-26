@@ -1,0 +1,127 @@
+---
+import {
+  benchmarksNavPage,
+  cliNavPage,
+  languages,
+  languagesNavPage,
+  specNavPage,
+  toolingPages,
+  type PageKey,
+} from '../data/languages';
+
+interface Props {
+  currentPage: PageKey;
+}
+
+interface Crumb {
+  name: string;
+  href: string;
+}
+
+const { currentPage } = Astro.props;
+
+function getBreadcrumbTrail(page: PageKey): Crumb[] {
+  if (page === 'home' || page === 'none') {
+    return [];
+  }
+
+  const home: Crumb = { name: 'Home', href: '/' };
+
+  if (page === 'how-it-works') {
+    return [home, { name: 'How It Works', href: '/how-it-works' }];
+  }
+  if (page === benchmarksNavPage.key) {
+    return [home, { name: benchmarksNavPage.label, href: benchmarksNavPage.href }];
+  }
+  if (page === specNavPage.key) {
+    return [home, { name: 'Wire Specification', href: specNavPage.href }];
+  }
+  if (page === languagesNavPage.key) {
+    return [home, { name: languagesNavPage.label, href: languagesNavPage.href }];
+  }
+
+  const lang = languages.find((l) => l.key === page);
+  if (lang) {
+    return [
+      home,
+      { name: languagesNavPage.label, href: languagesNavPage.href },
+      { name: lang.label, href: lang.href },
+    ];
+  }
+
+  if (page === cliNavPage.key) {
+    return [home, { name: cliNavPage.label, href: cliNavPage.href }];
+  }
+
+  const tool = toolingPages.find((t) => t.key === page);
+  if (tool) {
+    return [
+      home,
+      { name: cliNavPage.label, href: cliNavPage.href },
+      { name: tool.label, href: tool.href },
+    ];
+  }
+
+  return [];
+}
+
+const trail = getBreadcrumbTrail(currentPage);
+const isNarrow =
+  currentPage === 'tooling' ||
+  currentPage === 'tooling-cli' ||
+  currentPage === 'tooling-editors' ||
+  currentPage === 'tooling-devtools' ||
+  currentPage === 'tooling-traffic';
+
+const siteOrigin = 'https://omnibuf.com';
+const breadcrumbJsonLd =
+  trail.length > 0
+    ? {
+        '@context': 'https://schema.org',
+        '@type': 'BreadcrumbList',
+        itemListElement: trail.map((crumb, idx) => ({
+          '@type': 'ListItem',
+          position: idx + 1,
+          name: crumb.name,
+          item: crumb.href === '/' ? `${siteOrigin}/` : `${siteOrigin}${crumb.href}`,
+        })),
+      }
+    : null;
+---
+
+{trail.length > 0 && (
+  <nav
+    aria-label="Breadcrumb"
+    class:list={['mx-auto px-4 sm:px-6 pt-5 no-print', isNarrow ? 'max-w-4xl' : 'max-w-6xl']}
+  >
+    <ol class="flex flex-wrap items-center gap-1.5 text-xs font-mono text-ink/65">
+      {trail.map((crumb, idx) => {
+        const isLast = idx === trail.length - 1;
+        return (
+          <li class="inline-flex items-center gap-1.5 min-w-0">
+            {idx > 0 && (
+              <span class="text-ink/50 select-none" aria-hidden="true">
+                /
+              </span>
+            )}
+            {isLast ? (
+              <span aria-current="page" class="text-ink font-medium truncate">
+                {crumb.name}
+              </span>
+            ) : (
+              <a
+                href={crumb.href}
+                class="hover:text-accent hover:underline underline-offset-4 transition-colors"
+              >
+                {crumb.name}
+              </a>
+            )}
+          </li>
+        );
+      })}
+    </ol>
+    {breadcrumbJsonLd && (
+      <script is:inline type="application/ld+json" set:html={JSON.stringify(breadcrumbJsonLd)} />
+    )}
+  </nav>
+)}

@@ -2,6 +2,7 @@
 import Layout from '../layouts/Layout.astro';
 import Navbar from '../components/Navbar.astro';
 import Footer from '../components/Footer.astro';
+import { languages, toolingPages } from '../data/languages';
 ---
 
 <Layout
@@ -10,78 +11,78 @@ import Footer from '../components/Footer.astro';
   noindex={true}
 >
   <Navbar currentPage="none" />
-  <main id="main-content" class="py-20 sm:py-28 px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto">
-    <div class="os-window overflow-hidden">
-      <div class="os-titlebar bg-[#E5E0D5]">
-        <span class="font-mono text-sm sm:text-base font-bold uppercase">
-          Error 404: Field Offset Out of Bounds
-        </span>
-      </div>
-      <div class="p-6 sm:p-10 bg-[#FAF8F2] space-y-6">
-        <h1 class="text-4xl sm:text-6xl font-bold tracking-tight uppercase leading-none text-ink">
-          Page not <span class="text-[#FF4F18]">found.</span>
+  <main id="main-content" class="py-16 sm:py-24 px-4 sm:px-6 max-w-4xl mx-auto">
+    <div class="os-window p-6 sm:p-10 space-y-8">
+      <div class="space-y-3">
+        <h1 class="text-3xl sm:text-4xl font-bold tracking-tight text-ink">
+          Page not <span class="text-accent">found</span>
         </h1>
-        <p class="text-lg sm:text-xl text-ink/85 leading-relaxed max-w-[60ch]">
+        <p class="text-base sm:text-lg text-ink/80 leading-relaxed max-w-[60ch]">
           The route you requested does not exist in the OmniBuf documentation or wire specification.
         </p>
-        <div class="flex flex-wrap gap-3.5 pt-2 font-mono text-sm sm:text-base">
-          <a href="/" class="os-btn px-5 py-3 bg-acid text-ink font-bold rounded-md">
+        <div class="flex flex-wrap gap-2.5 pt-2 text-sm">
+          <a href="/" class="btn-primary px-4 py-2">
             Overview &rarr;
           </a>
-          <a
-            href="/how-it-works"
-            class="os-btn px-5 py-3 bg-[#FAF8F2] text-ink font-bold rounded-md"
-          >
-            How It Works &rarr;
+          <button type="button" id="not-found-search" class="btn-secondary px-4 py-2">
+            Search documentation
+          </button>
+        </div>
+      </div>
+
+      <div class="grid sm:grid-cols-2 gap-6 pt-6 border-t border-ink/12">
+        <div class="space-y-2.5">
+          <h2 class="text-xs font-mono font-semibold text-ink/65">Documentation</h2>
+          <div class="flex flex-wrap gap-2 text-sm">
+            <a href="/how-it-works" class="btn-secondary px-3 py-1.5">
+              How It Works
+            </a>
+            <a href="/benchmarks" class="btn-secondary px-3 py-1.5">
+              Benchmarks
+            </a>
+            <a href="/spec" class="btn-secondary px-3 py-1.5">
+              Wire Specification
+            </a>
+          </div>
+        </div>
+
+        <div class="space-y-2.5">
+          <h2 class="text-xs font-mono font-semibold text-ink/65">Tooling</h2>
+          <div class="flex flex-wrap gap-2 text-sm">
+            <a href="/tooling" class="btn-secondary px-3 py-1.5">
+              Tooling
+            </a>
+            {toolingPages.map((tool) => (
+              <a href={tool.href} class="btn-secondary px-3 py-1.5">
+                {tool.label}
+              </a>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <div class="space-y-2.5 pt-6 border-t border-ink/12">
+        <div class="flex items-center justify-between gap-2">
+          <h2 class="text-xs font-mono font-semibold text-ink/65">Languages</h2>
+          <a href="/languages" class="doc-link text-xs font-mono">
+            All {languages.length} runtimes &rarr;
           </a>
-          <a href="/benchmarks" class="os-btn px-5 py-3 bg-[#FAF8F2] text-ink font-bold rounded-md">
-            Benchmarks &rarr;
-          </a>
-          <a href="/spec" class="os-btn px-5 py-3 bg-[#FAF8F2] text-ink font-bold rounded-md">
-            Wire Specification &rarr;
-          </a>
-          <a href="/go" class="os-btn px-5 py-3 bg-[#FAF8F2] text-ink font-bold rounded-md">
-            OmniBuf for Go &rarr;
-          </a>
-          <a href="/es" class="os-btn px-5 py-3 bg-[#FAF8F2] text-ink font-bold rounded-md">
-            TypeScript / JS &rarr;
-          </a>
-          <a href="/rs" class="os-btn px-5 py-3 bg-[#FAF8F2] text-ink font-bold rounded-md">
-            Rust &rarr;
-          </a>
-          <a href="/py" class="os-btn px-5 py-3 bg-[#FAF8F2] text-ink font-bold rounded-md">
-            Python &rarr;
-          </a>
-          <a href="/cpp" class="os-btn px-5 py-3 bg-[#FAF8F2] text-ink font-bold rounded-md">
-            C++ &rarr;
-          </a>
-          <a href="/nano" class="os-btn px-5 py-3 bg-[#FAF8F2] text-ink font-bold rounded-md">
-            C (Nano) &rarr;
-          </a>
-          <a href="/java" class="os-btn px-5 py-3 bg-[#FAF8F2] text-ink font-bold rounded-md">
-            Java &rarr;
-          </a>
-          <a href="/cs" class="os-btn px-5 py-3 bg-[#FAF8F2] text-ink font-bold rounded-md">
-            C# / .NET &rarr;
-          </a>
-          <a href="/swift" class="os-btn px-5 py-3 bg-[#FAF8F2] text-ink font-bold rounded-md">
-            Swift &rarr;
-          </a>
-          <a href="/dart" class="os-btn px-5 py-3 bg-[#FAF8F2] text-ink font-bold rounded-md">
-            Dart &rarr;
-          </a>
-          <a href="/php" class="os-btn px-5 py-3 bg-[#FAF8F2] text-ink font-bold rounded-md">
-            PHP &rarr;
-          </a>
-          <a href="/elixir" class="os-btn px-5 py-3 bg-[#FAF8F2] text-ink font-bold rounded-md">
-            Elixir &rarr;
-          </a>
-          <a href="/tooling" class="os-btn px-5 py-3 bg-[#FAF8F2] text-ink font-bold rounded-md">
-            OmniBuf Tooling &rarr;
-          </a>
+        </div>
+        <div class="flex flex-wrap gap-2 text-sm">
+          {languages.map((lang) => (
+            <a href={lang.href} class="btn-secondary px-3 py-1.5">
+              {lang.label}
+            </a>
+          ))}
         </div>
       </div>
     </div>
   </main>
   <Footer />
 </Layout>
+
+<script>
+  document.getElementById('not-found-search')?.addEventListener('click', () => {
+    document.getElementById('search-trigger')?.click();
+  });
+</script>

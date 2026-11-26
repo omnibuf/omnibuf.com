@@ -1,0 +1,176 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Navbar from '../../components/Navbar.astro';
+import Footer from '../../components/Footer.astro';
+---
+
+<Layout
+  title="Browser DevTools | OmniBuf Network Inspector"
+  description="Chrome and Chromium DevTools panel for inspecting application/omnibuf, Connect, and gRPC-Web payloads directly next to the Network tab."
+>
+  <Navbar currentPage="tooling-devtools" />
+
+  <main id="main-content">
+    <section class="pt-6 pb-8 sm:pt-8 sm:pb-10 px-4 sm:px-6 max-w-4xl mx-auto space-y-3">
+      <h1 class="text-3xl sm:text-5xl font-bold tracking-tight leading-[1.1] text-ink">
+        Browser DevTools
+      </h1>
+      <p class="text-base sm:text-lg text-ink/80 leading-relaxed max-w-[64ch]">
+        Chrome and Chromium DevTools extension that intercepts OmniBuf traffic right inside the
+        browser, with zero proxy setup or TLS certificates.
+      </p>
+    </section>
+
+    <section class="pb-12 sm:pb-16 px-4 sm:px-6 max-w-4xl mx-auto space-y-8">
+      <div
+        id="browser-devtools"
+        class="scroll-mt-16 bg-[#FAF8F2] border border-ink/15 rounded-lg p-5 sm:p-6 space-y-4"
+      >
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <div class="flex items-center gap-3.5">
+            <svg
+              aria-hidden="true"
+              viewBox="0 0 100 100"
+              class="w-8 h-8 shrink-0"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <circle cx="50" cy="50" r="46" fill="#FBBC05" />
+              <path
+                d="M50 4A46 46 0 0 1 89.8 27H50L31 60 11.4 26A46 46 0 0 1 50 4Z"
+                fill="#EA4335"
+              />
+              <path d="M11.4 26L31 60 50 96A46 46 0 0 1 11.4 26Z" fill="#34A853" />
+              <circle cx="50" cy="50" r="22" fill="#FAF8F2" />
+              <circle cx="50" cy="50" r="16" fill="#4285F4" />
+            </svg>
+            <h2 class="text-xl sm:text-2xl font-bold tracking-tight text-ink">
+              <code>omnibuf-devtools</code>
+            </h2>
+          </div>
+          <code class="text-xs font-mono text-ink/65">omnibuf/omnibuf-devtools</code>
+        </div>
+
+        <p class="text-sm sm:text-base text-ink/85 leading-relaxed max-w-[65ch]">
+          Adds an OmniBuf panel next to the Chrome Network tab. Requests and responses carrying
+          OmniBuf content types decode automatically into structured field trees with hex byte
+          ranges, wire types, and inline <code>Field #0</code> field names when present.
+        </p>
+
+        <figure class="space-y-2">
+          <a
+            href="/images/tooling/devtools-hex.webp"
+            target="_blank"
+            rel="noopener noreferrer"
+            title="Open full-size DevTools dark screenshot"
+            class="block rounded-lg overflow-hidden border border-ink/15 hover:border-ink/40 bg-ink transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#FF4F18]"
+          >
+            <img
+              src="/images/tooling/devtools-hex.webp"
+              alt="OmniBuf Browser DevTools panel showing decoded Connect stream PeerUpdate fields alongside the synchronized hex byte inspector highlighting the selected field."
+              width="2880"
+              height="1800"
+              loading="eager"
+              class="w-full h-auto block"
+            />
+          </a>
+          <figcaption class="text-xs text-ink/65">
+            Tree view and synchronized hex byte highlighting on a Connect streaming{' '}
+            <code>PeerUpdate</code> response. Click image to view full size.
+          </figcaption>
+        </figure>
+
+        <figure class="space-y-2 pt-2">
+          <a
+            href="/images/tooling/devtools-light.webp"
+            target="_blank"
+            rel="noopener noreferrer"
+            title="Open full-size DevTools light screenshot"
+            class="block rounded-lg overflow-hidden border border-ink/15 hover:border-ink/40 bg-[#FAF8F2] transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#FF4F18]"
+          >
+            <img
+              src="/images/tooling/devtools-light.webp"
+              alt="OmniBuf Browser DevTools panel in light theme displaying decoded unary and streaming requests."
+              width="2880"
+              height="1800"
+              loading="lazy"
+              class="w-full h-auto block"
+            />
+          </a>
+          <figcaption class="text-xs text-ink/65">
+            Light theme view showing decoded nested messages, arrays, and map entries. Click image
+            to view full size.
+          </figcaption>
+        </figure>
+
+        <div class="flex flex-wrap gap-2.5 text-xs sm:text-sm pt-1 no-print">
+          <a
+            href="https://github.com/omnibuf/omnibuf-devtools"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="btn-primary px-3.5 py-2"
+          >
+            GitHub Repository &rarr;
+          </a>
+          <a href="/es" class="btn-secondary px-3.5 py-2">
+            TypeScript / JS Guide &rarr;
+          </a>
+        </div>
+      </div>
+
+      <!-- Supported content types -->
+      <div id="content-types" class="scroll-mt-16 pt-8 border-t border-ink/15 space-y-4">
+        <h2 class="text-2xl sm:text-[1.75rem] font-bold tracking-tight text-ink">
+          Intercepted content types
+        </h2>
+        <p class="text-base text-ink/85 leading-relaxed max-w-[65ch]">
+          The panel captures unary and framed RPC payloads from both browser <code>fetch</code>{' '}
+          calls and Connect/gRPC-Web clients.
+        </p>
+        <div class="border border-ink/15 rounded-lg overflow-hidden">
+          <div class="overflow-x-auto bg-[#FAF8F2]">
+            <table class="w-full text-left border-collapse font-mono text-xs sm:text-sm">
+              <thead>
+                <tr class="border-b border-ink/15 bg-[#EDE8DC] text-ink/75 text-xs">
+                  <th class="py-2.5 px-3 font-semibold">Content-Type</th>
+                  <th class="py-2.5 px-3 font-semibold">Framing</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-ink/10 text-ink">
+                <tr>
+                  <td class="py-2.5 px-3">
+                    <code>application/omnibuf</code>
+                  </td>
+                  <td class="py-2.5 px-3 font-sans">Raw unary OmniBuf request or response body</td>
+                </tr>
+                <tr>
+                  <td class="py-2.5 px-3">
+                    <code>application/connect+omnibuf</code>
+                  </td>
+                  <td class="py-2.5 px-3 font-sans">5-byte Connect streaming envelope frames</td>
+                </tr>
+                <tr>
+                  <td class="py-2.5 px-3">
+                    <code>application/grpc-web+omnibuf</code>
+                  </td>
+                  <td class="py-2.5 px-3 font-sans">
+                    5-byte gRPC-Web framed payloads and trailers
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <p class="text-sm text-ink/75 leading-relaxed max-w-[65ch]">
+          Need to inspect non-browser HTTP/2, gRPC, or raw TCP traffic? See{' '}
+          <a href="/tooling/traffic" class="doc-link">
+            Traffic Inspection
+          </a>{' '}
+          for the <code>mitmproxy</code> and Wireshark plugins.
+        </p>
+      </div>
+    </section>
+  </main>
+
+  <Footer />
+</Layout>

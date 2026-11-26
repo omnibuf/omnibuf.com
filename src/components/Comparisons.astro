@@ -36,13 +36,13 @@ const comparisonLanguageCharts = languageBenchmarkList.map((suite) => {
 
 <section
   id="comparisons"
-  class="py-16 sm:py-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto border-t-2 border-ink/15"
+  class="py-12 sm:py-16 px-4 sm:px-6 max-w-6xl mx-auto border-t border-ink/15"
 >
-  <div class="max-w-3xl mb-10">
-    <h2 class="text-3xl sm:text-5xl font-bold tracking-tight uppercase leading-none">
-      How OmniBuf compares to other formats.
+  <div class="max-w-3xl mb-8">
+    <h2 class="text-2xl sm:text-3xl font-bold tracking-tight text-ink">
+      How OmniBuf compares to other formats
     </h2>
-    <p class="mt-3 text-lg sm:text-xl text-ink/80 font-medium leading-relaxed">
+    <p class="mt-2.5 text-base sm:text-lg text-ink/80 leading-relaxed max-w-[65ch]">
       Wire size is identical across languages, and encode/decode speed tracks each runtime. Full
       numbers, cross-language comparisons, and methodology live on the{' '}
       <a href="/benchmarks" class="doc-link">
@@ -52,48 +52,44 @@ const comparisonLanguageCharts = languageBenchmarkList.map((suite) => {
     </p>
   </div>
 
-  <!-- Tabbed Language Butterfly Preview + Packet Size on the Wire -->
+  <!-- Tabbed Language Speed Preview + Packet Size on the Wire -->
   <div
-    class="grid lg:grid-cols-12 gap-8 mb-10 items-start select-none"
+    class="grid lg:grid-cols-12 gap-6 mb-10 items-start select-none"
     data-butterfly-widget="comparisons"
   >
-    <!-- Left: Interactive Tabbed Butterfly Chart -->
-    <div class="lg:col-span-5 flex flex-col justify-between p-4 sm:p-5 bg-[#FAF8F2] border-2 border-ink rounded-md">
+    <!-- Left: Interactive Tabbed Speed Comparison -->
+    <div class="lg:col-span-5 os-window p-4 sm:p-5 flex flex-col justify-between">
       <div>
         <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
-          <h3 class="text-xl sm:text-2xl font-bold uppercase tracking-tight leading-none text-ink">
-            Runtime <span class="text-[#FF4F18]">speed.</span>
-          </h3>
-          <div
-            role="tablist"
-            aria-label="Select runtime speed comparison language"
-            class="inline-flex flex-wrap items-center gap-1.5 font-mono text-xs font-bold uppercase"
-          >
-            {comparisonLanguageCharts.map((preview, idx) => (
-              <button
-                id={`comp-butterfly-tab-${preview.key}`}
-                type="button"
-                role="tab"
-                data-butterfly-tab={preview.key}
-                aria-selected={idx === 0 ? 'true' : 'false'}
-                aria-controls={`comp-butterfly-panel-${preview.key}`}
-                tabindex={idx === 0 ? 0 : -1}
-                class:list={[
-                  'px-2 py-1 rounded border-2 border-ink transition cursor-pointer',
-                  idx === 0
-                    ? 'bg-acid text-ink shadow-[2px_2px_0px_#111111]'
-                    : 'bg-white text-ink/75 hover:bg-[#E5E0D5] hover:text-ink',
-                ]}
-              >
-                {preview.shortLabel}
-              </button>
-            ))}
-          </div>
+          <h3 class="text-base sm:text-lg font-bold tracking-tight text-ink">Runtime speed</h3>
+          <span class="font-mono text-xs text-ink/60">Shorter = faster</span>
         </div>
 
-        <div class="grid grid-cols-2 items-baseline border-b-2 border-ink pb-1 mb-2 font-mono text-xs font-bold uppercase text-ink">
-          <div class="text-right pr-3">&larr; Encode</div>
-          <div class="text-left pl-3 border-l-2 border-ink">Decode &rarr;</div>
+        <div
+          role="tablist"
+          aria-label="Select runtime speed comparison language"
+          class="flex flex-wrap items-center gap-1.5 mb-4 font-mono text-xs"
+        >
+          {comparisonLanguageCharts.map((preview, idx) => (
+            <button
+              id={`comp-butterfly-tab-${preview.key}`}
+              type="button"
+              role="tab"
+              data-butterfly-tab={preview.key}
+              aria-selected={idx === 0 ? 'true' : 'false'}
+              aria-controls={`comp-butterfly-panel-${preview.key}`}
+              tabindex={idx === 0 ? 0 : -1}
+              class="seg-tab px-2 py-1"
+            >
+              {preview.shortLabel}
+            </button>
+          ))}
+        </div>
+
+        <div class="grid grid-cols-[6.75rem_1fr_1fr] items-baseline border-b border-ink/15 pb-1.5 mb-2.5 font-mono text-xs font-medium text-ink/70">
+          <div>Format</div>
+          <div class="text-right pr-2">&larr; Encode</div>
+          <div class="text-left pl-2 border-l border-ink/15">Decode &rarr;</div>
         </div>
 
         {comparisonLanguageCharts.map((preview, idx) => (
@@ -106,124 +102,58 @@ const comparisonLanguageCharts = languageBenchmarkList.map((suite) => {
           >
             <!-- OmniBuf Row -->
             <div
-              class="grid grid-cols-2 items-center py-1"
+              class="grid grid-cols-[6.75rem_1fr_1fr] items-center py-1"
               title={`${preview.omni.name} - Encode: ${preview.omni.encVal} ns, Decode: ${preview.omni.decVal} ns`}
             >
-              <div class="flex items-center justify-end pr-0.5 min-w-0">
-                <svg
-                  class="w-5 h-3.5 text-[#FF4F18] shrink-0 mr-1"
-                  viewBox="0 0 22 14"
-                  fill="none"
-                  aria-hidden="true"
-                >
-                  <path
-                    d="M1 7H19M19 7L14 2M19 7L14 12"
-                    stroke="currentColor"
-                    stroke-width="2.2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                  />
-                </svg>
+              <span class="font-mono text-xs font-semibold text-accent truncate pr-2">OmniBuf</span>
+              <div class="flex items-center justify-end pr-1 min-w-0">
                 <div
-                  class="h-4 bench-bar-omni border-2 border-ink rounded-l-sm shadow-[1px_1px_0px_#111111] shrink-0"
-                  style={`width: min(${preview.omni.encPct}%, calc(100% - 1.5rem));`}
+                  class="h-3.5 bench-bar-omni rounded-l-sm shrink-0"
+                  style={`width: ${preview.omni.encPct}%;`}
                 />
               </div>
-              <div class="flex items-center justify-start pl-0.5 border-l-2 border-ink min-w-0">
+              <div class="flex items-center justify-start pl-1 border-l border-ink/15 min-w-0">
                 <div
-                  class="h-4 bench-bar-omni border-2 border-ink rounded-r-sm shadow-[1px_1px_0px_#111111] shrink-0"
-                  style={`width: min(${preview.omni.decPct}%, calc(100% - 5.75rem));`}
+                  class="h-3.5 bench-bar-omni rounded-r-sm shrink-0"
+                  style={`width: ${preview.omni.decPct}%;`}
                 />
-                <svg
-                  class="w-5 h-3.5 text-[#FF4F18] shrink-0 mx-1"
-                  viewBox="0 0 22 14"
-                  fill="none"
-                  aria-hidden="true"
-                >
-                  <path
-                    d="M21 7H3M3 7L8 2M3 7L8 12"
-                    stroke="currentColor"
-                    stroke-width="2.2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                  />
-                </svg>
-                <span class="font-mono text-xs font-bold uppercase px-2 py-0.5 bg-acid border-2 border-ink text-ink shadow-[2px_2px_0px_#111111] leading-none rounded-sm shrink-0">
-                  OmniBuf
-                </span>
               </div>
             </div>
 
             <!-- Competitor Rows -->
-            <div class="mt-0.5 space-y-1">
+            <div class="mt-1 space-y-1.5">
               {preview.rest.map((r) => (
                 <div
-                  class="grid grid-cols-2 items-center"
+                  class="grid grid-cols-[6.75rem_1fr_1fr] items-center"
                   title={`${r.name} - Encode: ${r.encVal} ns, Decode: ${r.decVal} ns`}
                 >
-                  <div class="flex items-center justify-end pr-0.5 min-w-0">
+                  <span class="font-mono text-xs text-ink/75 truncate pr-2">{r.name}</span>
+                  <div class="flex items-center justify-end pr-1 min-w-0">
                     <div
-                      class="h-2.5 bench-bar-competitor border border-ink/65 rounded-l-sm opacity-80"
+                      class="h-2.5 bench-bar-competitor rounded-l-sm opacity-80"
                       style={`width: ${r.encPct}%;`}
                     />
                   </div>
-                  <div class="flex items-center justify-start pl-0.5 border-l-2 border-ink min-w-0">
+                  <div class="flex items-center justify-start pl-1 border-l border-ink/15 min-w-0">
                     <div
-                      class="h-2.5 bench-bar-competitor border border-ink/65 rounded-r-sm opacity-80"
+                      class="h-2.5 bench-bar-competitor rounded-r-sm opacity-80"
                       style={`width: ${r.decPct}%;`}
                     />
                   </div>
                 </div>
               ))}
             </div>
-
-            <div class="mt-2.5 flex items-center justify-center gap-2">
-              <svg
-                class="w-7 h-4 text-ink/75 shrink-0"
-                viewBox="0 0 28 16"
-                fill="none"
-                aria-hidden="true"
-              >
-                <path
-                  d="M26 13C16 13 11 9 6 2M6 2L5 8.5M6 2L12.5 4"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                />
-              </svg>
-              <span class="font-mono text-[11px] font-bold uppercase px-2 py-1 bg-[#E5E0D5] border border-ink text-ink text-center leading-tight rounded-sm">
-                {preview.competitorsLabel}
-              </span>
-              <svg
-                class="w-7 h-4 text-ink/75 shrink-0"
-                viewBox="0 0 28 16"
-                fill="none"
-                aria-hidden="true"
-              >
-                <path
-                  d="M2 13C12 13 17 9 22 2M22 2L23 8.5M22 2L15.5 4"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                />
-              </svg>
-            </div>
           </div>
         ))}
       </div>
 
-      <div class="pt-2.5 mt-3 border-t border-ink/20 flex items-center justify-between font-mono text-xs font-bold uppercase">
-        <span class="text-ink/65">Shorter = Faster</span>
+      <div class="pt-3 mt-4 border-t border-ink/12 flex items-center justify-between text-xs sm:text-sm">
+        <span class="font-mono text-xs text-ink/60">PeerUpdate (11 fields)</span>
         {comparisonLanguageCharts.map((preview, idx) => (
           <a
             href={preview.href}
             data-butterfly-link={preview.key}
-            class:list={[
-              'text-ink underline decoration-ink/50 underline-offset-2 hover:text-[#FF4F18]',
-              idx === 0 ? '' : 'hidden',
-            ]}
+            class:list={['doc-link', idx === 0 ? '' : 'hidden']}
           >
             {preview.ctaLabel} &rarr;
           </a>
@@ -237,14 +167,12 @@ const comparisonLanguageCharts = languageBenchmarkList.map((suite) => {
         id="packet-size"
         class="lg:col-span-7 os-window overflow-hidden scroll-mt-20 select-none"
       >
-        <div class="os-titlebar bg-[#E5E0D5]">
-          <span class="font-mono text-xs sm:text-sm font-bold uppercase">
-            {packetSizeCat.title}
-          </span>
+        <div class="os-titlebar">
+          <span class="text-sm font-semibold text-ink">{packetSizeCat.title}</span>
         </div>
 
-        <div class="p-3.5 sm:p-4 bg-[#FAF8F2] space-y-1">
-          <p class="text-xs sm:text-sm text-ink/85 leading-snug pb-1.5 max-w-[70ch]">
+        <div class="p-4 sm:p-5 bg-[#FAF8F2] space-y-1.5">
+          <p class="text-xs sm:text-sm text-ink/75 leading-relaxed pb-2 max-w-[70ch]">
             {packetSizeCat.methodology}
           </p>
           {(() => {
@@ -263,12 +191,12 @@ const comparisonLanguageCharts = languageBenchmarkList.map((suite) => {
               return (
                 <div
                   class:list={[
-                    'grid grid-cols-12 gap-x-2 gap-y-1 items-center px-2.5 py-1 rounded min-w-0',
+                    'grid grid-cols-12 gap-x-2 gap-y-1 items-center px-2.5 py-1.5 rounded-md min-w-0',
                     r.baseline
-                      ? 'bg-acid/45 border-2 border-ink shadow-[2px_2px_0px_#111111] font-bold'
+                      ? 'bench-row-omni font-semibold'
                       : r.highlight
-                        ? 'bg-acid/25 border-2 border-dashed border-ink font-bold'
-                        : 'border border-ink/15 bg-white',
+                        ? 'bench-row-omni-secondary font-medium'
+                        : 'border border-ink/10 bg-white',
                   ]}
                 >
                   <div
@@ -278,11 +206,10 @@ const comparisonLanguageCharts = languageBenchmarkList.map((suite) => {
                     {r.name}
                   </div>
                   <div class="col-span-6 sm:col-span-4 flex items-center min-w-0">
-                    <div class="w-full bg-[#E5E0D5] h-3.5 border border-ink rounded-sm overflow-hidden">
+                    <div class="w-full bench-track h-2.5 rounded-full overflow-hidden">
                       <div
                         class:list={[
-                          'h-full',
-                          numPct < 99.5 && 'border-r border-ink',
+                          'h-full rounded-full',
                           r.highlight ? 'bench-bar-omni' : 'bench-bar-competitor',
                         ]}
                         style={`width: ${pct}%;`}
@@ -290,8 +217,8 @@ const comparisonLanguageCharts = languageBenchmarkList.map((suite) => {
                     </div>
                   </div>
                   <div class="col-span-6 sm:col-span-3 text-right font-mono text-xs tabular-nums whitespace-nowrap leading-none">
-                    <span class="font-bold text-ink">{ratioStr}</span>{' '}
-                    <span class="text-ink/70 font-normal">
+                    <span class="font-semibold text-ink">{ratioStr}</span>{' '}
+                    <span class="text-ink/65 font-normal">
                       ({r.val.toLocaleString('en-US')} {packetSizeCat.unit})
                     </span>
                   </div>
@@ -307,22 +234,22 @@ const comparisonLanguageCharts = languageBenchmarkList.map((suite) => {
   <div class="grid md:grid-cols-2 gap-6">
     <!-- Standalone OmniBuf Panel Explaining the 5 Radar Scores -->
     <div id="compare-omnibuf" class="os-window overflow-hidden scroll-mt-20 flex flex-col">
-      <div class="os-titlebar bg-[#E5E0D5]">
-        <h3 class="font-mono text-sm sm:text-base font-bold uppercase">OmniBuf Baseline</h3>
+      <div class="os-titlebar">
+        <h3 class="text-sm font-semibold text-ink">OmniBuf baseline</h3>
       </div>
 
-      <div class="bg-ink text-paper p-6 sm:p-7 flex-1 flex flex-col justify-between min-w-0">
+      <div class="bg-ink text-paper p-5 sm:p-6 flex-1 flex flex-col justify-between min-w-0">
         <div>
-          <div class="flex items-center justify-between border-b border-paper/15 pb-3 mb-4 font-mono text-sm">
-            <span class="flex items-center gap-2 font-bold text-acid">
-              <span class="w-3 h-3 bg-acid inline-block border border-ink"></span> OmniBuf
+          <div class="flex items-center justify-between border-b border-paper/15 pb-3 mb-4 font-mono text-xs">
+            <span class="flex items-center gap-2 font-semibold text-[#FF7A4D]">
+              <span class="w-2.5 h-2.5 rounded-[2px] bg-[#FF4F18] inline-block"></span> OmniBuf
             </span>
           </div>
           <RadarChart oppKey="omnibuf" />
         </div>
 
-        <div class="mt-4 pt-4 border-t border-paper/20">
-          <p class="text-sm sm:text-base text-paper/95 leading-relaxed">
+        <div class="mt-4 pt-4 border-t border-paper/15">
+          <p class="text-sm sm:text-base text-paper/90 leading-relaxed">
             {formatProfiles.omnibuf.verdict}
           </p>
         </div>
@@ -333,28 +260,28 @@ const comparisonLanguageCharts = languageBenchmarkList.map((suite) => {
       const opp = formatProfiles[oppKey];
       return (
         <div id={`compare-${oppKey}`} class="os-window overflow-hidden scroll-mt-20 flex flex-col">
-          <div class="os-titlebar bg-[#E5E0D5]">
+          <div class="os-titlebar">
             {/* prettier-ignore */}
-            <h3 class="font-mono text-sm sm:text-base font-bold uppercase">
+            <h3 class="text-sm font-semibold text-ink">
               {opp.url ? <a href={opp.url} target="_blank" rel="noopener noreferrer" class="doc-link">{opp.name}</a> : opp.name} vs. OmniBuf
             </h3>
           </div>
 
-          <div class="bg-ink text-paper p-6 sm:p-7 flex-1 flex flex-col justify-between min-w-0">
+          <div class="bg-ink text-paper p-5 sm:p-6 flex-1 flex flex-col justify-between min-w-0">
             <div>
-              <div class="flex items-center justify-between border-b border-paper/15 pb-3 mb-4 font-mono text-sm">
-                <span class="flex items-center gap-2 font-bold text-[#FF4F18]">
-                  <span class="w-3 h-3 bg-[#FF4F18] inline-block border border-ink" /> {opp.name}
+              <div class="flex items-center justify-between border-b border-paper/15 pb-3 mb-4 font-mono text-xs">
+                <span class="flex items-center gap-2 font-semibold text-[#FF7A4D]">
+                  <span class="w-2.5 h-2.5 rounded-[2px] bg-[#FF4F18] inline-block" /> OmniBuf
                 </span>
-                <span class="flex items-center gap-2 font-bold text-acid">
-                  <span class="w-3 h-3 bg-acid inline-block border border-ink" /> OmniBuf
+                <span class="flex items-center gap-2 font-semibold text-[#7DD3FC]">
+                  <span class="w-2.5 h-2.5 rounded-[2px] bg-[#38BDF8] inline-block" /> {opp.name}
                 </span>
               </div>
               <RadarChart oppKey={oppKey} />
             </div>
 
-            <div class="mt-4 pt-4 border-t border-paper/20">
-              <p class="text-sm sm:text-base text-paper/95 leading-relaxed">{opp.verdict}</p>
+            <div class="mt-4 pt-4 border-t border-paper/15">
+              <p class="text-sm sm:text-base text-paper/90 leading-relaxed">{opp.verdict}</p>
             </div>
           </div>
         </div>
@@ -376,13 +303,6 @@ const comparisonLanguageCharts = languageBenchmarkList.map((suite) => {
           const isActive = tab.getAttribute('data-butterfly-tab') === key;
           tab.setAttribute('aria-selected', isActive ? 'true' : 'false');
           tab.setAttribute('tabindex', isActive ? '0' : '-1');
-          tab.classList.toggle('bg-acid', isActive);
-          tab.classList.toggle('text-ink', isActive);
-          tab.classList.toggle('shadow-[2px_2px_0px_#111111]', isActive);
-          tab.classList.toggle('bg-white', !isActive);
-          tab.classList.toggle('text-ink/75', !isActive);
-          tab.classList.toggle('hover:bg-[#E5E0D5]', !isActive);
-          tab.classList.toggle('hover:text-ink', !isActive);
         });
         panels.forEach((panel) => {
           panel.classList.toggle('hidden', panel.getAttribute('data-butterfly-panel') !== key);

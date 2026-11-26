@@ -1,0 +1,388 @@
+---
+import { Code } from 'astro:components';
+import Layout from '../../layouts/Layout.astro';
+import Navbar from '../../components/Navbar.astro';
+import Footer from '../../components/Footer.astro';
+
+const tryIn30SecondsSnippet = `curl -fsSLO https://omnibuf.com/sample.pcapng
+curl -fsSLO https://raw.githubusercontent.com/omnibuf/omnibuf-wireshark/main/omnibuf.lua
+curl -fsSLO https://raw.githubusercontent.com/omnibuf/omnibuf-wireshark/main/omnibuf_wire.lua
+tshark -X lua_script:omnibuf.lua -r sample.pcapng -Y omnibuf -V`;
+
+const mitmproxyInstallOptions = [
+  { label: 'Run directly as a single script', command: 'mitmproxy -s omnibuf_mitmproxy.py' },
+  { label: 'Install Python package (uv)', command: 'uv pip install mitmproxy-omnibuf' },
+];
+
+const mitmproxySchemaSnippet = `buf build -o schema.json
+mitmweb -s omnibuf_mitmproxy.py --set omnibuf_schema=schema.json`;
+
+const wiresharkInstallOptions = [
+  {
+    label: 'Install plugin (macOS & Linux)',
+    command:
+      'curl -fsSL https://raw.githubusercontent.com/omnibuf/omnibuf-wireshark/main/install.sh | sh',
+  },
+  {
+    label: 'Zero-install tshark run with schema overlay',
+    command:
+      'tshark -X lua_script:omnibuf.lua -o omnibuf.schema_path:schema.json -r sample.pcapng -Y omnibuf -V',
+  },
+  {
+    label: 'Pipe tshark JSON into jq',
+    command: `tshark -X lua_script:omnibuf.lua -r sample.pcapng -Y omnibuf -T json --no-duplicate-keys \\
+  | jq '.[]._source.layers.omnibuf'`,
+  },
+];
+---
+
+<Layout
+  title="Traffic Inspection | Wireshark, tshark & mitmproxy for OmniBuf"
+  description="Decode live OmniBuf packets off the wire with Wireshark, tshark, termshark, and mitmproxy plugins, including Connect/gRPC framing and optional schema overlays."
+>
+  <Navbar currentPage="tooling-traffic" />
+
+  <main id="main-content">
+    <section class="pt-6 pb-8 sm:pt-8 sm:pb-10 px-4 sm:px-6 max-w-4xl mx-auto space-y-3">
+      <h1 class="text-3xl sm:text-5xl font-bold tracking-tight leading-[1.1] text-ink">
+        Traffic inspection
+      </h1>
+      <p class="text-base sm:text-lg text-ink/80 leading-relaxed max-w-[64ch]">
+        Network dissectors and proxy addons that decode OmniBuf payloads straight off the wire. For
+        browser-only requests, check{' '}
+        <a href="/tooling/devtools" class="doc-link">
+          Browser DevTools
+        </a>
+        .
+      </p>
+    </section>
+
+    <section class="pb-12 sm:pb-16 px-4 sm:px-6 max-w-4xl mx-auto space-y-8">
+      <!-- Tool comparison table -->
+      <div class="border border-ink/15 rounded-lg overflow-hidden">
+        <div class="overflow-x-auto bg-[#FAF8F2]">
+          <table class="w-full text-left border-collapse font-mono text-xs sm:text-sm">
+            <thead>
+              <tr class="border-b border-ink/15 bg-[#EDE8DC] text-ink/75 text-xs">
+                <th class="py-2.5 px-3 font-semibold">Tool</th>
+                <th class="py-2.5 px-3 font-semibold">Best For</th>
+                <th class="py-2.5 px-3 font-semibold">Transport / TLS Setup</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-ink/10 text-ink">
+              <tr>
+                <td class="py-2.5 px-3 font-semibold">
+                  <a
+                    href="https://mitmproxy.org/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="doc-link"
+                  >
+                    mitmproxy <span aria-hidden="true">&#8599;</span>
+                  </a>
+                </td>
+                <td class="py-2.5 px-3 font-sans">Local API and RPC debugging</td>
+                <td class="py-2.5 px-3 font-sans">Built-in HTTPS MITM</td>
+              </tr>
+              <tr>
+                <td class="py-2.5 px-3 font-semibold">
+                  <a
+                    href="https://www.wireshark.org/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="doc-link"
+                  >
+                    Wireshark <span aria-hidden="true">&#8599;</span>
+                  </a>
+                </td>
+                <td class="py-2.5 px-3 font-sans">Packet-level TCP/UDP, HTTP/2, HTTP/3</td>
+                <td class="py-2.5 px-3 font-sans">
+                  <a
+                    href="https://wiki.wireshark.org/TLS#using-the-pre-master-secret"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="doc-link"
+                  >
+                    <code>SSLKEYLOGFILE</code>
+                  </a>{' '}
+                  for TLS
+                </td>
+              </tr>
+              <tr>
+                <td class="py-2.5 px-3 font-semibold">
+                  <a
+                    href="https://www.wireshark.org/docs/man-pages/tshark.html"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="doc-link"
+                  >
+                    tshark <span aria-hidden="true">&#8599;</span>
+                  </a>{' '}
+                  /{' '}
+                  <a
+                    href="https://termshark.io/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="doc-link"
+                  >
+                    termshark <span aria-hidden="true">&#8599;</span>
+                  </a>
+                </td>
+                <td class="py-2.5 px-3 font-sans">CLI, CI assertions, remote SSH</td>
+                <td class="py-2.5 px-3 font-sans">Same Lua plugin as Wireshark</td>
+              </tr>
+              <tr>
+                <td class="py-2.5 px-3 font-semibold">
+                  <a href="/tooling/devtools" class="doc-link">
+                    omnibuf-devtools
+                  </a>
+                </td>
+                <td class="py-2.5 px-3 font-sans">Frontend and browser apps</td>
+                <td class="py-2.5 px-3 font-sans">Zero setup (Browser DevTools)</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Try it in 30 seconds -->
+      <div
+        id="try-in-30-seconds"
+        class="scroll-mt-16 bg-[#FAF8F2] border border-ink/15 rounded-lg p-5 sm:p-6 space-y-4"
+      >
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <h2 class="text-xl sm:text-2xl font-bold tracking-tight text-ink">
+            Try it in 30 seconds
+          </h2>
+          <a href="/sample.pcapng" download="sample.pcapng" class="doc-link text-xs font-mono">
+            Download sample.pcapng &darr;
+          </a>
+        </div>
+        <p class="text-sm sm:text-base text-ink/85 leading-relaxed max-w-[65ch]">
+          Grab the hosted sample capture and run the Lua dissector with <code>tshark</code>. No
+          local server required.
+        </p>
+        <div class="bg-ink text-paper rounded-lg border border-ink/15 overflow-hidden">
+          <div class="flex items-center justify-between gap-2 px-3.5 py-2 border-b border-paper/12 text-xs font-mono text-paper/70">
+            <span>Run Lua dissector on sample.pcapng</span>
+            <button
+              type="button"
+              data-copy={tryIn30SecondsSnippet}
+              class="copy-snippet-btn min-w-[4rem] text-center px-2 py-0.5 text-xs font-medium bg-paper/10 hover:bg-paper/20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#FF7A4D] text-paper border border-paper/20 rounded shrink-0 transition cursor-pointer"
+            >
+              Copy
+            </button>
+          </div>
+          <div class="p-3.5 font-mono text-xs sm:text-sm overflow-x-auto leading-relaxed [&>pre]:bg-transparent! [&>pre]:p-0! [&>pre]:m-0! [&>pre]:border-0!">
+            <Code code={tryIn30SecondsSnippet} lang="sh" theme="github-dark" />
+          </div>
+        </div>
+      </div>
+
+      <!-- mitmproxy -->
+      <div
+        id="mitmproxy"
+        class="scroll-mt-16 bg-[#FAF8F2] border border-ink/15 rounded-lg p-5 sm:p-6 space-y-4"
+      >
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <div class="flex items-center gap-3.5">
+            <svg
+              aria-hidden="true"
+              viewBox="0 0 100 100"
+              class="w-8 h-8 shrink-0"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <rect x="6" y="6" width="88" height="88" rx="16" fill="#1E232A" />
+              <path
+                d="M22 68V32L38 52L54 32V68"
+                stroke="#F15A24"
+                stroke-width="8"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+              <path
+                d="M66 36L80 50L66 64"
+                stroke="#FAF8F2"
+                stroke-width="8"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+            <h2 class="text-xl sm:text-2xl font-bold tracking-tight text-ink">
+              mitmproxy &amp; mitmweb
+            </h2>
+          </div>
+          <code class="text-xs font-mono text-ink/65">omnibuf/omnibuf-mitmproxy</code>
+        </div>
+        <p class="text-sm sm:text-base text-ink/85 leading-relaxed max-w-[65ch]">
+          Single-file Python ContentView addon for day-to-day HTTPS and RPC debugging. Handles unary{' '}
+          <code>application/omnibuf</code> bodies and peels 5-byte Connect/gRPC streaming envelopes
+          (including gzip-compressed frames and end-stream trailers) inside both{' '}
+          <code>mitmproxy</code> and <code>mitmweb</code>. Payloads with <code>Field #0</code> show
+          field names automatically; pass <code>--set omnibuf_schema=schema.json</code> (from{' '}
+          <code>buf build -o schema.json</code>) to overlay field names and enum labels on compact
+          payloads.
+        </p>
+        <div class="space-y-3">
+          {mitmproxyInstallOptions.map((opt) => (
+            <div class="bg-ink text-paper rounded-lg border border-ink/15 overflow-hidden">
+              <div class="flex items-center justify-between gap-2 px-3.5 py-2 border-b border-paper/12 text-xs font-mono text-paper/70">
+                <span>{opt.label}</span>
+                <button
+                  type="button"
+                  data-copy={opt.command}
+                  class="copy-snippet-btn min-w-[4rem] text-center px-2 py-0.5 text-xs font-medium bg-paper/10 hover:bg-paper/20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#FF7A4D] text-paper border border-paper/20 rounded shrink-0 transition cursor-pointer"
+                >
+                  Copy
+                </button>
+              </div>
+              <div class="p-3.5 font-mono text-xs sm:text-sm overflow-x-auto leading-relaxed [&>pre]:bg-transparent! [&>pre]:p-0! [&>pre]:m-0! [&>pre]:border-0!">
+                <Code code={opt.command} lang="sh" theme="github-dark" />
+              </div>
+            </div>
+          ))}
+
+          <div class="bg-ink text-paper rounded-lg border border-ink/15 overflow-hidden">
+            <div class="flex items-center justify-between gap-2 px-3.5 py-2 border-b border-paper/12 text-xs font-mono text-paper/70">
+              <span>Overlay Protobuf field and enum names (optional)</span>
+              <button
+                type="button"
+                data-copy={mitmproxySchemaSnippet}
+                class="copy-snippet-btn min-w-[4rem] text-center px-2 py-0.5 text-xs font-medium bg-paper/10 hover:bg-paper/20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#FF7A4D] text-paper border border-paper/20 rounded shrink-0 transition cursor-pointer"
+              >
+                Copy
+              </button>
+            </div>
+            <div class="p-3.5 font-mono text-xs sm:text-sm overflow-x-auto leading-relaxed [&>pre]:bg-transparent! [&>pre]:p-0! [&>pre]:m-0! [&>pre]:border-0!">
+              <Code code={mitmproxySchemaSnippet} lang="sh" theme="github-dark" />
+            </div>
+          </div>
+        </div>
+
+        <figure class="space-y-2">
+          <a
+            href="/images/tooling/mitmproxy-view.webp"
+            target="_blank"
+            rel="noopener noreferrer"
+            title="Open full-size mitmproxy screenshot"
+            class="block rounded-lg overflow-hidden border border-ink/15 hover:border-ink/40 bg-ink transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#FF4F18]"
+          >
+            <img
+              src="/images/tooling/mitmproxy-view.webp"
+              alt="mitmproxy ContentView displaying a decoded application/omnibuf POST request with Field #0 inline field names and types."
+              width="2560"
+              height="1480"
+              loading="lazy"
+              class="w-full h-auto block"
+            />
+          </a>
+          <figcaption class="text-xs text-ink/65">
+            <code>mitmproxy</code> ContentView decoding an <code>application/omnibuf</code> request
+            body with inline <code>Field #0</code> names. Click image to view full size.
+          </figcaption>
+        </figure>
+        <div class="flex flex-wrap gap-2.5 text-xs sm:text-sm pt-1 no-print">
+          <a
+            href="https://github.com/omnibuf/omnibuf-mitmproxy"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="btn-primary px-3.5 py-2"
+          >
+            GitHub Repository &rarr;
+          </a>
+        </div>
+      </div>
+
+      <!-- Wireshark, tshark & termshark -->
+      <div
+        id="wireshark"
+        class="scroll-mt-16 bg-[#FAF8F2] border border-ink/15 rounded-lg p-5 sm:p-6 space-y-4"
+      >
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <div class="flex items-center gap-3.5">
+            <svg
+              aria-hidden="true"
+              viewBox="0 0 100 100"
+              class="w-8 h-8 shrink-0"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <rect x="6" y="6" width="88" height="88" rx="16" fill="#1679A7" />
+              <path
+                d="M14 72H30C33 44 47 26 66 20C57 38 56 54 64 72H86"
+                stroke="#FAF8F2"
+                stroke-width="7.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+            <h2 class="text-xl sm:text-2xl font-bold tracking-tight text-ink">
+              Wireshark, tshark &amp; termshark
+            </h2>
+          </div>
+          <code class="text-xs font-mono text-ink/65">omnibuf/omnibuf-wireshark</code>
+        </div>
+        <!-- prettier-ignore -->
+        <p class="text-sm sm:text-base text-ink/85 leading-relaxed max-w-[65ch]">
+          Pure Lua 5.4 dissector with exact hex-pane highlighting, display filters (<code>omnibuf</code>, <code>omnibuf.field_num</code>, <code>omnibuf.field_name</code>, <code>omnibuf.enum</code>), 5-byte Connect/gRPC envelope framing, and <code>Decode As...</code> on raw TCP and UDP with multi-segment TCP reassembly. Set <code>omnibuf.schema_path</code> to a <code>buf build -o schema.json</code> descriptor to resolve field and enum names on payloads that omit <code>Field #0</code>. Drop the scripts into your personal plugins folder to load the dissector automatically in Wireshark, <code>tshark</code>, and <code>termshark</code> (for encrypted TLS traffic, see the <a href="https://wiki.wireshark.org/TLS#using-the-pre-master-secret" target="_blank" rel="noopener noreferrer" class="doc-link">Wireshark TLS decryption guide</a>).
+        </p>
+        <div class="space-y-3">
+          {wiresharkInstallOptions.map((opt) => (
+            <div class="bg-ink text-paper rounded-lg border border-ink/15 overflow-hidden">
+              <div class="flex items-center justify-between gap-2 px-3.5 py-2 border-b border-paper/12 text-xs font-mono text-paper/70">
+                <span>{opt.label}</span>
+                <button
+                  type="button"
+                  data-copy={opt.command}
+                  class="copy-snippet-btn min-w-[4rem] text-center px-2 py-0.5 text-xs font-medium bg-paper/10 hover:bg-paper/20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#FF7A4D] text-paper border border-paper/20 rounded shrink-0 transition cursor-pointer"
+                >
+                  Copy
+                </button>
+              </div>
+              <div class="p-3.5 font-mono text-xs sm:text-sm overflow-x-auto leading-relaxed [&>pre]:bg-transparent! [&>pre]:p-0! [&>pre]:m-0! [&>pre]:border-0!">
+                <Code code={opt.command} lang="sh" theme="github-dark" />
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <figure class="space-y-2">
+          <a
+            href="/images/tooling/tshark-dissector.webp"
+            target="_blank"
+            rel="noopener noreferrer"
+            title="Open full-size tshark screenshot"
+            class="block rounded-lg overflow-hidden border border-ink/15 hover:border-ink/40 bg-ink transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#FF4F18]"
+          >
+            <img
+              src="/images/tooling/tshark-dissector.webp"
+              alt="tshark terminal output running omnibuf.lua with schema.json overlay on connect_stream.pcapng, showing framed OmniBuf messages, field names, enum labels, and wire types."
+              width="2560"
+              height="1580"
+              loading="lazy"
+              class="w-full h-auto block"
+            />
+          </a>
+          <figcaption class="text-xs text-ink/65">
+            <code>tshark</code> dissecting framed Connect stream messages with{' '}
+            <code>omnibuf.lua</code> and a <code>schema.json</code> overlay. Click image to view
+            full size.
+          </figcaption>
+        </figure>
+        <div class="flex flex-wrap gap-2.5 text-xs sm:text-sm pt-1 no-print">
+          <a
+            href="https://github.com/omnibuf/omnibuf-wireshark"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="btn-primary px-3.5 py-2"
+          >
+            GitHub Repository &rarr;
+          </a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <Footer />
+</Layout>

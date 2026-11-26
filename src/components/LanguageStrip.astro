@@ -1,23 +1,26 @@
 ---
 import { languages, type PageKey } from '../data/languages';
+import LanguageIcon from './LanguageIcon.astro';
 
 interface Props {
   currentPage?: PageKey;
   id?: string;
+  narrow?: boolean;
 }
 
-const { currentPage = 'home', id } = Astro.props;
+const { currentPage = 'home', id, narrow = false } = Astro.props;
 ---
 
 <section
   id={id}
-  class="scroll-mt-16 py-12 sm:py-14 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto border-t-2 border-ink no-print"
+  class:list={[
+    'scroll-mt-16 py-12 sm:py-16 px-4 sm:px-6 mx-auto border-t border-ink/15 no-print',
+    narrow ? 'max-w-4xl' : 'max-w-6xl',
+  ]}
 >
-  <div class="flex flex-wrap items-baseline justify-between gap-3 mb-5">
-    <h2 class="text-xl sm:text-2xl font-bold uppercase tracking-tight leading-none text-ink">
-      Language implementations.
-    </h2>
-    <span class="font-mono text-xs font-bold uppercase text-ink/70">
+  <div class="flex flex-wrap items-baseline justify-between gap-3 mb-6">
+    <h2 class="text-xl sm:text-2xl font-bold tracking-tight text-ink">Language implementations</h2>
+    <span class="font-mono text-xs text-ink/65">
       v1 DRAFT-1 &middot;{' '}
       <a
         href="https://github.com/orgs/omnibuf/discussions"
@@ -25,13 +28,18 @@ const { currentPage = 'home', id } = Astro.props;
         rel="noopener noreferrer"
         class="doc-link"
       >
-        GitHub Feedback &rarr;
+        GitHub Discussions &rarr;
       </a>
     </span>
   </div>
 
-  <!-- Language Guide Links with Icons -->
-  <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8 font-mono">
+  <!-- Clean Language Index -->
+  <div
+    class:list={[
+      'grid gap-2.5 mb-8',
+      narrow ? 'sm:grid-cols-2 md:grid-cols-3' : 'sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4',
+    ]}
+  >
     {languages.map((lang) => {
       const isCurrent = currentPage === lang.key;
       return (
@@ -39,197 +47,57 @@ const { currentPage = 'home', id } = Astro.props;
           href={lang.href}
           aria-current={isCurrent ? 'page' : undefined}
           class:list={[
-            'os-btn px-4 py-3.5 rounded-md flex items-center justify-between gap-3',
-            isCurrent ? 'bg-acid text-ink' : 'bg-[#FAF8F2] text-ink',
+            'group px-3.5 py-2.5 rounded-lg border flex items-center justify-between gap-3 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#FF4F18]',
+            isCurrent
+              ? 'bench-row-omni text-ink'
+              : 'bg-[#FAF8F2] border-ink/15 text-ink hover:bg-[#EDE8DC] hover:border-ink/30',
           ]}
         >
           <div class="flex items-center gap-3 min-w-0">
-            <span class="w-10 h-10 rounded border-2 border-ink bg-ink text-paper flex items-center justify-center shrink-0">
-              {lang.key === 'go' && (
-                <svg class="w-8 h-5 fill-current" viewBox="0 6.8 24 10.4" aria-hidden="true">
-                  <path d="M1.811 10.231c-.047 0-.058-.023-.035-.059l.246-.315c.023-.035.081-.058.128-.058h4.172c.046 0 .058.035.035.07l-.199.303c-.023.036-.082.07-.117.07zM.047 11.306c-.047 0-.059-.023-.035-.058l.245-.316c.023-.035.082-.058.129-.058h5.328c.047 0 .07.035.058.07l-.093.28c-.012.047-.058.07-.105.07zm2.828 1.075c-.047 0-.059-.035-.035-.07l.163-.292c.023-.035.07-.07.117-.07h2.337c.047 0 .07.035.07.082l-.023.28c0 .047-.047.082-.082.082zm12.129-2.36c-.736.187-1.239.327-1.963.514-.176.046-.187.058-.34-.117-.174-.199-.303-.327-.548-.444-.737-.362-1.45-.257-2.115.175-.795.514-1.204 1.274-1.192 2.22.011.935.654 1.706 1.577 1.835.795.105 1.46-.175 1.987-.77.105-.13.198-.27.315-.434H10.47c-.245 0-.304-.152-.222-.35.152-.362.432-.97.596-1.274a.315.315 0 01.292-.187h4.253c-.023.316-.023.631-.07.947a4.983 4.983 0 01-.958 2.29c-.841 1.11-1.94 1.8-3.33 1.986-1.145.152-2.209-.07-3.143-.77-.865-.655-1.356-1.52-1.484-2.595-.152-1.274.222-2.419.993-3.424.83-1.086 1.928-1.776 3.272-2.02 1.098-.2 2.15-.07 3.096.571.62.41 1.063.97 1.356 1.648.07.105.023.164-.117.2m3.868 6.461c-1.064-.024-2.034-.328-2.852-1.029a3.665 3.665 0 01-1.262-2.255c-.21-1.32.152-2.489.947-3.529.853-1.122 1.881-1.706 3.272-1.95 1.192-.21 2.314-.095 3.33.595.923.63 1.496 1.484 1.648 2.605.198 1.578-.257 2.863-1.344 3.962-.771.783-1.718 1.273-2.805 1.495-.315.06-.63.07-.934.106zm2.78-4.72c-.011-.153-.011-.27-.034-.387-.21-1.157-1.274-1.81-2.384-1.554-1.087.245-1.788.935-2.045 2.033-.21.912.234 1.835 1.075 2.21.643.28 1.285.244 1.905-.07.923-.48 1.425-1.228 1.484-2.233z" />
-                </svg>
-              )}
-              {lang.key === 'es' && (
-                <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24" aria-hidden="true">
-                  <path d="M1.125 0C.502 0 0 .502 0 1.125v21.75C0 23.498.502 24 1.125 24h21.75c.623 0 1.125-.502 1.125-1.125V1.125C24 .502 23.498 0 22.875 0zm17.363 9.75c.612 0 1.154.037 1.627.111a6.38 6.38 0 0 1 1.306.34v2.458a3.95 3.95 0 0 0-.643-.361 5.093 5.093 0 0 0-.717-.26 5.453 5.453 0 0 0-1.426-.2c-.3 0-.573.028-.819.086a2.1 2.1 0 0 0-.623.242c-.17.104-.3.229-.393.374a.888.888 0 0 0-.14.49c0 .196.053.373.156.529.104.156.252.304.443.444s.423.276.696.41c.273.135.582.274.926.416.47.197.892.407 1.266.628.374.222.695.473.963.753.268.279.472.598.614.957.142.359.214.776.214 1.253 0 .657-.125 1.21-.373 1.656a3.033 3.033 0 0 1-1.012 1.085 4.38 4.38 0 0 1-1.487.596c-.566.12-1.163.18-1.79.18a9.916 9.916 0 0 1-1.84-.164 5.544 5.544 0 0 1-1.512-.493v-2.63a5.033 5.033 0 0 0 3.237 1.2c.333 0 .624-.03.872-.09.249-.06.456-.144.623-.25.166-.108.29-.234.373-.38a1.023 1.023 0 0 0-.074-1.089 2.12 2.12 0 0 0-.537-.5 5.597 5.597 0 0 0-.807-.444 27.72 27.72 0 0 0-1.007-.436c-.918-.383-1.602-.852-2.053-1.405-.45-.553-.676-1.222-.676-2.005 0-.614.123-1.141.369-1.582.246-.441.58-.804 1.004-1.089a4.494 4.494 0 0 1 1.47-.629 7.536 7.536 0 0 1 1.77-.201zm-15.113.188h9.563v2.166H9.506v9.646H6.789v-9.646H3.375z" />
-                </svg>
-              )}
-              {lang.key === 'rs' && (
-                <svg
-                  class="w-6 h-6 stroke-current"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke-width="2"
-                  aria-hidden="true"
-                >
-                  <circle cx="12" cy="12" r="7.5" />
-                  <path
-                    d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M19.1 4.9l-1.8 1.8M6.7 17.3l-1.8 1.8"
-                    stroke-linecap="square"
-                  />
-                  <path
-                    d="M9.5 15V9h3.2a2 2 0 0 1 0 4H9.5m2.7 0L14.8 15"
-                    stroke-width="2"
-                    stroke-linecap="square"
-                    stroke-linejoin="miter"
-                  />
-                </svg>
-              )}
-              {lang.key === 'py' && (
-                <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24" aria-hidden="true">
-                  <path d="M11.914 0C5.82 0 6.2 2.656 6.2 2.656l.007 2.752h5.814v.826H3.9S0 5.789 0 11.969c0 6.18 3.403 5.96 3.403 5.96h2.03v-2.867s-.109-3.42 3.35-3.42h5.766s3.24.052 3.24-3.148V3.202S18.28 0 11.914 0zM8.708 1.85c.578 0 1.046.47 1.046 1.052 0 .581-.468 1.051-1.046 1.051-.579 0-1.046-.47-1.046-1.051 0-.582.467-1.052 1.046-1.052zM12.086 24c6.094 0 5.714-2.656 5.714-2.656l-.007-2.752h-5.814v-.826H20.1S24 18.211 24 12.031c0-6.18-3.403-5.96-3.403-5.96h-2.03v2.867s.109 3.42-3.35 3.42H9.451s-3.24-.052-3.24 3.148v5.292S5.72 24 12.086 24zm3.206-1.85c-.578 0-1.046-.47-1.046-1.052 0-.581.468-1.051 1.046-1.051.579 0 1.046.47 1.046 1.051 0 .582-.467 1.052-1.046 1.052z" />
-                </svg>
-              )}
-              {lang.key === 'cpp' && (
-                <svg
-                  class="w-6 h-6 stroke-current"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke-width="2.2"
-                  stroke-linecap="square"
-                  aria-hidden="true"
-                >
-                  <path d="M9.5 7.5a5 5 0 1 0 0 9" />
-                  <path d="M14 12h4M16 10v4M19.5 12h3.5M21.25 10.25v3.5" />
-                </svg>
-              )}
-              {lang.key === 'nano' && (
-                <svg
-                  class="w-6 h-6 stroke-current"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke-width="2"
-                  stroke-linecap="square"
-                  aria-hidden="true"
-                >
-                  <rect x="6" y="6" width="12" height="12" rx="1" />
-                  <path d="M9 2v4M15 2v4M9 18v4M15 18v4M2 9h4M2 15h4M18 9h4M18 15h4" />
-                  <path d="M13.5 9.8a2.6 2.6 0 1 0 0 4.4" stroke-width="2" />
-                </svg>
-              )}
-              {lang.key === 'java' && (
-                <svg
-                  class="w-6 h-6 stroke-current"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  aria-hidden="true"
-                >
-                  <path d="M6 11h9v4a4.5 4.5 0 0 1-9 0v-4z" />
-                  <path d="M15 12h1.8a2 2 0 0 1 0 4H15" />
-                  <path d="M4.5 19.5h12" />
-                  <path d="M8.5 4.5c0 1.5 1.5 1.5 1.5 3M12.5 4.5c0 1.5 1.5 1.5 1.5 3" />
-                </svg>
-              )}
-              {lang.key === 'cs' && (
-                <svg
-                  class="w-6 h-6 stroke-current"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke-width="2.2"
-                  stroke-linecap="square"
-                  aria-hidden="true"
-                >
-                  <path d="M10.5 7.5a5 5 0 1 0 0 9" />
-                  <path d="M15 9.5v5M19 9.5v5M13.8 11h6.4M13.8 13.5h6.4" />
-                </svg>
-              )}
-              {lang.key === 'swift' && (
-                <svg
-                  class="w-6 h-6 stroke-current"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  aria-hidden="true"
-                >
-                  <path d="M20 15.5c-2.8 3.6-8.4 4.2-13.2 1.1-1-.6-2-1.5-2.8-2.4 2.5 1.3 5.5 1.4 8.2.2-3.4-2.1-6.2-5.3-7.7-8.9 2.4 2 5.2 3.4 8.1 4.1-2-2.1-3.5-4.4-4.2-6.6 2.9 2.1 6.1 4.6 8.4 7.7 1.2-2.6.9-5.3-.5-7.7 3.7 2.8 5.2 7.5 3.7 12.5z" />
-                </svg>
-              )}
-              {lang.key === 'dart' && (
-                <svg
-                  class="w-6 h-6 stroke-current"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  aria-hidden="true"
-                >
-                  <path d="M6.5 6.5L14 4l6 6-2.5 7.5L10 20l-6-6 2.5-7.5z" />
-                  <path d="M6.5 6.5L17.5 17.5" />
-                  <path d="M14 4v6h6" />
-                </svg>
-              )}
-              {lang.key === 'php' && (
-                <svg
-                  class="w-6 h-6 stroke-current"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  aria-hidden="true"
-                >
-                  <ellipse cx="12" cy="12" rx="9.5" ry="6" />
-                  <path d="M7 14v-4h1.6a1.2 1.2 0 0 1 0 2.4H7M11 10v4M11 12h2M13 10v4M15.5 14v-4h1.6a1.2 1.2 0 0 1 0 2.4h-1.6" />
-                </svg>
-              )}
-              {lang.key === 'elixir' && (
-                <svg
-                  class="w-6 h-6 stroke-current"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  aria-hidden="true"
-                >
-                  <path d="M12 3c-3.8 5-6 8.3-6 11.5a6 6 0 0 0 12 0C18 11.3 15.8 8 12 3z" />
-                  <path d="M12 3c-.8 4.2-1.8 7.5-1.2 11.5.4 2.4 1.8 4 3.2 4.5" />
-                </svg>
-              )}
-            </span>
+            <LanguageIcon lang={lang.key} class="w-7 h-7 shrink-0" />
             <div class="min-w-0">
-              <div class="text-sm sm:text-base font-bold truncate">{lang.label}</div>
-              <div class="text-xs font-normal text-ink/70 truncate">{lang.shortPackage}</div>
+              <div class="text-sm font-semibold truncate flex items-center gap-2">
+                {isCurrent && (
+                  <span class="w-1.5 h-1.5 rounded-full bg-[#FF4F18] shrink-0" aria-hidden="true" />
+                )}
+                <span class="truncate">{lang.label}</span>
+              </div>
+              <div class="font-mono text-xs text-ink/60 truncate mt-0.5">{lang.shortPackage}</div>
             </div>
           </div>
-          <span class="font-bold text-base shrink-0">&rarr;</span>
+          <span
+            class="text-sm text-ink/60 group-hover:text-ink transition-colors shrink-0"
+            aria-hidden="true"
+          >
+            &rarr;
+          </span>
         </a>
       );
     })}
   </div>
 
   <!-- Core Documentation Links -->
-  <div class="pt-6 border-t border-ink/20 flex flex-wrap items-center justify-between gap-4">
-    <div class="font-mono text-xs sm:text-sm font-bold uppercase text-ink/80">
-      Architecture, Tooling &amp; Wire Specification
-    </div>
-    <div class="flex flex-wrap gap-3 font-mono text-sm sm:text-base">
+  <div class="pt-6 border-t border-ink/12 flex flex-wrap items-center justify-between gap-4">
+    <div class="text-sm font-medium text-ink/70">Architecture, benchmarks, and specification</div>
+    <div class="flex flex-wrap gap-2.5 text-sm">
       {currentPage !== 'how-it-works' && (
-        <a href="/how-it-works" class="os-btn px-5 py-2.5 bg-acid text-ink font-bold rounded-md">
+        <a href="/how-it-works" class="btn-secondary px-3.5 py-2">
           How It Works &rarr;
         </a>
       )}
+      {currentPage !== 'benchmarks' && (
+        <a href="/benchmarks" class="btn-secondary px-3.5 py-2">
+          Benchmarks &rarr;
+        </a>
+      )}
       {currentPage !== 'spec' && (
-        <a
-          href="/spec"
-          class:list={[
-            'os-btn px-5 py-2.5 font-bold rounded-md',
-            currentPage === 'how-it-works' ? 'bg-acid text-ink' : 'bg-[#FAF8F2] text-ink',
-          ]}
-        >
+        <a href="/spec" class="btn-secondary px-3.5 py-2">
           Wire Specification &rarr;
         </a>
       )}
       {currentPage !== 'tooling' && (
-        <a href="/tooling" class="os-btn px-5 py-2.5 bg-[#FAF8F2] text-ink font-bold rounded-md">
-          OmniBuf Tooling &rarr;
+        <a href="/tooling" class="btn-secondary px-3.5 py-2">
+          Tooling &rarr;
         </a>
       )}
     </div>

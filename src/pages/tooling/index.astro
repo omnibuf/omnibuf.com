@@ -1,0 +1,145 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Navbar from '../../components/Navbar.astro';
+import Footer from '../../components/Footer.astro';
+import ToolingIcon from '../../components/ToolingIcon.astro';
+---
+
+<Layout
+  title="OmniBuf Tooling | CLI, Editor Plugins, DevTools & Traffic Inspection"
+  description="OmniBuf command-line tool, VS Code and Neovim editor plugins, Chrome DevTools panel, and Wireshark, tshark, and mitmproxy traffic dissectors."
+>
+  <Navbar currentPage="tooling" />
+
+  <main id="main-content">
+    <section class="pt-6 pb-8 sm:pt-8 sm:pb-10 px-4 sm:px-6 max-w-4xl mx-auto space-y-3">
+      <h1 class="text-3xl sm:text-5xl font-bold tracking-tight leading-[1.1] text-ink">Tooling</h1>
+      <p class="text-base sm:text-lg text-ink/80 leading-relaxed max-w-[64ch]">
+        Command-line utilities, editor plugins, browser DevTools, and packet dissectors for
+        inspecting and editing OmniBuf traffic and <code>.obuf</code> files.
+      </p>
+    </section>
+
+    <section class="pb-14 sm:pb-20 px-4 sm:px-6 max-w-4xl mx-auto">
+      <div class="grid sm:grid-cols-2 gap-4">
+        <a
+          href="/tooling/cli"
+          class="group bg-[#FAF8F2] border border-ink/15 hover:border-ink/40 rounded-lg p-5 sm:p-6 flex flex-col justify-between gap-4 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#FF4F18]"
+        >
+          <div class="space-y-3">
+            <div class="flex items-start gap-3.5">
+              <ToolingIcon tool="tooling-cli" class="w-10 h-10 shrink-0" />
+              <div class="min-w-0 flex-1">
+                <h2 class="text-lg sm:text-xl font-bold tracking-tight text-ink group-hover:text-accent transition-colors">
+                  CLI
+                </h2>
+                <div class="font-mono text-xs text-ink/60 mt-0.5">omnibuf-cli</div>
+              </div>
+            </div>
+            <p class="text-sm text-ink/80 leading-relaxed">
+              Decode raw <code>.obuf</code> files to JSON without a schema, filter fields with
+              built-in <code>jq</code> queries, and encode JSON back to wire bytes.
+            </p>
+          </div>
+          <span class="text-sm font-medium text-ink group-hover:text-accent transition-colors">
+            Open CLI guide &rarr;
+          </span>
+        </a>
+
+        <a
+          href="/tooling/editors"
+          class="group bg-[#FAF8F2] border border-ink/15 hover:border-ink/40 rounded-lg p-5 sm:p-6 flex flex-col justify-between gap-4 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#FF4F18]"
+        >
+          <div class="space-y-3">
+            <div class="flex items-start gap-3.5">
+              <ToolingIcon tool="tooling-editors" class="w-10 h-10 shrink-0" />
+              <div class="min-w-0 flex-1">
+                <h2 class="text-lg sm:text-xl font-bold tracking-tight text-ink group-hover:text-accent transition-colors">
+                  Editor plugins
+                </h2>
+                <div class="font-mono text-xs text-ink/60 mt-0.5">VS Code &middot; Neovim</div>
+              </div>
+            </div>
+            <p class="text-sm text-ink/80 leading-relaxed">
+              Open binary <code>.obuf</code> files as formatted JSON with split hex views and atomic
+              save back to wire bytes in VS Code, Neovim, and Vim.
+            </p>
+          </div>
+          <span class="text-sm font-medium text-ink group-hover:text-accent transition-colors">
+            Open editor plugins &rarr;
+          </span>
+        </a>
+
+        <a
+          href="/tooling/devtools"
+          class="group bg-[#FAF8F2] border border-ink/15 hover:border-ink/40 rounded-lg p-5 sm:p-6 flex flex-col justify-between gap-4 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#FF4F18]"
+        >
+          <div class="space-y-3">
+            <div class="flex items-start gap-3.5">
+              <ToolingIcon tool="tooling-devtools" class="w-10 h-10 shrink-0" />
+              <div class="min-w-0 flex-1">
+                <h2 class="text-lg sm:text-xl font-bold tracking-tight text-ink group-hover:text-accent transition-colors">
+                  DevTools
+                </h2>
+                <div class="font-mono text-xs text-ink/60 mt-0.5">omnibuf-devtools</div>
+              </div>
+            </div>
+            <p class="text-sm text-ink/80 leading-relaxed">
+              Chrome and Chromium DevTools panel that intercepts unary, Connect, and gRPC-Web
+              OmniBuf requests with zero proxy setup.
+            </p>
+          </div>
+          <span class="text-sm font-medium text-ink group-hover:text-accent transition-colors">
+            Open DevTools guide &rarr;
+          </span>
+        </a>
+
+        <a
+          href="/tooling/traffic"
+          class="group bg-[#FAF8F2] border border-ink/15 hover:border-ink/40 rounded-lg p-5 sm:p-6 flex flex-col justify-between gap-4 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#FF4F18]"
+        >
+          <div class="space-y-3">
+            <div class="flex items-start gap-3.5">
+              <ToolingIcon tool="tooling-traffic" class="w-10 h-10 shrink-0" />
+              <div class="min-w-0 flex-1">
+                <h2 class="text-lg sm:text-xl font-bold tracking-tight text-ink group-hover:text-accent transition-colors">
+                  Traffic inspection
+                </h2>
+                <div class="font-mono text-xs text-ink/60 mt-0.5">Wireshark &middot; mitmproxy</div>
+              </div>
+            </div>
+            <p class="text-sm text-ink/80 leading-relaxed">
+              Lua dissectors for Wireshark, <code>tshark</code>, and <code>termshark</code> plus a
+              Python addon for <code>mitmproxy</code> and <code>mitmweb</code>.
+            </p>
+          </div>
+          <span class="text-sm font-medium text-ink group-hover:text-accent transition-colors">
+            Open traffic inspection &rarr;
+          </span>
+        </a>
+      </div>
+    </section>
+
+    <section class="py-10 px-4 sm:px-6 max-w-4xl mx-auto border-t border-ink/15 no-print">
+      <div class="flex flex-wrap items-center justify-between gap-4">
+        <div class="text-sm font-medium text-ink/70">Libraries &amp; specification</div>
+        <div class="flex flex-wrap gap-2.5 text-sm">
+          <a href="/go" class="btn-secondary px-3.5 py-2">
+            Go &rarr;
+          </a>
+          <a href="/es" class="btn-secondary px-3.5 py-2">
+            TypeScript / JS &rarr;
+          </a>
+          <a href="/how-it-works" class="btn-secondary px-3.5 py-2">
+            How It Works &rarr;
+          </a>
+          <a href="/spec" class="btn-secondary px-3.5 py-2">
+            Wire Specification &rarr;
+          </a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <Footer />
+</Layout>

@@ -5,6 +5,7 @@ import {
   existsSync,
   mkdirSync,
   mkdtempSync,
+  readdirSync,
   readFileSync,
   rmSync,
   writeFileSync,
@@ -31,7 +32,7 @@ test('/es defineMessage snippet and prose match @omnibuf/core FieldSpec', () => 
 });
 
 test('schema-less omnibuf -c and DecodeBlind examples use field_<N> keys', () => {
-  for (const file of ['src/pages/tooling.astro', 'src/components/Motivation.astro']) {
+  for (const file of ['src/pages/tooling/cli.astro', 'src/components/Motivation.astro']) {
     const src = readRepoFile(file);
     assert.match(src, /"field_1"/);
     assert.match(src, /"field_2"/);
@@ -67,32 +68,33 @@ test('schema-less omnibuf -c and DecodeBlind examples use field_<N> keys', () =>
   assert.match(pyPage, /buf generate/);
 });
 
-test('Hero and Comparisons scope butterfly widget scripts and ARIA tab linkage', () => {
+test('Hero and Comparisons scope benchmark widgets, ARIA tab linkage, and clean copy', () => {
   const hero = readRepoFile('src/components/Hero.astro');
+  const motivation = readRepoFile('src/components/Motivation.astro');
   const comparisons = readRepoFile('src/components/Comparisons.astro');
-  const globalCss = readRepoFile('src/styles/global.css');
   const benchmarksData = readRepoFile('src/data/benchmarks.ts');
 
-  assert.match(hero, /\[data-butterfly-widget="hero"\]/);
-  assert.doesNotMatch(hero, /querySelectorAll<HTMLElement>\('\[data-butterfly-widget\]'\)/);
-  assert.match(hero, /hover:bg-\[#E5E0D5\]/);
+  assert.match(hero, /\[data-home-bench\]/);
   assert.match(hero, /aria-controls=/);
   assert.match(hero, /aria-labelledby=/);
   assert.match(hero, /tabindex=/);
-  assert.match(hero, /CYCLE_MS\s*=\s*14_000/);
-  assert.match(hero, /--hero-cycle-ms:\s*14000ms/);
-  assert.match(hero, /MANUAL_PAUSE_MS\s*=\s*90_000/);
-  assert.match(hero, /data-autorotate=/);
-  assert.match(hero, /data-butterfly-next/);
-  assert.match(hero, /hero-panel-progress/);
-  assert.match(hero, /prefers-reduced-motion:\s*reduce/);
-  assert.match(hero, /\[grid-area:1\/1\]/);
-  assert.match(hero, /\.proto Schemas or Plain Structs &rarr; Wire Encodings/);
-  assert.doesNotMatch(hero, /Plain Structs \(No \.proto\)/);
-  for (const stackedFile of ['Peer.java', 'Peer.cs', 'peer.hpp', 'peer.py', 'peer.rs', 'peer.ts']) {
-    assert.match(hero, new RegExp(stackedFile.replace('.', '\\.')));
+  assert.doesNotMatch(hero, /data-autorotate=/);
+  assert.doesNotMatch(hero, /CYCLE_MS/);
+  assert.match(hero, /peer\.proto/);
+  assert.match(hero, /Plain structs/);
+  assert.match(hero, /366 B/);
+  assert.match(hero, /341 B/);
+  assert.match(hero, /803 B/);
+  assert.match(hero, /time \/ op/);
+  assert.doesNotMatch(hero, /ns \/ op/);
+  assert.match(hero, /~same/);
+  assert.match(hero, /Compared against/);
+  assert.doesNotMatch(hero, /bg-\[#E5E0D5\]|text-\[#FF4F18\]/);
+
+  for (const homeFile of [hero, motivation]) {
+    assert.doesNotMatch(homeFile, /—|&mdash;/);
+    assert.doesNotMatch(homeFile, /paying for|paying the price|pay the cost/i);
   }
-  assert.match(globalCss, /@keyframes hero-tab-cycle/);
 
   assert.doesNotMatch(benchmarksData, /canonical 11-field/);
   const summaryMatches = [...benchmarksData.matchAll(/heroSummaryHtml:\s*'([^']+)'/g)];
@@ -235,6 +237,19 @@ test('search-index.json decodes HTML entities and Navbar listbox options manage 
     'every static and dynamic [data-search-item] anchor must carry role="option"',
   );
   assert.match(navbar, /setAttribute\('aria-selected',\s*isSelected\s*\?\s*'true'\s*:\s*'false'\)/);
+  assert.match(navbar, /id="docs-nav-menu"[^>]*>\s*<a\s+href="\/"/);
+  assert.match(navbar, /id="lang-nav-menu"[^>]*>\s*<a\s+href=\{languagesNavPage\.href\}/);
+  assert.match(navbar, /id="tooling-nav-menu"[^>]*>\s*<a\s+href=\{cliNavPage\.href\}/);
+  assert.match(navbar, /data-dropdown-toggle/);
+  assert.doesNotMatch(navbar, /menu\.addEventListener\('focusin'/);
+
+  for (const entry of entries) {
+    assert.doesNotMatch(
+      entry.url,
+      /^\/benchmarks#(?:lang-panel|bench-panel)-/,
+      `benchmark search entry must link to canonical query URL, got ${entry.url}`,
+    );
+  }
 });
 
 test('CSS, 404 routes, FAQ deterministic wording, HowItWorks KiB units, and PRODUCT.md paths stay consistent', () => {
@@ -245,18 +260,26 @@ test('CSS, 404 routes, FAQ deterministic wording, HowItWorks KiB units, and PROD
     1,
     'global.css must not contain duplicate dark-mode #00805A SVG text rules',
   );
+  const builtCss = readdirSync(resolve(rootDir, 'dist/_astro'))
+    .filter((name) => name.endsWith('.css'))
+    .map((name) => readFileSync(resolve(rootDir, 'dist/_astro', name), 'utf8'))
+    .join('\n');
+  assert.match(builtCss, /hover\\:text-accent/);
+  assert.match(builtCss, /group-hover\\:text-accent/);
 
-  const notFoundPage = readRepoFile('src/pages/404.astro');
+  const notFoundPage = readFileSync(resolve(rootDir, 'dist/404.html'), 'utf8');
   for (const route of [
     '/',
     '/how-it-works',
     '/benchmarks',
     '/spec',
+    '/languages',
     '/go',
     '/es',
     '/rs',
     '/py',
     '/cpp',
+    '/nano',
     '/java',
     '/cs',
     '/swift',
@@ -264,6 +287,10 @@ test('CSS, 404 routes, FAQ deterministic wording, HowItWorks KiB units, and PROD
     '/php',
     '/elixir',
     '/tooling',
+    '/tooling/cli',
+    '/tooling/editors',
+    '/tooling/devtools',
+    '/tooling/traffic',
   ]) {
     assert.match(notFoundPage, new RegExp(`href="${route}"`));
   }
@@ -279,4 +306,38 @@ test('CSS, 404 routes, FAQ deterministic wording, HowItWorks KiB units, and PROD
   const productMd = readRepoFile('PRODUCT.md');
   assert.doesNotMatch(productMd, /web\/src\//);
   assert.match(productMd, /\/cli/);
+});
+
+test('Breadcrumbs and BreadcrumbList JSON-LD render everywhere except the root page', () => {
+  const rootHtml = readFileSync(resolve(rootDir, 'dist/index.html'), 'utf8');
+  assert.doesNotMatch(rootHtml, /aria-label="Breadcrumb"/);
+  assert.doesNotMatch(rootHtml, /"BreadcrumbList"/);
+
+  const subPages = [
+    ['dist/how-it-works/index.html', ['Home', 'How It Works']],
+    ['dist/benchmarks/index.html', ['Home', 'Benchmarks']],
+    ['dist/spec/index.html', ['Home', 'Wire Specification']],
+    ['dist/languages/index.html', ['Home', 'Languages']],
+    ['dist/go/index.html', ['Home', 'Languages', 'Go']],
+    ['dist/tooling/index.html', ['Home', 'Tooling']],
+    ['dist/tooling/cli/index.html', ['Home', 'Tooling', 'CLI']],
+    ['dist/tooling/editors/index.html', ['Home', 'Tooling', 'Editor Plugins']],
+    ['dist/tooling/devtools/index.html', ['Home', 'Tooling', 'DevTools']],
+    ['dist/tooling/traffic/index.html', ['Home', 'Tooling', 'Traffic Inspection']],
+  ];
+
+  for (const [relPath, expectedNames] of subPages) {
+    const html = readFileSync(resolve(rootDir, relPath), 'utf8');
+    assert.match(html, /aria-label="Breadcrumb"/, `${relPath} must render breadcrumb nav`);
+    const match = html.match(
+      /<script type="application\/ld\+json">(\{"@context":"https:\/\/schema\.org","@type":"BreadcrumbList"[^<]+)<\/script>/,
+    );
+    assert.ok(match, `${relPath} must embed BreadcrumbList JSON-LD`);
+    const jsonLd = JSON.parse(match[1]);
+    assert.deepEqual(
+      jsonLd.itemListElement.map((e) => e.name),
+      expectedNames,
+      `${relPath} BreadcrumbList names must match expected hierarchy`,
+    );
+  }
 });

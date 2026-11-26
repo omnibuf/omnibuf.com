@@ -78,42 +78,42 @@ const crossLangDefs: CrossLangBenchDef[] = [
     shortLabel: 'Full Decode',
     title: 'Full Message Decode Speed',
     summary:
-      'Unpacking and reading all 11 fields of PeerUpdate into a destination struct and checksum sink across every codec.',
+      'Decodes PeerUpdate and reads all 11 fields across every codec so lazy decoders do the same work as eager ones.',
   },
   {
     slug: 'encode',
     shortLabel: 'Full Encode',
     title: 'Full Message Encode Speed',
     summary:
-      'Serializing the 11-field PeerUpdate struct into a byte buffer. Tests single-pass 2-byte length slots and Prefix-Varint writes.',
+      'Serializes the 11-field PeerUpdate struct into a byte buffer, testing single-pass 2-byte length slots and Prefix-Varint writes.',
   },
   {
     slug: 'nested-read',
     shortLabel: 'Nested Read',
     title: 'Read a Single Nested Field',
     summary:
-      'Extracting a single nested city string directly from raw wire bytes by hopping over preceding fields by byte length.',
+      'Extracts one nested city string straight from raw wire bytes by jumping past earlier fields using their byte lengths.',
   },
   {
     slug: 'splice',
     shortLabel: 'Field Splice',
     title: 'Selective Single-Field Mutation',
     summary:
-      'Checking a nested city string, incrementing a 64-bit sequence counter, and splicing only the dirty field back into the packet.',
+      'Checks a nested city string, increments a 64-bit sequence counter, and splices only the dirty field back into the packet.',
   },
   {
     slug: 'large-embed',
     shortLabel: 'Large Embed',
     title: 'Large Embedded Message Encode',
     summary:
-      'Encoding a ~39 KiB message with embedded sub-messages exceeding the 16 KiB 2-byte slot to exercise the 4-byte length path.',
+      'Encodes a ~39 KiB message with embedded sub-messages past the 16 KiB 2-byte slot to exercise the 4-byte length path.',
   },
   {
     slug: 'growth',
     shortLabel: 'Growth',
     title: 'Embedded Message Growth',
     summary:
-      'Scaling behavior as embedded sub-message payloads grow, checking for linear O(N) performance across container sizes.',
+      'Grows embedded sub-message payloads across size thresholds to verify linear O(N) scaling.',
   },
 ];
 
@@ -134,7 +134,6 @@ const crossLangPanels = crossLangDefs.map((def) => {
         label: suite.label,
         shortLabel: suite.shortLabel,
         href: meta?.href ?? `/${suite.key}`,
-        runtimeLabel: omniRow.name,
         val: omniRow.val,
         unit: cat.unit,
         protoVal: protoRow?.val ?? null,
@@ -178,7 +177,7 @@ const methodologyBenchmarks = [
     title: 'Full Message Decode Speed',
     slug: 'decode',
     description:
-      'Unpacks all 11 fields of PeerUpdate into a destination struct and feeds every field into a non-inlined checksum sink. Reading every field prevents lazy wrappers from skipping work and isolates trailing-zero Prefix-Varint loads and packed primitive arrays against LEB128 byte loops and JSON tokenizers under equal struct reuse.',
+      'Decodes PeerUpdate into a reused struct and reads all 11 fields into a checksum the compiler cannot optimize away. That forces lazy decoders (like FlatBuffers or C upb) to unpack every field just like eager structs, isolating Prefix-Varint loads and packed arrays against LEB128 byte loops and JSON parsers.',
   },
   {
     title: 'Read a Single Nested Field',
@@ -217,22 +216,23 @@ const validLangKeys: LanguageKey[] = languageBenchmarkList.map((s) => s.key);
 
   <main id="main-content">
     <!-- Page Header -->
-    <section class="pt-10 sm:pt-14 pb-6 sm:pb-8 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+    <section class="pt-10 sm:pt-14 pb-6 sm:pb-8 px-4 sm:px-6 max-w-6xl mx-auto">
       <div class="flex flex-wrap items-end justify-between gap-4">
-        <div class="max-w-3xl">
-          <h1 class="text-4xl sm:text-6xl font-bold tracking-tight uppercase leading-[0.95] text-ink">
-            Runtime <span class="text-[#FF4F18]">benchmarks.</span>
+        <div class="max-w-3xl space-y-2.5">
+          <h1 class="text-3xl sm:text-5xl font-bold tracking-tight leading-[1.1] text-ink">
+            Runtime <span class="text-accent">benchmarks</span>
           </h1>
-          <p class="mt-3 text-base sm:text-lg text-ink/85 font-medium leading-relaxed max-w-[64ch]">
-            Inspect OmniBuf against Protobuf, JSON, and native serializers in each of the 11
-            supported languages, or compare runtimes side by side on the same Apple M1 Pro workload.
+          <p class="text-base sm:text-lg text-ink/80 leading-relaxed max-w-[64ch]">
+            Every runtime runs the same 11-field <code>PeerUpdate</code> suite on an Apple M1 Pro
+            against Protobuf, JSON, and native serializers. Browse by language or compare all{' '}
+            {languageBenchmarkList.length} runtimes side by side.
           </p>
         </div>
-        <div class="flex flex-wrap gap-2 font-mono text-xs sm:text-sm">
-          <a href="#wire-size" class="os-btn px-3.5 py-2 bg-[#FAF8F2] text-ink font-bold rounded">
+        <div class="flex flex-wrap gap-2 text-sm">
+          <a href="#wire-size" class="btn-secondary px-3.5 py-2">
             Wire Size &darr;
           </a>
-          <a href="#methodology" class="os-btn px-3.5 py-2 bg-[#FAF8F2] text-ink font-bold rounded">
+          <a href="#methodology" class="btn-secondary px-3.5 py-2">
             Methodology &darr;
           </a>
         </div>
@@ -243,60 +243,54 @@ const validLangKeys: LanguageKey[] = languageBenchmarkList.map((s) => s.key);
     <section
       id="results"
       data-benchmark-explorer
-      class="pb-12 sm:pb-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto"
+      class="scroll-mt-14 pb-12 sm:pb-16 px-4 sm:px-6 max-w-6xl mx-auto"
     >
-      <!-- Workstation Control Bar -->
-      <div class="os-window overflow-hidden mb-6">
-        <div class="os-titlebar bg-[#E5E0D5]">
-          <span class="font-mono text-xs sm:text-sm font-bold uppercase text-ink">
-            Benchmark Explorer &middot; 11 Languages &middot; 6 Workloads
-          </span>
-          <span class="font-mono text-xs font-bold uppercase text-ink/80">
-            Shorter bars = Faster
-          </span>
-        </div>
-
-        <div class="p-3.5 sm:p-4 bg-[#FAF8F2] space-y-3.5">
-          <!-- Mode Switcher + Scale Toggle -->
-          <div class="flex flex-wrap items-center justify-between gap-3">
-            <div
-              role="tablist"
-              aria-label="Benchmark view mode"
-              class="inline-flex flex-wrap gap-1.5 font-mono text-xs sm:text-sm font-bold"
+      <!-- Compact Sticky Explorer Controls (sticks until after #results) -->
+      <div
+        data-explorer-bar
+        class="sticky top-14 z-30 -mx-4 sm:-mx-6 px-4 sm:px-6 py-2 mb-5 bg-[var(--bg-paper)]"
+      >
+        <div class="bg-[#FAF8F2] border border-ink/15 rounded-lg shadow-sm px-2.5 py-1.5 flex flex-col lg:flex-row lg:items-center gap-2 lg:gap-2.5">
+          <!-- Mode Switcher -->
+          <div
+            role="tablist"
+            aria-label="Benchmark view mode"
+            class="inline-flex items-center gap-1 text-xs font-medium shrink-0"
+          >
+            <button
+              type="button"
+              role="tab"
+              id="view-tab-language"
+              data-view-tab="language"
+              aria-selected="true"
+              aria-controls="view-panel-language"
+              tabindex="0"
+              class="seg-tab px-2.5 py-1.5 sm:py-1 whitespace-nowrap"
             >
-              <button
-                type="button"
-                role="tab"
-                id="view-tab-language"
-                data-view-tab="language"
-                aria-selected="true"
-                aria-controls="view-panel-language"
-                tabindex="0"
-                class="px-3.5 py-1.5 rounded border-2 border-ink bg-acid text-ink shadow-[2px_2px_0px_#111111] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink transition cursor-pointer"
-              >
-                By Language
-              </button>
-              <button
-                type="button"
-                role="tab"
-                id="view-tab-compare"
-                data-view-tab="compare"
-                aria-selected="false"
-                aria-controls="view-panel-compare"
-                tabindex="-1"
-                class="px-3.5 py-1.5 rounded border-2 border-ink bg-[#FAF8F2] text-ink hover:bg-[#E5E0D5] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink transition cursor-pointer"
-              >
-                Compare Languages
-              </button>
-            </div>
+              By language
+            </button>
+            <button
+              type="button"
+              role="tab"
+              id="view-tab-compare"
+              data-view-tab="compare"
+              aria-selected="false"
+              aria-controls="view-panel-compare"
+              tabindex="-1"
+              class="seg-tab px-2.5 py-1.5 sm:py-1 whitespace-nowrap"
+            >
+              Compare languages
+            </button>
           </div>
 
-          <!-- Sub-tabs: 11 Languages (By Language mode) -->
+          <span class="hidden lg:block w-px h-5 bg-ink/15 shrink-0" aria-hidden="true"></span>
+
+          <!-- Sub-tabs: Languages (By Language mode) -->
           <div
             data-language-subtabs
             role="tablist"
             aria-label="Select language runtime"
-            class="flex flex-wrap gap-1.5 pt-2.5 border-t border-ink/15 font-mono text-xs font-bold"
+            class="flex items-center gap-1 overflow-x-auto pt-1.5 border-t border-ink/12 lg:pt-0 lg:border-t-0 font-mono text-xs min-w-0"
           >
             {languageBenchmarkList.map((suite, idx) => (
               <button
@@ -307,12 +301,7 @@ const validLangKeys: LanguageKey[] = languageBenchmarkList.map((s) => s.key);
                 aria-selected={idx === 0 ? 'true' : 'false'}
                 aria-controls={`lang-panel-${suite.key}`}
                 tabindex={idx === 0 ? 0 : -1}
-                class:list={[
-                  'px-2.5 py-1.5 rounded border-2 border-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink transition cursor-pointer',
-                  idx === 0
-                    ? 'bg-acid text-ink shadow-[2px_2px_0px_#111111]'
-                    : 'bg-white text-ink hover:bg-[#E5E0D5]',
-                ]}
+                class="seg-tab px-2 py-1.5 sm:py-1 whitespace-nowrap shrink-0"
               >
                 {suite.shortLabel}
               </button>
@@ -324,7 +313,7 @@ const validLangKeys: LanguageKey[] = languageBenchmarkList.map((s) => s.key);
             data-compare-subtabs
             role="tablist"
             aria-label="Select benchmark workload"
-            class="hidden flex-wrap gap-1.5 pt-2.5 border-t border-ink/15 font-mono text-xs font-bold"
+            class="hidden items-center gap-1 overflow-x-auto pt-1.5 border-t border-ink/12 lg:pt-0 lg:border-t-0 font-mono text-xs min-w-0"
           >
             {crossLangPanels.map((panel, idx) => (
               <button
@@ -335,12 +324,7 @@ const validLangKeys: LanguageKey[] = languageBenchmarkList.map((s) => s.key);
                 aria-selected={idx === 0 ? 'true' : 'false'}
                 aria-controls={`bench-panel-${panel.slug}`}
                 tabindex={idx === 0 ? 0 : -1}
-                class:list={[
-                  'px-2.5 py-1.5 rounded border-2 border-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink transition cursor-pointer',
-                  idx === 0
-                    ? 'bg-acid text-ink shadow-[2px_2px_0px_#111111]'
-                    : 'bg-white text-ink hover:bg-[#E5E0D5]',
-                ]}
+                class="seg-tab px-2 py-1.5 sm:py-1 whitespace-nowrap shrink-0"
               >
                 {panel.shortLabel}
               </button>
@@ -366,85 +350,72 @@ const validLangKeys: LanguageKey[] = languageBenchmarkList.map((s) => s.key);
             class:list={[pIdx !== 0 && 'hidden']}
           >
             <div class="os-window overflow-hidden">
-              <div class="os-titlebar bg-[#E5E0D5]">
-                <h2 class="font-mono text-xs sm:text-sm font-bold uppercase text-ink">
-                  {panel.title} &middot; All 11 Runtimes
+              <div class="os-titlebar">
+                <h2 class="text-sm font-semibold text-ink">
+                  {panel.title} &middot; {panel.rows.length} runtimes
                 </h2>
               </div>
 
               <div class="p-4 sm:p-5 bg-[#FAF8F2] space-y-3">
-                <p class="text-sm sm:text-base text-ink/85 leading-relaxed max-w-[75ch]">
+                <p class="text-sm sm:text-base text-ink/80 leading-relaxed max-w-[75ch]">
                   {panel.summary}
                 </p>
 
                 <!-- Column Headers (Desktop) -->
-                <div class="hidden md:grid md:grid-cols-[minmax(190px,1.25fr)_minmax(180px,1.25fr)_minmax(165px,1fr)_minmax(165px,1fr)_auto] gap-4 px-3 pb-1.5 border-b-2 border-ink font-mono text-xs font-bold uppercase text-ink/80">
-                  <div>Language &amp; Runtime</div>
-                  <div>OmniBuf Latency</div>
+                <div class="hidden md:grid md:grid-cols-[minmax(180px,1.2fr)_minmax(210px,1.45fr)_minmax(170px,1fr)_minmax(170px,1fr)] gap-4 px-3 pb-1.5 border-b border-ink/15 font-mono text-xs font-semibold text-ink/65">
+                  <div>Language</div>
+                  <div>Latency</div>
                   <div class="text-right">vs Protobuf</div>
                   <div class="text-right">vs JSON</div>
-                  <div class="text-right">Charts</div>
                 </div>
 
                 <div class="space-y-1.5">
                   {panel.rows.map((row) => (
-                    <div
+                    <button
+                      type="button"
+                      data-inspect-lang={row.key}
+                      aria-label={`View all ${row.label} benchmark charts`}
+                      title={`View all ${row.label} benchmark charts`}
                       class:list={[
-                        'grid grid-cols-1 md:grid-cols-[minmax(190px,1.25fr)_minmax(180px,1.25fr)_minmax(165px,1fr)_minmax(165px,1fr)_auto] gap-x-4 gap-y-2 items-center px-3 py-2.5 rounded border transition',
-                        row.rank === 1
-                          ? 'bg-acid/30 border-2 border-ink shadow-[2px_2px_0px_#111111]'
-                          : 'bg-white border-ink/20 hover:border-ink',
+                        'group w-full text-left cursor-pointer grid grid-cols-1 md:grid-cols-[minmax(180px,1.2fr)_minmax(210px,1.45fr)_minmax(170px,1fr)_minmax(170px,1fr)] gap-x-4 gap-y-2 items-center px-3 py-2.5 rounded-md focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#FF4F18]',
+                        row.rank === 1 ? 'bench-compare-row-top' : 'bench-compare-row',
                       ]}
                     >
-                      <!-- Language & Runtime (with mobile drill-down button) -->
-                      <div class="min-w-0 flex items-center justify-between md:block gap-2">
-                        <div class="min-w-0">
-                          <div class="flex items-center gap-2 min-w-0">
-                            <span class="font-mono text-xs font-bold text-ink/80 tabular-nums w-5 shrink-0">
-                              #{row.rank}
-                            </span>
-                            <a
-                              href={row.href}
-                              class="font-mono text-sm font-bold text-ink hover:underline decoration-2 decoration-[#FF4F18] underline-offset-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink rounded-sm truncate"
-                            >
-                              {row.label}
-                            </a>
-                          </div>
-                          <div class="font-mono text-xs text-ink/80 truncate pl-7">
-                            {row.runtimeLabel}
-                          </div>
-                        </div>
-                        <button
-                          type="button"
-                          data-inspect-lang={row.key}
-                          class="md:hidden px-2.5 py-1.5 rounded border border-ink bg-[#FAF8F2] hover:bg-acid text-ink font-mono text-xs font-bold focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink transition cursor-pointer whitespace-nowrap shrink-0"
-                          title={`View all ${row.label} benchmark charts`}
+                      <!-- Language -->
+                      <span class="flex items-center gap-2 min-w-0">
+                        <span class="font-mono text-xs font-semibold text-ink/60 tabular-nums w-5 shrink-0">
+                          #{row.rank}
+                        </span>
+                        <span class="text-sm font-semibold text-ink group-hover:text-accent transition-colors truncate">
+                          {row.label}
+                        </span>
+                        <span
+                          class="text-xs text-ink/60 group-hover:text-accent group-hover:translate-x-0.5 transition-all shrink-0"
+                          aria-hidden="true"
                         >
-                          All 6 &rarr;
-                        </button>
-                      </div>
+                          &rarr;
+                        </span>
+                      </span>
 
                       <!-- Latency Bar + Metric -->
-                      <div class="flex items-center gap-2.5 min-w-0">
-                        <div class="flex-1 bg-[#E5E0D5] h-4 border border-ink rounded-sm overflow-hidden">
-                          <div
-                            class="h-full bench-bar-omni border-r border-ink"
+                      <span class="flex items-center gap-2.5 min-w-0">
+                        <span class="flex-1 bench-track h-2.5 rounded-full overflow-hidden block">
+                          <span
+                            class="block h-full bench-bar-omni rounded-full"
                             style={`width: ${row.linearPct}%;`}
                           />
-                        </div>
-                        <span class="font-mono text-xs sm:text-sm font-bold text-ink tabular-nums whitespace-nowrap w-20 text-right shrink-0">
+                        </span>
+                        <span class="font-mono text-xs sm:text-sm font-semibold text-ink tabular-nums whitespace-nowrap w-20 text-right shrink-0">
                           {formatMetric(row.val, row.unit)}
                         </span>
-                      </div>
+                      </span>
 
                       <!-- vs Protobuf -->
-                      <div class="flex items-baseline justify-between md:block font-mono text-xs tabular-nums md:text-right min-w-0 gap-2">
-                        <span class="md:hidden text-xs uppercase text-ink/80 shrink-0">
-                          vs Protobuf
-                        </span>
-                        <div class="text-right min-w-0">
-                          <div
-                            class="font-bold text-ink text-xs sm:text-sm"
+                      <span class="flex items-baseline justify-between md:block font-mono text-xs tabular-nums md:text-right min-w-0 gap-2">
+                        <span class="md:hidden text-xs text-ink/65 shrink-0">vs Protobuf</span>
+                        <span class="block text-right min-w-0">
+                          <span
+                            class="block font-semibold text-ink text-xs sm:text-sm"
                             title={
                               row.protoVal !== null && row.protoName
                                 ? `${row.protoName}: ${formatMetric(row.protoVal, row.unit)}`
@@ -452,24 +423,22 @@ const validLangKeys: LanguageKey[] = languageBenchmarkList.map((s) => s.key);
                             }
                           >
                             {row.vsProto}
-                          </div>
+                          </span>
                           {row.protoVal !== null && (
-                            <div class="text-xs text-ink/85 truncate">
-                              {formatMetric(row.protoVal, row.unit)} (
-                              {shortCompetitorName(row.protoName)})
-                            </div>
+                            <span class="block text-xs text-ink/65 truncate">
+                              {formatMetric(row.protoVal, row.unit)} &middot;{' '}
+                              {shortCompetitorName(row.protoName)}
+                            </span>
                           )}
-                        </div>
-                      </div>
+                        </span>
+                      </span>
 
                       <!-- vs JSON -->
-                      <div class="flex items-baseline justify-between md:block font-mono text-xs tabular-nums md:text-right min-w-0 gap-2">
-                        <span class="md:hidden text-xs uppercase text-ink/80 shrink-0">
-                          vs JSON
-                        </span>
-                        <div class="text-right min-w-0">
-                          <div
-                            class="font-bold text-ink text-xs sm:text-sm"
+                      <span class="flex items-baseline justify-between md:block font-mono text-xs tabular-nums md:text-right min-w-0 gap-2">
+                        <span class="md:hidden text-xs text-ink/65 shrink-0">vs JSON</span>
+                        <span class="block text-right min-w-0">
+                          <span
+                            class="block font-semibold text-ink text-xs sm:text-sm"
                             title={
                               row.jsonVal !== null && row.jsonName
                                 ? `${row.jsonName}: ${formatMetric(row.jsonVal, row.unit)}`
@@ -477,36 +446,24 @@ const validLangKeys: LanguageKey[] = languageBenchmarkList.map((s) => s.key);
                             }
                           >
                             {row.vsJson}
-                          </div>
+                          </span>
                           {row.jsonVal !== null && (
-                            <div class="text-xs text-ink/85 truncate">
-                              {formatMetric(row.jsonVal, row.unit)} (
-                              {shortCompetitorName(row.jsonName)})
-                            </div>
+                            <span class="block text-xs text-ink/65 truncate">
+                              {formatMetric(row.jsonVal, row.unit)} &middot;{' '}
+                              {shortCompetitorName(row.jsonName)}
+                            </span>
                           )}
-                        </div>
-                      </div>
-
-                      <!-- Desktop drill-down button -->
-                      <div class="hidden md:flex justify-end">
-                        <button
-                          type="button"
-                          data-inspect-lang={row.key}
-                          class="px-2.5 py-1.5 rounded border border-ink bg-[#FAF8F2] hover:bg-acid text-ink font-mono text-xs font-bold focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink transition cursor-pointer whitespace-nowrap"
-                          title={`View all ${row.label} benchmark charts`}
-                        >
-                          All 6 &rarr;
-                        </button>
-                      </div>
-                    </div>
+                        </span>
+                      </span>
+                    </button>
                   ))}
                 </div>
 
-                <p class="pt-2 text-xs text-ink/75 font-mono leading-relaxed">
+                <p class="pt-2 text-xs text-ink/70 leading-relaxed">
                   Note: Cross-language latency reflects each runtime model (AOT native, JIT,
-                  interpreter + Rust FFI/NIF, or BEAM). Click any row&apos;s{' '}
-                  <strong>All 6 &rarr;</strong> button to inspect all competitors and pure-language
-                  variants for that ecosystem.
+                  interpreter + compiled Rust extension/NIF for Python, PHP, and Elixir, or BEAM).
+                  Click any row to inspect all competitors and pure-language variants for that
+                  ecosystem.
                 </p>
               </div>
             </div>
@@ -531,23 +488,17 @@ const validLangKeys: LanguageKey[] = languageBenchmarkList.map((s) => s.key);
               data-lang-panel={suite.key}
               class:list={['space-y-6', sIdx !== 0 && 'hidden']}
             >
-              <div class="flex flex-wrap items-end justify-between gap-4">
-                <div class="max-w-3xl">
-                  <h2
-                    tabindex="-1"
-                    data-lang-heading={suite.key}
-                    class="text-2xl sm:text-4xl font-bold tracking-tight uppercase leading-none text-ink focus:outline-none"
-                  >
-                    {suite.headingPrefix} benchmarks.
-                  </h2>
-                  <p
-                    class="mt-2 text-sm sm:text-base text-ink/80 font-medium"
-                    set:html={suite.subtitleHtml}
-                  />
-                </div>
+              <div class="flex flex-wrap items-center justify-between gap-4">
+                <h2
+                  tabindex="-1"
+                  data-lang-heading={suite.key}
+                  class="text-2xl sm:text-3xl font-bold tracking-tight text-ink focus:outline-none"
+                >
+                  {suite.headingPrefix} benchmarks
+                </h2>
                 <a
                   href={langMeta?.href ?? `/${suite.key}`}
-                  class="os-btn px-3.5 py-2 bg-acid text-ink font-mono font-bold text-xs sm:text-sm rounded"
+                  class="btn-primary px-3.5 py-2 text-xs sm:text-sm"
                 >
                   {suite.label} Guide &rarr;
                 </a>
@@ -556,14 +507,12 @@ const validLangKeys: LanguageKey[] = languageBenchmarkList.map((s) => s.key);
               <div class="grid lg:grid-cols-2 gap-5 items-start">
                 {suite.categories.map((cat) => (
                   <div class="os-window overflow-hidden">
-                    <div class="os-titlebar bg-[#E5E0D5]">
-                      <span class="font-mono text-xs sm:text-sm font-bold uppercase">
-                        {cat.title}
-                      </span>
+                    <div class="os-titlebar">
+                      <span class="text-sm font-semibold text-ink">{cat.title}</span>
                     </div>
 
-                    <div class="p-3.5 sm:p-4 bg-[#FAF8F2] space-y-1">
-                      <p class="text-xs sm:text-sm text-ink/85 leading-snug pb-1.5 max-w-[70ch]">
+                    <div class="p-4 bg-[#FAF8F2] space-y-1.5">
+                      <p class="text-xs sm:text-sm text-ink/75 leading-relaxed pb-2 max-w-[70ch]">
                         {cat.methodology}
                       </p>
                       {(() => {
@@ -588,12 +537,12 @@ const validLangKeys: LanguageKey[] = languageBenchmarkList.map((s) => s.key);
                           return (
                             <div
                               class:list={[
-                                'grid grid-cols-12 gap-x-2 gap-y-1 items-center px-2.5 py-1 rounded min-w-0',
+                                'grid grid-cols-12 gap-x-2 gap-y-1 items-center px-2.5 py-1.5 rounded-md min-w-0',
                                 r.baseline
-                                  ? 'bg-acid/45 border-2 border-ink shadow-[2px_2px_0px_#111111] font-bold'
+                                  ? 'bench-row-omni font-semibold'
                                   : r.highlight
-                                    ? 'bg-acid/25 border-2 border-dashed border-ink font-bold'
-                                    : 'border border-ink/15 bg-white',
+                                    ? 'bench-row-omni-secondary font-medium'
+                                    : 'border border-ink/10 bg-white',
                               ]}
                               title={rowTitle}
                             >
@@ -601,11 +550,10 @@ const validLangKeys: LanguageKey[] = languageBenchmarkList.map((s) => s.key);
                                 {r.name}
                               </div>
                               <div class="col-span-6 sm:col-span-3 flex items-center min-w-0">
-                                <div class="w-full bg-[#E5E0D5] h-3.5 border border-ink rounded-sm overflow-hidden">
+                                <div class="w-full bench-track h-2.5 rounded-full overflow-hidden">
                                   <div
                                     class:list={[
-                                      'h-full',
-                                      numPct < 99.5 && 'border-r border-ink',
+                                      'h-full rounded-full',
                                       r.highlight ? 'bench-bar-omni' : 'bench-bar-competitor',
                                     ]}
                                     style={`width: ${pct}%;`}
@@ -613,8 +561,10 @@ const validLangKeys: LanguageKey[] = languageBenchmarkList.map((s) => s.key);
                                 </div>
                               </div>
                               <div class="col-span-6 sm:col-span-4 flex flex-wrap items-baseline justify-end gap-x-1 text-right font-mono text-xs tabular-nums leading-tight min-w-0">
-                                <span class="font-bold text-ink whitespace-nowrap">{ratioStr}</span>
-                                <span class="text-ink/70 font-normal whitespace-nowrap">
+                                <span class="font-semibold text-ink whitespace-nowrap">
+                                  {ratioStr}
+                                </span>
+                                <span class="text-ink/65 font-normal whitespace-nowrap">
                                   ({formatMetric(r.val, cat.unit)})
                                 </span>
                               </div>
@@ -628,12 +578,12 @@ const validLangKeys: LanguageKey[] = languageBenchmarkList.map((s) => s.key);
               </div>
 
               <!-- Per-Language Runtime & Reproducibility Notes -->
-              <div class="pt-6 border-t-2 border-ink/15 grid md:grid-cols-12 gap-6 items-start">
+              <div class="pt-6 border-t border-ink/15 grid md:grid-cols-12 gap-6 items-start">
                 <div class="md:col-span-4">
-                  <div class="p-4 bg-ink text-paper rounded-md border-2 border-ink space-y-1.5 font-mono text-xs sm:text-sm">
-                    <div class="text-acid font-bold uppercase">{suite.label} Environment</div>
+                  <div class="p-4 bg-ink text-paper rounded-lg border border-ink/15 space-y-1.5 font-mono text-xs sm:text-sm">
+                    <div class="text-acid font-semibold">{suite.label} environment</div>
                     {suite.hardwareLines.map((line) => (
-                      <div>{line}</div>
+                      <div class="text-paper/85">{line}</div>
                     ))}
                   </div>
                 </div>
@@ -653,17 +603,15 @@ const validLangKeys: LanguageKey[] = languageBenchmarkList.map((s) => s.key);
     {wireSizeCategory && (
       <section
         id="wire-size"
-        class="scroll-mt-16 py-10 sm:py-14 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto border-t-2 border-ink/15"
+        class="scroll-mt-16 py-12 sm:py-16 px-4 sm:px-6 max-w-6xl mx-auto border-t border-ink/15"
       >
         <div class="grid lg:grid-cols-12 gap-6 lg:gap-8 items-start">
           <div class="lg:col-span-4 space-y-3">
-            <h2 class="text-2xl sm:text-4xl font-bold tracking-tight uppercase leading-none text-ink">
-              Wire size.
-            </h2>
+            <h2 class="text-2xl sm:text-3xl font-bold tracking-tight text-ink">Wire size</h2>
             <p class="text-sm sm:text-base text-ink/85 leading-relaxed">
-              Packet size is identical across all 11 OmniBuf runtimes. Protobuf saves ~7% on dense
-              messages by omitting type disambiguation, while OmniBuf stays 35% to 54% smaller than
-              Cap&apos;n Proto, FlatBuffers, MessagePack, and JSON.
+              Packet size is identical across all {languageBenchmarkList.length} OmniBuf runtimes.
+              Protobuf saves ~7% on dense messages by omitting type disambiguation, while OmniBuf
+              stays 35% to 54% smaller than Cap&apos;n Proto, FlatBuffers, MessagePack, and JSON.
             </p>
             <p class="text-xs sm:text-sm text-ink/75 leading-relaxed">
               Even with optional <strong>Field #0</strong> metadata enabled (writing field names
@@ -673,12 +621,12 @@ const validLangKeys: LanguageKey[] = languageBenchmarkList.map((s) => s.key);
 
           <div class="lg:col-span-8">
             <div class="os-window overflow-hidden">
-              <div class="os-titlebar bg-[#E5E0D5]">
-                <span class="font-mono text-xs sm:text-sm font-bold uppercase">
-                  {wireSizeCategory.title} &middot; 11-Field PeerUpdate
+              <div class="os-titlebar">
+                <span class="text-sm font-semibold text-ink">
+                  {wireSizeCategory.title} &middot; 11-field PeerUpdate
                 </span>
               </div>
-              <div class="p-3.5 sm:p-4 bg-[#FAF8F2] space-y-1">
+              <div class="p-4 bg-[#FAF8F2] space-y-1.5">
                 {(() => {
                   const sorted = [...wireSizeCategory.rows].sort((a, b) => a.val - b.val);
                   const baseVal = sorted.find((r) => r.baseline)?.val ?? 366;
@@ -698,23 +646,22 @@ const validLangKeys: LanguageKey[] = languageBenchmarkList.map((s) => s.key);
                     return (
                       <div
                         class:list={[
-                          'grid grid-cols-12 gap-x-2 gap-y-1 items-center px-2.5 py-1.5 rounded min-w-0',
+                          'grid grid-cols-12 gap-x-2 gap-y-1 items-center px-2.5 py-1.5 rounded-md min-w-0',
                           r.baseline
-                            ? 'bg-acid/45 border-2 border-ink shadow-[2px_2px_0px_#111111] font-bold'
+                            ? 'bench-row-omni font-semibold'
                             : r.highlight
-                              ? 'bg-acid/25 border-2 border-dashed border-ink font-bold'
-                              : 'border border-ink/15 bg-white',
+                              ? 'bench-row-omni-secondary font-medium'
+                              : 'border border-ink/10 bg-white',
                         ]}
                       >
                         <div class="col-span-12 sm:col-span-5 font-mono text-xs text-ink truncate">
                           {r.name}
                         </div>
                         <div class="col-span-6 sm:col-span-3 flex items-center min-w-0">
-                          <div class="w-full bg-[#E5E0D5] h-3.5 border border-ink rounded-sm overflow-hidden">
+                          <div class="w-full bench-track h-2.5 rounded-full overflow-hidden">
                             <div
                               class:list={[
-                                'h-full',
-                                numPct < 99.5 && 'border-r border-ink',
+                                'h-full rounded-full',
                                 r.highlight ? 'bench-bar-omni' : 'bench-bar-competitor',
                               ]}
                               style={`width: ${pct}%;`}
@@ -722,8 +669,8 @@ const validLangKeys: LanguageKey[] = languageBenchmarkList.map((s) => s.key);
                           </div>
                         </div>
                         <div class="col-span-6 sm:col-span-4 flex flex-wrap items-baseline justify-end gap-x-1 text-right font-mono text-xs tabular-nums leading-tight min-w-0">
-                          <span class="font-bold text-ink whitespace-nowrap">{deltaLabel}</span>
-                          <span class="text-ink/70 font-normal whitespace-nowrap">
+                          <span class="font-semibold text-ink whitespace-nowrap">{deltaLabel}</span>
+                          <span class="text-ink/65 font-normal whitespace-nowrap">
                             ({r.val.toLocaleString('en-US')} B)
                           </span>
                         </div>
@@ -741,13 +688,13 @@ const validLangKeys: LanguageKey[] = languageBenchmarkList.map((s) => s.key);
     <!-- Benchmark Methodology (Placed AFTER Data) -->
     <section
       id="methodology"
-      class="scroll-mt-16 py-12 sm:py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto border-t-2 border-ink/15 space-y-12"
+      class="scroll-mt-16 py-12 sm:py-16 px-4 sm:px-6 max-w-6xl mx-auto border-t border-ink/15 space-y-10"
     >
-      <div class="max-w-4xl">
-        <h2 class="text-3xl sm:text-5xl font-bold tracking-tight uppercase leading-none text-ink">
-          Benchmark methodology.
+      <div class="max-w-3xl space-y-2.5">
+        <h2 class="text-2xl sm:text-3xl font-bold tracking-tight text-ink">
+          Benchmark methodology
         </h2>
-        <p class="mt-3 text-base sm:text-lg text-ink/85 leading-relaxed">
+        <p class="text-base sm:text-lg text-ink/80 leading-relaxed max-w-[65ch]">
           Every runtime runs the same six workloads on the same Apple M1 Pro machine against
           idiomatic Protobuf, JSON, and native serializers. Each test targets a specific wire-format
           property so fast paths cannot hide regressions elsewhere.
@@ -756,15 +703,15 @@ const validLangKeys: LanguageKey[] = languageBenchmarkList.map((s) => s.key);
 
       <!-- Shared Test Setup & Equal-Footing Rules -->
       <div class="space-y-4">
-        <h3 class="text-xl sm:text-2xl font-bold uppercase tracking-tight text-ink">
-          Test Payloads &amp; Equal-Footing Rules
+        <h3 class="text-lg sm:text-xl font-bold tracking-tight text-ink">
+          Test payloads and equal-footing rules
         </h3>
-        <div class="border-t-2 border-ink divide-y divide-ink/20">
+        <div class="border-t border-ink/15 divide-y divide-ink/12">
           <div class="py-4 grid md:grid-cols-12 gap-2 md:gap-8 items-baseline">
-            <div class="md:col-span-3 font-mono text-sm sm:text-base font-bold text-ink">
+            <div class="md:col-span-3 font-mono text-sm font-semibold text-ink">
               Shared Payloads
             </div>
-            <p class="md:col-span-9 text-sm sm:text-base text-ink/85 leading-relaxed max-w-[75ch]">
+            <p class="md:col-span-9 text-sm sm:text-base text-ink/85 leading-relaxed max-w-[58ch]">
               The primary workload is an 11-field <code>PeerUpdate</code> struct with unsigned and
               signed integers, booleans, UTF-8 strings, a nested <code>Location</code> sub-message,
               packed integer arrays, and repeated nested peer entries (366 B in OmniBuf, 341 B in
@@ -774,26 +721,23 @@ const validLangKeys: LanguageKey[] = languageBenchmarkList.map((s) => s.key);
             </p>
           </div>
           <div class="py-4 grid md:grid-cols-12 gap-2 md:gap-8 items-baseline">
-            <div class="md:col-span-3 font-mono text-sm sm:text-base font-bold text-ink">
-              No Dead-Code Elimination
+            <div class="md:col-span-3 font-mono text-sm font-semibold text-ink">
+              Every Field Actually Read
             </div>
-            <p class="md:col-span-9 text-sm sm:text-base text-ink/85 leading-relaxed max-w-[75ch]">
-              Every full-decode benchmark reads all 11 fields into a non-inlined checksum sink so
-              lazy wrappers (such as C <code>upb</code> arenas or FlatBuffers tables) perform the
-              same field materialization as eager structs.
+            <p class="md:col-span-9 text-sm sm:text-base text-ink/85 leading-relaxed max-w-[58ch]">
+              Some formats (like FlatBuffers or C <code>upb</code>) decode lazily and only unpack a
+              field when your code asks for it. Every full-decode benchmark reads all 11 fields and
+              folds them into a checksum the compiler cannot optimize away, so lazy and eager
+              decoders both do the same amount of work.
             </p>
           </div>
           <div class="py-4 grid md:grid-cols-12 gap-2 md:gap-8 items-baseline">
-            <div class="md:col-span-3 font-mono text-sm sm:text-base font-bold text-ink">
+            <div class="md:col-span-3 font-mono text-sm font-semibold text-ink">
               Equal Reuse &amp; Warmup
             </div>
-            <p class="md:col-span-9 text-sm sm:text-base text-ink/85 leading-relaxed max-w-[75ch]">
-              Where a benchmark reuses output buffers or destination structs, every competitor in
-              that chart gets the same reuse. AOT languages compile with release optimizations (
-              <code>-O3</code>, <code>--release</code>, <code>-c release</code>), and JIT runtimes
-              (V8, JVM C2, .NET RyuJIT) warm up before timing. Every harness and recorded JSON
-              output lives in its language repository under <code>benchmarks/</code> and{' '}
-              <code>testdata/benchmarks.json</code>.
+            <!-- prettier-ignore -->
+            <p class="md:col-span-9 text-sm sm:text-base text-ink/85 leading-relaxed max-w-[58ch]">
+              Where a benchmark reuses output buffers or destination structs, every competitor in that chart gets the same reuse. AOT languages compile with release optimizations (<code>-O3</code>, <code>--release</code>, <code>-c release</code>), and JIT runtimes (V8, JVM C2, .NET RyuJIT) warm up before timing. Every harness lives in its language repository&apos;s benchmark directory alongside recorded output in <code>testdata/benchmarks.json</code>.
             </p>
           </div>
         </div>
@@ -801,16 +745,14 @@ const validLangKeys: LanguageKey[] = languageBenchmarkList.map((s) => s.key);
 
       <!-- The Six Benchmarks Explained -->
       <div class="space-y-4">
-        <h3 class="text-xl sm:text-2xl font-bold uppercase tracking-tight text-ink">
-          Why These Six Benchmarks
+        <h3 class="text-lg sm:text-xl font-bold tracking-tight text-ink">
+          Why these six benchmarks
         </h3>
-        <div class="border-t-2 border-ink divide-y divide-ink/20">
+        <div class="border-t border-ink/15 divide-y divide-ink/12">
           {methodologyBenchmarks.map((item) => (
             <div class="py-4 sm:py-5 grid md:grid-cols-12 gap-2 md:gap-8 items-baseline">
-              <h4 class="md:col-span-3 font-mono text-sm sm:text-base font-bold text-ink">
-                {item.title}
-              </h4>
-              <p class="md:col-span-9 text-sm sm:text-base text-ink/85 leading-relaxed max-w-[75ch]">
+              <h4 class="md:col-span-3 font-mono text-sm font-semibold text-ink">{item.title}</h4>
+              <p class="md:col-span-9 text-sm sm:text-base text-ink/85 leading-relaxed max-w-[58ch]">
                 {item.description}
               </p>
             </div>
@@ -844,13 +786,9 @@ const validLangKeys: LanguageKey[] = languageBenchmarkList.map((s) => s.key);
     let activeBench = validBenchSlugs[0] || 'decode';
     let activeLang = validLangKeys[0] || 'go';
 
-    function setTabStyle(btn, isActive, inactiveBg = 'bg-white') {
+    function setTabStyle(btn, isActive) {
       btn.setAttribute('aria-selected', isActive ? 'true' : 'false');
       btn.setAttribute('tabindex', isActive ? '0' : '-1');
-      btn.classList.toggle('bg-acid', isActive);
-      btn.classList.toggle('shadow-[2px_2px_0px_#111111]', isActive);
-      btn.classList.toggle(inactiveBg, !isActive);
-      btn.classList.toggle('hover:bg-[#E5E0D5]', !isActive);
     }
 
     function syncUrl(push = false) {
@@ -885,7 +823,7 @@ const validLangKeys: LanguageKey[] = languageBenchmarkList.map((s) => s.key);
       activeView = view === 'language' ? 'language' : 'compare';
       viewTabs.forEach((tab) => {
         const isActive = tab.getAttribute('data-view-tab') === activeView;
-        setTabStyle(tab, isActive, 'bg-[#FAF8F2]');
+        setTabStyle(tab, isActive);
       });
       viewPanels.forEach((panel) => {
         const isActive = panel.getAttribute('data-view-panel') === activeView;
@@ -906,7 +844,9 @@ const validLangKeys: LanguageKey[] = languageBenchmarkList.map((s) => s.key);
       if (!validBenchSlugs.includes(slug)) return;
       activeBench = slug;
       benchTabs.forEach((tab) => {
-        setTabStyle(tab, tab.getAttribute('data-bench-tab') === activeBench, 'bg-white');
+        const isActive = tab.getAttribute('data-bench-tab') === activeBench;
+        setTabStyle(tab, isActive);
+        if (isActive) tab.scrollIntoView({ block: 'nearest', inline: 'nearest' });
       });
       benchPanels.forEach((panel) => {
         panel.classList.toggle('hidden', panel.getAttribute('data-bench-panel') !== activeBench);
@@ -918,7 +858,9 @@ const validLangKeys: LanguageKey[] = languageBenchmarkList.map((s) => s.key);
       if (!validLangKeys.includes(lang)) return;
       activeLang = lang;
       langTabs.forEach((tab) => {
-        setTabStyle(tab, tab.getAttribute('data-lang-tab') === activeLang, 'bg-white');
+        const isActive = tab.getAttribute('data-lang-tab') === activeLang;
+        setTabStyle(tab, isActive);
+        if (isActive) tab.scrollIntoView({ block: 'nearest', inline: 'nearest' });
       });
       langPanels.forEach((panel) => {
         panel.classList.toggle('hidden', panel.getAttribute('data-lang-panel') !== activeLang);
@@ -942,30 +884,45 @@ const validLangKeys: LanguageKey[] = languageBenchmarkList.map((s) => s.key);
       });
     }
 
+    function scrollToResultsTopIfStuck() {
+      if (root.getBoundingClientRect().top < 56) {
+        const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        root.scrollIntoView({ behavior: prefersReduced ? 'auto' : 'smooth', block: 'start' });
+      }
+    }
+
     viewTabs.forEach((tab) => {
       tab.addEventListener('click', () => {
-        applyView(tab.getAttribute('data-view-tab') || 'language', true, true);
+        applyView(tab.getAttribute('data-view-tab') || 'language', true, false);
+        scrollToResultsTopIfStuck();
       });
     });
-    wireArrowNav(viewTabs, (tab) =>
-      applyView(tab.getAttribute('data-view-tab') || 'language', true, true),
-    );
+    wireArrowNav(viewTabs, (tab) => {
+      applyView(tab.getAttribute('data-view-tab') || 'language', true, false);
+      scrollToResultsTopIfStuck();
+    });
 
     benchTabs.forEach((tab) => {
       tab.addEventListener('click', () => {
         applyBench(tab.getAttribute('data-bench-tab') || 'decode');
+        scrollToResultsTopIfStuck();
       });
     });
-    wireArrowNav(benchTabs, (tab) => applyBench(tab.getAttribute('data-bench-tab') || 'decode'));
+    wireArrowNav(benchTabs, (tab) => {
+      applyBench(tab.getAttribute('data-bench-tab') || 'decode');
+      scrollToResultsTopIfStuck();
+    });
 
     langTabs.forEach((tab) => {
       tab.addEventListener('click', () => {
-        applyLang(tab.getAttribute('data-lang-tab') || 'go', true, true);
+        applyLang(tab.getAttribute('data-lang-tab') || 'go', true, false);
+        scrollToResultsTopIfStuck();
       });
     });
-    wireArrowNav(langTabs, (tab) =>
-      applyLang(tab.getAttribute('data-lang-tab') || 'go', true, true),
-    );
+    wireArrowNav(langTabs, (tab) => {
+      applyLang(tab.getAttribute('data-lang-tab') || 'go', true, false);
+      scrollToResultsTopIfStuck();
+    });
 
     inspectButtons.forEach((btn) => {
       btn.addEventListener('click', () => {
@@ -983,10 +940,16 @@ const validLangKeys: LanguageKey[] = languageBenchmarkList.map((s) => s.key);
 
     function hydrateFromLocation() {
       const params = new URLSearchParams(window.location.search);
-      const hashLang = window.location.hash.replace(/^#/, '').toLowerCase();
+      const rawHash = window.location.hash.replace(/^#/, '').toLowerCase();
+      const hashLang = rawHash.startsWith('lang-panel-')
+        ? rawHash.slice('lang-panel-'.length)
+        : rawHash;
+      const hashBench = rawHash.startsWith('bench-panel-')
+        ? rawHash.slice('bench-panel-'.length)
+        : '';
       const paramLang = (params.get('lang') || '').toLowerCase();
       const paramView = (params.get('view') || '').toLowerCase();
-      const paramBench = (params.get('bench') || '').toLowerCase();
+      const paramBench = (params.get('bench') || hashBench).toLowerCase();
 
       if (paramView === 'compare' || validBenchSlugs.includes(paramBench)) {
         if (validBenchSlugs.includes(paramBench)) {
