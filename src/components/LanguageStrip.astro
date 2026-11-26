@@ -55,18 +55,15 @@ const { currentPage = 'home', id, narrow = false } = Astro.props;
         >
           <div class="flex items-center gap-3 min-w-0">
             <LanguageIcon lang={lang.key} class="w-7 h-7 shrink-0" />
-            <div class="min-w-0">
-              <div class="text-sm font-semibold truncate flex items-center gap-2">
-                {isCurrent && (
-                  <span class="w-1.5 h-1.5 rounded-full bg-[#FF4F18] shrink-0" aria-hidden="true" />
-                )}
-                <span class="truncate">{lang.label}</span>
-              </div>
-              <div class="font-mono text-xs text-ink/60 truncate mt-0.5">{lang.shortPackage}</div>
+            <div class="text-sm font-semibold truncate flex items-center gap-2 min-w-0">
+              {isCurrent && (
+                <span class="w-1.5 h-1.5 rounded-full bg-[#FF4F18] shrink-0" aria-hidden="true" />
+              )}
+              <span class="truncate group-hover:text-accent transition-colors">{lang.label}</span>
             </div>
           </div>
           <span
-            class="text-sm text-ink/60 group-hover:text-ink transition-colors shrink-0"
+            class="text-sm text-ink/60 group-hover:text-accent transition-colors shrink-0"
             aria-hidden="true"
           >
             &rarr;

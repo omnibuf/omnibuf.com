@@ -244,120 +244,165 @@ omnibuf decode --schema descriptors.pb --type demo.v1.PeerUpdate packet.obuf`;
         </p>
         <div class="border border-ink/15 rounded-lg overflow-hidden">
           <div class="overflow-x-auto bg-[#FAF8F2]">
-            <table class="w-full text-left border-collapse font-mono text-xs sm:text-sm">
+            <table class="w-full text-left border-collapse text-sm">
               <thead>
-                <tr class="border-b border-ink/15 bg-[#EDE8DC] text-ink/75 text-xs">
-                  <th class="py-2.5 px-3 font-semibold">JSON Value</th>
-                  <th class="py-2.5 px-3 font-semibold">OmniBuf Wire Type</th>
-                  <th class="py-2.5 px-3 font-semibold">Protobuf Equiv.</th>
+                <tr class="border-b border-ink/15 bg-[#EDE8DC] text-ink/75 text-xs font-mono">
+                  <th class="py-2.5 px-3.5 font-semibold">JSON input</th>
+                  <th class="py-2.5 px-3.5 font-semibold">Wire type</th>
+                  <th class="py-2.5 px-3.5 font-semibold text-right">Tag</th>
+                  <th class="py-2.5 px-3.5 font-semibold">Protobuf</th>
                 </tr>
               </thead>
               <tbody class="divide-y divide-ink/10 text-ink">
                 <tr>
-                  <td class="py-2.5 px-3">
-                    <code>true</code> / <code>false</code>
+                  <td class="py-2.5 px-3.5">
+                    <span class="font-medium">Boolean</span>
+                    <span class="font-mono text-xs text-ink/65 ml-2">true, false</span>
                   </td>
-                  <td class="py-2.5 px-3">
-                    <code>WireBoolTrue</code> (3) / <code>WireBoolFalse</code> (2)
+                  <td class="py-2.5 px-3.5 font-mono text-xs sm:text-sm whitespace-nowrap">
+                    WireBoolFalse / WireBoolTrue
                   </td>
-                  <td class="py-2.5 px-3">
-                    <code>bool</code>
+                  <td class="py-2.5 px-3.5 font-mono text-xs text-ink/65 text-right tabular-nums whitespace-nowrap">
+                    2, 3
                   </td>
-                </tr>
-                <tr>
-                  <td class="py-2.5 px-3">
-                    Non-negative integer (<code>0..2^64-1</code>)
-                  </td>
-                  <td class="py-2.5 px-3">
-                    <code>WireUint</code> (0)
-                  </td>
-                  <td class="py-2.5 px-3">
-                    <code>uint32</code> / <code>uint64</code>
+                  <td class="py-2.5 px-3.5 font-mono text-xs sm:text-sm text-ink/80 whitespace-nowrap">
+                    bool
                   </td>
                 </tr>
                 <tr>
-                  <td class="py-2.5 px-3">
-                    Negative integer (<code>-2^63..-1</code>)
+                  <td class="py-2.5 px-3.5">
+                    <span class="font-medium">Unsigned integer</span>
+                    <span class="font-mono text-xs text-ink/65 ml-2">0 .. 2^64-1</span>
                   </td>
-                  <td class="py-2.5 px-3">
-                    <code>WireSint</code> (1, ZigZag)
+                  <td class="py-2.5 px-3.5 font-mono text-xs sm:text-sm whitespace-nowrap">
+                    WireUint
                   </td>
-                  <td class="py-2.5 px-3">
-                    <code>sint32</code> / <code>sint64</code>
+                  <td class="py-2.5 px-3.5 font-mono text-xs text-ink/65 text-right tabular-nums">
+                    0
                   </td>
-                </tr>
-                <tr>
-                  <td class="py-2.5 px-3">
-                    Decimal, exponent (<code>.</code>/<code>e</code>), or &gt;64-bit
-                  </td>
-                  <td class="py-2.5 px-3">
-                    <code>WireFloat64</code> (9, 8B LE)
-                  </td>
-                  <td class="py-2.5 px-3">
-                    <code>double</code>
+                  <td class="py-2.5 px-3.5 font-mono text-xs sm:text-sm text-ink/80 whitespace-nowrap">
+                    uint32 / uint64
                   </td>
                 </tr>
                 <tr>
-                  <td class="py-2.5 px-3">
-                    String (<code>"FRA"</code>)
+                  <td class="py-2.5 px-3.5">
+                    <span class="font-medium">Negative integer</span>
+                    <span class="font-mono text-xs text-ink/65 ml-2">-2^63 .. -1</span>
                   </td>
-                  <td class="py-2.5 px-3">
-                    <code>WireString</code> (10, UTF-8)
+                  <td class="py-2.5 px-3.5 font-mono text-xs sm:text-sm whitespace-nowrap">
+                    WireSint
                   </td>
-                  <td class="py-2.5 px-3">
-                    <code>string</code>
+                  <td class="py-2.5 px-3.5 font-mono text-xs text-ink/65 text-right tabular-nums">
+                    1
                   </td>
-                </tr>
-                <tr>
-                  <td class="py-2.5 px-3">
-                    <code>"base64:..."</code> (valid std base64)
-                  </td>
-                  <td class="py-2.5 px-3">
-                    <code>WireBytes</code> (11, raw bytes)
-                  </td>
-                  <td class="py-2.5 px-3">
-                    <code>bytes</code>
+                  <td class="py-2.5 px-3.5 font-mono text-xs sm:text-sm text-ink/80 whitespace-nowrap">
+                    sint32 / sint64
                   </td>
                 </tr>
                 <tr>
-                  <td class="py-2.5 px-3">
-                    Nested object (<code>&#123;...&#125;</code>)
+                  <td class="py-2.5 px-3.5">
+                    <span class="font-medium">Decimal or exponent</span>
+                    <span class="font-mono text-xs text-ink/65 ml-2">3.14, 1e9, &gt;64-bit</span>
                   </td>
-                  <td class="py-2.5 px-3">
-                    <code>WireSubMsg</code> (12)
+                  <td class="py-2.5 px-3.5 font-mono text-xs sm:text-sm whitespace-nowrap">
+                    WireFloat64
                   </td>
-                  <td class="py-2.5 px-3">
-                    <code>message</code>
+                  <td class="py-2.5 px-3.5 font-mono text-xs text-ink/65 text-right tabular-nums">
+                    9
                   </td>
-                </tr>
-                <tr>
-                  <td class="py-2.5 px-3">
-                    Homogeneous array (<code>[...]</code>)
-                  </td>
-                  <td class="py-2.5 px-3">
-                    <code>WireArray</code> (13)
-                    <div class="text-xs font-sans text-ink/70 mt-0.5">
-                      Numbers widen across elements: <code>WireUint</code> &rarr;{' '}
-                      <code>WireSint</code> &rarr; <code>WireFloat64</code>. All-base64 string
-                      arrays encode as <code>WireBytes</code>. Objects share one field table. Nested
-                      arrays and empty arrays are supported; mixed incompatible types fail and{' '}
-                      <code>null</code> elements are omitted.
-                    </div>
-                  </td>
-                  <td class="py-2.5 px-3">
-                    <code>repeated T</code>
+                  <td class="py-2.5 px-3.5 font-mono text-xs sm:text-sm text-ink/80 whitespace-nowrap">
+                    double
                   </td>
                 </tr>
                 <tr>
-                  <td class="py-2.5 px-3">
-                    <code>null</code>
+                  <td class="py-2.5 px-3.5">
+                    <span class="font-medium">String</span>
+                    <span class="font-mono text-xs text-ink/65 ml-2">&quot;FRA&quot;</span>
                   </td>
-                  <td class="py-2.5 px-3">Omitted (absent field)</td>
-                  <td class="py-2.5 px-3">unset field</td>
+                  <td class="py-2.5 px-3.5 font-mono text-xs sm:text-sm whitespace-nowrap">
+                    WireString
+                  </td>
+                  <td class="py-2.5 px-3.5 font-mono text-xs text-ink/65 text-right tabular-nums">
+                    10
+                  </td>
+                  <td class="py-2.5 px-3.5 font-mono text-xs sm:text-sm text-ink/80 whitespace-nowrap">
+                    string
+                  </td>
+                </tr>
+                <tr>
+                  <td class="py-2.5 px-3.5">
+                    <span class="font-medium">Base64 string</span>
+                    <span class="font-mono text-xs text-ink/65 ml-2">&quot;base64:...&quot;</span>
+                  </td>
+                  <td class="py-2.5 px-3.5 font-mono text-xs sm:text-sm whitespace-nowrap">
+                    WireBytes
+                  </td>
+                  <td class="py-2.5 px-3.5 font-mono text-xs text-ink/65 text-right tabular-nums">
+                    11
+                  </td>
+                  <td class="py-2.5 px-3.5 font-mono text-xs sm:text-sm text-ink/80 whitespace-nowrap">
+                    bytes
+                  </td>
+                </tr>
+                <tr>
+                  <td class="py-2.5 px-3.5">
+                    <span class="font-medium">Nested object</span>
+                    <span class="font-mono text-xs text-ink/65 ml-2">&#123;...&#125;</span>
+                  </td>
+                  <td class="py-2.5 px-3.5 font-mono text-xs sm:text-sm whitespace-nowrap">
+                    WireSubMsg
+                  </td>
+                  <td class="py-2.5 px-3.5 font-mono text-xs text-ink/65 text-right tabular-nums">
+                    12
+                  </td>
+                  <td class="py-2.5 px-3.5 font-mono text-xs sm:text-sm text-ink/80 whitespace-nowrap">
+                    message
+                  </td>
+                </tr>
+                <tr>
+                  <td class="py-2.5 px-3.5">
+                    <span class="font-medium">Array</span>
+                    <span class="font-mono text-xs text-ink/65 ml-2">[...]</span>
+                  </td>
+                  <td class="py-2.5 px-3.5 font-mono text-xs sm:text-sm whitespace-nowrap">
+                    WireArray
+                  </td>
+                  <td class="py-2.5 px-3.5 font-mono text-xs text-ink/65 text-right tabular-nums">
+                    13
+                  </td>
+                  <td class="py-2.5 px-3.5 font-mono text-xs sm:text-sm text-ink/80 whitespace-nowrap">
+                    repeated T
+                  </td>
+                </tr>
+                <tr>
+                  <td class="py-2.5 px-3.5">
+                    <span class="font-medium">Null</span>
+                    <span class="font-mono text-xs text-ink/65 ml-2">null</span>
+                  </td>
+                  <td class="py-2.5 px-3.5 text-ink/65">Omitted</td>
+                  <td class="py-2.5 px-3.5 font-mono text-xs text-ink/50 text-right">&ndash;</td>
+                  <td class="py-2.5 px-3.5 font-mono text-xs sm:text-sm text-ink/65">unset</td>
                 </tr>
               </tbody>
             </table>
           </div>
+        </div>
+        <div class="text-sm text-ink/80 leading-relaxed max-w-[65ch] space-y-1.5">
+          <p class="font-medium text-ink">Array rules</p>
+          <ul class="list-disc pl-5 space-y-1">
+            <li>
+              Numeric arrays widen to fit all elements: <code>WireUint</code> &rarr;{' '}
+              <code>WireSint</code> &rarr; <code>WireFloat64</code>.
+            </li>
+            <li>
+              Arrays where every element is a valid <code>"base64:..."</code> string encode as a{' '}
+              <code>WireBytes</code> array.
+            </li>
+            <li>
+              Object arrays share a single field table. Nested and empty arrays are supported,{' '}
+              <code>null</code> elements are skipped, and mixed incompatible types return an error.
+            </li>
+          </ul>
         </div>
       </div>
     </section>
