@@ -1544,7 +1544,7 @@ export const languageBenchmarks: Record<LanguageKey, LanguageBenchmarkSuite> = {
       'Command: just bench',
     ],
     environmentParagraphs: [
-      'Measured on Elixir 1.18.6 running on Erlang/OTP 27 on an Apple M1 Pro Mac. Both the optional Rustler NIF backed by <code>omnibuf-rs</code> and the pure-Elixir iodata / binary pattern-matching backend pass all 992 conformance tests.',
+      'Measured on Elixir 1.18.6 running on Erlang/OTP 27 on an Apple M1 Pro Mac. Both the optional Rustler NIF backed by <code>omnibuf-rs</code> and the pure-Elixir iodata / binary pattern-matching backend pass all 1109 conformance tests.',
       'Benchmark source lives in <a href="https://github.com/omnibuf/omnibuf-elixir/tree/main/bench" target="_blank" rel="noopener noreferrer" class="doc-link font-mono">bench/</a>, with recorded output in <a href="https://github.com/omnibuf/omnibuf-elixir/blob/main/testdata/benchmarks.json" target="_blank" rel="noopener noreferrer" class="doc-link font-mono">testdata/benchmarks.json</a>.',
     ],
   },

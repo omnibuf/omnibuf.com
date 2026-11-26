@@ -264,8 +264,12 @@ const javaFaqJsonLd = {
             <p class="text-base sm:text-lg text-ink/85 leading-relaxed">
               Services with existing <code>com.google.protobuf.Message</code> builders and gRPC
               stubs pass them straight to <code>OmniBufProtobuf.marshal</code> and{' '}
-              <code>OmniBufProtobuf.unmarshal</code>. Presence, <code>oneof</code> unions, maps, and
-              Editions descriptors preserve exact semantics.
+              <code>OmniBufProtobuf.unmarshal</code>. Presence, <code>oneof</code> unions, maps, and{' '}
+              <a href="/spec#sec-11-4" class="doc-link">
+                Editions 2023, 2024, and 2026
+              </a>{' '}
+              descriptors follow the documented OmniBuf subset and reject unsupported features
+              explicitly.
             </p>
           </div>
 

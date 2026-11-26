@@ -160,7 +160,12 @@ const subsectionTitles: Record<number, string[]> = {
     'WireExtended (15)',
   ],
   8: ['SchemaMeta Definition', 'Placement, Inheritance & Merge'],
-  11: ['Schema Mapping', 'Conformance Runner & Client Protocol', 'Conformance Test Coverage'],
+  11: [
+    'Schema Mapping',
+    'Conformance Runner & Client Protocol',
+    'Conformance Test Coverage',
+    'Protobuf Editions Support Matrix',
+  ],
 };
 const tocSections = sectionTitles.map((title, index) => ({
   id: `sec-${index + 1}`,
@@ -1120,7 +1125,183 @@ WireSubMsg (12): [ByteLen: Prefix-Varint][Message field stream]</code></pre>
             Counts near integer limits, mismatched byte lengths, malformed empty collections,
             invalid UTF-8, nesting limits, corrupt Field #0 headers, and unsupported extensions.
           </li>
+          <li>
+            Protobuf Editions 2023, 2024, and 2026 vectors covering explicit presence zeros
+            (including <code>WireBoolFalse</code>, empty strings/bytes, <code>0.0</code>, and enum{' '}
+            <code>0</code>), inherited <code>IMPLICIT</code> overrides, open enum unknown values
+            (positive and negative), <code>DELIMITED</code> submessages, <code>PACKED</code> and{' '}
+            <code>EXPANDED</code> arrays, <code>oneof</code> last-wins resolution, and Field #0
+            metadata.
+          </li>
         </ul>
+
+        <h3 id="sec-11-4">11.4 Protobuf Editions Support Matrix</h3>
+        <p>
+          All 12 language repositories and schema-aware tools target Protobuf Editions{' '}
+          <code>2023</code> (<code>1000</code>), <code>2024</code> (<code>1001</code>), and{' '}
+          <code>2026</code> (<code>1002</code>), tested against <code>protoc 36.2</code>,{' '}
+          <code>buf 1.75.0</code>, and the shared 1109-case conformance suite. Any edition number
+          outside <code>1000..1002</code> returns an explicit error.
+        </p>
+        <p>
+          <strong>Supported Editions features:</strong> <code>field_presence</code> (
+          <code>EXPLICIT</code> and <code>IMPLICIT</code>, resolved down file, message, oneof, and
+          field scopes), open enums (<code>enum_type = OPEN</code> with unknown integers kept intact
+          on round-trip), <code>repeated_field_encoding</code> (<code>PACKED</code> and{' '}
+          <code>EXPANDED</code>, both encoded as <code>WireArray</code>),{' '}
+          <code>message_encoding</code> (<code>LENGTH_PREFIXED</code> and <code>DELIMITED</code>,
+          both encoded as <code>WireSubMsg</code> while legacy <code>proto2</code>{' '}
+          <code>TYPE_GROUP</code> stays rejected), <code>json_format</code> (<code>ALLOW</code> and{' '}
+          <code>LEGACY_BEST_EFFORT</code>), <code>oneof</code> unions, zero defaults, custom option
+          extensions under <code>google.protobuf.*Options</code>, and 2024/2026 source or language
+          features (<code>export</code>/<code>local</code> visibility, naming/limit checks, Go{' '}
+          <code>API_OPAQUE</code>, Java top-level classes, and C# nullable reference types).
+        </p>
+        <p>
+          <strong>Rejected everywhere (both codegen and reflection):</strong>{' '}
+          <code>enum_type = CLOSED</code> (local or imported, including imported <code>proto2</code>{' '}
+          closed enums), <code>field_presence = LEGACY_REQUIRED</code>,{' '}
+          <code>utf8_validation = NONE</code> on any <code>string</code> field (singular, repeated,
+          oneof, or map key/value), non-zero <code>[default = ...]</code> values (including{' '}
+          <code>-0.0</code> and non-zero enum defaults), and non-option extensions.
+        </p>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Target</th>
+                <th>Tier 1 codegen</th>
+                <th>Tier 2 reflection / runtime</th>
+                <th>Tested notes</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Go</td>
+                <td>2023, 2024, 2026</td>
+                <td>2023, 2024, 2026</td>
+                <td>
+                  1109/1109 conformance; Go Open, Hybrid, and Opaque APIs. Edition 2026 currently
+                  requires <code>google.golang.org/protobuf v1.37.0-rc.1</code> (
+                  <code>v1.36.x</code> stops at 2024).
+                </td>
+              </tr>
+              <tr>
+                <td>TypeScript / JS</td>
+                <td>2023, 2024, 2026</td>
+                <td>2023, 2024, 2026</td>
+                <td>
+                  1109/1109 conformance across generated codecs, <code>protobuf-es</code>, and{' '}
+                  <code>DescriptorRegistry</code>.
+                </td>
+              </tr>
+              <tr>
+                <td>Rust</td>
+                <td>2023, 2024, 2026</td>
+                <td>
+                  2023, 2024, 2026 (<code>buffa_codec</code>)
+                </td>
+                <td>
+                  1109/1109 conformance via <code>protoc-gen-omnibuf-rs</code> and{' '}
+                  <code>buffa_codec</code>. <code>prost_codec</code> (
+                  <code>prost-reflect 0.16.5</code>) stays <code>proto2</code>/<code>proto3</code>{' '}
+                  only because upstream does not parse Editions.
+                </td>
+              </tr>
+              <tr>
+                <td>Python</td>
+                <td>2023, 2024, 2026</td>
+                <td>2023, 2024, 2026</td>
+                <td>
+                  1109/1109 conformance; byte-identical across generated code,{' '}
+                  <code>google.protobuf 7.36.2</code>, and <code>protobuf-py</code>.
+                </td>
+              </tr>
+              <tr>
+                <td>C++20</td>
+                <td>2023, 2024, 2026</td>
+                <td>2023, 2024, 2026</td>
+                <td>
+                  1109/1109 conformance across generated headers and zero-dependency{' '}
+                  <code>DescriptorPool</code> / <code>DynamicMessage</code> (Release + ASan/UBSan).
+                </td>
+              </tr>
+              <tr>
+                <td>C99 Nano</td>
+                <td>2023, 2024, 2026</td>
+                <td>Codegen only</td>
+                <td>
+                  15/15 canonical Editions valid vectors and 4/4 invalid cases verified under strict
+                  C99, <code>-fshort-enums</code>, and ASan/UBSan.
+                </td>
+              </tr>
+              <tr>
+                <td>Java 21</td>
+                <td>2023, 2024, 2026</td>
+                <td>2023, 2024, 2026</td>
+                <td>
+                  1109/1109 conformance with <code>protobuf-java 4.36.2</code>.
+                </td>
+              </tr>
+              <tr>
+                <td>C# (.NET 8)</td>
+                <td>2023, 2024, 2026</td>
+                <td>2023, 2024, 2026</td>
+                <td>
+                  1109/1109 conformance with <code>Google.Protobuf 3.36.2</code>, including Edition
+                  2026 C# nullable reference types.
+                </td>
+              </tr>
+              <tr>
+                <td>Swift 6</td>
+                <td>2023, 2024, 2026</td>
+                <td>2023, 2024, 2026</td>
+                <td>
+                  1109/1109 conformance with strict Swift 6 concurrency and{' '}
+                  <code>SwiftProtobufCodec</code>.
+                </td>
+              </tr>
+              <tr>
+                <td>Dart 3</td>
+                <td>2023, 2024, 2026</td>
+                <td>2023, 2024, 2026</td>
+                <td>
+                  1109/1109 conformance with AOT binaries and <code>ProtobufOmniBufCodec</code>.
+                </td>
+              </tr>
+              <tr>
+                <td>PHP 8.3+</td>
+                <td>2023, 2024, 2026</td>
+                <td>2023, 2024, 2026</td>
+                <td>
+                  1109/1109 conformance in both pure PHP and Rust <code>ext-omnibuf</code>. Upstream{' '}
+                  <code>protoc 36.2 --php_out</code> rejects{' '}
+                  <code>message_encoding = DELIMITED</code>, while{' '}
+                  <code>protoc-gen-omnibuf-php</code> supports it.
+                </td>
+              </tr>
+              <tr>
+                <td>Elixir</td>
+                <td>2023, 2024, 2026</td>
+                <td>2023, 2024, 2026</td>
+                <td>
+                  1109/1109 conformance across generated modules, <code>OmniBuf.Protobuf</code>, and
+                  Rustler NIF / pure-Elixir backends.
+                </td>
+              </tr>
+              <tr>
+                <td>Tooling</td>
+                <td colspan="2">2023, 2024, 2026</td>
+                <td>
+                  <code>omnibuf</code> CLI, VS Code, Vim, mitmproxy, and Wireshark load Editions
+                  2023/2024/2026 <code>FileDescriptorSet</code> schemas (<code>.pb</code>,{' '}
+                  <code>.pb.gz</code>, <code>.json</code>); DevTools inspects Field #0 and raw
+                  packets directly.
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </article>
     </div>
 

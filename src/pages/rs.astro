@@ -115,14 +115,14 @@ const rsFaqItems = [
     question: 'What differs under the hood between buffa and prost integration?',
     paragraphs: [
       '<code>prost</code> encodes schema metadata inside <code>#[prost(...)]</code> field attributes, boxes recursive messages in <code>Option&lt;Box&lt;T&gt;&gt;</code>, and stores enums as bare <code>i32</code> values. <code>buffa</code> emits <code>/// Field N: `name`</code> doc attributes, wraps singular sub-messages in <code>buffa::MessageField&lt;T&gt;</code>, preserves unknown enum discriminants via <code>buffa::EnumValue&lt;E&gt;</code>, and exposes zero-allocation <code>Reflectable</code> vtables.',
-      '<code>#[derive(OmniBuf)]</code> recognizes both field layouts natively at macro expansion time. At runtime, <code>buffa_codec::encode_buffa_reflect</code> reads <code>buffa</code> structs in place through their <code>Reflectable</code> vtable, whereas <code>prost_codec::encode_prost</code> converts through <code>prost_reflect::DynamicMessage</code>.',
+      '<code>#[derive(OmniBuf)]</code> recognizes both field layouts natively at macro expansion time. At runtime, <code>buffa_codec::encode_buffa_reflect</code> reads <code>buffa</code> structs in place through their <code>Reflectable</code> vtable and supports <a href="/spec#sec-11-4" class="doc-link">Editions 2023, 2024, and 2026</a>, whereas <code>prost_codec::encode_prost</code> converts through <code>prost_reflect::DynamicMessage</code> and stays <code>proto2</code>/<code>proto3</code> only (upstream <code>prost-reflect 0.16.5</code> does not parse Editions).',
     ],
   },
   {
     id: 'rs-faq-untrusted-limits',
     question: 'How are untrusted network payloads bounded before allocation?',
     paragraphs: [
-      '<code>DecodeOptions</code> caps packet byte length (<code>max_message_bytes</code>), cumulative array and map element counts (<code>max_elements</code>), total heap reservation (<code>max_alloc_bytes</code>), and recursion depth (<code>max_depth</code>, capped at 32). All four checks run ahead of owned value allocation in <code>from_slice_with_options</code>, <code>decode_buffa_with_options</code>, <code>decode_prost_with_options</code>, and <code>decode_blind_with_options</code>, verified across <code>992/992</code> conformance cases.',
+      '<code>DecodeOptions</code> caps packet byte length (<code>max_message_bytes</code>), cumulative array and map element counts (<code>max_elements</code>), total heap reservation (<code>max_alloc_bytes</code>), and recursion depth (<code>max_depth</code>, capped at 32). All four checks run ahead of owned value allocation in <code>from_slice_with_options</code>, <code>decode_buffa_with_options</code>, <code>decode_prost_with_options</code>, and <code>decode_blind_with_options</code>, verified across <code>1109/1109</code> conformance cases.',
     ],
   },
   {

@@ -75,9 +75,9 @@ test('Hero and Comparisons scope benchmark widgets, ARIA tab linkage, and clean 
   const benchmarksData = readRepoFile('src/data/benchmarks.ts');
 
   assert.match(hero, /\[data-home-bench\]/);
-  assert.match(hero, /aria-controls=/);
-  assert.match(hero, /aria-labelledby=/);
-  assert.match(hero, /tabindex=/);
+  assert.match(hero, /href=\{suite\.href\}/);
+  assert.match(hero, /data-home-bench-tab=/);
+  assert.match(hero, /data-home-bench-panel=/);
   assert.doesNotMatch(hero, /data-autorotate=/);
   assert.doesNotMatch(hero, /CYCLE_MS/);
   assert.match(hero, /peer\.proto/);
@@ -85,9 +85,9 @@ test('Hero and Comparisons scope benchmark widgets, ARIA tab linkage, and clean 
   assert.match(hero, /366 B/);
   assert.match(hero, /341 B/);
   assert.match(hero, /803 B/);
-  assert.match(hero, /time \/ op/);
+  assert.match(hero, /bench-matrix-cell/);
   assert.doesNotMatch(hero, /ns \/ op/);
-  assert.match(hero, /~same/);
+  assert.match(hero, /stat\.multiple\} faster/);
   assert.match(hero, /Compared against/);
   assert.doesNotMatch(hero, /bg-\[#E5E0D5\]|text-\[#FF4F18\]/);
 

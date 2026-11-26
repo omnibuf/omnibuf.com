@@ -1,57 +1,98 @@
 ---
 import { languageBenchmarkList, type BenchmarkRow } from '../data/benchmarks';
 
-function formatNs(val: number): string {
-  if (val >= 1_000_000) {
-    return `${(val / 1_000_000).toFixed(2)} ms`;
-  }
-  if (val >= 10_000) {
-    return `${(val / 1_000).toFixed(1)} µs`;
-  }
-  return `${val.toLocaleString('en-US')} ns`;
+function formatMultiple(competitorVal: number, omniVal: number): string {
+  if (omniVal <= 0 || competitorVal <= omniVal) return '1.0x';
+  const ratio = competitorVal / omniVal;
+  return ratio >= 10 ? `${Math.round(ratio)}x` : `${ratio.toFixed(1)}x`;
 }
 
-function formatRatio(val: number, baselineVal: number): string {
-  if (baselineVal <= 0 || val === baselineVal) return 'baseline';
-  if (val > baselineVal) {
-    const ratio = val / baselineVal;
-    if (ratio < 1.15) {
-      const pct = Math.round((ratio - 1) * 100);
-      return pct === 0 ? '~same' : `${pct}% slower`;
-    }
-    return ratio >= 10 ? `${Math.round(ratio)}x slower` : `${ratio.toFixed(1)}x slower`;
-  }
-  const ratio = baselineVal / val;
-  if (ratio < 1.15) {
-    const pct = Math.round((ratio - 1) * 100);
-    return pct === 0 ? '~same' : `${pct}% faster`;
-  }
-  return `${ratio.toFixed(1)}x faster`;
+function findPrimaryProtobuf(rows: BenchmarkRow[]): BenchmarkRow | undefined {
+  const candidates = rows.filter(
+    (r) =>
+      !(r.baseline || r.highlight) &&
+      /protobuf|buffa|prost|nanopb|swiftprotobuf|elixir-protobuf|package:protobuf/i.test(r.name),
+  );
+  if (candidates.length === 0) return undefined;
+  return (
+    candidates.find((r) =>
+      /^(Protobuf|@bufbuild\/protobuf|buffa|prost|google\.protobuf \(upb|libprotobuf|protobuf-java|Google\.Protobuf|SwiftProtobuf|package:protobuf|google\/protobuf|elixir-protobuf|nanopb)/i.test(
+        r.name,
+      ),
+    ) ?? candidates[0]
+  );
 }
 
-function prepareBarRows(rows: BenchmarkRow[]) {
+function findPrimaryJson(rows: BenchmarkRow[]): BenchmarkRow | undefined {
+  return rows.find((r) => !(r.baseline || r.highlight) && /json|jason/i.test(r.name));
+}
+
+function protobufLabelFor(langKey: string): string {
+  if (langKey === 'rs') return 'buffa';
+  if (langKey === 'nano') return 'nanopb';
+  if (langKey === 'es') return 'protobuf-es';
+  return 'Protobuf';
+}
+
+function prepareAbbreviatedBars(rows: BenchmarkRow[]) {
   const maxVal = Math.max(...rows.map((r) => r.val), 1);
-  const baselineVal =
-    rows.find((r) => r.baseline)?.val ?? rows.find((r) => r.highlight)?.val ?? rows[0]?.val ?? 1;
   return rows.map((r) => ({
     name: r.name,
-    val: r.val,
-    formattedVal: formatNs(r.val),
-    ratioLabel: formatRatio(r.val, baselineVal),
     isOmni: Boolean(r.baseline || r.highlight),
-    pct: Math.max(1, Math.min(100, (r.val / maxVal) * 100)).toFixed(1),
+    pct: Math.max(3, Math.min(100, (r.val / maxVal) * 100)).toFixed(1),
   }));
 }
 
-const benchmarkPreviews = languageBenchmarkList.map((suite) => ({
-  key: suite.key,
-  label: suite.label,
-  shortLabel: suite.shortLabel,
-  href: suite.href,
-  langHref: `/${suite.key}`,
-  encodeRows: prepareBarRows(suite.butterflyEncodeRows),
-  decodeRows: prepareBarRows(suite.butterflyDecodeRows),
-}));
+interface ComparisonStat {
+  multiple: string;
+  label: string;
+}
+
+function buildComparisonStats(langKey: string, rows: BenchmarkRow[]): ComparisonStat[] {
+  const omni = rows.find((r) => r.baseline || r.highlight) ?? rows[0];
+  if (!omni) return [];
+  const stats: ComparisonStat[] = [];
+  const proto = findPrimaryProtobuf(rows);
+  if (proto) {
+    stats.push({
+      multiple: formatMultiple(proto.val, omni.val),
+      label: protobufLabelFor(langKey),
+    });
+  }
+  const json = findPrimaryJson(rows);
+  if (json) {
+    stats.push({
+      multiple: formatMultiple(json.val, omni.val),
+      label: 'JSON',
+    });
+  }
+  return stats;
+}
+
+const benchmarkPreviews = languageBenchmarkList.map((suite) => {
+  const encodeBars = prepareAbbreviatedBars(suite.butterflyEncodeRows);
+  const decodeBars = prepareAbbreviatedBars(suite.butterflyDecodeRows);
+  const rowCount = Math.max(encodeBars.length, decodeBars.length);
+  const pairedRows = Array.from({ length: rowCount }, (_, i) => ({
+    encode: encodeBars[i] ?? null,
+    decode: decodeBars[i] ?? null,
+  }));
+  const encodeStats = buildComparisonStats(suite.key, suite.butterflyEncodeRows);
+  const decodeStats = buildComparisonStats(suite.key, suite.butterflyDecodeRows);
+  const encAria = encodeStats.map((s) => `${s.multiple} faster than ${s.label}`).join(', ');
+  const decAria = decodeStats.map((s) => `${s.multiple} faster than ${s.label}`).join(', ');
+  return {
+    key: suite.key,
+    label: suite.label,
+    shortLabel: suite.shortLabel,
+    href: suite.href,
+    langHref: `/${suite.key}`,
+    pairedRows,
+    encodeStats,
+    decodeStats,
+    ariaLabel: `${suite.label}: OmniBuf fastest on encode (${encAria}) and decode (${decAria}).`,
+  };
+});
 ---
 
 <section class="pt-12 pb-10 sm:pt-16 sm:pb-14 px-4 sm:px-6 max-w-4xl mx-auto">
@@ -675,7 +716,7 @@ const benchmarkPreviews = languageBenchmarkList.map((suite) => ({
     dataclasses, Java/C# annotations, and similar).
   </p>
 
-  <!-- Calm Static-Default Benchmark Visualization -->
+  <!-- Abbreviated All-12 Benchmark Specimen Matrix -->
   <div id="speed" class="mt-14 sm:mt-16 pt-10 border-t border-ink/15 scroll-mt-16" data-home-bench>
     <div class="flex flex-wrap items-baseline justify-between gap-3 mb-4">
       <div>
@@ -683,139 +724,164 @@ const benchmarkPreviews = languageBenchmarkList.map((suite) => ({
           Encode and decode benchmarks
         </h2>
         <p class="mt-1 text-sm sm:text-base text-ink/75 max-w-[62ch]">
-          Full encode and decode on the 11-field <code>PeerUpdate</code> struct (Apple M1 Pro).
-          Shorter bars are faster.
+          Full 11-field <code>PeerUpdate</code> encode and decode across all{' '}
+          {benchmarkPreviews.length} languages (Apple M1 Pro). Each cluster stacks every format
+          tested, fastest at top; shorter bars are faster.
         </p>
       </div>
       <a href="/benchmarks" class="doc-link text-sm shrink-0">
-        All 12 benchmarks &rarr;
+        All {benchmarkPreviews.length} benchmarks &rarr;
       </a>
     </div>
 
-    <!-- Language Selector (manual only, no auto-rotation) -->
-    <div
-      role="tablist"
-      aria-label="Select language benchmark"
-      class="flex flex-wrap gap-1.5 mb-4 text-xs font-medium"
-    >
-      {benchmarkPreviews.map((suite, idx) => (
-        <button
-          id={`home-bench-tab-${suite.key}`}
-          type="button"
-          role="tab"
-          data-home-bench-tab={suite.key}
-          aria-selected={idx === 0 ? 'true' : 'false'}
-          aria-controls={`home-bench-panel-${suite.key}`}
-          tabindex={idx === 0 ? 0 : -1}
-          class="seg-tab px-2.5 py-1.5 font-mono"
-        >
-          {suite.shortLabel}
-        </button>
-      ))}
-    </div>
-
-    <!-- Grouped Horizontal Bar Panels -->
-    <div class="os-window p-4 sm:p-6">
-      {benchmarkPreviews.map((suite, idx) => (
-        <div
-          id={`home-bench-panel-${suite.key}`}
-          role="tabpanel"
-          aria-labelledby={`home-bench-tab-${suite.key}`}
-          data-home-bench-panel={suite.key}
-          class:list={[idx === 0 ? '' : 'hidden']}
-        >
-          <div class="grid md:grid-cols-2 gap-6 sm:gap-8">
-            <!-- Full Encode Column -->
-            <div class="min-w-0">
-              <div class="flex items-baseline justify-between pb-2 mb-3 border-b border-ink/12">
-                <span class="text-sm font-semibold text-ink">Full message encode</span>
-                <span class="font-mono text-xs text-ink/65">time / op</span>
-              </div>
-              <div class="space-y-3">
-                {suite.encodeRows.map((row) => (
-                  <div class="space-y-1">
-                    <div class="flex items-baseline justify-between gap-2 text-xs sm:text-sm">
-                      <span
-                        class:list={[
-                          'truncate',
-                          row.isOmni ? 'font-semibold text-ink' : 'text-ink/80',
-                        ]}
-                        title={row.name}
-                      >
-                        {row.name}
-                      </span>
-                      <span class="font-mono text-xs tabular-nums shrink-0">
-                        <span class={row.isOmni ? 'font-semibold text-accent' : 'text-ink/85'}>
-                          {row.formattedVal}
-                        </span>
-                        {!row.isOmni && <span class="text-ink/65 ml-1.5">{row.ratioLabel}</span>}
-                      </span>
-                    </div>
-                    <div class="w-full h-2 rounded-full bench-track overflow-hidden">
-                      <div
-                        class:list={[
-                          'h-full rounded-full min-w-[3px]',
-                          row.isOmni ? 'bench-bar-omni' : 'bench-bar-competitor',
-                        ]}
-                        style={`width: ${row.pct}%;`}
-                      />
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <!-- Full Decode Column -->
-            <div class="min-w-0">
-              <div class="flex items-baseline justify-between pb-2 mb-3 border-b border-ink/12">
-                <span class="text-sm font-semibold text-ink">Full message decode</span>
-                <span class="font-mono text-xs text-ink/65">time / op</span>
-              </div>
-              <div class="space-y-3">
-                {suite.decodeRows.map((row) => (
-                  <div class="space-y-1">
-                    <div class="flex items-baseline justify-between gap-2 text-xs sm:text-sm">
-                      <span
-                        class:list={[
-                          'truncate',
-                          row.isOmni ? 'font-semibold text-ink' : 'text-ink/80',
-                        ]}
-                        title={row.name}
-                      >
-                        {row.name}
-                      </span>
-                      <span class="font-mono text-xs tabular-nums shrink-0">
-                        <span class={row.isOmni ? 'font-semibold text-accent' : 'text-ink/85'}>
-                          {row.formattedVal}
-                        </span>
-                        {!row.isOmni && <span class="text-ink/65 ml-1.5">{row.ratioLabel}</span>}
-                      </span>
-                    </div>
-                    <div class="w-full h-2 rounded-full bench-track overflow-hidden">
-                      <div
-                        class:list={[
-                          'h-full rounded-full min-w-[3px]',
-                          row.isOmni ? 'bench-bar-omni' : 'bench-bar-competitor',
-                        ]}
-                        style={`width: ${row.pct}%;`}
-                      />
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          <div class="mt-5 pt-4 border-t border-ink/12 flex flex-wrap items-center justify-between gap-2 text-xs sm:text-sm">
-            <a href={suite.langHref} class="doc-link">
-              {suite.label} guide &rarr;
-            </a>
-            <a href={suite.href} class="doc-link text-ink/75">
-              Full {suite.shortLabel} benchmark suite &rarr;
-            </a>
-          </div>
+    <div class="os-window overflow-hidden">
+      <!-- Compact Key Bar -->
+      <div class="px-4 sm:px-5 py-2.5 border-b border-ink/12 flex flex-wrap items-center justify-between gap-x-4 gap-y-1.5 text-xs">
+        <div class="flex flex-wrap items-center gap-x-4 gap-y-1">
+          <span class="inline-flex items-center gap-1.5 font-semibold text-ink">
+            <span
+              class="inline-block w-3 h-1.5 rounded-[1.5px] bench-bar-omni"
+              aria-hidden="true"
+            ></span>
+            OmniBuf (#1 in all {benchmarkPreviews.length})
+          </span>
+          <span class="inline-flex items-center gap-1.5 text-ink/65">
+            <span
+              class="inline-block w-3 h-1.5 rounded-[1.5px] bench-bar-competitor opacity-70"
+              aria-hidden="true"
+            ></span>
+            Other formats tested
+          </span>
         </div>
-      ))}
+        <span class="font-mono text-xs text-ink/65">
+          &larr; encode <span class="mx-1 text-ink/40">|</span> decode &rarr;
+        </span>
+      </div>
+
+      <!-- 12-Language Small-Multiples Butterfly Grid (no bar labels) -->
+      <div
+        aria-label="Benchmarks by language"
+        class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-px bg-[var(--border-subtle)]"
+      >
+        {benchmarkPreviews.map((suite, idx) => (
+          <a
+            id={`home-bench-tab-${suite.key}`}
+            href={suite.href}
+            data-home-bench-tab={suite.key}
+            data-active={idx === 0 ? 'true' : 'false'}
+            aria-label={suite.ariaLabel}
+            class="bench-matrix-cell group text-left px-3.5 py-3 flex flex-col justify-start gap-3 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-[var(--accent)] no-underline"
+          >
+            <div class="flex items-center justify-between gap-2">
+              <span class="bench-matrix-lang font-mono text-xs font-semibold text-ink">
+                {suite.shortLabel}
+              </span>
+              <span
+                class="bench-matrix-dot w-1.5 h-1.5 rounded-full transition-opacity"
+                aria-hidden="true"
+              ></span>
+            </div>
+
+            <!-- Label-free mirrored micro-bars: Encode left | Decode right -->
+            <div class="relative flex flex-col gap-[3px] min-h-[53px]" aria-hidden="true">
+              <span class="pointer-events-none absolute inset-y-0 left-1/2 -translate-x-1/2 w-px bg-ink/15"></span>
+              {suite.pairedRows.map((pair) => (
+                <div class="grid grid-cols-2 items-center gap-[5px] h-[5px]">
+                  <div class="flex justify-end items-center h-full">
+                    {pair.encode && (
+                      <span
+                        class:list={[
+                          'block h-full rounded-l-[1.5px] min-w-[4px]',
+                          pair.encode.isOmni ? 'bench-bar-omni' : 'bench-bar-competitor opacity-65',
+                        ]}
+                        style={`width: ${pair.encode.pct}%;`}
+                        title={`Encode: ${pair.encode.name}`}
+                      />
+                    )}
+                  </div>
+                  <div class="flex justify-start items-center h-full">
+                    {pair.decode && (
+                      <span
+                        class:list={[
+                          'block h-full rounded-r-[1.5px] min-w-[4px]',
+                          pair.decode.isOmni ? 'bench-bar-omni' : 'bench-bar-competitor opacity-65',
+                        ]}
+                        style={`width: ${pair.decode.pct}%;`}
+                        title={`Decode: ${pair.decode.name}`}
+                      />
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </a>
+        ))}
+      </div>
+
+      <!-- Fixed-Height Relative Readout for Selected / Hovered Language -->
+      <div class="border-t border-ink/12 bg-[var(--bg-subtle)]/55 px-4 sm:px-5 py-3">
+        {benchmarkPreviews.map((suite, idx) => (
+          <div
+            id={`home-bench-panel-${suite.key}`}
+            data-home-bench-panel={suite.key}
+            class:list={[
+              'grid grid-cols-1 sm:grid-cols-[8.5rem_1fr_auto] sm:items-center gap-x-5 gap-y-2',
+              idx === 0 ? '' : 'hidden',
+            ]}
+          >
+            <div class="text-sm font-semibold text-ink leading-snug">{suite.label}</div>
+
+            <dl class="grid grid-cols-[4.25rem_1fr] gap-x-3 gap-y-1 text-xs items-baseline min-w-0">
+              <dt class="font-medium text-ink/65">Encode</dt>
+              <dd class="font-mono tabular-nums text-ink/80 flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
+                {suite.encodeStats.map((stat, statIdx) => (
+                  <span class="whitespace-nowrap">
+                    {statIdx > 0 && (
+                      <span class="mr-2 text-ink/45" aria-hidden="true">
+                        &middot;
+                      </span>
+                    )}
+                    <span
+                      class={statIdx === 0 ? 'font-semibold text-accent' : 'font-semibold text-ink'}
+                    >
+                      {stat.multiple} faster
+                    </span>{' '}
+                    <span class="text-ink/70">vs {stat.label}</span>
+                  </span>
+                ))}
+              </dd>
+
+              <dt class="font-medium text-ink/65">Decode</dt>
+              <dd class="font-mono tabular-nums text-ink/80 flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
+                {suite.decodeStats.map((stat, statIdx) => (
+                  <span class="whitespace-nowrap">
+                    {statIdx > 0 && (
+                      <span class="mr-2 text-ink/45" aria-hidden="true">
+                        &middot;
+                      </span>
+                    )}
+                    <span
+                      class={statIdx === 0 ? 'font-semibold text-accent' : 'font-semibold text-ink'}
+                    >
+                      {stat.multiple} faster
+                    </span>{' '}
+                    <span class="text-ink/70">vs {stat.label}</span>
+                  </span>
+                ))}
+              </dd>
+            </dl>
+
+            <div class="flex sm:flex-col items-baseline sm:items-end justify-between sm:justify-center gap-x-4 gap-y-1 text-xs shrink-0 pt-1 sm:pt-0 border-t sm:border-t-0 border-ink/10">
+              <a href={suite.langHref} class="doc-link">
+                {suite.shortLabel} guide
+              </a>
+              <a href={suite.href} class="doc-link text-ink/75">
+                Full benchmarks &rarr;
+              </a>
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
 
     <!-- Honest Tradeoffs -->
@@ -832,34 +898,36 @@ const benchmarkPreviews = languageBenchmarkList.map((suite) => ({
 
 <script>
   document.querySelectorAll<HTMLElement>('[data-home-bench]').forEach((widget) => {
-    const tabs = Array.from(widget.querySelectorAll<HTMLButtonElement>('[data-home-bench-tab]'));
+    const cells = Array.from(widget.querySelectorAll<HTMLElement>('[data-home-bench-tab]'));
     const panels = Array.from(widget.querySelectorAll<HTMLElement>('[data-home-bench-panel]'));
 
     function activate(key: string) {
-      tabs.forEach((tab) => {
-        const isActive = tab.getAttribute('data-home-bench-tab') === key;
-        tab.setAttribute('aria-selected', isActive ? 'true' : 'false');
-        tab.setAttribute('tabindex', isActive ? '0' : '-1');
+      cells.forEach((cell) => {
+        const isActive = cell.getAttribute('data-home-bench-tab') === key;
+        cell.setAttribute('data-active', isActive ? 'true' : 'false');
       });
       panels.forEach((panel) => {
         panel.classList.toggle('hidden', panel.getAttribute('data-home-bench-panel') !== key);
       });
     }
 
-    tabs.forEach((tab, idx) => {
-      tab.addEventListener('click', () => {
-        const key = tab.getAttribute('data-home-bench-tab');
+    cells.forEach((cell, idx) => {
+      const key = cell.getAttribute('data-home-bench-tab');
+      cell.addEventListener('pointerenter', () => {
         if (key) activate(key);
       });
-      tab.addEventListener('keydown', (e) => {
+      cell.addEventListener('focus', () => {
+        if (key) activate(key);
+      });
+      cell.addEventListener('keydown', (e) => {
         if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') {
           e.preventDefault();
           const dir = e.key === 'ArrowRight' ? 1 : -1;
-          const next = tabs[(idx + dir + tabs.length) % tabs.length];
+          const next = cells[(idx + dir + cells.length) % cells.length];
           if (next) {
             next.focus();
-            const key = next.getAttribute('data-home-bench-tab');
-            if (key) activate(key);
+            const nextKey = next.getAttribute('data-home-bench-tab');
+            if (nextKey) activate(nextKey);
           }
         }
       });
