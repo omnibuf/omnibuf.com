@@ -104,6 +104,12 @@ test('Hero and Comparisons scope benchmark widgets, ARIA tab linkage, and clean 
     assert.doesNotMatch(html, /[0-9]+\.[0-9]+x/);
     assert.doesNotMatch(html, /encoded_len/);
   }
+  const rowBlocks = [...benchmarksData.matchAll(/rows:\s*\[([\s\S]*?)\n\s*\],/g)];
+  assert.ok(rowBlocks.length >= 60);
+  for (const [, block] of rowBlocks) {
+    assert.match(block, /highlight:\s*true/);
+    assert.match(block, /baseline:\s*true/);
+  }
 
   assert.match(comparisons, /\[data-butterfly-widget="comparisons"\]/);
   assert.doesNotMatch(comparisons, /querySelectorAll<HTMLElement>\('\[data-butterfly-widget\]'\)/);

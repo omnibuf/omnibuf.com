@@ -307,7 +307,14 @@ export const esBenchmarkCategories: EsBenchmarkCategory[] = [
     maxVal: 5000,
     methodology: 'Serializes the 11-field PeerUpdate object into a fresh Uint8Array (366 B).',
     rows: [
-      { name: 'OmniBuf', val: 736, ops: '1,358,132 ops/s', sizeBytes: 366 },
+      {
+        name: 'OmniBuf',
+        val: 736,
+        ops: '1,358,132 ops/s',
+        sizeBytes: 366,
+        highlight: true,
+        baseline: true,
+      },
       { name: 'protobufjs', val: 1211, ops: '825,786 ops/s', sizeBytes: 341 },
       { name: 'JSON', val: 1493, ops: '669,788 ops/s', sizeBytes: 791 },
       { name: '@bufbuild/protobuf (protobuf-es)', val: 2159, ops: '463,090 ops/s', sizeBytes: 341 },
@@ -321,7 +328,7 @@ export const esBenchmarkCategories: EsBenchmarkCategory[] = [
     maxVal: 4000,
     methodology: 'Decodes Uint8Array into a fresh PeerUpdate object and reads all 11 fields.',
     rows: [
-      { name: 'OmniBuf', val: 635, ops: '1,574,693 ops/s' },
+      { name: 'OmniBuf', val: 635, ops: '1,574,693 ops/s', highlight: true, baseline: true },
       { name: 'protobufjs', val: 1706, ops: '586,093 ops/s' },
       { name: 'JSON', val: 1867, ops: '535,504 ops/s' },
       { name: '@msgpack/msgpack', val: 2629, ops: '380,434 ops/s' },
@@ -336,7 +343,7 @@ export const esBenchmarkCategories: EsBenchmarkCategory[] = [
     methodology:
       'Reads a nested city string from a Uint8Array. The other JS libraries decode the whole message first; OmniBuf skips earlier fields by byte length.',
     rows: [
-      { name: 'OmniBuf', val: 247, ops: '4,046,221 ops/s' },
+      { name: 'OmniBuf', val: 247, ops: '4,046,221 ops/s', highlight: true, baseline: true },
       { name: 'protobufjs', val: 1113, ops: '898,493 ops/s' },
       { name: 'JSON', val: 1702, ops: '587,443 ops/s' },
       { name: 'google-protobuf', val: 2544, ops: '393,057 ops/s' },
@@ -351,7 +358,7 @@ export const esBenchmarkCategories: EsBenchmarkCategory[] = [
     methodology:
       'Checks a nested city string, increments the sequence number from the packet, and returns an updated Uint8Array.',
     rows: [
-      { name: 'OmniBuf', val: 1150, ops: '869,476 ops/s' },
+      { name: 'OmniBuf', val: 1150, ops: '869,476 ops/s', highlight: true, baseline: true },
       { name: 'JSON', val: 2734, ops: '365,786 ops/s' },
       { name: 'protobufjs', val: 3079, ops: '324,756 ops/s' },
       { name: '@bufbuild/protobuf (protobuf-es)', val: 5854, ops: '170,813 ops/s' },
@@ -366,7 +373,14 @@ export const esBenchmarkCategories: EsBenchmarkCategory[] = [
     methodology:
       'Serializes a 39 KiB packet whose 20 KiB and 18 KiB nested messages exceed the 2-byte 16,383 B length reservation.',
     rows: [
-      { name: 'OmniBuf', val: 4031, ops: '248,052 ops/s', sizeBytes: 39256 },
+      {
+        name: 'OmniBuf',
+        val: 4031,
+        ops: '248,052 ops/s',
+        sizeBytes: 39256,
+        highlight: true,
+        baseline: true,
+      },
       { name: 'google-protobuf', val: 11496, ops: '86,983 ops/s', sizeBytes: 39227 },
       { name: 'protobufjs', val: 12879, ops: '77,644 ops/s', sizeBytes: 39227 },
       {
@@ -386,7 +400,7 @@ export const esBenchmarkCategories: EsBenchmarkCategory[] = [
     methodology:
       'Grows a nested string field past 16 KiB ahead of 32 trailing Neighbor entries and emits an updated Uint8Array.',
     rows: [
-      { name: 'OmniBuf', val: 4802, ops: '208,265 ops/s' },
+      { name: 'OmniBuf', val: 4802, ops: '208,265 ops/s', highlight: true, baseline: true },
       { name: 'protobufjs', val: 18916, ops: '52,865 ops/s' },
       { name: 'JSON', val: 21756, ops: '45,965 ops/s' },
       { name: '@bufbuild/protobuf (protobuf-es)', val: 26698, ops: '37,456 ops/s' },
