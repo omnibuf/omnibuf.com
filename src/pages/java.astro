@@ -99,7 +99,7 @@ const javaFaqItems = [
     id: 'java-faq-encode',
     question: 'Why does protobuf-java lead on the 39 KiB Large Embedded Message Encode test?',
     paragraphs: [
-      'Immutable <code>protobuf-java</code> messages cache <code>memoizedSerializedSize</code> and UTF-8 <code>ByteString</code> slices. Repeated <code>toByteArray()</code> calls allocate the exact 39,227-byte array upfront and copy cached bytes in one pass (4.38 µs). Mutable OmniBuf classes never cache stale sizes, streaming UTF-8 into a pooled encoder and copying out in 5.04 µs. OmniBuf leads every other Java benchmark, up to about 8x faster on single-field reads.',
+      'Immutable <code>protobuf-java</code> messages cache <code>memoizedSerializedSize</code> and UTF-8 <code>ByteString</code> slices. Repeated <code>toByteArray()</code> calls allocate the exact 39,227-byte array upfront and copy cached bytes in one pass (3.79 µs). Mutable OmniBuf classes never cache stale sizes, streaming UTF-8 into a pooled encoder and copying out in 3.99 µs. OmniBuf leads every other Java benchmark, nearly 10x faster on single-field reads.',
     ],
   },
   {
@@ -301,8 +301,8 @@ const javaFaqJsonLd = {
             <p class="text-base sm:text-lg text-ink/85 leading-relaxed">
               <code>protoc-gen-omnibuf-java</code> emits mutable model classes, static{' '}
               <code>&lt;Msg&gt;OmniBuf</code> codecs, and <code>Opaque&lt;Msg&gt;</code> views over
-              raw <code>byte[]</code> packets. On OpenJDK 21, an end-to-end nested string check and
-              64-bit sequence splice finishes in 294 ns.
+              raw <code>byte[]</code> packets. On OpenJDK 25, an end-to-end nested string check and
+              64-bit sequence splice finishes in 253 ns.
             </p>
           </div>
 
