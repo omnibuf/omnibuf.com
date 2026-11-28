@@ -183,16 +183,16 @@ export const benchmarkCategories: BenchmarkCategory[] = [
     methodology:
       "Serializes the 11-field Go struct into a reused byte slice. FlatBuffers and Cap'n Proto times include building the buffer from the struct.",
     rows: [
-      { name: 'OmniBuf (Generated)', val: 93, highlight: true, baseline: true },
-      { name: 'Protobuf (vtprotobuf)', val: 128 },
-      { name: 'OmniBuf (Go Struct Tags)', val: 373, highlight: true },
-      { name: 'Avro (Raw Binary)', val: 409 },
-      { name: 'FlatBuffers', val: 554 },
-      { name: 'Protobuf', val: 561 },
-      { name: "Cap'n Proto", val: 993 },
-      { name: 'MessagePack', val: 1545 },
-      { name: 'JSON (encoding/json)', val: 1656 },
-      { name: 'JSON (encoding/json/v2)', val: 1704 },
+      { name: 'OmniBuf (Generated)', val: 95, highlight: true, baseline: true },
+      { name: 'Protobuf (vtprotobuf)', val: 140 },
+      { name: 'OmniBuf (Go Struct Tags)', val: 379, highlight: true },
+      { name: 'Avro (Raw Binary)', val: 421 },
+      { name: 'FlatBuffers', val: 562 },
+      { name: 'Protobuf', val: 566 },
+      { name: "Cap'n Proto", val: 1031 },
+      { name: 'MessagePack', val: 1594 },
+      { name: 'JSON (encoding/json/v2)', val: 1720 },
+      { name: 'JSON (encoding/json)', val: 1846 },
     ],
   },
   {
@@ -202,18 +202,18 @@ export const benchmarkCategories: BenchmarkCategory[] = [
     methodology:
       'Unpacks and reads all 11 fields. Includes both zero-copy reuse (OmniBuf, vtprotobuf, FlatBuffers) and safe fresh-allocation decode (OmniBuf Safe Alloc, vtprotobuf Safe, official Protobuf).',
     rows: [
-      { name: 'OmniBuf (Generated)', val: 99, highlight: true, baseline: true },
-      { name: 'Protobuf (vtprotobuf)', val: 159 },
+      { name: 'OmniBuf (Generated)', val: 102, highlight: true, baseline: true },
+      { name: 'Protobuf (vtprotobuf)', val: 161 },
       { name: 'FlatBuffers', val: 197 },
-      { name: 'OmniBuf (Safe Alloc)', val: 363, highlight: true },
-      { name: 'OmniBuf (Go Struct Tags)', val: 372, highlight: true },
-      { name: 'Avro (Raw Binary)', val: 408 },
-      { name: 'Protobuf (vtprotobuf Safe)', val: 564 },
-      { name: "Cap'n Proto", val: 752 },
-      { name: 'Protobuf', val: 892 },
-      { name: 'MessagePack', val: 2186 },
-      { name: 'JSON (encoding/json/v2)', val: 2712 },
-      { name: 'JSON (encoding/json)', val: 3453 },
+      { name: 'OmniBuf (Go Struct Tags)', val: 367, highlight: true },
+      { name: 'OmniBuf (Safe Alloc)', val: 402, highlight: true },
+      { name: 'Avro (Raw Binary)', val: 417 },
+      { name: 'Protobuf (vtprotobuf Safe)', val: 589 },
+      { name: "Cap'n Proto", val: 786 },
+      { name: 'Protobuf', val: 932 },
+      { name: 'MessagePack', val: 2220 },
+      { name: 'JSON (encoding/json/v2)', val: 2747 },
+      { name: 'JSON (encoding/json)', val: 3482 },
     ],
   },
   {
@@ -224,12 +224,12 @@ export const benchmarkCategories: BenchmarkCategory[] = [
       "Reads a nested string field directly from the raw byte slice. Cap'n Proto and FlatBuffers use offset tables; OmniBuf hops over preceding field headers by length.",
     rows: [
       { name: "Cap'n Proto", val: 5 },
-      { name: 'FlatBuffers', val: 26 },
-      { name: 'OmniBuf', val: 84, highlight: true, baseline: true },
-      { name: 'Protobuf (vtprotobuf)', val: 202 },
-      { name: 'Avro (Raw Binary)', val: 476 },
-      { name: 'MessagePack', val: 587 },
-      { name: 'Protobuf', val: 952 },
+      { name: 'FlatBuffers', val: 27 },
+      { name: 'OmniBuf', val: 86, highlight: true, baseline: true },
+      { name: 'Protobuf (vtprotobuf)', val: 205 },
+      { name: 'Avro (Raw Binary)', val: 522 },
+      { name: 'MessagePack', val: 605 },
+      { name: 'Protobuf', val: 980 },
     ],
   },
   {
@@ -239,15 +239,15 @@ export const benchmarkCategories: BenchmarkCategory[] = [
     methodology:
       'Checks a nested city string, increments the 64-bit sequence counter, and returns the updated packet. OmniBuf splices the field in place; the others decode and re-encode.',
     rows: [
-      { name: 'OmniBuf (Opaque Splice)', val: 211, highlight: true, baseline: true },
-      { name: 'Protobuf (vtprotobuf)', val: 329 },
-      { name: 'FlatBuffers', val: 763 },
-      { name: 'Avro (Raw Binary)', val: 846 },
-      { name: 'Protobuf', val: 1539 },
-      { name: "Cap'n Proto", val: 1857 },
-      { name: 'MessagePack', val: 3894 },
-      { name: 'JSON (encoding/json/v2)', val: 4503 },
-      { name: 'JSON (encoding/json)', val: 5206 },
+      { name: 'OmniBuf (Opaque Splice)', val: 216, highlight: true, baseline: true },
+      { name: 'Protobuf (vtprotobuf)', val: 336 },
+      { name: 'FlatBuffers', val: 769 },
+      { name: 'Avro (Raw Binary)', val: 868 },
+      { name: 'Protobuf', val: 1605 },
+      { name: "Cap'n Proto", val: 1896 },
+      { name: 'MessagePack', val: 3930 },
+      { name: 'JSON (encoding/json/v2)', val: 4590 },
+      { name: 'JSON (encoding/json)', val: 5304 },
     ],
   },
   {
@@ -257,16 +257,16 @@ export const benchmarkCategories: BenchmarkCategory[] = [
     methodology:
       'Serializes a 39 KiB packet whose 20 KiB and 18 KiB nested sub-messages exceed the 2-byte 16,383 B length reservation and trigger 2B-to-4B header shifts.',
     rows: [
-      { name: 'OmniBuf (Generated)', val: 614, highlight: true, baseline: true },
-      { name: 'Protobuf (vtprotobuf)', val: 646 },
-      { name: 'FlatBuffers', val: 1129 },
-      { name: 'Protobuf', val: 1690 },
-      { name: 'OmniBuf (Go Struct Tags)', val: 1762, highlight: true },
-      { name: 'Avro (Raw Binary)', val: 6730 },
-      { name: "Cap'n Proto", val: 7938 },
-      { name: 'MessagePack', val: 12123 },
-      { name: 'JSON (encoding/json/v2)', val: 30417 },
-      { name: 'JSON (encoding/json)', val: 32743 },
+      { name: 'OmniBuf (Generated)', val: 586, highlight: true, baseline: true },
+      { name: 'Protobuf (vtprotobuf)', val: 676 },
+      { name: 'FlatBuffers', val: 1082 },
+      { name: 'Protobuf', val: 1710 },
+      { name: 'OmniBuf (Go Struct Tags)', val: 1758, highlight: true },
+      { name: 'Avro (Raw Binary)', val: 6626 },
+      { name: "Cap'n Proto", val: 7693 },
+      { name: 'MessagePack', val: 11723 },
+      { name: 'JSON (encoding/json/v2)', val: 31704 },
+      { name: 'JSON (encoding/json)', val: 32830 },
     ],
   },
   {
@@ -276,15 +276,15 @@ export const benchmarkCategories: BenchmarkCategory[] = [
     methodology:
       'Grows a nested string field past 16 KiB ahead of 32 trailing Neighbor entries via Opaque splicing vs full decode and re-encode.',
     rows: [
-      { name: 'OmniBuf (Opaque Splice)', val: 866, highlight: true, baseline: true },
-      { name: 'Protobuf (vtprotobuf)', val: 1650 },
-      { name: 'FlatBuffers', val: 3048 },
-      { name: 'Avro (Raw Binary)', val: 5864 },
-      { name: 'Protobuf', val: 6687 },
-      { name: "Cap'n Proto", val: 8853 },
-      { name: 'MessagePack', val: 23899 },
-      { name: 'JSON (encoding/json/v2)', val: 32640 },
-      { name: 'JSON (encoding/json)', val: 35939 },
+      { name: 'OmniBuf (Opaque Splice)', val: 860, highlight: true, baseline: true },
+      { name: 'Protobuf (vtprotobuf)', val: 1569 },
+      { name: 'FlatBuffers', val: 2987 },
+      { name: 'Avro (Raw Binary)', val: 5853 },
+      { name: 'Protobuf', val: 6896 },
+      { name: "Cap'n Proto", val: 8806 },
+      { name: 'MessagePack', val: 24091 },
+      { name: 'JSON (encoding/json/v2)', val: 33971 },
+      { name: 'JSON (encoding/json)', val: 37242 },
     ],
   },
   {
@@ -418,7 +418,7 @@ export const esBenchmarkCategories: EsBenchmarkCategory[] = [
   },
 ];
 
-// Rust results from omnibuf-rs/testdata/benchmarks.json (rustc 1.100.0)
+// Rust results from omnibuf-rs/testdata/benchmarks.json (rustc 1.100.1)
 export const rsBenchmarkCategories: BenchmarkCategory[] = [
   {
     title: 'Full Message Encode Speed',
@@ -426,11 +426,11 @@ export const rsBenchmarkCategories: BenchmarkCategory[] = [
     maxVal: 900,
     methodology: 'Serializes PeerUpdate into a freshly allocated Vec<u8> across every library.',
     rows: [
-      { name: 'OmniBuf (#[derive(OmniBuf)])', val: 136, sizeBytes: 366, highlight: true },
-      { name: 'OmniBuf (Generated)', val: 138, sizeBytes: 366, highlight: true, baseline: true },
-      { name: 'buffa (Protobuf)', val: 212, sizeBytes: 341 },
-      { name: 'prost (Protobuf)', val: 237, sizeBytes: 341 },
-      { name: 'rmp-serde (MessagePack)', val: 644, sizeBytes: 626 },
+      { name: 'OmniBuf (Generated)', val: 133, sizeBytes: 366, highlight: true, baseline: true },
+      { name: 'OmniBuf (#[derive(OmniBuf)])', val: 138, sizeBytes: 366, highlight: true },
+      { name: 'buffa (Protobuf)', val: 198, sizeBytes: 341 },
+      { name: 'prost (Protobuf)', val: 241, sizeBytes: 341 },
+      { name: 'rmp-serde (MessagePack)', val: 639, sizeBytes: 626 },
       { name: 'serde_json', val: 791, sizeBytes: 803 },
     ],
   },
@@ -440,12 +440,12 @@ export const rsBenchmarkCategories: BenchmarkCategory[] = [
     maxVal: 1500,
     methodology: 'Decodes &[u8] into a fresh owned PeerUpdate struct and reads all 11 fields.',
     rows: [
-      { name: 'OmniBuf (Generated)', val: 316, highlight: true, baseline: true },
+      { name: 'OmniBuf (Generated)', val: 319, highlight: true, baseline: true },
       { name: 'OmniBuf (#[derive(OmniBuf)])', val: 347, highlight: true },
-      { name: 'buffa (Protobuf)', val: 540 },
-      { name: 'prost (Protobuf)', val: 703 },
-      { name: 'rmp-serde (MessagePack)', val: 879 },
-      { name: 'serde_json', val: 1260 },
+      { name: 'buffa (Protobuf)', val: 552 },
+      { name: 'prost (Protobuf)', val: 707 },
+      { name: 'rmp-serde (MessagePack)', val: 875 },
+      { name: 'serde_json', val: 1276 },
     ],
   },
   {
@@ -455,11 +455,11 @@ export const rsBenchmarkCategories: BenchmarkCategory[] = [
     methodology:
       'Borrows a nested &str directly from &[u8] via OpaquePeerUpdate vs buffa PeerUpdateView vs full decode.',
     rows: [
-      { name: 'OmniBuf (Generated)', val: 76, highlight: true, baseline: true },
-      { name: 'buffa (Protobuf)', val: 373 },
-      { name: 'prost (Protobuf)', val: 691 },
-      { name: 'rmp-serde (MessagePack)', val: 870 },
-      { name: 'serde_json', val: 1257 },
+      { name: 'OmniBuf (Generated)', val: 77, highlight: true, baseline: true },
+      { name: 'buffa (Protobuf)', val: 374 },
+      { name: 'prost (Protobuf)', val: 693 },
+      { name: 'rmp-serde (MessagePack)', val: 865 },
+      { name: 'serde_json', val: 1274 },
     ],
   },
   {
@@ -469,11 +469,11 @@ export const rsBenchmarkCategories: BenchmarkCategory[] = [
     methodology:
       'Checks a nested city string and splices an incremented 64-bit sequence counter into &[u8] vs decode and re-encode.',
     rows: [
-      { name: 'OmniBuf (Generated)', val: 220, highlight: true, baseline: true },
-      { name: 'buffa (Protobuf)', val: 738 },
-      { name: 'prost (Protobuf)', val: 973 },
-      { name: 'rmp-serde (MessagePack)', val: 1541 },
-      { name: 'serde_json', val: 2100 },
+      { name: 'OmniBuf (Generated)', val: 224, highlight: true, baseline: true },
+      { name: 'buffa (Protobuf)', val: 729 },
+      { name: 'prost (Protobuf)', val: 957 },
+      { name: 'rmp-serde (MessagePack)', val: 1523 },
+      { name: 'serde_json', val: 2099 },
     ],
   },
   {
@@ -483,12 +483,12 @@ export const rsBenchmarkCategories: BenchmarkCategory[] = [
     methodology:
       'Serializes a 39 KiB packet whose >16 KiB nested sub-messages trigger 4-byte container length pre-sizing vs two-pass encoded_len() in buffa and prost.',
     rows: [
-      { name: 'OmniBuf (#[derive(OmniBuf)])', val: 1172, sizeBytes: 39256, highlight: true },
-      { name: 'OmniBuf (Generated)', val: 1594, sizeBytes: 39256, highlight: true, baseline: true },
-      { name: 'prost (Protobuf)', val: 1625, sizeBytes: 39227 },
-      { name: 'rmp-serde (MessagePack)', val: 1722, sizeBytes: 39508 },
-      { name: 'buffa (Protobuf)', val: 1745, sizeBytes: 39227 },
-      { name: 'serde_json', val: 14557, sizeBytes: 39681 },
+      { name: 'OmniBuf (#[derive(OmniBuf)])', val: 848, sizeBytes: 39256, highlight: true },
+      { name: 'OmniBuf (Generated)', val: 876, sizeBytes: 39256, highlight: true, baseline: true },
+      { name: 'buffa (Protobuf)', val: 889, sizeBytes: 39227 },
+      { name: 'prost (Protobuf)', val: 923, sizeBytes: 39227 },
+      { name: 'rmp-serde (MessagePack)', val: 1714, sizeBytes: 39508 },
+      { name: 'serde_json', val: 14452, sizeBytes: 39681 },
     ],
   },
   {
@@ -498,16 +498,16 @@ export const rsBenchmarkCategories: BenchmarkCategory[] = [
     methodology:
       'Grows a nested string field past 16 KiB ahead of 32 trailing Neighbor entries via Opaque splicing vs full decode and re-encode.',
     rows: [
-      { name: 'OmniBuf (Generated)', val: 1874, highlight: true, baseline: true },
-      { name: 'buffa (Protobuf)', val: 3648 },
-      { name: 'prost (Protobuf)', val: 4161 },
-      { name: 'rmp-serde (MessagePack)', val: 6463 },
-      { name: 'serde_json', val: 15463 },
+      { name: 'OmniBuf (Generated)', val: 1873, highlight: true, baseline: true },
+      { name: 'buffa (Protobuf)', val: 3710 },
+      { name: 'prost (Protobuf)', val: 4112 },
+      { name: 'rmp-serde (MessagePack)', val: 6530 },
+      { name: 'serde_json', val: 15548 },
     ],
   },
 ];
 
-// Python results from omnibuf-py/testdata/benchmarks.json (Python 3.14.5, rustc 1.94.0)
+// Python results from omnibuf-py/testdata/benchmarks.json (Python 3.14.5, rustc 1.100.1)
 export const pyBenchmarkCategories: BenchmarkCategory[] = [
   {
     title: 'Full Message Encode Speed',
@@ -516,13 +516,13 @@ export const pyBenchmarkCategories: BenchmarkCategory[] = [
     methodology:
       'Serializes PeerUpdate into fresh bytes across native Rust and C extensions (omnibuf, upb, protobuf-py, msgspec, msgpack, stdlib json).',
     rows: [
-      { name: 'OmniBuf (Generated)', val: 372, sizeBytes: 366, highlight: true, baseline: true },
-      { name: 'OmniBuf (@dataclass)', val: 375, sizeBytes: 366, highlight: true },
-      { name: 'google.protobuf (upb)', val: 437, sizeBytes: 341 },
-      { name: 'msgspec', val: 632, sizeBytes: 634 },
-      { name: 'protobuf-py', val: 948, sizeBytes: 341 },
-      { name: 'msgpack', val: 1681, sizeBytes: 634 },
-      { name: 'json (stdlib)', val: 4844, sizeBytes: 874 },
+      { name: 'OmniBuf (Generated)', val: 382, sizeBytes: 366, highlight: true, baseline: true },
+      { name: 'OmniBuf (@dataclass)', val: 415, sizeBytes: 366, highlight: true },
+      { name: 'google.protobuf (upb)', val: 445, sizeBytes: 341 },
+      { name: 'msgspec', val: 643, sizeBytes: 634 },
+      { name: 'protobuf-py', val: 954, sizeBytes: 341 },
+      { name: 'msgpack', val: 1702, sizeBytes: 634 },
+      { name: 'json (stdlib)', val: 4893, sizeBytes: 874 },
     ],
   },
   {
@@ -532,13 +532,13 @@ export const pyBenchmarkCategories: BenchmarkCategory[] = [
     methodology:
       'Decodes bytes and reads all 11 fields in Python. Accessing every field forces upb to materialize Python strings and sub-messages out of its C arena.',
     rows: [
-      { name: 'OmniBuf (Generated)', val: 1686, highlight: true, baseline: true },
-      { name: 'OmniBuf (@dataclass)', val: 1699, highlight: true },
-      { name: 'msgspec', val: 2215 },
-      { name: 'protobuf-py', val: 3353 },
-      { name: 'msgpack', val: 4142 },
-      { name: 'google.protobuf (upb)', val: 4819 },
-      { name: 'json (stdlib)', val: 6227 },
+      { name: 'OmniBuf (Generated)', val: 1702, highlight: true, baseline: true },
+      { name: 'OmniBuf (@dataclass)', val: 1712, highlight: true },
+      { name: 'msgspec', val: 2169 },
+      { name: 'protobuf-py', val: 3393 },
+      { name: 'msgpack', val: 4084 },
+      { name: 'google.protobuf (upb)', val: 4714 },
+      { name: 'json (stdlib)', val: 6374 },
     ],
   },
   {
@@ -547,12 +547,12 @@ export const pyBenchmarkCategories: BenchmarkCategory[] = [
     maxVal: 6000,
     methodology: 'OpaquePeerUpdate header-hop lookup vs native C and Rust extension decode.',
     rows: [
-      { name: 'OmniBuf (Generated)', val: 469, highlight: true, baseline: true },
-      { name: 'google.protobuf (upb)', val: 795 },
-      { name: 'msgspec', val: 1224 },
-      { name: 'protobuf-py', val: 2204 },
-      { name: 'msgpack', val: 2872 },
-      { name: 'json (stdlib)', val: 4858 },
+      { name: 'OmniBuf (Generated)', val: 500, highlight: true, baseline: true },
+      { name: 'google.protobuf (upb)', val: 798 },
+      { name: 'msgspec', val: 1231 },
+      { name: 'protobuf-py', val: 2214 },
+      { name: 'msgpack', val: 2925 },
+      { name: 'json (stdlib)', val: 4876 },
     ],
   },
   {
@@ -562,12 +562,12 @@ export const pyBenchmarkCategories: BenchmarkCategory[] = [
     methodology:
       'Checks a nested city string and splices an updated sequence number vs full decode and re-encode.',
     rows: [
-      { name: 'OmniBuf (Generated)', val: 760, highlight: true, baseline: true },
-      { name: 'google.protobuf (upb)', val: 1373 },
-      { name: 'msgspec', val: 1852 },
-      { name: 'protobuf-py', val: 3268 },
-      { name: 'msgpack', val: 4570 },
-      { name: 'json (stdlib)', val: 9979 },
+      { name: 'OmniBuf (Generated)', val: 762, highlight: true, baseline: true },
+      { name: 'google.protobuf (upb)', val: 1396 },
+      { name: 'msgspec', val: 1884 },
+      { name: 'protobuf-py', val: 3287 },
+      { name: 'msgpack', val: 4552 },
+      { name: 'json (stdlib)', val: 10098 },
     ],
   },
   {
@@ -577,13 +577,13 @@ export const pyBenchmarkCategories: BenchmarkCategory[] = [
     methodology:
       'Serializes a 39 KiB packet whose 20 KiB and 18 KiB nested strings trigger 4-byte container length pre-sizing.',
     rows: [
-      { name: 'msgspec', val: 1822, sizeBytes: 39516 },
-      { name: 'OmniBuf (@dataclass)', val: 1860, sizeBytes: 39256, highlight: true },
-      { name: 'OmniBuf (Generated)', val: 1881, sizeBytes: 39256, highlight: true, baseline: true },
-      { name: 'google.protobuf (upb)', val: 2248, sizeBytes: 39227 },
-      { name: 'msgpack', val: 3243, sizeBytes: 39516 },
-      { name: 'protobuf-py', val: 3340, sizeBytes: 39227 },
-      { name: 'json (stdlib)', val: 65433, sizeBytes: 39752 },
+      { name: 'msgspec', val: 1956, sizeBytes: 39516 },
+      { name: 'OmniBuf (@dataclass)', val: 1960, sizeBytes: 39256, highlight: true },
+      { name: 'OmniBuf (Generated)', val: 2131, sizeBytes: 39256, highlight: true, baseline: true },
+      { name: 'google.protobuf (upb)', val: 2372, sizeBytes: 39227 },
+      { name: 'msgpack', val: 3255, sizeBytes: 39516 },
+      { name: 'protobuf-py', val: 3436, sizeBytes: 39227 },
+      { name: 'json (stdlib)', val: 69798, sizeBytes: 39752 },
     ],
   },
   {
@@ -593,12 +593,12 @@ export const pyBenchmarkCategories: BenchmarkCategory[] = [
     methodology:
       'Grows a nested string field past 16 KiB ahead of 32 trailing Neighbor entries via Opaque splicing vs full decode and re-encode.',
     rows: [
-      { name: 'OmniBuf (Generated)', val: 2393, highlight: true, baseline: true },
-      { name: 'google.protobuf (upb)', val: 4600 },
-      { name: 'msgspec', val: 7165 },
-      { name: 'protobuf-py', val: 13813 },
-      { name: 'msgpack', val: 19169 },
-      { name: 'json (stdlib)', val: 64368 },
+      { name: 'OmniBuf (Generated)', val: 2472, highlight: true, baseline: true },
+      { name: 'google.protobuf (upb)', val: 4563 },
+      { name: 'msgspec', val: 7256 },
+      { name: 'protobuf-py', val: 13793 },
+      { name: 'msgpack', val: 19081 },
+      { name: 'json (stdlib)', val: 64911 },
     ],
   },
 ];
@@ -1328,11 +1328,11 @@ export const languageBenchmarks: Record<LanguageKey, LanguageBenchmarkSuite> = {
     butterflyDecodeRows: primaryAndCompetitors(rsDecodeCat.rows),
     hardwareLines: [
       'CPU: Apple M1 Pro (darwin/arm64)',
-      'Compiler: rustc 1.100.0 (--release)',
+      'Compiler: rustc 1.100.1 (--release)',
       'Command: just bench',
     ],
     environmentParagraphs: [
-      'Compiled with <code>rustc 1.100.0</code> in release mode on an Apple M1 Pro Mac. Encode benchmarks start from identical <code>Vec::with_capacity(128)</code> buffers, and decode benchmarks read all 11 fields through <code>black_box</code> so the compiler cannot optimize them away.',
+      'Compiled with <code>rustc 1.100.1</code> in release mode on an Apple M1 Pro Mac. Encode benchmarks start from identical <code>Vec::with_capacity(128)</code> buffers, and decode benchmarks read all 11 fields through <code>black_box</code> so the compiler cannot optimize them away.',
       'Benchmark source lives in <a href="https://github.com/omnibuf/omnibuf-rs/tree/main/crates/omnibuf-bench" target="_blank" rel="noopener noreferrer" class="doc-link font-mono">crates/omnibuf-bench/</a>, with recorded output in <a href="https://github.com/omnibuf/omnibuf-rs/blob/main/testdata/benchmarks.json" target="_blank" rel="noopener noreferrer" class="doc-link font-mono">testdata/benchmarks.json</a>.',
     ],
   },
@@ -1351,7 +1351,7 @@ export const languageBenchmarks: Record<LanguageKey, LanguageBenchmarkSuite> = {
     butterflyDecodeRows: primaryAndCompetitors(pyDecodeCat.rows),
     hardwareLines: [
       'CPU: Apple M1 Pro (darwin/arm64)',
-      'Runtime: Python 3.14.5 + rustc 1.94.0',
+      'Runtime: Python 3.14.5 + rustc 1.100.1',
       'Command: just bench',
     ],
     environmentParagraphs: [
