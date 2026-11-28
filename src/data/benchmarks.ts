@@ -184,6 +184,7 @@ export const benchmarkCategories: BenchmarkCategory[] = [
       "Serializes the 11-field Go struct into a reused byte slice. FlatBuffers and Cap'n Proto times include building the buffer from the struct.",
     rows: [
       { name: 'OmniBuf (Generated)', val: 95, highlight: true, baseline: true },
+      { name: 'Protobuf (vtprotobuf)', val: 129 },
       { name: 'OmniBuf (Go Struct Tags)', val: 383, highlight: true },
       { name: 'Avro (Raw Binary)', val: 463 },
       { name: 'Protobuf', val: 560 },
@@ -199,12 +200,15 @@ export const benchmarkCategories: BenchmarkCategory[] = [
     unit: 'ns',
     maxVal: 4000,
     methodology:
-      'Unpacks and reads all 11 fields into a reused destination struct across every codec, including Protobuf.',
+      'Unpacks and reads all 11 fields. Includes both zero-copy reuse (OmniBuf, vtprotobuf, FlatBuffers) and safe fresh-allocation decode (OmniBuf Safe Alloc, vtprotobuf Safe, official Protobuf).',
     rows: [
+      { name: 'Protobuf (vtprotobuf)', val: 160 },
       { name: 'OmniBuf (Generated)', val: 187, highlight: true, baseline: true },
       { name: 'FlatBuffers', val: 195 },
       { name: 'OmniBuf (Go Struct Tags)', val: 363, highlight: true },
       { name: 'Avro (Raw Binary)', val: 501 },
+      { name: 'OmniBuf (Safe Alloc)', val: 587, highlight: true },
+      { name: 'Protobuf (vtprotobuf Safe)', val: 736 },
       { name: "Cap'n Proto", val: 816 },
       { name: 'Protobuf', val: 1041 },
       { name: 'MessagePack', val: 2397 },
@@ -222,6 +226,7 @@ export const benchmarkCategories: BenchmarkCategory[] = [
       { name: "Cap'n Proto", val: 5 },
       { name: 'FlatBuffers', val: 26 },
       { name: 'OmniBuf', val: 84, highlight: true, baseline: true },
+      { name: 'Protobuf (vtprotobuf)', val: 203 },
       { name: 'Avro (Raw Binary)', val: 449 },
       { name: 'MessagePack', val: 702 },
       { name: 'Protobuf', val: 1096 },
@@ -235,6 +240,7 @@ export const benchmarkCategories: BenchmarkCategory[] = [
       'Checks a nested city string, increments the 64-bit sequence counter, and returns the updated packet. OmniBuf splices the field in place; the others decode and re-encode.',
     rows: [
       { name: 'OmniBuf (Opaque Splice)', val: 214, highlight: true, baseline: true },
+      { name: 'Protobuf (vtprotobuf)', val: 334 },
       { name: 'FlatBuffers', val: 781 },
       { name: 'Avro (Raw Binary)', val: 1026 },
       { name: 'Protobuf', val: 1819 },
@@ -252,6 +258,7 @@ export const benchmarkCategories: BenchmarkCategory[] = [
       'Serializes a 39 KiB packet whose 20 KiB and 18 KiB nested sub-messages exceed the 2-byte 16,383 B length reservation and trigger 2B-to-4B header shifts.',
     rows: [
       { name: 'OmniBuf (Generated)', val: 612, highlight: true, baseline: true },
+      { name: 'Protobuf (vtprotobuf)', val: 652 },
       { name: 'FlatBuffers', val: 1099 },
       { name: 'Protobuf', val: 1704 },
       { name: 'OmniBuf (Go Struct Tags)', val: 1785, highlight: true },
@@ -270,6 +277,7 @@ export const benchmarkCategories: BenchmarkCategory[] = [
       'Grows a nested string field past 16 KiB ahead of 32 trailing Neighbor entries via Opaque splicing vs full decode and re-encode.',
     rows: [
       { name: 'OmniBuf (Opaque Splice)', val: 908, highlight: true, baseline: true },
+      { name: 'Protobuf (vtprotobuf)', val: 1574 },
       { name: 'FlatBuffers', val: 3504 },
       { name: 'Avro (Raw Binary)', val: 6382 },
       { name: 'Protobuf', val: 7630 },
@@ -1117,12 +1125,13 @@ export const elixirBenchmarkCategories: BenchmarkCategory[] = [
     unit: 'ns',
     maxVal: 7000,
     methodology:
-      'Serializes PeerUpdate to a flat binary on BEAM OTP 27 across optional Rustler NIF (omnibuf-rs), pure-Elixir iodata, Jason JSON, and elixir-protobuf.',
+      'Serializes PeerUpdate to a flat binary on BEAM OTP 27 across optional Rustler NIF (omnibuf-rs), pure-Elixir iodata, OTP 27 :json (stdlib), Jason JSON, and elixir-protobuf.',
     rows: [
-      { name: 'OmniBuf (Rust NIF)', val: 945, sizeBytes: 358, highlight: true, baseline: true },
-      { name: 'OmniBuf (Pure Elixir)', val: 2276, sizeBytes: 358, highlight: true },
-      { name: 'Jason (JSON)', val: 4986, sizeBytes: 803 },
-      { name: 'elixir-protobuf', val: 5942, sizeBytes: 341 },
+      { name: 'OmniBuf (Rust NIF)', val: 969, sizeBytes: 358, highlight: true, baseline: true },
+      { name: 'OmniBuf (Pure Elixir)', val: 2315, sizeBytes: 358, highlight: true },
+      { name: 'OTP :json (stdlib)', val: 3522, sizeBytes: 803 },
+      { name: 'Jason (JSON)', val: 4908, sizeBytes: 803 },
+      { name: 'elixir-protobuf', val: 6209, sizeBytes: 341 },
     ],
   },
   {
@@ -1131,10 +1140,11 @@ export const elixirBenchmarkCategories: BenchmarkCategory[] = [
     maxVal: 7000,
     methodology: 'Decodes a binary into a fresh PeerUpdate struct and reads all 11 fields.',
     rows: [
-      { name: 'OmniBuf (Rust NIF)', val: 1627, highlight: true, baseline: true },
-      { name: 'OmniBuf (Pure Elixir)', val: 4503, highlight: true },
-      { name: 'elixir-protobuf', val: 4509 },
-      { name: 'Jason (JSON)', val: 6179 },
+      { name: 'OmniBuf (Rust NIF)', val: 1557, highlight: true, baseline: true },
+      { name: 'OmniBuf (Pure Elixir)', val: 4303, highlight: true },
+      { name: 'elixir-protobuf', val: 4307 },
+      { name: 'OTP :json (stdlib)', val: 4531 },
+      { name: 'Jason (JSON)', val: 5707 },
     ],
   },
   {
@@ -1143,10 +1153,11 @@ export const elixirBenchmarkCategories: BenchmarkCategory[] = [
     maxVal: 7000,
     methodology: 'Reads a nested city string via PeerUpdate.Opaque vs full message decode.',
     rows: [
-      { name: 'OmniBuf (Rust NIF)', val: 423, highlight: true, baseline: true },
-      { name: 'OmniBuf (Pure Elixir)', val: 1574, highlight: true },
-      { name: 'elixir-protobuf', val: 4770 },
-      { name: 'Jason (JSON)', val: 6274 },
+      { name: 'OmniBuf (Rust NIF)', val: 411, highlight: true, baseline: true },
+      { name: 'OmniBuf (Pure Elixir)', val: 1459, highlight: true },
+      { name: 'elixir-protobuf', val: 4333 },
+      { name: 'OTP :json (stdlib)', val: 4645 },
+      { name: 'Jason (JSON)', val: 5935 },
     ],
   },
   {
@@ -1156,10 +1167,11 @@ export const elixirBenchmarkCategories: BenchmarkCategory[] = [
     methodology:
       'Checks a nested city string and splices an updated sequence counter via zero-copy BEAM sub-binaries vs full decode and re-encode.',
     rows: [
-      { name: 'OmniBuf (Rust NIF)', val: 618, highlight: true, baseline: true },
-      { name: 'OmniBuf (Pure Elixir)', val: 2650, highlight: true },
-      { name: 'elixir-protobuf', val: 10999 },
-      { name: 'Jason (JSON)', val: 12050 },
+      { name: 'OmniBuf (Rust NIF)', val: 1242, highlight: true, baseline: true },
+      { name: 'OmniBuf (Pure Elixir)', val: 4372, highlight: true },
+      { name: 'OTP :json (stdlib)', val: 9835 },
+      { name: 'elixir-protobuf', val: 11408 },
+      { name: 'Jason (JSON)', val: 12807 },
     ],
   },
   {
@@ -1169,10 +1181,11 @@ export const elixirBenchmarkCategories: BenchmarkCategory[] = [
     methodology:
       'Serializes a 39 KiB packet whose >16 KiB nested sub-messages trigger 2B-to-4B header expansion.',
     rows: [
-      { name: 'OmniBuf (Pure Elixir)', val: 2945, sizeBytes: 39250, highlight: true },
-      { name: 'OmniBuf (Rust NIF)', val: 2982, sizeBytes: 39250, highlight: true, baseline: true },
-      { name: 'Jason (JSON)', val: 83265, sizeBytes: 39681 },
-      { name: 'elixir-protobuf', val: 105716, sizeBytes: 39227 },
+      { name: 'OmniBuf (Rust NIF)', val: 3276, sizeBytes: 39250, highlight: true, baseline: true },
+      { name: 'OmniBuf (Pure Elixir)', val: 3391, sizeBytes: 39250, highlight: true },
+      { name: 'OTP :json (stdlib)', val: 34398, sizeBytes: 39681 },
+      { name: 'Jason (JSON)', val: 87209, sizeBytes: 39681 },
+      { name: 'elixir-protobuf', val: 114033, sizeBytes: 39227 },
     ],
   },
   {
@@ -1182,10 +1195,11 @@ export const elixirBenchmarkCategories: BenchmarkCategory[] = [
     methodology:
       'Grows a nested string field past 16 KiB ahead of 32 trailing Neighbor entries via Opaque splicing vs full decode and re-encode.',
     rows: [
-      { name: 'OmniBuf (Rust NIF)', val: 4972, highlight: true, baseline: true },
-      { name: 'OmniBuf (Pure Elixir)', val: 6386, highlight: true },
-      { name: 'Jason (JSON)', val: 90588 },
-      { name: 'elixir-protobuf', val: 104248 },
+      { name: 'OmniBuf (Rust NIF)', val: 5029, highlight: true, baseline: true },
+      { name: 'OmniBuf (Pure Elixir)', val: 6442, highlight: true },
+      { name: 'OTP :json (stdlib)', val: 53080 },
+      { name: 'Jason (JSON)', val: 85914 },
+      { name: 'elixir-protobuf', val: 103810 },
     ],
   },
 ];
@@ -1253,15 +1267,18 @@ export const languageBenchmarks: Record<LanguageKey, LanguageBenchmarkSuite> = {
     headingPrefix: 'Go',
     href: '/benchmarks?lang=go',
     ctaLabel: 'See full results',
-    competitorsLabel: "Protobuf, FlatBuffers, Avro, Cap'n Proto, MsgPack, JSON",
+    competitorsLabel: "Protobuf, vtprotobuf, FlatBuffers, Avro, Cap'n Proto, MsgPack, JSON",
     heroSummaryHtml:
-      'In Go, OmniBuf encodes and decodes <strong>around 5x to 6x faster</strong> than Protobuf. Plain Go structs with struct tags run <strong>around 5x to 9x faster</strong> than standard JSON at roughly half the wire size. Generated views read or splice single fields in place. Explore the <a href="/go" class="doc-link">Go runtime</a>.',
+      'In Go, OmniBuf encodes and decodes <strong>around 5x to 6x faster</strong> than official Protobuf and beats static-codegen <code>vtprotobuf</code> on encode, lookup, splice, and large messages. Plain Go structs with struct tags run <strong>around 5x to 9x faster</strong> than standard JSON at roughly half the wire size. Explore the <a href="/go" class="doc-link">Go runtime</a>.',
     categories: goSpeedCategories,
     butterflyEncodeRows: (goEncodeCat?.rows ?? []).filter(
       (r) => (r.baseline || !r.highlight) && r.name !== 'JSON (encoding/json/v2)',
     ),
     butterflyDecodeRows: (goDecodeCat?.rows ?? []).filter(
-      (r) => (r.baseline || !r.highlight) && r.name !== 'JSON (encoding/json/v2)',
+      (r) =>
+        (r.baseline || !r.highlight) &&
+        r.name !== 'JSON (encoding/json/v2)' &&
+        r.name !== 'Protobuf (vtprotobuf Safe)',
     ),
     hardwareLines: [
       'CPU: Apple M1 Pro (darwin/arm64)',
@@ -1269,7 +1286,7 @@ export const languageBenchmarks: Record<LanguageKey, LanguageBenchmarkSuite> = {
       'Samples: 5 × 250 ms, CPU=1',
     ],
     environmentParagraphs: [
-      'M1 Pro MacBook Pro, Go 1.27.4 (<code>GOEXPERIMENT=jsonv2</code>), <code>-benchtime=250ms -count=5 -cpu=1</code>. Every decode benchmark reads all 11 fields into a checksum (so the compiler cannot skip unused work) and reuses the destination struct across codecs, including Protobuf.',
+      'M1 Pro MacBook Pro, Go 1.27.4 (<code>GOEXPERIMENT=jsonv2</code>), <code>-benchtime=250ms -count=5 -cpu=1</code>. Decode includes both zero-copy reuse (<code>OmniBuf (Generated)</code>, <code>Protobuf (vtprotobuf)</code>, and <code>FlatBuffers</code>; note <code>vtprotobuf</code> skips UTF-8 checks in unsafe mode) and safe fresh-allocation decoding (<code>OmniBuf (Safe Alloc)</code>, <code>Protobuf (vtprotobuf Safe)</code>, and official <code>Protobuf</code>).',
       'Benchmark source lives in <a href="https://github.com/omnibuf/omnibuf-go/tree/main/benchmarks" target="_blank" rel="noopener noreferrer" class="doc-link font-mono">benchmarks/</a>, with recorded output in <a href="https://github.com/omnibuf/omnibuf-go/blob/main/testdata/benchmarks.txt" target="_blank" rel="noopener noreferrer" class="doc-link font-mono">testdata/benchmarks.txt</a> and <a href="https://github.com/omnibuf/omnibuf-go/blob/main/testdata/benchmarks.json" target="_blank" rel="noopener noreferrer" class="doc-link font-mono">testdata/benchmarks.json</a>.',
     ],
   },
@@ -1496,9 +1513,9 @@ export const languageBenchmarks: Record<LanguageKey, LanguageBenchmarkSuite> = {
     headingPrefix: 'Elixir',
     href: '/benchmarks?lang=elixir',
     ctaLabel: 'See full results',
-    competitorsLabel: 'elixir-protobuf, Jason (JSON)',
+    competitorsLabel: 'elixir-protobuf, OTP :json (stdlib), Jason (JSON)',
     heroSummaryHtml:
-      'On the BEAM, OmniBuf with its optional Rust NIF encodes <strong>over 6x faster</strong> and decodes <strong>nearly 3x faster</strong> than <code>elixir-protobuf</code>. Lazy views read nested strings <strong>over 11x faster</strong> and splice single-field updates <strong>over 17x faster</strong>. Explore the <a href="/elixir" class="doc-link">Elixir runtime</a>.',
+      'On the BEAM, OmniBuf with its optional Rust NIF encodes <strong>over 6x faster</strong> than <code>elixir-protobuf</code> and <strong>over 3x faster</strong> than OTP 27 <code>:json</code>. Lazy views read nested strings <strong>over 10x faster</strong> and splice single-field updates <strong>around 9x faster</strong>. Explore the <a href="/elixir" class="doc-link">Elixir runtime</a>.',
     categories: elixirBenchmarkCategories,
     butterflyEncodeRows: primaryAndCompetitors(elixirEncodeCat.rows),
     butterflyDecodeRows: primaryAndCompetitors(elixirDecodeCat.rows),
@@ -1508,7 +1525,7 @@ export const languageBenchmarks: Record<LanguageKey, LanguageBenchmarkSuite> = {
       'Command: just bench',
     ],
     environmentParagraphs: [
-      'Measured on Elixir 1.18.6 running on Erlang/OTP 27 on an Apple M1 Pro Mac. Both the optional Rustler NIF backed by <code>omnibuf-rs</code> and the pure-Elixir iodata / binary pattern-matching backend pass all 1109 conformance tests.',
+      'Measured on Elixir 1.18.6 running on Erlang/OTP 27 on an Apple M1 Pro Mac against <code>elixir-protobuf</code>, OTP 27&apos;s built-in <code>:json</code> module, and <code>Jason</code>. Both the optional Rustler NIF backed by <code>omnibuf-rs</code> and the pure-Elixir iodata / binary pattern-matching backend pass all 1109 conformance tests.',
       'Benchmark source lives in <a href="https://github.com/omnibuf/omnibuf-elixir/tree/main/bench" target="_blank" rel="noopener noreferrer" class="doc-link font-mono">bench/</a>, with recorded output in <a href="https://github.com/omnibuf/omnibuf-elixir/blob/main/testdata/benchmarks.json" target="_blank" rel="noopener noreferrer" class="doc-link font-mono">testdata/benchmarks.json</a>.',
     ],
   },

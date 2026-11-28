@@ -35,12 +35,12 @@ function findPrimaryProtobuf(rows: BenchmarkRow[]): BenchmarkRow | undefined {
       /protobuf|prost|buffa|libprotobuf|upb|swiftprotobuf|package:protobuf|elixir-protobuf|nanopb/i.test(
         r.name,
       ) &&
-      !/pure php|leb128 wire/i.test(r.name),
+      !/pure php|leb128 wire|vtprotobuf safe/i.test(r.name),
   );
   if (candidates.length === 0) return undefined;
   return (
     candidates.find((r) =>
-      /^(Protobuf|@bufbuild\/protobuf|prost|google\/protobuf \(upb|libprotobuf|protobuf-java|Google\.Protobuf|SwiftProtobuf|package:protobuf|google\/protobuf \(C ext|elixir-protobuf|nanopb)/i.test(
+      /^(Protobuf$|protobufjs$|buffa \(Protobuf\)|google\.protobuf \(upb\)|Protobuf \(libprotobuf\)|Protobuf \(protobuf-java\)|Google\.Protobuf$|SwiftProtobuf$|package:protobuf$|google\/protobuf \(C ext\)|elixir-protobuf$|nanopb)/i.test(
         r.name,
       ),
     ) ?? candidates[0]
@@ -50,7 +50,11 @@ function findPrimaryProtobuf(rows: BenchmarkRow[]): BenchmarkRow | undefined {
 function findPrimaryJson(rows: BenchmarkRow[]): BenchmarkRow | undefined {
   const candidates = rows.filter((r) => !r.highlight && /json|jason/i.test(r.name));
   if (candidates.length === 0) return undefined;
-  return candidates.find((r) => !/json\/v2/i.test(r.name)) ?? candidates[0];
+  return (
+    candidates.find((r) => /^OTP :json/i.test(r.name)) ??
+    candidates.find((r) => !/json\/v2/i.test(r.name)) ??
+    candidates[0]
+  );
 }
 
 function shortCompetitorName(name: string | null): string {
@@ -60,7 +64,9 @@ function shortCompetitorName(name: string | null): string {
     .replace(/^JSON \(([^)]+)\)$/i, '$1')
     .replace(/^([^(]+) \(Protobuf\)$/i, '$1')
     .replace(/^([^(]+) \(JSON\)$/i, '$1')
+    .replace(/^google\.protobuf \(upb\)$/i, 'google.protobuf (upb)')
     .replace(/^google\/protobuf \(C ext\)$/i, 'ext-protobuf')
+    .replace(/^OTP :json \(stdlib\)$/i, 'OTP :json')
     .replace(/^json \(stdlib\)$/i, 'stdlib json')
     .replace(/^encoding\/json$/i, 'encoding/json');
 }

@@ -30,12 +30,12 @@ function findPrimaryProtobuf(rows: BenchmarkRow[]): BenchmarkRow | undefined {
     (r) =>
       !(r.baseline || r.highlight) &&
       /protobuf|buffa|prost|nanopb|swiftprotobuf|elixir-protobuf|package:protobuf/i.test(r.name) &&
-      !/pure php|leb128 wire/i.test(r.name),
+      !/pure php|leb128 wire|vtprotobuf safe/i.test(r.name),
   );
   if (candidates.length === 0) return undefined;
   return (
     candidates.find((r) =>
-      /^(Protobuf|@bufbuild\/protobuf|buffa|prost|google\.protobuf \(upb|libprotobuf|protobuf-java|Google\.Protobuf|SwiftProtobuf|package:protobuf|google\/protobuf \(C ext|elixir-protobuf|nanopb)/i.test(
+      /^(Protobuf$|protobufjs$|buffa \(Protobuf\)|google\.protobuf \(upb\)|Protobuf \(libprotobuf\)|Protobuf \(protobuf-java\)|Google\.Protobuf$|SwiftProtobuf$|package:protobuf$|google\/protobuf \(C ext\)|elixir-protobuf$|nanopb)/i.test(
         r.name,
       ),
     ) ?? candidates[0]
@@ -43,13 +43,19 @@ function findPrimaryProtobuf(rows: BenchmarkRow[]): BenchmarkRow | undefined {
 }
 
 function findPrimaryJson(rows: BenchmarkRow[]): BenchmarkRow | undefined {
-  return rows.find((r) => !(r.baseline || r.highlight) && /json|jason/i.test(r.name));
+  const candidates = rows.filter((r) => !(r.baseline || r.highlight) && /json|jason/i.test(r.name));
+  if (candidates.length === 0) return undefined;
+  return (
+    candidates.find((r) => /^OTP :json/i.test(r.name)) ??
+    candidates.find((r) => !/json\/v2/i.test(r.name)) ??
+    candidates[0]
+  );
 }
 
 function protobufLabelFor(langKey: string): string {
   if (langKey === 'rs') return 'buffa';
   if (langKey === 'nano') return 'nanopb';
-  if (langKey === 'es') return 'protobuf-es';
+  if (langKey === 'es') return 'protobufjs';
   if (langKey === 'php') return 'ext-protobuf';
   return 'Protobuf';
 }
