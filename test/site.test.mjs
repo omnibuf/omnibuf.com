@@ -87,7 +87,7 @@ test('Hero and Comparisons scope benchmark widgets, ARIA tab linkage, and clean 
   assert.match(hero, /803 B/);
   assert.match(motivation, /bench-matrix-cell/);
   assert.doesNotMatch(motivation, /ns \/ op/);
-  assert.match(motivation, /stat\.multiple\} faster/);
+  assert.match(motivation, /stat\.multiple\} \{stat\.direction\}/);
   assert.doesNotMatch(hero, /Encode and decode benchmarks/);
   assert.doesNotMatch(hero, /bg-\[#E5E0D5\]|text-\[#FF4F18\]/);
   assert.doesNotMatch(motivation, /bg-\[#E5E0D5\]|text-\[#FF4F18\]/);

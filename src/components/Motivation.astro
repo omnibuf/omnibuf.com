@@ -2,22 +2,40 @@
 import { Code } from 'astro:components';
 import { languageBenchmarkList, type BenchmarkRow } from '../data/benchmarks';
 
-function formatMultiple(competitorVal: number, omniVal: number): string {
-  if (omniVal <= 0 || competitorVal <= omniVal) return '1.0x';
-  const ratio = competitorVal / omniVal;
-  return ratio >= 10 ? `${Math.round(ratio)}x` : `${ratio.toFixed(1)}x`;
+function formatComparison(
+  competitorVal: number,
+  omniVal: number,
+): { multiple: string; direction: 'faster' | 'slower'; faster: boolean } {
+  if (omniVal <= 0 || competitorVal === omniVal) {
+    return { multiple: '1.0x', direction: 'faster', faster: true };
+  }
+  if (competitorVal > omniVal) {
+    const ratio = competitorVal / omniVal;
+    return {
+      multiple: ratio >= 10 ? `${Math.round(ratio)}x` : `${ratio.toFixed(1)}x`,
+      direction: 'faster',
+      faster: true,
+    };
+  }
+  const ratio = omniVal / competitorVal;
+  return {
+    multiple: ratio >= 10 ? `${Math.round(ratio)}x` : `${ratio.toFixed(1)}x`,
+    direction: 'slower',
+    faster: false,
+  };
 }
 
 function findPrimaryProtobuf(rows: BenchmarkRow[]): BenchmarkRow | undefined {
   const candidates = rows.filter(
     (r) =>
       !(r.baseline || r.highlight) &&
-      /protobuf|buffa|prost|nanopb|swiftprotobuf|elixir-protobuf|package:protobuf/i.test(r.name),
+      /protobuf|buffa|prost|nanopb|swiftprotobuf|elixir-protobuf|package:protobuf/i.test(r.name) &&
+      !/pure php|leb128 wire/i.test(r.name),
   );
   if (candidates.length === 0) return undefined;
   return (
     candidates.find((r) =>
-      /^(Protobuf|@bufbuild\/protobuf|buffa|prost|google\.protobuf \(upb|libprotobuf|protobuf-java|Google\.Protobuf|SwiftProtobuf|package:protobuf|google\/protobuf|elixir-protobuf|nanopb)/i.test(
+      /^(Protobuf|@bufbuild\/protobuf|buffa|prost|google\.protobuf \(upb|libprotobuf|protobuf-java|Google\.Protobuf|SwiftProtobuf|package:protobuf|google\/protobuf \(C ext|elixir-protobuf|nanopb)/i.test(
         r.name,
       ),
     ) ?? candidates[0]
@@ -32,6 +50,7 @@ function protobufLabelFor(langKey: string): string {
   if (langKey === 'rs') return 'buffa';
   if (langKey === 'nano') return 'nanopb';
   if (langKey === 'es') return 'protobuf-es';
+  if (langKey === 'php') return 'ext-protobuf';
   return 'Protobuf';
 }
 
@@ -46,6 +65,8 @@ function prepareAbbreviatedBars(rows: BenchmarkRow[]) {
 
 interface ComparisonStat {
   multiple: string;
+  direction: 'faster' | 'slower';
+  faster: boolean;
   label: string;
 }
 
@@ -56,14 +77,14 @@ function buildComparisonStats(langKey: string, rows: BenchmarkRow[]): Comparison
   const proto = findPrimaryProtobuf(rows);
   if (proto) {
     stats.push({
-      multiple: formatMultiple(proto.val, omni.val),
+      ...formatComparison(proto.val, omni.val),
       label: protobufLabelFor(langKey),
     });
   }
   const json = findPrimaryJson(rows);
   if (json) {
     stats.push({
-      multiple: formatMultiple(json.val, omni.val),
+      ...formatComparison(json.val, omni.val),
       label: 'JSON',
     });
   }
@@ -80,8 +101,8 @@ const benchmarkPreviews = languageBenchmarkList.map((suite) => {
   }));
   const encodeStats = buildComparisonStats(suite.key, suite.butterflyEncodeRows);
   const decodeStats = buildComparisonStats(suite.key, suite.butterflyDecodeRows);
-  const encAria = encodeStats.map((s) => `${s.multiple} faster than ${s.label}`).join(', ');
-  const decAria = decodeStats.map((s) => `${s.multiple} faster than ${s.label}`).join(', ');
+  const encAria = encodeStats.map((s) => `${s.multiple} ${s.direction} than ${s.label}`).join(', ');
+  const decAria = decodeStats.map((s) => `${s.multiple} ${s.direction} than ${s.label}`).join(', ');
   return {
     key: suite.key,
     label: suite.label,
@@ -91,7 +112,7 @@ const benchmarkPreviews = languageBenchmarkList.map((suite) => {
     pairedRows,
     encodeStats,
     decodeStats,
-    ariaLabel: `${suite.label}: OmniBuf fastest on encode (${encAria}) and decode (${decAria}).`,
+    ariaLabel: `${suite.label}: encode (${encAria}) and decode (${decAria}).`,
   };
 });
 
@@ -310,10 +331,12 @@ omnibuf -r '.neighbors[] | select(.established) | .router' event.obuf`;
                         )}
                         <span
                           class={
-                            statIdx === 0 ? 'font-semibold text-accent' : 'font-semibold text-ink'
+                            statIdx === 0 && stat.faster
+                              ? 'font-semibold text-accent'
+                              : 'font-semibold text-ink'
                           }
                         >
-                          {stat.multiple} faster
+                          {stat.multiple} {stat.direction}
                         </span>{' '}
                         <span class="text-ink/70">vs {stat.label}</span>
                       </span>
@@ -331,10 +354,12 @@ omnibuf -r '.neighbors[] | select(.established) | .router' event.obuf`;
                         )}
                         <span
                           class={
-                            statIdx === 0 ? 'font-semibold text-accent' : 'font-semibold text-ink'
+                            statIdx === 0 && stat.faster
+                              ? 'font-semibold text-accent'
+                              : 'font-semibold text-ink'
                           }
                         >
-                          {stat.multiple} faster
+                          {stat.multiple} {stat.direction}
                         </span>{' '}
                         <span class="text-ink/70">vs {stat.label}</span>
                       </span>
